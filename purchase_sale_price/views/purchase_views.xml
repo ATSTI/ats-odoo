@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="purchase_order_purchase_itens_form_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.itens.form.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="abrir_item_pedidos" string="Definir Preços" class="oe_highlight" type="object" attrs="{'invisible': [('state','not in', ('purchase','done'))]}"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button type="object"
+                    name="abrir_item_pedidos"
+                    class="oe_stat_button"
+                    icon="fa-money" attrs="{'invisible':[('state', 'in', ('draft','sent','to approve'))]}">
+                    <field name="purchase_itens_ref" widget="statinfo"  string="Definir Preços"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

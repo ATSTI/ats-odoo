@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="purchase_itens_tree" model="ir.ui.view">
+            <field name="name">purchase.itens.tree</field>
+            <field name="model">purchase.itens</field>
+            <field name="arch" type="xml">
+                <tree string="Verificação de compras">
+                    <field name="purchase_order_ref"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="purchase_itens_form" model="ir.ui.view">
+            <field name="name">purchase.itens.form</field>
+            <field name="model">purchase.itens</field>
+            <field name="arch" type="xml">
+                <form string="Itens da compra">
+                    <header>
+                        <button type="object" string="Alterar o cadastro de produtos" class="oe_highlight" name="save_product_changes" attrs="{'invisible':[('state','!=','new')]}"/>
+                        <field name="state" widget="statusbar" statusbar_visible="new,done" readonly="1"/>
+                    </header>
+                    <group>
+                        <field name="purchase_order_ref" readonly="1"/>
+                    </group>
+                    <field name="purchase_lines" mode="tree">
+                        <form string="Item da Ordem">
+                            <group>
+                                <field name="name" readonly="1"/>
+                                <field name="product_cst" readonly="1"/>
+                                <field name="price" readonly="1"/>
+                                <field name="margin" readonly="1"/>
+                                <field name="new_price"/>
+                                <field name="new_margin"/>
+                            </group>
+                        </form>
+                        <tree editable="bottom" create="false" >
+                            <field name="name" readonly="1"/>
+                            <field name="product_cst" readonly="1"/>
+                            <field name="price" readonly="1"/>
+                            <field name="margin" readonly="1"/>
+                            <field name="new_price"/>
+                            <field name="new_margin"/>
+                        </tree>
+                    </field>
+                </form>
+            </field>
+        </record>
+
+         <record id="pruchase_itens_action" model="ir.actions.act_window">
+            <field name="name">Itens da compra</field>
+            <field name="res_model">purchase.itens</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+              </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

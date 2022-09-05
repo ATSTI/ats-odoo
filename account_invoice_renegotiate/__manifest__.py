@@ -15,7 +15,7 @@
           Precisa criar um diário para Acordo: 
              - acordo
           e contas de lançamento da Fatura:
-             - c-acordo : Conta de débito
+             - c-acordo : Conta de débito (Tipo: A Receber)
              - p-acordo : Conta de crédito
    """,
     'author': 'ATS Soluções',

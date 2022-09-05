@@ -15,6 +15,16 @@ class ExecuteRenegotiate(models.TransientModel):
     def _onchange_incluir_juros(self):
         self.calcula_juros()
 
+    @api.onchange('valor_juro')
+    def _onchange_valor_juro(self):
+        if self.valor_juro and self.valor:
+            self.juro = (((self.valor_juro / self.valor) * 30) / self.numero_parcela) * 100
+
+    @api.onchange('valor_multa')
+    def _onchange_valor_multa(self):
+        if self.valor_multa and self.valor and self.numero_parcela:
+            self.multa = (self.valor_multa / self.valor ) * 100
+
     @api.depends('valor')
     def compute_total(self):
         self.calcula_juros()

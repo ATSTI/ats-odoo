@@ -56,11 +56,11 @@ class ExecuteRenegotiate(models.TransientModel):
     primeiro_vencimento = fields.Date('Último vencimento')
     numero_parcela = fields.Integer('Número parcela')
     valor_total = fields.Float(string="Valor Total", compute="compute_total")
-    juro = fields.Float(string="Juro Mês", default=1.0)
+    juro = fields.Float(string="Juros Mês", default=1.0)
     multa = fields.Float(string="Multa", default=2.0)
     cobrar_juros = fields.Boolean(string="Cobrar juros ?")
     valor_multa = fields.Float(string="Valor Multa")
-    valor_juro = fields.Float(string="Valor Juro")
+    valor_juro = fields.Float(string="Valor Juros")
     valor = fields.Float(string="Valor Negociado")
 
     def execute_faturamento(self):

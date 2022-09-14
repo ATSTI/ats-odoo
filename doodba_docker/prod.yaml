@@ -1,0 +1,45 @@
+version: "2.4"
+
+services:
+  odoo:
+    extends:
+      file: common.yaml
+      service: odoo
+    restart: unless-stopped
+    env_file:
+      - .docker/odoo.env
+      - .docker/db-access.env
+    environment:
+      DB_FILTER: "^22_doodba_z"
+      DOODBA_ENVIRONMENT: "${DOODBA_ENVIRONMENT-prod}"
+      INITIAL_LANG: "pt_BR"
+    depends_on:
+      - db
+    networks:
+      default:
+    labels:
+      doodba.domain.main: ""
+
+  db:
+    extends:
+      file: common.yaml
+      service: db
+    env_file:
+      - .docker/db-creation.env
+    restart: unless-stopped
+    networks:
+      default:
+      inverseproxy_shared:
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "inverseproxy_shared"
+      traefik.tcp.services.22_doodba_x-14-0-prod-database.loadbalancer.server.port: 5432
+
+networks:
+  default:
+    driver_opts:
+      encrypted: 1
+
+volumes:
+  filestore:
+  db:

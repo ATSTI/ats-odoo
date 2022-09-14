@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report 
+            id="action_report_invoice_service"
+            string="Nota de Serviço"
+            model="account.move" 
+            report_type="qweb-pdf"
+            file="account_move_service_report.report_service_template" 
+            name="account_move_service_report.report_service_template" 
+        />
+    </data>
+</odoo>

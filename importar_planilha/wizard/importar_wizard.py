@@ -17,6 +17,8 @@ class ImportarWizard(models.TransientModel):
 
     input_file = fields.Binary('Arquivo', required=False)
     mensagem = fields.Html('Log :', readonly=True)
+    inicio = fields.Integer('Linha inicial')
+    fim = fields.Integer('Linha final')
 
     def action_importar_produto(self):
         # Colunas
@@ -44,7 +46,7 @@ class ImportarWizard(models.TransientModel):
             conta_registros = 0
             for rownum in range(first_sheet.nrows):                                                                                                       
                 rowValues = first_sheet.row_values(rownum)
-                if rownum > 0 and rownum < 400:
+                if rownum > self.inicio and rownum < self.fim:
                     vals = {}
                     if rowValues[c_codigo]:
                         cod = rowValues[c_codigo]
@@ -150,7 +152,7 @@ class ImportarWizard(models.TransientModel):
             
             for rownum in range(first_sheet.nrows):                                                                                                       
                 rowValues = first_sheet.row_values(rownum)
-                if rownum > 0 and rownum < 700:
+                if rownum > self.inicio and rownum < self.fim:
                     vals = {}
                     cod = 0
                     cnpj_cpf = ""
@@ -361,7 +363,7 @@ class ImportarWizard(models.TransientModel):
 
             for rownum in range(first_sheet.nrows):                                                                                                       
                 rowValues = first_sheet.row_values(rownum)
-                if rownum > 0 and rownum < 100:
+                if rownum > self.inicio and rownum < self.fim:
                     vals = {}
                     cod = 0
                     cnpj_cpf = ""

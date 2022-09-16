@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="importar_wizard" model="ir.ui.view">
+        <field name="name">importar.wizard</field>
+        <field name="model">importar.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Importar Planilha">
+                <group>
+                    <group>
+                        <field name="input_file" />
+                        <field name="mensagem" widget="html"/>
+                    </group> 
+                </group>
+                <footer>
+                    <button
+                        name="action_importar_produto"
+                        string="Importar Produto"
+                        class="btn-primary"
+                        type="object"
+                    />
+                    <button
+                        name="action_importar_cliente"
+                        string="Importar Cliente"
+                        class="btn-primary"
+                        type="object"
+                    />
+                    <button
+                        name="action_importar_dependente"
+                        string="Importar Dependente"
+                        class="btn-primary"
+                        type="object"
+                    />                                        
+                    <button string="Cancel" class="btn-default" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_importar_planilha_view" model="ir.actions.act_window">
+        <field name="name">Importar Planilha</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">importar.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="importar_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem
+        id="menu_importar_wizard"
+        name="Importar Planilha"
+        action="importar_planilha.action_importar_planilha_view"
+        parent="l10n_br_fiscal.configuration_menu"
+        sequence="99"/>
+
+</odoo>

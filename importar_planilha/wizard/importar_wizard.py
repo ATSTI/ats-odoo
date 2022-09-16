@@ -183,6 +183,7 @@ class ImportarWizard(models.TransientModel):
                     else:
                        vals['legal_name'] = vals['name']
 
+                    vals['category_id'] = 1
                     if rowValues[c_cnpj_cpf]:
                         cnpj_cpf = rowValues[c_cnpj_cpf]
                         if type(cnpj_cpf) == float:
@@ -386,7 +387,7 @@ class ImportarWizard(models.TransientModel):
                     c_id = cli_obj.search([('ref', '=', vals['ref'])])
                     if c_id or not resp_financeiro:
                         continue
-
+                    vals['category_id'] = 2
                     if resp_financeiro:
                         vals['parent_id'] = resp_financeiro.id
                     if vals['name']:

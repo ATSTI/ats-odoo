@@ -7,6 +7,10 @@
             <form string="Importar Planilha">
                 <group>
                     <group>
+                        <field name="inicio" />
+                        <field name="fim" />
+                    </group>
+                    <group>
                         <field name="input_file" />
                         <field name="mensagem" widget="html"/>
                     </group> 

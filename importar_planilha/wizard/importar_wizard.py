@@ -24,14 +24,14 @@ class ImportarWizard(models.TransientModel):
         # Colunas
         c_codigo = 1
         c_nome = 2
-        c_ncm = 3
-        c_preco_venda = 4
-        c_custo = 5
+        c_ncm = 17
+        c_preco_venda = 6
+        c_custo = 4
         # Materia Prima, Mercadoria Revenda
         c_tipo_fiscal = 6
-        c_unidade = 7
-        c_codbarra = 8
-
+        c_unidade = 11
+        c_codbarra = 13
+        mensagem = ""
         prod_obj = self.env['product.product']
         #uom_obj = self.env['product.uom']
         tmpl_obj = self.env['product.template']
@@ -62,35 +62,47 @@ class ImportarWizard(models.TransientModel):
                         print ('Produto: %s' %(descricao))                        
                                                                     
                     if rowValues[c_preco_venda]:
-                       vals['lst_price'] = float(rowValues[c_preco_venda])
+                        try:
+                            vals['lst_price'] = float(rowValues[c_preco_venda])
+                        except:
+                            pass
                     if rowValues[c_custo]:
-                       vals['standard_price'] = float(rowValues[c_custo])
+                        try:
+                            vals['standard_price'] = float(rowValues[c_custo])
+                        except:
+                            pass
                     
                     # Tipo Fiscal - esta colocando Produto Revenda
                     vals['fiscal_type'] = '00'
                     
                     # UNIDADE
-                    if rowValues[c_unidade]:
-                        d_uom = self.env['uom.uom']
-                        uni_id = d_uom.search([('code', 'ilike', rowValues[c_unidade])], limit=1)
-                        if not uni_id:
-                            uni_id = d_uom.create({'code': rowValues[c_unidade], 'name': rowValues[c_unidade], 'category_id': 1})     
-                        else:
-                            vals['uom_id'] = uni_id.id
-                            vals['uom_po_id'] = uni_id.id
+                    # import pudb;pu.db 
+                    # if rowValues[c_unidade] and type(rowValues[c_unidade]) == str:
+                    #     d_uom = self.env['uom.uom']
+                    #     uni_id = d_uom.search([('code', 'ilike', rowValues[c_unidade])], limit=1)
+                    #     if not uni_id:
+                    #         uni_id = d_uom.create({'code': rowValues[c_unidade], 'name': rowValues[c_unidade], 'category_id': 1})     
+                    #     else:
+                    #         vals['uom_id'] = uni_id.id
+                    #         vals['uom_po_id'] = uni_id.id
 
                     # NCM
+                    # if vals['default_code'] == '2000000000275':
+                    #     import pudb;pu.db
                     if rowValues[c_ncm]:
                         ncm = rowValues[c_ncm]
                         if type(ncm) == str:
                             if not len(ncm) == 8:
                                 ncm = re.sub('[^0-9]', '', ncm)
-                        if type(ncm) == float:
-                            ncm = str(int(ncm))
-                        ncm = '{}.{}.{}'.format(ncm[:4], ncm[4:6], ncm[6:8])
-                        ncm_id = self.env['l10n_br_fiscal.ncm'].search([('code', '=', ncm)])
-                        if ncm_id:
-                            vals['ncm_id'] = ncm_id.id
+                        try:
+                            if type(ncm) == float:
+                                ncm = str(int(ncm))
+                            ncm = '{}.{}.{}'.format(ncm[:4], ncm[4:6], ncm[6:8])
+                            ncm_id = self.env['l10n_br_fiscal.ncm'].search([('code', '=', ncm)])
+                            if ncm_id:
+                                vals['ncm_id'] = ncm_id.id
+                        except:
+                            pass
 
                     vals['invoice_policy'] = 'order'
 
@@ -100,17 +112,32 @@ class ImportarWizard(models.TransientModel):
                     vals['purchase_method'] = 'purchase'
 
                     if rowValues[c_codbarra] and len(str(rowValues[c_codbarra])) > 7:
-                        bcod = rowValues[c_codbarra]
-                        if type(bcod) == float:
-                            bcod = str(int(bcod))
-                        vals['barcode'] = str
-                    
-                    p_id =  prod_obj.create(vals)
+                        bcod = str(rowValues[c_codbarra])
+                        if type(bcod) == str:
+                            try:
+                                bcod = str(int(bcod))
+                                bcod = re.sub('[^0-9]', '', bcod)
+                                if len(bcod) > 7:
+                                    if type(bcod) == float:
+                                        bcod = str(int(bcod))
+                                    vals['barcode'] = str
+                            except:
+                                pass
+
+                    try:
+                        p_id =  prod_obj.create(vals)
+                    except Exception as error:
+                        if mensagem == "":
+                            mensagem += "Erro cadastro : <br>"
+                        mensagem += str(error) + "<br>"
+                        if 'name' in vals:
+                            mensagem += f"{vals['name']}<br>"
+
                     conta_registros += 1
 
-            mensagem = 'TOTAL DE REGISTROS INCLUIDOS : {}'.format(str(conta_registros))
+            mensagem += f"TOTAL DE REGISTROS INCLUIDOS : {str(conta_registros)}"
+            self.write({'mensagem': mensagem})
 
-        return self.write({'mensagem': mensagem})
 
     def action_importar_cliente(self):
         # Colunas
@@ -182,8 +209,11 @@ class ImportarWizard(models.TransientModel):
                        vals['legal_name'] = rowValues[c_razao]
                     else:
                        vals['legal_name'] = vals['name']
+                    # import pudb;pu.db
+                    # category = []
+                    # category.append((0, 0, [1]))
+                    # vals['category_id'] = category
 
-                    vals['category_id'] = 1
                     if rowValues[c_cnpj_cpf]:
                         cnpj_cpf = rowValues[c_cnpj_cpf]
                         if type(cnpj_cpf) == float:
@@ -279,34 +309,38 @@ class ImportarWizard(models.TransientModel):
                     except Exception as error:
                         if mensagem == "":
                             mensagem += "Erro cadastro : <br>"
-                        mensagem += str(error) + "<br>"
                         if 'name' in vals:
-                            mensagem += f"{vals['name']}<br>"
-
-                    if 'zip' in vals and c_id.zip:
-                        try:
-                            c_id.zip_search()
-                        except:
-                            if not 'city_id' in vals:
-                                vals['country_id'] = 31
-                                if rowValues[c_state_id]:
-                                    uf = self.env['res.country.state'].search([
-                                        ('code', '=', rowValues[c_state_id]),
-                                        ('country_id', '=', 31)
-                                    ])
-                                    if uf:
-                                        vals['state_id'] = uf.id
-                                        if rowValues[c_city_id]:
-                                            city = self.env['res.city'].search([
-                                                ('name', '=', rowValues[c_city_id]),
-                                                ('country_id', '=', 31),
-                                                ('state_id', '=', uf.id),
-                                            ])
-                                            if city:
-                                                vals['city_id'] = city.id
-                                c_id.write(vals)                               
-                            pass
-                    conta_registros += 1
+                            mensagem += f"{str(error)} - {vals['name']}"  + "<br>"
+                        else:
+                            mensagem += str(error)  + "<br>"
+                    vals = {
+                        'category_id': [(6,0,[1])]
+                    }
+                    # if c_id and c_id.zip:
+                        # try:
+                        #     # c_id.zip_search()
+                        #     self.env["l10n_br.zip"].zip_search(c_id)
+                        # except:
+                        # if not 'city_id' in vals:
+                    vals['country_id'] = 31
+                    if rowValues[c_state_id]:
+                        uf = self.env['res.country.state'].search([
+                            ('code', '=', rowValues[c_state_id]),
+                            ('country_id', '=', 31)
+                        ])
+                        if uf:
+                            vals['state_id'] = uf.id
+                            if rowValues[c_city_id]:
+                                city = self.env['res.city'].search([
+                                    ('name', '=', rowValues[c_city_id]),
+                                    ('country_id', '=', 31),
+                                    ('state_id', '=', uf.id),
+                                ])
+                                if city:
+                                    vals['city_id'] = city.id
+                    if c_id:
+                        c_id.write(vals)
+                        conta_registros += 1
 
             mensagem += 'TOTAL DE REGISTROS INCLUIDOS : {}'.format(str(conta_registros))
             self.write({'mensagem': mensagem})
@@ -383,11 +417,11 @@ class ImportarWizard(models.TransientModel):
                     # if cod and cod == '0000518':
                     if rowValues[c_name]:
                         vals['name'] = rowValues[c_name]
-                    resp_financeiro = cli_obj.search([('name', '=', rowValues[c_resp_financeiro])])
+                    resp_financeiro = cli_obj.search([('name', '=', rowValues[c_resp_financeiro])], limit=1)
                     c_id = cli_obj.search([('ref', '=', vals['ref'])])
                     if c_id or not resp_financeiro:
                         continue
-                    vals['category_id'] = 2
+     
                     if resp_financeiro:
                         vals['parent_id'] = resp_financeiro.id
                     if vals['name']:
@@ -417,7 +451,7 @@ class ImportarWizard(models.TransientModel):
                         ])
                         if uf:
                             vals['birth_state_id'] = uf.id
-                        vals['birth_country_id'] = uf.id       
+                        vals['birth_country_id'] = 31
 
                     if len(rowValues) > c_cnpj_cpf-1 and rowValues[c_cnpj_cpf]:
                         cnpj_cpf = rowValues[c_cnpj_cpf]
@@ -515,33 +549,36 @@ class ImportarWizard(models.TransientModel):
                     except Exception as error:
                         if mensagem == "":
                             mensagem += "Erro cadastro : <br>"
-                        mensagem += str(error) + "<br>"
                         if 'name' in vals:
-                            mensagem += f"{vals['name']}<br>"
+                            mensagem += f"{str(error)} - {vals['name']}"  + "<br>"
+                        else:
+                            mensagem += str(error)  + "<br>"
 
-                    if 'zip' in vals and c_id.zip:
-                        try:
-                            c_id.zip_search()
-                        except:
-                            if not 'city_id' in vals:
-                                vals['country_id'] = 31
-                                if rowValues[c_state_id]:
-                                    uf = self.env['res.country.state'].search([
-                                        ('code', '=', rowValues[c_state_id]),
-                                        ('country_id', '=', 31)
-                                    ])
-                                    if uf:
-                                        vals['state_id'] = uf.id
-                                        if rowValues[c_city_id]:
-                                            city = self.env['res.city'].search([
-                                                ('name', '=', rowValues[c_city_id]),
-                                                ('country_id', '=', 31),
-                                                ('state_id', '=', uf.id),
-                                            ])
-                                            if city:
-                                                vals['city_id'] = city.id
-                                c_id.write(vals)                               
-                            pass
+                    vals = {
+                        'category_id': [(6,0,[2])]
+                    }
+                    # if c_id and c_id.zip:
+                        # try:
+                        #     c_id.zip_search()
+                        # except:                    
+                    vals['country_id'] = 31
+                    if rowValues[c_state_id]:
+                        uf = self.env['res.country.state'].search([
+                            ('code', '=', rowValues[c_state_id]),
+                            ('country_id', '=', 31)
+                        ])
+                        if uf:
+                            vals['state_id'] = uf.id
+                            if rowValues[c_city_id]:
+                                city = self.env['res.city'].search([
+                                    ('name', '=', rowValues[c_city_id]),
+                                    ('country_id', '=', 31),
+                                    ('state_id', '=', uf.id),
+                                ])
+                                if city:
+                                    vals['city_id'] = city.id
+                    if c_id:
+                        c_id.write(vals)
                     conta_registros += 1
 
             mensagem += 'TOTAL DE REGISTROS INCLUIDOS : {}'.format(str(conta_registros))

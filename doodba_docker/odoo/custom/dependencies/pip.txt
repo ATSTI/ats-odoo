@@ -1,0 +1,7 @@
+git+https://github.com/OCA/openupgradelib.git@master
+unicodecsv
+unidecode
+erpbrasil.base
+erpbrasil.edoc
+py3o.template
+py3o.formats

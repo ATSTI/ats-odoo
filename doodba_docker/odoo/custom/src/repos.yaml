@@ -1,0 +1,79 @@
+# See https://github.com/Tecnativa/doodba#optodoocustomsrcreposyaml
+./odoo:
+  defaults:
+    # Shallow repositories ($DEPTH_DEFAULT=1) are faster & thinner
+    # You may need a bigger depth when merging PRs (use $DEPTH_MERGE
+    # for a sane value of 100 commits)
+    depth: $DEPTH_DEFAULT
+  remotes:
+    ocb: https://github.com/OCA/OCB.git
+    #odoo: https://github.com/odoo/odoo.git
+    openupgrade: https://github.com/OCA/OpenUpgrade.git
+  target: ocb $ODOO_VERSION
+  merges:
+    - ocb $ODOO_VERSION
+    # Example of a merge of the PR with the number <PR>
+    # - oca refs/pull/<PR>/head
+/opt/odoo/custom/src/server-tools:
+  depth: $DEPTH_DEFAULT
+  remotes:
+    origin: https://github.com/OCA/server-tools.git
+  target: origin $ODOO_VERSION
+  merges:
+    - origin $ODOO_VERSION
+/opt/odoo/custom/src/l10n-brazil:
+  depth: $DEPTH_DEFAULT
+  remotes:
+    origin: https://github.com/OCA/l10n-brazil.git
+  target: origin $ODOO_VERSION
+  merges:
+    - origin $ODOO_VERSION
+/opt/odoo/custom/src/account-invoicing:
+  depth: $DEPTH_DEFAULT
+  remotes:
+    origin: https://github.com/OCA/account-invoicing.git
+  target: origin $ODOO_VERSION
+  merges:
+    - origin $ODOO_VERSION
+/opt/odoo/custom/src/bank-payment:
+  depth: $DEPTH_DEFAULT
+  remotes:
+    origin: https://github.com/OCA/bank-payment.git
+  target: origin $ODOO_VERSION
+  merges:
+    - origin $ODOO_VERSION
+/opt/odoo/custom/src/account-payment:
+  depth: $DEPTH_DEFAULT
+  remotes:
+    origin: https://github.com/OCA/account-payment.git
+  target: origin $ODOO_VERSION
+  merges:
+    - origin $ODOO_VERSION
+/opt/odoo/custom/src/web:
+  depth: $DEPTH_DEFAULT
+  remotes:
+    origin: https://github.com/OCA/web.git
+  target: origin $ODOO_VERSION
+  merges:
+    - origin $ODOO_VERSION
+/opt/odoo/custom/src/backend_theme:
+  depth: $DEPTH_DEFAULT
+  remotes:
+    origin: https://github.com/Openworx/backend_theme.git
+  target: origin $ODOO_VERSION
+  merges:
+    - origin $ODOO_VERSION
+/opt/odoo/custom/src/report-engine:
+  depth: $DEPTH_DEFAULT
+  remotes:
+    origin: https://github.com/OCA/report-engine.git
+  target: origin $ODOO_VERSION
+  merges:
+    - origin $ODOO_VERSION
+# /opt/odoo/custom/src/ats-odoo:
+#   depth: $DEPTH_DEFAULT
+#   remotes:
+#     origin: https://github.com/ATSTI/ats-odoo.git
+#   target: origin $ODOO_VERSION
+#   merges:
+#     - origin $ODOO_VERSION

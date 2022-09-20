@@ -1,0 +1,48 @@
+l10n-brazil:
+  - l10n_br_account
+  - l10n_br_account_due_list
+  - l10n_br_account_nfe
+  - l10n_br_account_payment_brcobranca
+  - l10n_br_account_payment_order
+  - l10n_br_base
+  - l10n_br_coa
+  - l10n_br_coa_generic
+  - l10n_br_coa_simple
+  - l10n_br_contract
+  - l10n_br_crm
+  - l10n_br_currency_rate_update
+  - l10n_br_fiscal
+  - l10n_br_hr
+  - l10n_br_mis_report
+  - l10n_br_nfe
+  - l10n_br_nfe_spec
+  - l10n_br_nfse
+  - l10n_br_portal
+  - l10n_br_purchase
+  - l10n_br_resource
+  - l10n_br_sale
+  - l10n_br_stock
+  - l10n_br_website_sale
+  - l10n_br_zip
+  - payment_pagseguro
+bank-payment:
+  - account_payment_order
+  - account_payment_mode
+account-payment:
+  - account_due_list
+account-invoicing:
+  - account_invoice_date_due
+  - account_invoice_merge
+server-tools:
+  - datetime_formatter
+web:
+  - web_responsive
+  - web_advanced_search
+  - web_widget_x2many_2d_matrix
+backend_theme:
+  - backend_theme_v14
+ats-odoo:
+  - pdv_integracao
+  - purchase_sale_price
+report-engine:
+  - report_py3o

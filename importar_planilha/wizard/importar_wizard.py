@@ -22,15 +22,15 @@ class ImportarWizard(models.TransientModel):
 
     def action_importar_produto(self):
         # Colunas
-        c_codigo = 1
-        c_nome = 2
-        c_ncm = 17
-        c_preco_venda = 6
-        c_custo = 4
+        c_codigo = 0
+        c_nome = 1
+        c_ncm = 6
+        c_preco_venda = 3
+        c_custo = 2
         # Materia Prima, Mercadoria Revenda
-        c_tipo_fiscal = 6
-        c_unidade = 11
-        c_codbarra = 13
+        c_tipo_fiscal = 65
+        c_unidade = 4
+        c_codbarra = 7
         mensagem = ""
         prod_obj = self.env['product.product']
         #uom_obj = self.env['product.uom']
@@ -74,6 +74,7 @@ class ImportarWizard(models.TransientModel):
                     
                     # Tipo Fiscal - esta colocando Produto Revenda
                     vals['fiscal_type'] = '00'
+                    vals['type'] = 'product'
                     
                     # UNIDADE
                     # import pudb;pu.db 
@@ -110,6 +111,7 @@ class ImportarWizard(models.TransientModel):
                     # vals['available_in_pos'] = True
 
                     vals['purchase_method'] = 'purchase'
+                    vals['type'] = 'product'
 
                     if rowValues[c_codbarra] and len(str(rowValues[c_codbarra])) > 7:
                         bcod = str(rowValues[c_codbarra])
@@ -137,7 +139,12 @@ class ImportarWizard(models.TransientModel):
 
             mensagem += f"TOTAL DE REGISTROS INCLUIDOS : {str(conta_registros)}"
             self.write({'mensagem': mensagem})
-
+        return {
+            'view_mode': 'form',
+            'res_model': 'importar.wizard',
+            'res_id': self.id,
+            'type': 'ir.actions.act_window',
+        }
 
     def action_importar_cliente(self):
         # Colunas

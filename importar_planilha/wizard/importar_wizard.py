@@ -19,7 +19,6 @@ class ImportarWizard(models.TransientModel):
         if not self.tipo:
             return True
         arquivo = f"/tmp/registro_{self.tipo}.txt"
-        import pudb;pu.db
         if not (os.path.isfile(arquivo)):
             arq = open(arquivo, "w+")
             if self.tipo == "produto":
@@ -138,7 +137,6 @@ class ImportarWizard(models.TransientModel):
         for linha in linhas:
             # print(linha)
             ln += f"{linha}\n"
-        import pudb;pu.db
         self.input_campos = ln
         arq.close
 
@@ -158,7 +156,6 @@ class ImportarWizard(models.TransientModel):
     def gravar_campos(self):
         arquivo = f"/tmp/registro_{self.tipo}.txt"
         arq = open(arquivo,"w+")
-        import pudb;pu.db
         # for lnh in self.input_campos:
         arq.write(self.input_campos)
         # arq.write("\n")
@@ -225,7 +222,7 @@ class ImportarWizard(models.TransientModel):
                         print ('Produto: %s' %(descricao))                        
 
                     # Marca
-                    if rowValues[c_marca]:
+                    if len(rowValues) > c_marca-1 and rowValues[c_marca]:
                         marca = rowValues[c_marca]
                         mc = self.env["product.brand"]
                         marca_id = mc.search([('name', 'ilike', marca)])
@@ -234,7 +231,7 @@ class ImportarWizard(models.TransientModel):
                         vals['product_brand_id'] = marca_id.id
 
                     # Categoria
-                    if rowValues[c_categoria]:
+                    if len(rowValues) > c_categoria-1 and rowValues[c_categoria]:
                         categoria = rowValues[c_categoria]
                         pc = self.env["product.category"]
                         cat_id = pc.search([('name', 'ilike', categoria)])

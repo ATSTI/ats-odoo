@@ -8,29 +8,189 @@ import tempfile
 import time
 import xlrd
 import re
+import os.path
 
 
 class ImportarWizard(models.TransientModel):
     _name = "importar.wizard"
     _description = "Importar Wizard"
 
+    def _le_registro(self):
+        if not self.tipo:
+            return True
+        arquivo = f"/tmp/registro_{self.tipo}.txt"
+        if not (os.path.isfile(arquivo)):
+            arq = open(arquivo, "w+")
+            if self.tipo == "produto":
+                arq.write("c_codigo=0")
+                arq.write("\n")
+                arq.write("c_nome=1")
+                arq.write("\n")
+                arq.write("c_ncm=6")
+                arq.write("\n")
+                arq.write("c_preco_venda=3")
+                arq.write("\n")
+                arq.write("c_custo=2")
+                arq.write("\n")
+                arq.write("c_tipo_fiscal=65")
+                arq.write("\n")
+                arq.write("c_unidade=4")
+                arq.write("\n")
+                arq.write("c_codbarra=7")
+                arq.write("\n")
+                arq.write("c_marca=8")
+                arq.write("\n")
+                arq.write("c_categoria=9")
+                arq.write("\n")
+            if self.tipo == "cliente":
+                arq.write("c_ref=0")
+                arq.write("\n")
+                arq.write("c_name=2")
+                arq.write("\n")
+                arq.write("c_razao=3")
+                arq.write("\n")
+                arq.write("c_cnpj_cpf=4")
+                arq.write("\n")
+                arq.write("c_inscrest=5")
+                arq.write("\n")
+                arq.write("c_rg=63")
+                arq.write("\n")
+                arq.write("c_zip=16")
+                arq.write("\n")
+                arq.write("c_street_name=9") 
+                arq.write("\n")
+                arq.write("c_street_number=10")
+                arq.write("\n")
+                arq.write("c_district=11")
+                arq.write("\n")
+                arq.write("c_street2=13")
+                arq.write("\n")
+                arq.write("c_company_type=61")
+                arq.write("\n")
+                arq.write("c_state_id=15")
+                arq.write("\n")
+                arq.write("c_city_id=12")
+                arq.write("\n")
+                arq.write("c_phone=17")
+                arq.write("\n")
+                arq.write("c_mobile=18")
+                arq.write("\n")
+                arq.write("c_mobile2=19")
+                arq.write("\n")
+                arq.write("c_email=20")
+                arq.write("\n")
+                arq.write("c_fiscal_profile_id=62")
+                arq.write("\n")
+            if self.tipo == "dependente":
+                arq.write("c_ref=1")
+                arq.write("\n")
+                arq.write("c_name=2")
+                arq.write("\n")
+                arq.write("c_razao=2")
+                arq.write("\n")
+                arq.write("c_cnpj_cpf=68")
+                arq.write("\n")
+                arq.write("c_inscrest=63")
+                arq.write("\n")
+                arq.write("c_rg=9")
+                arq.write("\n")
+                arq.write("c_zip=37")
+                arq.write("\n")
+                arq.write("c_street_name=30")
+                arq.write("\n")
+                arq.write("c_street_number=31")
+                arq.write("\n")
+                arq.write("c_district=33") 
+                arq.write("\n")
+                arq.write("c_street2=32")
+                arq.write("\n")
+                arq.write("c_company_type=61")
+                arq.write("\n")
+                arq.write("c_state_id=34") 
+                arq.write("\n")
+                arq.write("c_city_id = 33")
+                arq.write("\n")
+                arq.write("c_phone = 24")
+                arq.write("\n")
+                arq.write("c_mobile=7")
+                arq.write("\n")
+                arq.write("c_mobile2=8")
+                arq.write("\n")
+                arq.write("c_email=29")
+                arq.write("\n")
+                arq.write("c_fiscal_profile_id=62")
+                arq.write("\n")                 
+                arq.write("c_resp_financeiro=5") 
+                arq.write("\n")
+                arq.write("c_birthdate_date=22")
+                arq.write("\n")
+                arq.write("c_gender=4")
+                arq.write("\n")
+                arq.write("c_birth_city=23")
+                arq.write("\n")
+                arq.write("c_birth_state_id=28")
+                arq.write("\n")
+            arq.close    
+        arq = open(arquivo)
+        linhas = arq.readlines()
+        ln = ''
+        for linha in linhas:
+            # print(linha)
+            ln += f"{linha}\n"
+        self.input_campos = ln
+        arq.close
 
     input_file = fields.Binary('Arquivo', required=False)
+    input_campos = fields.Text('Ordem dos Campos')
+    tipo = fields.Selection([
+            ("produto", "Produto"),
+            ("cliente", "Cliente"),
+            ("dependente", "Dependente"),
+        ],
+        string="Tipo Importação",
+    )
     mensagem = fields.Html('Log :', readonly=True)
     inicio = fields.Integer('Linha inicial')
     fim = fields.Integer('Linha final')
 
+    def gravar_campos(self):
+        arquivo = f"/tmp/registro_{self.tipo}.txt"
+        arq = open(arquivo,"w+")
+        # for lnh in self.input_campos:
+        arq.write(self.input_campos)
+        # arq.write("\n")
+        arq.close
+
+    @api.onchange('tipo')
+    def onchange_tipo(self):
+        self._le_registro()
+
     def action_importar_produto(self):
+        self.gravar_campos()
+        linhas = self.input_campos.split('\n')
         # Colunas
-        c_codigo = 0
-        c_nome = 1
-        c_ncm = 6
-        c_preco_venda = 3
-        c_custo = 2
-        # Materia Prima, Mercadoria Revenda
-        c_tipo_fiscal = 65
-        c_unidade = 4
-        c_codbarra = 7
+        for linha in linhas:    
+            if "c_codigo" in linha:
+                c_codigo = int(linha[linha.find('=')+1:])
+            if "c_nome" in linha:
+                c_nome = int(linha[linha.find('=')+1:])
+            if "c_ncm" in linha:
+                c_ncm = int(linha[linha.find('=')+1:])
+            if "c_preco_venda" in linha:
+                c_preco_venda = int(linha[linha.find('=')+1:])
+            if "c_custo" in linha:
+                c_custo = int(linha[linha.find('=')+1:])
+            if "c_tipo_fiscal" in linha:
+                c_tipo_fiscal = int(linha[linha.find('=')+1:])
+            if "c_unidade" in linha:
+                c_unidade = int(linha[linha.find('=')+1:])            
+            if "c_codbarra" in linha:
+                c_codbarra = int(linha[linha.find('=')+1:])
+            if "c_marca" in linha:
+                c_marca = int(linha[linha.find('=')+1:])
+            if "c_categoria" in linha:
+                c_categoria = int(linha[linha.find('=')+1:])
+
         mensagem = ""
         prod_obj = self.env['product.product']
         #uom_obj = self.env['product.uom']
@@ -60,7 +220,25 @@ class ImportarWizard(models.TransientModel):
                         continue
                     if descricao:
                         print ('Produto: %s' %(descricao))                        
-                                                                    
+
+                    # Marca
+                    if len(rowValues) > c_marca-1 and rowValues[c_marca]:
+                        marca = rowValues[c_marca]
+                        mc = self.env["product.brand"]
+                        marca_id = mc.search([('name', 'ilike', marca)])
+                        if not marca_id:
+                            marca_id = mc.create({'name': marca})
+                        vals['product_brand_id'] = marca_id.id
+
+                    # Categoria
+                    if len(rowValues) > c_categoria-1 and rowValues[c_categoria]:
+                        categoria = rowValues[c_categoria]
+                        pc = self.env["product.category"]
+                        cat_id = pc.search([('name', 'ilike', categoria)])
+                        if not cat_id:
+                            cat_id = pc.create({'name': categoria, 'parent_id': 1})
+                        vals['categ_id'] = cat_id.id
+
                     if rowValues[c_preco_venda]:
                         try:
                             vals['lst_price'] = float(rowValues[c_preco_venda])
@@ -148,30 +326,47 @@ class ImportarWizard(models.TransientModel):
 
     def action_importar_cliente(self):
         # Colunas
-        c_ref = 0
-        c_name = 2
-        c_razao = 3
-        c_cnpj_cpf = 4
-        c_inscrest = 5
-        c_rg = 63
-        c_zip = 16
-        c_street_name = 9
-        c_street_number = 10
-        c_district = 11
-        # complemento
-        c_street2 = 13
-        # person / company
-        c_company_type = 61
-        c_state_id = 15
-        c_city_id = 12
-        # c_country_id = 14
-        c_phone = 17
-        c_mobile = 18
-        c_mobile2 = 19
-        c_email = 20
-        # Simples-0, Contribuinte-3, Não contribuinte-4, isento-5
-        c_fiscal_profile_id = 62
-
+        self.gravar_campos()
+        linhas = self.input_campos.split('\n')
+        for linha in linhas:    
+            if "c_ref" in linha:
+                c_ref = int(linha[linha.find('=')+1:])
+            if "c_name" in linha:
+                c_name = int(linha[linha.find('=')+1:])
+            if "c_razao" in linha:
+                c_razao = int(linha[linha.find('=')+1:])
+            if "c_cnpj_cpf" in linha:
+                c_cnpj_cpf = int(linha[linha.find('=')+1:])
+            if "c_inscrest" in linha:
+                c_inscrest = int(linha[linha.find('=')+1:])
+            if "c_rg" in linha:
+                c_rg = int(linha[linha.find('=')+1:])
+            if "c_zip" in linha:
+                c_zip = int(linha[linha.find('=')+1:])
+            if "c_street_name" in linha:
+                c_street_name = int(linha[linha.find('=')+1:])
+            if "c_street_number" in linha:
+                c_street_number = int(linha[linha.find('=')+1:])
+            if "c_district" in linha:
+                c_district = int(linha[linha.find('=')+1:])
+            if "c_street2" in linha:
+                c_street2 = int(linha[linha.find('=')+1:])
+            if "c_company_type" in linha:
+                c_company_type = int(linha[linha.find('=')+1:])
+            if "c_state_id" in linha:
+                c_state_id = int(linha[linha.find('=')+1:])
+            if "c_city_id" in linha:
+                c_city_id = int(linha[linha.find('=')+1:])
+            if "c_phone" in linha:
+                c_phone = int(linha[linha.find('=')+1:])
+            if "c_mobile" in linha:
+                c_mobile = int(linha[linha.find('=')+1:])
+            if "c_mobile2" in linha:
+                c_mobile2 = int(linha[linha.find('=')+1:])
+            if "c_email" in linha:
+                c_email = int(linha[linha.find('=')+1:])
+            if "c_fiscal_profile_id" in linha:
+                c_fiscal_profile_id = int(linha[linha.find('=')+1:])
         cli_obj = self.env['res.partner']
         mensagem = ""
         for chain in self:
@@ -361,36 +556,57 @@ class ImportarWizard(models.TransientModel):
 
     def action_importar_dependente(self):
         # Colunas
-        c_ref = 1
-        c_name = 2
-        c_razao = 2
-        c_cnpj_cpf = 68
-        c_inscrest = 63
-        c_rg = 9
-        c_zip = 37
-        c_street_name = 30
-        c_street_number = 31
-        c_district = 33
-        # complemento
-        c_street2 = 32
-        # person / company
-        c_company_type = 61
-        c_state_id = 34
-        c_city_id = 33
-        # c_country_id = 14
-        c_phone = 24
-        c_mobile = 7
-        c_mobile2 = 8
-        c_email = 29
-        # Simples-0, Contribuinte-3, Não contribuinte-4, isento-5
-        c_fiscal_profile_id = 62
-        c_resp_financeiro = 5
-        # nascimento : Data, Local, Estadao, Pais e Sexo
-        c_birthdate_date = 22
-        c_gender = 4
-        c_birth_city = 23
-        c_birth_state_id = 28 
-
+        self.gravar_campos()
+        linhas = self.input_campos.split('\n')
+        for linha in linhas:    
+            if "c_ref" in linha:
+                c_ref = int(linha[linha.find('=')+1:])
+            if "c_name" in linha:
+                c_name = int(linha[linha.find('=')+1:])
+            if "c_razao" in linha:
+                c_razao = int(linha[linha.find('=')+1:])
+            if "c_cnpj_cpf" in linha:
+                c_cnpj_cpf = int(linha[linha.find('=')+1:])
+            if "c_inscrest" in linha:
+                c_inscrest = int(linha[linha.find('=')+1:])
+            if "c_rg" in linha:
+                c_rg = int(linha[linha.find('=')+1:])
+            if "c_zip" in linha:
+                c_zip = int(linha[linha.find('=')+1:])
+            if "c_street_name" in linha:
+                c_street_name = int(linha[linha.find('=')+1:])
+            if "c_street_number" in linha:
+                c_street_number = int(linha[linha.find('=')+1:])
+            if "c_district" in linha:
+                c_district = int(linha[linha.find('=')+1:])
+            if "c_street2" in linha:
+                c_street2 = int(linha[linha.find('=')+1:])
+            if "c_company_type" in linha:
+                c_company_type = int(linha[linha.find('=')+1:])
+            if "c_state_id" in linha:
+                c_state_id = int(linha[linha.find('=')+1:])
+            if "c_city_id" in linha:
+                c_city_id = int(linha[linha.find('=')+1:])
+            if "c_phone" in linha:
+                c_phone = int(linha[linha.find('=')+1:])
+            if "c_mobile" in linha:
+                c_mobile = int(linha[linha.find('=')+1:])
+            if "c_mobile2" in linha:
+                c_mobile2 = int(linha[linha.find('=')+1:])
+            if "c_email" in linha:
+                c_email = int(linha[linha.find('=')+1:])
+            if "c_fiscal_profile_id" in linha:
+                c_fiscal_profile_id = int(linha[linha.find('=')+1:])
+            if "c_resp_financeiro" in linha:
+                c_resp_financeiro = int(linha[linha.find('=')+1:])
+            if "c_birthdate_date" in linha:
+                c_birthdate_date = int(linha[linha.find('=')+1:])
+            if "c_gender" in linha:
+                c_gender = int(linha[linha.find('=')+1:])
+            if "c_birth_city" in linha:
+                c_birth_city = int(linha[linha.find('=')+1:])
+            if "c_birth_state_id" in linha:
+                c_birth_state_id = int(linha[linha.find('=')+1:])
         cli_obj = self.env['res.partner']
         mensagem = ""
         for chain in self:

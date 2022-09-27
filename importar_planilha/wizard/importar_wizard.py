@@ -81,6 +81,10 @@ class ImportarWizard(models.TransientModel):
                 arq.write("\n")
                 arq.write("c_fiscal_profile_id=62")
                 arq.write("\n")
+                arq.write("c_nascimento=63")
+                arq.write("\n")
+                arq.write("c_outros=64")
+                arq.write("\n")
             if self.tipo == "dependente":
                 arq.write("c_ref=1")
                 arq.write("\n")
@@ -365,10 +369,15 @@ class ImportarWizard(models.TransientModel):
                 c_mobile2 = int(linha[linha.find('=')+1:])
             if "c_email" in linha:
                 c_email = int(linha[linha.find('=')+1:])
+            if "c_nascimento" in linha:
+                c_nascimento = int(linha[linha.find('=')+1:])
             if "c_fiscal_profile_id" in linha:
                 c_fiscal_profile_id = int(linha[linha.find('=')+1:])
+            if "c_outros" in linha:
+                c_outros = int(linha[linha.find('=')+1:])
         cli_obj = self.env['res.partner']
         mensagem = ""
+        # import pudb;pu.db
         for chain in self:
             file_path = tempfile.gettempdir()+'/file.xls'
             data = base64.decodebytes(chain.input_file)
@@ -411,7 +420,6 @@ class ImportarWizard(models.TransientModel):
                        vals['legal_name'] = rowValues[c_razao]
                     else:
                        vals['legal_name'] = vals['name']
-                    # import pudb;pu.db
                     # category = []
                     # category.append((0, 0, [1]))
                     # vals['category_id'] = category
@@ -454,17 +462,35 @@ class ImportarWizard(models.TransientModel):
                     if rowValues[c_street_name]:
                         vals['street_name'] = rowValues[c_street_name]
                     if rowValues[c_street_number]:
-                        vals['street_number'] = rowValues[c_street_number]
+                        if type(rowValues[c_street_number]) == str:
+                            num = rowValues[c_street_number]
+                        else:
+                            num = str(int(rowValues[c_street_number]))
+                        vals['street_number'] = num
                     if rowValues[c_district]:
                         vals['district'] = rowValues[c_district]
                     if len(rowValues) > c_street2-1 and rowValues[c_street2]:
                         vals['street2'] = rowValues[c_street2]
                     if rowValues[c_phone]:
                         vals['phone'] = rowValues[c_phone]
-                    if rowValues[c_mobile] or rowValues[c_mobile2]:
-                        vals['mobile'] = rowValues[c_mobile] or rowValues[c_mobile2]
+                    mobile = ''
+                    if len(rowValues) > c_mobile and rowValues[c_mobile]:
+                        mobile = rowValues[c_mobile]
+                    if len(rowValues) > c_mobile2 and rowValues[c_mobile2]:
+                        if mobile:
+                            mobile += ', '
+                        mobile += rowValues[c_mobile2]
+                    if mobile:
+                        vals['mobile'] = mobile
                     if rowValues[c_email]:
                         vals['email'] = rowValues[c_email]
+
+                    if len(rowValues) > c_nascimento and rowValues[c_nascimento]:
+                        n = rowValues[c_nascimento]
+                        nasc = f"{n[6:10]}-{n[3:5]}-{n[:2]}"
+                        vals['birthdate_date'] = nasc
+                    if len(rowValues) > c_outros and rowValues[c_outros]:
+                        vals['comment'] = str(rowValues[c_outros])
 
                     if len(rowValues) > c_company_type-1 and rowValues[c_company_type]:
                         vals['company_type'] = rowValues[c_company_type]

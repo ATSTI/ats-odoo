@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_category_change_wizard_view" model="ir.ui.view">
+        <field name="name">product_category_change.view</field>
+        <field name="model">product.category.change</field>
+        <field name="arch" type="xml">
+            <form>
+                <group string="Nova Categoria">
+                    <field name="categoria" />
+                </group>
+                <footer>
+                    <button class="btn-primary" string="Executar"  name="action_trocar_categoria" type="object"/>
+                    <button string="Sair" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="product_category_change_action" model="ir.actions.act_window">
+        <field name="name">Trocar Categoria</field>
+        <field name="res_model">product.category.change</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="product_category_change_wizard_view"/>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="product.model_product_template" />       
+    </record>    
+</odoo> 

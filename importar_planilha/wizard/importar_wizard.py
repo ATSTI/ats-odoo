@@ -229,7 +229,7 @@ class ImportarWizard(models.TransientModel):
                     if len(rowValues) > c_marca-1 and rowValues[c_marca]:
                         marca = rowValues[c_marca]
                         mc = self.env["product.brand"]
-                        marca_id = mc.search([('name', 'ilike', marca)])
+                        marca_id = mc.search([('name', '=', marca)])
                         if not marca_id:
                             marca_id = mc.create({'name': marca})
                         vals['product_brand_id'] = marca_id.id

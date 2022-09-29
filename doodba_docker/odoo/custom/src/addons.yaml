@@ -25,6 +25,7 @@ l10n-brazil:
   - l10n_br_website_sale
   - l10n_br_zip
   - payment_pagseguro
+  - spec_driven_model
 bank-payment:
   - account_payment_order
   - account_payment_mode
@@ -35,6 +36,7 @@ account-invoicing:
   - account_invoice_merge
 server-tools:
   - datetime_formatter
+  - auto_backup
 web:
   - web_responsive
   - web_advanced_search
@@ -44,5 +46,9 @@ backend_theme:
 ats-odoo:
   - pdv_integracao
   - purchase_sale_price
+  - product_sale_margin
 report-engine:
   - report_py3o
+#utros:
+#  - purchase_sale_price
+

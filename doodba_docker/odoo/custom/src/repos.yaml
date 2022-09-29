@@ -70,10 +70,16 @@
   target: origin $ODOO_VERSION
   merges:
     - origin $ODOO_VERSION
-# /opt/odoo/custom/src/ats-odoo:
-#   depth: $DEPTH_DEFAULT
-#   remotes:
-#     origin: https://github.com/ATSTI/ats-odoo.git
-#   target: origin $ODOO_VERSION
-#   merges:
-#     - origin $ODOO_VERSION
+/opt/odoo/custom/src/ats-odoo:
+  depth: $DEPTH_DEFAULT
+  remotes:
+    origin: https://github.com/ATSTI/ats-odoo.git
+  target: origin $ODOO_VERSION
+  merges:
+    - origin $ODOO_VERSION
+#/opt/odoo/custom/src/outros:
+#  depth: $DEPTH_DEFAULT
+#  volumes:
+#    - outros:/home/manoel/ats-odoo
+
+

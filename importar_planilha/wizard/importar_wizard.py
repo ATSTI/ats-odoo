@@ -140,7 +140,7 @@ class ImportarWizard(models.TransientModel):
         ln = ''
         for linha in linhas:
             # print(linha)
-            ln += f"{linha}\n"
+            ln += f"{linha}"
         self.input_campos = ln
         arq.close
 
@@ -160,9 +160,7 @@ class ImportarWizard(models.TransientModel):
     def gravar_campos(self):
         arquivo = f"/tmp/registro_{self.tipo}.txt"
         arq = open(arquivo,"w+")
-        # for lnh in self.input_campos:
         arq.write(self.input_campos)
-        # arq.write("\n")
         arq.close
 
     @api.onchange('tipo')
@@ -667,7 +665,7 @@ class ImportarWizard(models.TransientModel):
                     if rowValues[c_name]:
                         vals['name'] = rowValues[c_name]
                     resp_financeiro = cli_obj.search([('name', '=', rowValues[c_resp_financeiro])], limit=1)
-                    c_id = cli_obj.search([('ref', '=', vals['ref'])])
+                    c_id = cli_obj.search([('ref', '=', vals['ref']), ('name', '=', vals['name'])])
                     if c_id or not resp_financeiro:
                         continue
      

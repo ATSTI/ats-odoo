@@ -3,5 +3,7 @@ unicodecsv
 unidecode
 erpbrasil.base
 erpbrasil.edoc
+erpbrasil.edoc.pdf
 py3o.template
 py3o.formats
+git+https://github.com/akretion/nfelib

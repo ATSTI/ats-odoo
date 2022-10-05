@@ -61,7 +61,10 @@ class IntegracaoPdv(http.Controller):
             produto = unidecode(produto)
             prod['produto'] = produto
             prod['valor_prazo'] = prd.list_price
-            data_alt = prd.write_date
+            if prd.write_date > prd.product_tmpl_id.write_date:
+                data_alt = prd.write_date
+            else:
+                data_alt = prd.product_tmpl_id.write_date
             data_alterado = data_alt + timedelta(hours=+3)
             prod['datacadastro'] = datetime.strftime(data_alterado,'%m/%d/%Y %H:%M:%S')
             if prd.default_code:
@@ -168,12 +171,12 @@ class IntegracaoPdv(http.Controller):
         caixa = data['caixa']
         aml_id = data['aml_id']
         cod_forma = data['cod_forma']   
-        if ',' in data['valor_pago']:     
-            valor_pago = data['valor_pago'].replace(',','.')
-            juro = data['juro'].replace(',','.')
-        else:
-            valor_pago = data['valor_pago']
-            juro = data['juro']
+        #if ',' in data['valor_pago']:     
+        valor_pago = data['valor_pago'].replace(',','.')
+        juro = data['juro'].replace(',','.')
+        #else:
+        #    valor_pago = data['valor_pago']
+        #    juro = data['juro']
         # TODO testar aqui se e a empresa mesmo
         cc = http.request.env['account.account'].search([
             ('name', 'ilike', 'Cliente Padrao'),
@@ -184,13 +187,27 @@ class IntegracaoPdv(http.Controller):
             ('company_id', '=', user_id.company_id.id),
         ])        
         conta_obj = http.request.env['account.move.line']
-        conta_ids = conta_obj.sudo().search([('partner_id', '=',int(cod_cliente)), 
-            ('full_reconcile_id', '=', False), ('balance','!=', 0),
-            ('company_id', '=', user_id.company_id.id),
-            ('account_id.reconcile','=',True),
-            ('account_id', '=', cc.id),
-            ('journal_id', '=', cj.id),
-        ], order='date_maturity')
+        # rotina q testa se a conta ja foi baixada
+        lista = []
+        if cod_cliente == '0' and aml_id:
+            conta_ids = conta_obj.sudo().search([('id', '=',int(aml_id))])
+            for ct in conta_ids:
+                cod_cliente = str(ct.partner_id.id)
+                ja_importou = http.request.env['account.payment'].search([
+                    ('communication', '=', ct.ref)])
+                for imp in ja_importou:
+                    lista.append({'Conta baixada': ct.ref + '-' + ct.partner_id.name + ', ' + str(imp.amount)})
+                if ja_importou:
+                    return json.dumps(lista)
+
+        if cod_cliente != '0':
+            conta_ids = conta_obj.sudo().search([('partner_id', '=',int(cod_cliente)), 
+                ('full_reconcile_id', '=', False), ('balance','!=', 0),
+                ('company_id', '=', user_id.company_id.id),
+                ('account_id.reconcile','=',True),
+                ('account_id', '=', cc.id),
+                ('journal_id', '=', cj.id),
+            ], order='date_maturity')
         vlr = float(valor_pago)
         juros = float(juro)
         vlr = vlr - juros
@@ -232,7 +249,6 @@ class IntegracaoPdv(http.Controller):
                 ('account_id', '=', cc.id),
                 ('journal_id', '=', cj.id),
             ], order='date_maturity')        
-        lista = []
         for conta in conta_ids:
             #if not '4-' in conta.journal_id.name or conta.debit == 0.0:
             #    continue
@@ -342,7 +358,7 @@ class IntegracaoPdv(http.Controller):
             lista.append(caixa)
         return json.dumps(lista)
 
-    @http.route('/pedidoconsulta', type='json', auth="user", csrf=True)
+    @http.route('/pedidoconsulta', type='json', auth="user", csrf=False)
     def website_pedidoconsulta(self, **kwargs):
         data = request.jsonrequest
         # TODO testar aqui se e a empresa mesmo
@@ -372,16 +388,16 @@ class IntegracaoPdv(http.Controller):
             if not p_id.pos_reference:
                 continue
             ped = p_id.pos_reference[p_id.pos_reference.find('-')+1:]
-        #     if ultimo != '':
-        #         ultimo += ','
+            if ultimo != '':
+                ultimo += ','
             ultimo += ped
-        #     if int(ped) < menor or menor == 0:
-        #         menor = int(ped)
-        #     if int(ped) > maior or maior == 0:
-        #         maior = int(ped)
-        # if (maior - menor) > 10:
-        #     menor = maior - 1
-        # ultimo = '(%s) AND m.CODMOVIMENTO > %s' %(str(ultimo), str(menor))
+            if int(ped) < menor or menor == 0:
+                menor = int(ped)
+            if int(ped) > maior or maior == 0:
+                maior = int(ped)
+        if (maior - menor) > 10:
+            menor = maior - 1
+        ultimo = '(%s) AND m.CODMOVIMENTO > %s' %(str(ultimo), str(menor))
         ped = {'pedido': str(ultimo)}
 
         lista.append(ped)
@@ -454,13 +470,13 @@ class IntegracaoPdv(http.Controller):
                 vals['nb_print'] = 0
                 vals['pos_reference'] = ord_name
                 vals['session_id'] = int(str(caixa))
-                # vals['pos_session_id'] = int(str(caixa))
+                vals['pos_session_id'] = int(str(caixa))
                 # vals['pricelist_id'] = session.config_id.pricelist_id.id
                 vals['create_date'] = data_pedido #datetime.strftime(datetime.now(),'%Y-%m-%d %H:%M:%S')
                 vals['date_order'] = data_pedido
                 vals['sequence_number'] = codmov
-                vals['partner_id'] = int(codcliente)
-                vals['user_id'] = int(codvendedor)
+                vals['partner_id'] = codcliente
+                vals['user_id'] = codvendedor
                 vals['amount_tax'] = 0.0
                 vals['company_id'] = user_id.company_id.id
             """
@@ -520,7 +536,7 @@ class IntegracaoPdv(http.Controller):
                 prd['discount'] = desconto * 100
                 prd['qty'] = qtd
                 prd['price_unit'] = pco
-                prd['full_product_name'] = prdname
+                prd['name'] = prdname
                 prd['price_subtotal_incl'] = vlr_totprod
                 prd['price_subtotal'] = vlr_totprod
                 num_linha -= 1
@@ -529,7 +545,6 @@ class IntegracaoPdv(http.Controller):
         return order_line    
 
     def _monta_pagamento(self, dados, cliente, session, ord_name, data_ord):        
-        # import pudb;pu.db
         pag_line = []
         desconto_t = 0.0
         total_g = 0.0
@@ -564,9 +579,9 @@ class IntegracaoPdv(http.Controller):
             session_id = http.request.env['pos.session'].sudo().browse([session])
             if not session_id:
                 return 0,0,0,0
-            # for stt in session_id.payment_ids:
-            #     if stt.journal_id.id == jrn_id.id:
-            #         pag['payment_ids'] = stt.id
+            for stt in session_id.payment_ids:
+                if stt.journal_id.id == jrn_id.id:
+                    pag['payment_ids'] = stt.id
                         
             company_cxt = jrn_id.company_id.id
             # pag['account_id'] = self.env['res.partner'].browse(cliente).property_account_receivable_id.id

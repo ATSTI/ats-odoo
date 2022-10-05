@@ -168,12 +168,12 @@ class IntegracaoPdv(http.Controller):
         caixa = data['caixa']
         aml_id = data['aml_id']
         cod_forma = data['cod_forma']   
-        if ',' in data['valor_pago']:     
-            valor_pago = data['valor_pago'].replace(',','.')
-            juro = data['juro'].replace(',','.')
-        else:
-            valor_pago = data['valor_pago']
-            juro = data['juro']
+        #if ',' in data['valor_pago']:     
+        valor_pago = data['valor_pago'].replace(',','.')
+        juro = data['juro'].replace(',','.')
+        #else:
+        #    valor_pago = data['valor_pago']
+        #    juro = data['juro']
         # TODO testar aqui se e a empresa mesmo
         cc = http.request.env['account.account'].search([
             ('name', 'ilike', 'Cliente Padrao'),
@@ -184,13 +184,27 @@ class IntegracaoPdv(http.Controller):
             ('company_id', '=', user_id.company_id.id),
         ])        
         conta_obj = http.request.env['account.move.line']
-        conta_ids = conta_obj.sudo().search([('partner_id', '=',int(cod_cliente)), 
-            ('full_reconcile_id', '=', False), ('balance','!=', 0),
-            ('company_id', '=', user_id.company_id.id),
-            ('account_id.reconcile','=',True),
-            ('account_id', '=', cc.id),
-            ('journal_id', '=', cj.id),
-        ], order='date_maturity')
+        # rotina q testa se a conta ja foi baixada
+        lista = []
+        if cod_cliente == '0' and aml_id:
+            conta_ids = conta_obj.sudo().search([('id', '=',int(aml_id))])
+            for ct in conta_ids:
+                cod_cliente = str(ct.partner_id.id)
+                ja_importou = http.request.env['account.payment'].search([
+                    ('communication', '=', ct.ref)])
+                for imp in ja_importou:
+                    lista.append({'Conta baixada': ct.ref + '-' + ct.partner_id.name + ', ' + str(imp.amount)})
+                if ja_importou:
+                    return json.dumps(lista)
+
+        if cod_cliente != '0':
+            conta_ids = conta_obj.sudo().search([('partner_id', '=',int(cod_cliente)), 
+                ('full_reconcile_id', '=', False), ('balance','!=', 0),
+                ('company_id', '=', user_id.company_id.id),
+                ('account_id.reconcile','=',True),
+                ('account_id', '=', cc.id),
+                ('journal_id', '=', cj.id),
+            ], order='date_maturity')
         vlr = float(valor_pago)
         juros = float(juro)
         vlr = vlr - juros
@@ -232,7 +246,6 @@ class IntegracaoPdv(http.Controller):
                 ('account_id', '=', cc.id),
                 ('journal_id', '=', cj.id),
             ], order='date_maturity')        
-        lista = []
         for conta in conta_ids:
             #if not '4-' in conta.journal_id.name or conta.debit == 0.0:
             #    continue
@@ -529,7 +542,6 @@ class IntegracaoPdv(http.Controller):
         return order_line    
 
     def _monta_pagamento(self, dados, cliente, session, ord_name, data_ord):        
-        # import pudb;pu.db
         pag_line = []
         desconto_t = 0.0
         total_g = 0.0
@@ -583,7 +595,6 @@ class IntegracaoPdv(http.Controller):
                 
     @http.route('/pedidoinsere', type='json', auth="user", csrf=False)
     def website_pedidoinsere(self, **kwargs):
-        import pudb;pu.db
         data = request.jsonrequest
         hj = datetime.now()
         hj = datetime.strftime(hj,'%m-%d-%Y')

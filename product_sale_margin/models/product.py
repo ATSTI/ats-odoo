@@ -25,7 +25,6 @@ class ProductTemplate (models.Model):
         if self.margin:
             self.list_price = self.standard_price * (1 + (float(self.margin)/100))
 
-    @api.multi
     def write(self, vals):
         if 'list_price' in vals:
             if self.standard_price:

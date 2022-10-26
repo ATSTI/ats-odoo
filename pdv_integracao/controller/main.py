@@ -30,7 +30,7 @@ class IntegracaoPdv(http.Controller):
         data = request.jsonrequest
         # TODO testar aqui se e a empresa mesmo
         hj = datetime.now()
-        hj = hj - timedelta(days=10)
+        hj = hj - timedelta(days=30)
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
         prod_tmpl = http.request.env['product.template'].sudo().search([
             ('write_date', '>=', hj),
@@ -48,8 +48,8 @@ class IntegracaoPdv(http.Controller):
         for prd in prod_ids:
             prod = {}
             ncm = ''
-            if prd.fiscal_classification_id:
-                ncm = prd.fiscal_classification_id.code
+            if prd.ncm_id:
+                ncm = prd.ncm_id.code
                 if ncm:
                     ncm = re.sub('[^0-9]', '', ncm)
             if ncm and len(ncm) > 8:
@@ -69,8 +69,8 @@ class IntegracaoPdv(http.Controller):
             else:
                 codpro = str(prd.id)
             prod['codpro'] = codpro[:15]
-            if prd.origin:
-                prod['origem'] = prd.origin
+            if prd.icms_origin:
+                prod['origem'] = prd.icms_origin
             prod['ncm'] = ncm
             prod['usa'] = 'S'
             if prd.barcode and len(prd.barcode) < 14:
@@ -136,7 +136,7 @@ class IntegracaoPdv(http.Controller):
         hj = hj - timedelta(days=10)
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
         cliente = http.request.env['res.partner']
-        cli_ids = cliente.sudo().search([('write_date', '>=', hj), ('customer','=', True)])
+        cli_ids = cliente.sudo().search([('write_date', '>=', hj), ('category_id','=', 1)])
         lista = []
         for partner_id in cli_ids:
             cliente = {}

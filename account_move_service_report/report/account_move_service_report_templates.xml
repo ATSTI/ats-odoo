@@ -158,8 +158,8 @@
                         <td class="shipping">
                             <span><h3>RECIBO DE LOCAÇÃO E COBRANÇA Nº: <span t-field="doc.name"/></h3></span><br/>
                             <h6><span>CNPJ: <span t-field="doc.company_id.cnpj_cpf"/></span></h6>
-                            <h6><span>Insc. Municipal: <span t-field="doc.company_id.inscr_est"/></span></h6>
-                            <h6><span>Insc. Estadual: <span t-field="doc.company_id.inscr_mun"/></span></h6><br/>
+                            <h6><span>Insc. Municipal: <span t-field="doc.company_id.inscr_mun"/></span></h6>
+                            <h6><span>Insc. Estadual: <span t-field="doc.company_id.inscr_est"/></span></h6><br/>
                             
                             <h6>NAT.DA OPERACAO : Locação</h6>
                             <span><h4>DATA DE EMISSÃO : <span t-field="doc.invoice_date"/></h4></span>

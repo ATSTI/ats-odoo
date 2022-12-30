@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="cash_flow_report_id">
+        <div class="o_account_financial_reports_page">
+            <t t-call="cash_flow_report.report_buttons" />
+            <t t-call="cash_flow_report.report_cash_flow_base" />
+        </div>
+    </template>
+</odoo>

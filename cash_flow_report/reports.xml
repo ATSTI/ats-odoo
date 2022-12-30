@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- PDF REPORTS : paperformat -->
+    <record id="report_cash_qweb_paperformat" model="report.paperformat">
+        <field name="name">Cash Flow report qweb paperformat</field>
+        <field name="default" eval="True" />
+        <field name="format">custom</field>
+        <field name="page_height">297</field>
+        <field name="page_width">210</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">12</field>
+        <field name="margin_bottom">8</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="False" />
+        <field name="header_spacing">10</field>
+        <field name="dpi">110</field>
+    </record>
+
+    <!-- PDF/HMTL REPORTS -->
+    <!-- General Ledger -->
+    <!-- Open Items -->
+    <record id="action_print_report_cash_flow_qweb" model="ir.actions.report">
+        <field name="name">Cash Flow Report</field>
+        <field name="model">cash_flow_report.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">cash_flow_report.cash_flow_report</field>
+        <field name="report_file">cash_flow_report.cash_flow_report</field>
+        <field name="paperformat_id" ref="report_cash_qweb_paperformat" />
+    </record>
+    <record id="action_print_report_cash_flow_html" model="ir.actions.report">
+        <field name="name">Cash Flow Report</field>
+        <field name="model">cash_flow_report.report.wizard</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">cash_flow_report.cash_flow_report</field>
+        <field name="report_file">cash_flow_report.cash_flow_report</field>
+    </record>
+
+    <!-- XLSX REPORTS -->
+    <record id="action_report_cash_flow_xlsx" model="ir.actions.report">
+        <field name="name">Cash Flow Report XLSX</field>
+        <field name="model">cash.flow.report.wizard</field>
+        <field name="type">ir.actions.report</field>
+        <field name="report_name">a_f_r.cash_flow_report_xlsx</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_file">cash_flow_report</field>
+    </record>
+</odoo>

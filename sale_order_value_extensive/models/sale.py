@@ -2,8 +2,8 @@ from odoo import models, fields, api
 from num2words import num2words
 
 
-class AccountMove(models.Model):
-    _inherit = 'account.move'
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
 
     extensive_value = fields.Char(
         'Valor por Extenso', compute="_compute_extensive_value")

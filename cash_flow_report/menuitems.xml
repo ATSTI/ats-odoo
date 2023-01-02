@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <menuitem
+        parent="account.menu_finance_reports"
+        id="menu_cash_reports"
+        name="Relatorios Caixa"
+        groups="account.group_account_manager,account.group_account_user"
+    />
+    <menuitem
+        parent="menu_cash_reports"
+        action="action_cash_flow_report_wizard"
+        id="menu_cash_flow_report_wizard"
+        sequence="90"
+    />
+</odoo>

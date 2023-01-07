@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<template id="report_contaspagar_document">
+    <tr style="border:1px solid lightgray">
+        <td width="50%"><span t-field="o.fornecedor"/></td>
+        <td width="15%"><span t-field="o.fatura"/></td>
+        <td width="15%"><span t-field="o.forma_pagto"/></td>
+        <td width="10%"><span t-field="o.data_pagto"/></td>
+        <td width="10%"><span t-field="o.vlr_fatura"/></td>
+    </tr>
+    <tr><td colspan="5"><span t-field="o.lancamento"/></td></tr>   
+</template>
+
+
+<template id="report_contaspagar">
+    <t t-call="report.html_container">
+       <t t-call="report.external_layout">        
+           <div class="page">
+               <h2 align="center">Posição de Contas Pagas por Vencimento</h2>
+               <t t-set="vcto" t-value="[]"/>
+               
+               
+               <t t-foreach="docs.sorted(key=lambda r: r.data_vcto)" t-as="x">
+                   <t t-set="vcto" t-value="vcto+[x.data_vcto]"/>
+               </t>
+               <!-- removendo duplicados
+               <t t-set="vcto" t-esc="sorted(set(vcto))"/> 
+               <span t-set="vcto_ids" t-esc="o.vencimentos_ids()"/> -->
+               
+               <t t-foreach="set(vcto)" t-as="venc">
+                   <table class="table table-condensed" width="90%" style="border:1px solid lightgray">
+                       <tr><td><div><strong t-esc="venc"/></div></td></tr></table>
+                   <table class="table table-condensed" width="90%" style="border:1px solid lightgray">
+                      <thead>
+                        <tr>
+                            <th><strong>Fornecedor</strong></th>
+                            <th><strong>Duplicata</strong></th>
+                            <th><strong>Forma Pagamento</strong></th>
+                            <th><strong>Data pagamento</strong></th>
+                            <th class="text-right"><strong>Valor</strong></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                         
+                         <t t-foreach="docs.sorted(key=lambda r: r.data_vcto)" t-as="o">
+                           <t t-if="venc==o.data_vcto">          
+                              <t t-call="account_move_report.report_contaspagar_document"/>
+                           </t>
+                         </t>
+                      </tbody>
+                   </table>
+               </t>
+               
+           </div>
+       </t> 
+    </t>
+</template>
+</odoo>

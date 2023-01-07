@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report 
+            id="action_report_contas_pagas"
+            string="Resumo Contas Pagas"
+            model="account.move.line" 
+            report_type="qweb-pdf"
+            file="acocunt_move_line_report.report_contas_pagas" 
+            name="account_move_line_report.report_contas_pagas" 
+        />
+        <report 
+            id="action_report_contas_a_pagar"
+            string="Resumo Contas a Pagar"
+            model="account.move.line" 
+            report_type="qweb-pdf"
+            file="acocunt_move_line_report.report_contas_a_pagar" 
+            name="account_move_line_report.report_contas_a_pagar" 
+        />                
+    </data>
+</odoo>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="tag_view_invoice_form" model="ir.ui.view">
+            <field name="name">tag.view.invoice.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="br_account.view_br_account_invoice_form"/>
+            <field name="arch" type="xml">
+                <field name="team_id" position="after" >
+                    <field name="tag_campo" widget="many2many_tags" readonly="1"/>
+                </field>
+            </field>
+        </record>
+        <record id="tag_view_invoice_search" model="ir.ui.view">
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='group_by_partner_id']" position="after">
+                <field string="Marcadores"
+                        name="tag_campo"
+                        filter_domain="[('tag_campo','ilike', self)]"
+                />
+                <!-- <filter name="group_by_tag_campo" string="Marcadores" context="{'group_by':'tag_campo'}"/> -->
+            </xpath>
+        </field>
+    </record>
+
+    </data>
+</odoo>

@@ -7,7 +7,7 @@
     "version": "10.0.0.0.1",
     "depends": [
         "website",
-        "account",
+        "br_account_payment",
     ],
     'license': 'AGPL-3',
     "author": "ATS Solucoes, ",

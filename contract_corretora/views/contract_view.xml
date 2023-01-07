@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2018 Tecnativa - Carlos Dauden
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+
+<odoo>
+    <record id="contract_corretora_line_form_view" model="ir.ui.view">
+        <field name="name">contract.corretora.line.form.view</field>
+        <field name="model">contract.line</field>
+        <field name="inherit_id" ref="contract_novo.contract_line_form_view"/>
+        <field name="arch" type="xml">
+            <field name="recurring_next_date" position="after">
+                <field name="dia_vencimento" string="Vencimento(dia)" />
+            </field>
+        </field>
+    </record>
+<record id="account_analytic_account_recurring_form_form" model="ir.ui.view">
+    <field name="model">contract.contract</field>
+    <field name="inherit_id" ref="contract_novo.contract_contract_form_view"/>
+    <field name="arch" type="xml">  
+        <field name="name" position="replace">
+            <field name="name" string="Número apôlice"/>
+        </field>
+        <field name="group_id" position="replace">
+            <field name="group_id" invisible="1"/>
+        </field> 
+        <field name="contract_template_id" position="replace">
+            <field name="contract_template_id" invisible="1"/>
+        </field>
+        <field name="journal_id" position="replace">
+            <field name="journal_id" invisible="1"/>
+        </field>
+        <!-- <field name="recurring_invoicing_type" position="replace">
+            <field name="recurring_invoicing_type" />
+        </field>  -->
+        <field name="pricelist_id" position="replace">
+            <field name="pricelist_id" invisible="1"/>
+        </field> 
+        <field name="date_end" position="replace">
+            <field name="date_end" string="Fim vigência"/>
+        </field>
+        <xpath expr="//group[@name='main']" position="after">
+            <group name="corretora">
+             <!-- <group> -->
+                <group>
+                    <field name="tipo"/>
+                    <field name="tipo_seguro" attrs="{'invisible': [('tipo','!=','seguro')]}" />
+                    <field name="cod_seguro"/>
+                    <field name="valorl"/>
+                    <!--<field name="propos"/>-->
+                </group>
+                <group>
+                    <field name="forma_de_pag"/>            
+                    <field name="corretora_id"/>
+                    <field name="descr" string="Observação" />
+                    <field name="cmssao"/>
+                    <field name="vencimentos" readonly="1" />
+                </group>
+            </group>
+        </xpath>
+        <field name="date_start" position="before">
+            <field name="dia_vencimento" string="Vencimento(dia)" />
+        </field>
+        <!-- <field name="contract_line_ids" position="replace">
+            <field name="contract_line_ids" nolabel="1">
+                <tree string="Account Analytic Lines" editable="bottom">
+                    <field name="sequence" widget="handle" />
+                    <field name="product_id" string="Item" />
+                    <field name="name" />
+                    <field name="quantity" />
+                    <field name="uom_id" invisible="1" />
+                    <field name="dia_vencimento" string="Vencimento(data)" />
+                    <field name="data_fim_vencimento" string="Fim de vencimento(data)" />
+                    <field name="automatic_price" attrs="{'column_invisible': [('parent.contract_type','=','purchase')]}" invisible="1"/>
+                    <field name="price_unit" attrs="{'readonly': [('automatic_price', '=', True)]}" />
+                    <field name="specific_price" invisible="1"/>
+                    <field name="discount" groups="base.group_no_one" invisible="1"/>
+                    <field name="price_subtotal" />
+                </tree>
+            </field> 
+        </field> -->
+    </field>
+</record>
+<record id="email_lembrete_parcela" model="mail.template">
+    <field name="name">Email Lembrete Parcela</field>
+    <field name="email_from">carlos@atsti.com.br</field>
+    <field name="email_to">ats@atsti.com.br</field>
+    <field name="lang">${user.lang}</field>
+    <field name="model_id" ref="base.model_ir_module_module"/>
+    <field name="auto_delete" eval="False"/>
+    <field name="subject">Lembrete de vencimento de parcela</field>
+    <field name="body_html" ></field>
+</record>
+<record id="corretora_contract_contract_tree_view" model="ir.ui.view">
+    <field name="name">lista apolices</field>
+    <field name="model">contract.contract</field>
+    <field name="inherit_id" ref="contract_novo.contract_contract_tree_view" />
+    <field name="arch" type="xml">
+        <xpath expr="//tree" position="replace">
+            <tree>
+                <field name="date_end" string="Venc."/>
+                <field name="partner_id" string="Segurado" />
+                <field name="name" string="Descrição" />
+                <field name="tipo_seguro" />
+                <field name="vencimentos" />
+                <field name="corretora_id" string="CIA" />
+                <field name="valorl" />
+                <field name="cmssao" string="Com." />
+                <field name="activity_summary"/>
+                <field name="tag_ids"
+                       widget="many2many_tags"
+                       options="{'color_field': 'color'}"/>
+                <field name="descr" string="Observação" />
+            </tree>
+        </xpath>
+    </field>
+</record>
+<!-- <record id="view_contract_contract_calendar" model="ir.ui.view">
+    <field name="name">contract.contract.calendar</field>
+    <field name="model">contract.contract</field>
+    <field name="inherit_id" ref="contract.view_contract_contract_calendar" />
+    <field name="arch" type="xml">
+        <xpath expr="/calendar/field[@name='partner_id']" position="after"></xpath>
+        <calendar string="Contracts" date_start="date_end" color="is_terminated">
+            <field name="name" />
+            <field name="partner_id" />
+        </calendar>
+    </field>
+</record> -->
+<record id="contract_novo.action_customer_contract" model="ir.actions.act_window">
+    <field name="name">Apólices e Contratos</field>
+</record>
+</odoo>

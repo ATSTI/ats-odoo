@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!--Email template -->
+        <record id="email_lista_aniversariantes" model="mail.template">
+            <field name="name">Lista Aniversariantes</field>
+            <field name="email_from">carlos@xxxx.com.br</field>
+            <field name="subject">Lista de Aniversariantes</field>
+            <field name="email_to">mario@xxxxx.com.br;mauricio@xxxxx.com.br</field>
+            <field name="lang"></field>
+            <field name="model_id" ref="base.model_ir_module_module"/>
+            <field name="auto_delete" eval="False"/>
+        </record>
+    </data>
+</odoo>

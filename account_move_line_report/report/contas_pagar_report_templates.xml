@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<template id="report_contas_pagas">
+    <t t-call="web.basic_layout">        
+         <div class="page">
+             <h2 align="center">Resumo de Contas Pagas</h2>              
+             <t t-set="tot_fat" t-value="0.0"/> 
+             <t t-set="tot" t-value="0.0"/> 
+                  <table class="table table-condensed" width="98%" style="border:1px solid lightgray">
+                    <thead style="font-size:10px;" >
+                      <tr>
+                          <th><strong>Emissão</strong></th>
+                          <th><strong>Pagamento</strong></th>
+                          <th><strong>Fornecedor</strong></th>
+                          <th><strong>Fatura</strong></th>
+                          <th><strong>Descrição</strong></th>
+                          <th class="text-right"><strong>Valor pago</strong></th>
+                          <th><strong>Caixa</strong></th>                           
+                      </tr>
+                    </thead>
+                    <tbody>                        
+                       <t t-foreach="docs" t-as="o">                           
+                        <tr style="border:1px solid lightgray">
+                          <td style="font-size:10px;" width="7%"><span t-field="o.date"/></td>
+                          <td style="font-size:10px;" width="7%"><span t-field="o.date_maturity"/></td>
+                          <td style="font-size:10px;" width="25%"><span t-field="o.partner_id"/></td>
+                          <td style="font-size:10px;" width="17%"><span t-field="o.move_id"/></td>
+                          <td style="font-size:10px;" width="22%"><span t-field="o.name"/></td>
+                          <td style="font-size:10px;" width="7%" class="text-right"><span t-esc="o.payment_value" t-options='{"widget": "float", "precision": 2}'/></td>
+                          <td style="font-size:10px;" width="15%"><span t-field="o.journal_id"/></td>
+                        </tr>
+                    
+                          <t t-set="tot" t-value="tot + o.payment_value"/>
+                          <t t-set="tot_fat" t-value="tot_fat + o.debit"/>
+                       </t>
+                       <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>Total </td>
+                        <td  class="text-right">
+                            <span t-esc="tot" t-options='{"widget": "float", "precision": 2}'/>
+                        </td>
+                    </tr>  
+                    </tbody>
+                 </table>   
+         </div>
+    </t>
+</template>
+<template id="report_contas_a_pagar">
+    <t t-call="web.basic_layout">        
+         <div class="page">
+             <h2 align="center">Resumo de Contas a Pagar</h2>              
+             <t t-set="tot_fat" t-value="0.0"/> 
+             <t t-set="tot" t-value="0.0"/> 
+                  <table class="table table-condensed" width="98%" style="border:1px solid lightgray">
+                    <thead style="font-size:10px;" >
+                      <tr>
+                          <th><strong>Fornecedor</strong></th>
+                          <th><strong>Titulo</strong></th>
+                          <th><strong>Emissão</strong></th>
+                          <th><strong>Vencimento</strong></th>
+                          <th class="text-right"><strong>Pendente</strong></th>                          
+                      </tr>
+                    </thead>
+                    <tbody>                        
+                       <t t-foreach="docs" t-as="o">                           
+                        <tr style="border:1px solid lightgray">
+                          <td style="font-size:10px;" width="45%"><span t-field="o.partner_id"/></td>
+                          <td style="font-size:10px;" width="25%"><span t-field="o.move_id"/></td>
+                          <td style="font-size:10px;" width="10%"><span t-field="o.date"/></td>
+                          <td style="font-size:10px;" width="10%"><span t-field="o.date_maturity"/></td>
+                          <td style="font-size:10px;" width="10%" class="text-right"><span t-esc="o.amount_residual" t-options='{"widget": "float", "precision": 2}'/></td>
+                        </tr>
+                    
+                          <t t-set="tot" t-value="tot + o.amount_residual"/>
+                          <t t-set="tot_fat" t-value="tot_fat + o.credit"/>
+                       </t>
+                       <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>Total </td>
+                        <td  class="text-right">
+                            <span t-esc="tot" t-options='{"widget": "float", "precision": 2}'/>
+                        </td>
+                    </tr>  
+                    </tbody>
+                 </table>   
+         </div>
+    </t>
+</template>
+
+</odoo>

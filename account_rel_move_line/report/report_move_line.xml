@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+            id="report_move_line_rec"
+            string="Contas a Receber"
+            model="account.move.line"
+            report_type="qweb-pdf"
+            file="account_rel_move_line.report_move_line_rec_main"
+            name="account_rel_move_line.report_move_line_rec_main"
+        />
+        <report
+            id="report_move_line_pag"
+            string="Contas a Pagar"
+            model="account.move.line"
+            report_type="qweb-pdf"
+            file="account_rel_move_line.report_move_line_pag_main"
+            name="account_rel_move_line.report_move_line_pag_main"
+        />
+        
+    </data>
+</odoo>

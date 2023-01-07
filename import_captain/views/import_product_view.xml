@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="import_prd_tree">
+            <field name="name">importa.prd.tree</field>
+            <field name="model">import.product</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Importar Planilha">
+                    <field name="name"/>
+                    <field name="input_file"/>
+                    <field name="state"/>
+                    <field name="user_id" colspan="2"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="import_prd_view_event_form">
+            <field name="name">import.prd.view.event.form</field>
+            <field name="model">import.product</field>
+            <field name="arch" type="xml">
+                <form string="Importar Planilha" version="7.0">
+                    <header>
+                        <button name="set_done" string="Importado" type="object" states="open" class="oe_highlight"/>
+                        <button name="set_open" string="Re-ativar" type="object" states="done,cancelled" class="oe_highlight"/>
+                        <button name="set_cancelled" string="Suspender" type="object" states="open" class="oe_highlight"/>
+                        <field name="state" nolabel="1" colspan="2" widget="statusbar" statusbar_visible="open,done"/>
+                    </header>
+                    <sheet>
+                        <label string="Informar Produtos."/>
+                        <p />
+                        <field name="name" colspan="2"/>
+                        <field name="input_file" colspan="2"/>
+                        <field name="user_id" colspan="2" invisible="1"/>
+                        <button string="Importar" type="object" name="import_to_db"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="import_prd_event_action" model="ir.actions.act_window">
+            <field name="name">Imp. Produtos</field>
+            <field name="res_model">import.product</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="import_prd_tree"/>
+        </record>        
+
+
+        <menuitem name="Imp. Produtos" id="import_prd_aparelhos_menu" parent="sale.menu_sale_invoicing" sequence="98" action="import_prd_event_action"/>
+
+    </data>
+</odoo>

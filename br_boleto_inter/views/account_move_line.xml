@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="account_move_line_inter_form" model="ir.ui.view">
+        <field name="name">account.move.line.form</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="br_boleto.account_move_line_form" />
+        <field name="arch" type="xml">
+            <field name="payment_mode_id" position="after">
+                <field name="codigo_barra" />
+                <field name="linha_digitavel" />
+            </field>
+        </field>
+    </record>
+
+</odoo>

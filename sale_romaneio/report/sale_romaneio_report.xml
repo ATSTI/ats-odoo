@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report 
+            id="action_sale_report_romaneio"
+            string="Romaneio"
+            model="sale.order" 
+            report_type="qweb-pdf"
+            file="sale_romaneio.sale_report_romaneio" 
+            name="sale_romaneio.sale_report_romaneio"
+            print_report_name="'Romaneio - %s' % (object.name)"
+        />            
+    </data>
+</odoo>

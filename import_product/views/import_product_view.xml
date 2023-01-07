@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<odoo>
+
+        <record model="ir.ui.view" id="import_prd_tree">
+            <field name="name">importa_prd_tree</field>
+            <field name="model">import.product</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Importar Planilha Mairibel">
+                    <field name="name"/>
+                    <field name="input_file"/>
+                    <field name="state"/>
+                    <field name="user_id" colspan="2"/>
+                </tree>
+            </field>
+        </record>
+
+    <record id="import_prd_view_event_form" model="ir.ui.view">
+        <field name="name">import.product.mairibel.form</field>
+        <field name="model">import.product</field>
+        <field name="arch" type="xml">
+            <form string="Importar Produtos Mairibel">
+                <sheet>
+                    <field name="name" colspan="2"/>
+                    <field name="input_file" colspan="2"/>
+                    <field name="user_id" colspan="2" invisible="1"/>
+                    <button string="Importar" type="object" name="import_to_db"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+        <record id="import_prd_event_action" model="ir.actions.act_window">
+            <field name="name">Imp. Produtos</field>
+            <field name="res_model">import.product</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="import_prd_tree"/>
+        </record>        
+
+
+        <menuitem id="import_prd_aparelhos_menu" name="Importa Produtos Mairibel" parent="sale.sale_order_menu" sequence="98" action="import_prd_event_action"/>
+
+</odoo>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="br_account_invoice_eletronic_form_cte" model="ir.ui.view">
+            <field name="name">br.account.invoice.eletronic.form.cte</field>
+            <field name="model">invoice.eletronic</field>
+            <field name="inherit_id" ref="br_account_einvoice.br_account_invoice_eletronic_form"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page string="Dados CTe">
+                        <group>
+                            <field name="cod_mun_env"/>
+                            <field name="cod_mun_ini"/>
+                            <field name="cod_mun_fim"/>
+                            <field name="tp_emiss_cte"/>
+                        </group>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+    </data>
+</odoo>

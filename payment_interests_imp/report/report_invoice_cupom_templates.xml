@@ -1,0 +1,190 @@
+<?xml version="1.0" ?>
+<odoo>
+  <template id="report_invoice_cupom_main_document">
+    <t t-call="web.html_container">
+        <t t-call="web.basic_layout">
+            <t t-set="o" t-value="o.with_context(lang=lang)"/>
+                <t t-set="address">
+                    <address t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                    <div t-if="o.partner_id.vat" class="mt16"><t t-esc="o.company_id.country_id.vat_label or 'Tax ID'"/>: <span t-field="o.partner_id.vat"/></div>
+                </t>
+                <div class="page">
+                  <table border="1" width="100%">
+                      <tr>
+                        <td width="10%">
+                          <div style="width: 100%;float: left;">
+                            <img t-attf-src="data:image/*;base64,{{o.company_id.logo}}"
+                                 t-att-alt="o.company_id.name" style="width:100%"/>
+                          </div>
+                        </td>
+                        <td border="1" width="90%">
+                          <table width="100%">
+                            <tr width="100%">
+                              <td align="center" width="100%"><h3><span t-field="o.company_id.name" /></h3></td>
+                            </tr>   
+                            <tr>
+                              <td align="center" width="70%"><h3>Recibo</h3></td>
+                              <td align="center" width="13%"><h5>Fatura:</h5></td>
+                              <td align="center" width="17%"><span t-field="o.invoice_id.name"/></td>
+                            </tr>
+                          </table>  
+                        </td>
+                      </tr>  
+                  </table>
+                  <p></p>
+                  <table  border="1"  width="100%">
+                    <tr width="100%">
+                      <td width="10%">Nome:</td>
+                      <td width="40%"><span t-field="o.company_id.name" /></td>
+                      <td width="10%">Endereco:</td>
+                      <td width="40%"><span t-esc="o.company_id.partner_id.street + ',' + o.company_id.partner_id.number"/></td>
+                    </tr>   
+                    <tr width="100%">
+                      <td width="10%">CNPJ:</td>
+                      <td width="40%"><span t-field="o.company_id.partner_id.cnpj_cpf" /></td>
+                      <td width="10%">Bairro:</td>
+                      <td width="40%"><span t-field="o.company_id.partner_id.district" /></td>
+                    </tr>   
+                    <tr width="100%">
+                      <td width="10%">Cidade:</td>
+                      <td width="40%"><span t-field="o.company_id.partner_id.city_id.name" /></td>
+                      <td width="10%">CEP:</td>
+                      <td width="40%"><span t-field="o.company_id.partner_id.zip" /></td>
+                    </tr>   
+                    <tr width="100%">
+                      <td width="10%">Telefone</td>
+                      <td width="40%"><span t-field="o.company_id.partner_id.phone" /></td>
+                      <td width="10%">E-mail:</td>
+                      <td width="40%"><span t-field="o.company_id.partner_id.email" /></td>
+                    </tr>   
+                  </table>
+                  <p></p>
+                  <p></p>
+                  <p></p>
+                  <h4>Recebido de <span t-field="o.partner_id.name"/>, CPF <span t-field="o.partner_id.cnpj_cpf"/>, a quantia de <span t-field="o.amount"/>, referente a</h4>
+                  <t t-foreach="o.invoice_id.invoice_line_ids" t-as="line">
+                  <h5> <span t-field="line.name"/> Com vencimento em <span t-field="o.invoice_id.date_due"/>. </h5>
+                  <!--<t t-foreach="o.invoice_line_ids" t-as="line">
+                    <h4>Recebido de <span t-field="o.partner_id.name"/>, CPF <span t-field="o.partner_id.cnpj_cpf"/> a quantia de R<span t-field="o.amount_total"/>, referente a <span t-field="line.name"/>, com vencimento em <span t-field="o.date_due"/>. </h4>
+                  -->
+                  </t>
+                  <br></br>
+                  <br></br>
+                  ___________________________________________
+                  <p></p>
+                  <p></p>
+                  <p></p>
+                  <p></p>
+                  Holambra, ___ de __________________ de ______.
+                  <br></br>
+                  <br></br>
+                  <br></br>
+                  ---------------------------------------------------------------------------------------------------------------------------------------------------------
+                  <br></br>
+                  <br></br>
+                  <table border="1" width="100%">
+                      <tr>
+                        <td width="10%">
+                          <div style="width: 100%;float: left;">
+                            <img t-attf-src="data:image/*;base64,{{o.company_id.logo}}"
+                                 t-att-alt="o.company_id.name" style="width:100%"/>
+                          </div>
+                        </td>
+                        <td border="1" width="90%">
+                          <table width="100%">
+                            <tr width="100%">
+                              <td align="center" width="100%"><h3><span t-field="o.company_id.name" /></h3></td>
+                            </tr>   
+                            <tr>
+                              <td align="center" width="70%"><h3>Recibo</h3></td>
+                              <td align="center" width="13%"><h5>Fatura:</h5></td>
+                              <td align="center" width="17%"><span t-field="o.invoice_id.name"/></td>
+                            </tr>
+                          </table>  
+                        </td>
+                      </tr>  
+                  </table>
+                  <p></p>
+                  <table  border="1"  width="100%">
+                    <tr width="100%">
+                      <td width="10%">Nome:</td>
+                      <td width="40%"><span t-field="o.company_id.name" /></td>
+                      <td width="10%">Endereco:</td>
+                      <td width="40%"><span t-esc="o.company_id.partner_id.street + ',' + o.company_id.partner_id.number"/></td>
+                    </tr>   
+                    <tr width="100%">
+                      <td width="10%">CNPJ:</td>
+                      <td width="40%"><span t-field="o.company_id.partner_id.cnpj_cpf" /></td>
+                      <td width="10%">Bairro:</td>
+                      <td width="40%"><span t-field="o.company_id.partner_id.district" /></td>
+                    </tr>   
+                    <tr width="100%">
+                      <td width="10%">Cidade:</td>
+                      <td width="40%"><span t-field="o.company_id.partner_id.city_id.name" /></td>
+                      <td width="10%">CEP:</td>
+                      <td width="40%"><span t-field="o.company_id.partner_id.zip" /></td>
+                    </tr>   
+                    <tr width="100%">
+                      <td width="10%">Telefone</td>
+                      <td width="40%"><span t-field="o.company_id.partner_id.phone" /></td>
+                      <td width="10%">E-mail:</td>
+                      <td width="40%"><span t-field="o.company_id.partner_id.email" /></td>
+                    </tr>   
+                  </table>
+                  <p></p>
+                  <p></p>
+                  <p></p>
+                  <h4>Recebido de <span t-field="o.partner_id.name"/>, CPF <span t-field="o.partner_id.cnpj_cpf"/>, a quantia de <span t-field="o.amount"/>, referente a</h4>
+                  <t t-foreach="o.invoice_id.invoice_line_ids" t-as="line">
+                  <h5> <span t-field="line.name"/> Com vencimento em <span t-field="o.invoice_id.date_due"/>. </h5>
+                  <!--<t t-foreach="o.invoice_line_ids" t-as="line">
+                    <h4>Recebido de <span t-field="o.partner_id.name"/>, CPF <span t-field="o.partner_id.cnpj_cpf"/> a quantia de R<span t-field="o.amount_total"/>, referente a <span t-field="line.name"/>, com vencimento em <span t-field="o.date_due"/>. </h4>
+                  -->
+                  </t>
+                  <br></br>
+                  <br></br>
+                  ___________________________________________
+                  <p></p>
+                  <p></p>
+                  <p></p>
+                  Holambra, ___ de __________________ de ______.
+                  <p></p>
+                  <p></p>
+                  <p></p>
+                    <t t-set="display_discount" t-value="any([l.discount for l in o.invoice_id.invoice_line_ids])"/>
+                      <div class="clearfix">
+                        <div id="total" class="row">
+                            <div t-attf-class="#{'col-4' if report_type != 'html' else 'col-sm-7 col-md-5'} ml-auto">
+                                <table class="table table-sm">
+                                    <tr class="border-black o_subtotal" style="">
+                                        <td><strong>Subtotal</strong></td>
+                                        <td class="text-right">
+                                            <span t-field="o.amount"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-black o_total">
+                                        <td><strong>Total</strong></td>
+                                        <td class="text-right">
+                                            <span t-field="o.amount"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+  </template>
+
+
+  <template id="report_invoice_cupom_main">
+    <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="payment_interests.report_invoice_cupom_main_document" t-lang="o.partner_id.lang"/>
+        </t>
+    </t>
+  </template>
+
+  
+</odoo>

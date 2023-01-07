@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="payment_cheque_form_view" model="ir.ui.view">
+        <field name="name">payment_cheque_form</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_invoice_form"/>
+        <field name="arch" type="xml">
+            <field name="communication" position="after">
+                <field name="e_cheque" invisible="1"/>
+                <label for="cheque_barra" attrs="{'invisible': [('e_cheque', '!=', True)]}"/>
+                <field name="cheque_barra" attrs="{'invisible': [('e_cheque', '!=', True)]}"/>
+                <group attrs="{'invisible': [('e_cheque', '!=', True)]}">
+                    <field name="cheque" />
+                    <field name="comp" />
+                    <field name="banco" />
+                    <field name="agencia" />
+                    <field name="conta" />
+                </group>
+            </field>  
+        </field>
+    </record>    
+</odoo>

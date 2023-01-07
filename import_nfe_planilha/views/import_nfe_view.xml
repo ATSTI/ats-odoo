@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<odoo>
+        <record model="ir.ui.view" id="import_lista_tree">
+            <field name="name">import.nfe.planilha.tree</field>
+            <field name="model">import.nfe.planilha</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Importar Planilha NFe">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="import_nfe_planilha_form">
+            <field name="name">import.nfe.planilha.form</field>
+            <field name="model">import.nfe.planilha</field>
+            <field name="arch" type="xml">
+                <form string="Importar Planilha de NFE" version="7.0">
+                    <sheet>
+                        <field name="name" colspan="2"/>
+                        <button name="import_to_db" type="object" class="oe_highlight" 
+                            string="Importar">
+                        </button>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+</odoo>

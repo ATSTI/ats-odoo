@@ -4,8 +4,8 @@ from odoo import api, fields, models
 from datetime import datetime
 
 
-class AccountPaymentRegister(models.TransientModel):
-    _inherit = 'account.payment.register'
+class account_abstract_payment(models.AbstractModel):
+    _inherit = 'account.abstract.payment'
 
     def lanca_sangria_reforco(self, journal_id, caixa, valor, cod_forma, cod_venda, partner_id, motivo=''):
         # Inseri no PDV a Entrada no CAIXA

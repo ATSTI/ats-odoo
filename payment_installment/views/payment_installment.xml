@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="view_payment_installment_form" model="ir.ui.view">
+        <field name="name">view.payment.installment.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="br_account.view_br_account_invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='other_info']/group/group/field[@name='origin']" position="replace">
+                <field name='origin'/>
+            </xpath>
+            <page name="other_info" position="before">
+                <page name="parcelas" string="Parcelas"  states="draft">
+                    <group class="oe_edit_only">
+                        <group>
+                            <field name="dia_vcto" />
+                            <field name="vlr_prim_prc" />
+                            <field name="payment_mode_id" />
+                        </group>
+                        <group>
+                            <field name="num_parcela" />
+                            <field name="rateio_frete" />
+                            <button name="action_calcula_parcela" type="object" states="draft" class="oe_highlight" string="Calcular Parcelas" groups="account.group_account_invoice"/>
+                        </group>
+                    </group>    
+                    <field nolabel="1" name="parcela_ids"> 
+                        <tree name="parcelamento" string="Parcelamento" colors="grey:reconciled==True;red:date_maturity&lt;current_date" editable="bottom">
+                            <field name="invoice_id" invisible="1" />
+                            <field name="currency_id" invisible="1" />
+                            <field name="numero_fatura" />
+                            <field name="payment_mode_id" />
+                            <field name="data_vencimento" />
+                            <field name="valor" />
+                        </tree>
+                    </field>
+                </page>
+            </page>
+            <page name="vencimentos" position="replace">
+                <page name="vencimentos" string="Vencimentos">
+                    <field nolabel="1" name="receivable_move_line_ids">
+                        <tree name="vencimentos" string="Vencimentos" colors="grey:reconciled==True;red:date_maturity&lt;current_date">
+                            <field name="date_maturity"/>
+                            <field name="name"/>
+                            <field name="payment_mode_id"/>
+                            <field name="ref"/>
+                            <field name="debit"/>
+                            <field name="credit"/>
+                            <field name="reconciled" string="Pago" />
+                            <button name="action_register_payment" type="object" string="Register Payment" groups="account.group_account_invoice" icon="fa-usd"/>
+                            <button name="open_wizard_print_boleto" type="object" string="Boletos" icon="fa-barcode"/>
+                        </tree>
+                    </field>
+                </page>
+            </page>
+        </field>
+    </record>
+
+    <record id="view_payment_installment_supplier_form" model="ir.ui.view">
+        <field name="name">view.payment.installment.supplier.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="br_account.view_br_account_invoice_supplier_form"/>
+        <field name="arch" type="xml">
+            <page name="other_info" position="before">
+                <page name="parcelas" string="Parcelas"  states="draft">
+                    <group class="oe_edit_only">
+                        <field name="dia_vcto" />
+                        <field name="vlr_prim_prc" />
+                        <field name="payment_mode_id" />
+                        <field name="num_parcela" />
+                        <button name="action_calcula_parcela" type="object" states="draft" string="Calcular Parcelas" groups="account.group_account_invoice"/>
+                    </group>    
+                    <field nolabel="1" name="parcela_ids"> 
+                        <tree name="parcelamento" string="Parcelamento" colors="grey:reconciled==True;red:date_maturity&lt;current_date" editable="bottom">
+                            <field name="invoice_id" invisible="1" />
+                            <field name="currency_id" invisible="1" />
+                            <field name="numero_fatura" />
+                            <field name="payment_mode_id" />
+                            <field name="data_vencimento" />
+                            <field name="valor" />
+                        </tree>
+                    </field>
+                </page>
+            </page>
+
+        </field>
+    </record>
+    
+
+</odoo>

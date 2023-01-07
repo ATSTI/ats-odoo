@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="invoice_eletronic_item_import" model="ir.ui.view">
+        <field name="name">invoice.eletronic.item.form</field>
+        <field name="model">invoice.eletronic.item</field>
+        <field name="inherit_id" ref="br_nfe.invoice_eletronic_item_icms_inter" />
+        <field name="arch" type="xml">
+            <field name="icms_st_tipo_base" position="before">
+                <field name="importado" invisible="1"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

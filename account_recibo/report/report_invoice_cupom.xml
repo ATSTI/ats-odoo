@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+            id="report_invoice_cupom"
+            string="Imprimir Recibo"
+            model="account.move.line"
+            report_type="qweb-pdf"
+            file="account_recibo.report_invoice_cupom_main"
+            name="account_recibo.report_invoice_cupom_main"
+        />
+        <report
+            id="report_ficha_cadastral"
+            string="Ficha Cadastral"
+            model="res.partner"
+            report_type="qweb-pdf"
+            file="account_recibo.report_ficha_cadastral_view"
+            name="account_recibo.report_ficha_cadastral_view"
+        />     
+        
+        <report
+            id="report_contrato"
+            string="Contrato"
+            model="account.invoice"
+            report_type="qweb-pdf"
+            file="account_recibo.report_contrato_view"
+            name="account_recibo.report_contrato_view"
+        />            
+    </data>
+</odoo>

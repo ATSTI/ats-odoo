@@ -1,0 +1,231 @@
+<?xml version="1.0" ?>
+<odoo>
+  <template id="report_invoice_cupom_main_document">
+    <t t-call="web.html_container">
+        <t t-call="web.basic_layout">
+            <t t-foreach="docs" t-as="o">
+                <div class="page">
+                    <h6><span t-esc="o.company_id.name"/><br/>
+                    <span t-esc="o.company_id.street"/>, <span t-esc="o.company_id.number"/> - <span t-esc="o.company_id.district"/><br/>
+                    <span t-esc="o.company_id.city"/> / SP
+                    <div class="receipt-phone">
+                        Telefone: <span t-esc="o.company_id.phone"/>
+                    </div>
+                    <div class="receipt-user">
+                        Vendedor: <span t-esc="user.name"/>
+                    </div>
+                    <t t-if="o.partner_id">
+                        <br/>
+                        ----------------------------------------------------<br/>
+                        <t t-set="impresso" t-value="False"/>
+                        <t t-foreach="request.env['account.payment'].search([('move_line_id', '=', o.id)])" t-as="pay">
+                            <t t-foreach="pay.move_line_ids" t-as="r">
+                                <t t-if="impresso==False">
+                                    <t t-if="'Pagamento de Cliente' in r.name">
+                                        Recibo Nº: <span t-field="pay.id"/><br/>
+                                        Recebido: <span t-esc="r.credit" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.partner_id.currency_id}"/><br/>
+                                        Forma Pagamento: <span t-field="r.journal_id.name"/><br/>
+                                        Data Pagamento:  <span t-field="r.write_date"/><br/>
+                                        <t t-set="impresso" t-value="True"/>
+                                    </t>
+                                </t>
+                            </t>
+                        </t>
+                        <br/>
+			            ----------------------------------------------------
+                        <br/>
+                        Cliente: <t t-esc="o.partner_id.name"/><br/>
+                        CPF: <t t-esc="o.partner_id.cnpj_cpf"/><br/>
+                        Endereço: <t t-esc="o.partner_id.street"/>,<t t-esc="o.partner_id.number"/><br/>
+                        Bairro: <t t-esc="o.partner_id.district"/><br/>
+                        Cidade: <t t-esc="o.partner_id.city_id.name"/>,<t t-esc="o.partner_id.state_id.name"/><br/>
+			            ---------------------------------------------------- 
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        _______________________________
+                        <div class="receipt-user">
+                            <span t-esc="user.name"/>
+                        </div>
+                    </t>
+                    <br/>
+                    <div class="oe_structure"/></h6>
+                </div>
+            </t>
+        </t>
+    </t>
+  </template>
+
+
+  <template id="report_invoice_cupom_main">
+    <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="account_recibo.report_invoice_cupom_main_document" t-lang="o.partner_id.lang"/>
+        </t>
+    </t>
+  </template>
+
+
+  <template id="report_ficha_cadastral_view">
+    <t t-call="web.html_container">
+      <t t-call="web.external_layout">
+        <t t-foreach="docs" t-as="o">
+            <div class="page">
+                <p align="justify">NOME:  <b><span t-field="o.name"/></b></p>
+                <p align="justify"> CPF:  <b><span t-field="o.cnpj_cpf"/></b></p> 
+                <p align="justify"> CATEGORIA PRETENDIDA: <b><span t-field="o.vat"/> </b></p><br></br> 
+                <p align="justify"> ENDEREÇO: <span t-field="o.street"/>, <span t-field="o.number"/> - <span t-field="o.district"/>  </p> 
+                <p align="justify"> CIDADE: <span t-field="o.city_id.name"/> - UF: <span t-field="o.state_id.name"/> - CEP: <span t-field="o.zip"/> </p>
+                <p align="justify"> CELULAR: <b><span t-field="o.mobile"/></b>  - TELEFONE: <b><span t-field="o.phone"/></b>  </p> 
+                <p align="justify"> DATA DE NASCIMENTO: <span t-field="o.birthdate_date"/> </p> 
+                <p align="justify"> Nº DO RENACH: <span t-field="o.nrenach"/> </p>
+                <p align="justify"> Nº DA CNH: <span t-field="o.ncnh"/> </p> 
+                <p align="justify"> Nº DO REGISTRO DA CNH <span t-field="o.nregistro"/> </p> 
+                <p align="justify"> RG: <span t-field="o.rg_fisica"/> </p>
+                <p align="justify"> NOME DA MÃE: <span t-field="o.nomemae"/> </p>
+                <p align="justify"> NOME DO PAI: <span t-field="o.nomepai"/> </p>
+                <p align="justify"> OBSERVAÇÕES: <span t-field="o.comment"/> </p>
+            </div>
+        </t>
+      </t>
+    </t>
+  </template>
+  
+  <template id="report_contrato_view">
+     <t t-call="web.html_container">
+            <t t-call="web.internal_layout">
+                <t t-foreach="docs" t-as="o">
+                <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})"/>
+                <div class="page">
+                <h3>CONTRATO PARTICULAR DE PRESTAÇÃO DE SERVIÇOS</h3>
+                <p align="justify">HABILITACENTER AUTO ESCOLA, inscrita no CNPJ nº 18.580.360/0001-75, registrada no 
+                DETRAN/SP sob o numero 000 00, estabelecida a AV XV de Novembro, nº 985 - Bairro Jd Wada, 
+                em Artur Nogueira, SP, CEP 13160-000, ora denominada CONTRATADA e, <span t-field="o.partner_id.name"/>, 
+                natural do <span t-field="o.partner_id.country_id.name"/>, portador do CPF <span t-field="o.partner_id.cnpj_cpf"/>, 
+                RG <span t-field="o.partner_id.rg_fisica"/>, residente na cidade de <span t-field="o.partner_id.city_id.name"/>,
+                <span t-field="o.partner_id.street"/>, <span t-field="o.partner_id.number"/>, ora denominado(a) CONTRATANTE, em comum acordo, 
+                firmam o presente contrato de prestação de serviços, sob as seguintes condições.</p>
+
+                <p align="justify">II - DO OBJETO <br></br>
+                   Pelo presente instrumento, a Contratada, devidamente registrada e autorizada, 
+                   se compromete a prestar serviços de preparação e habilitação do CONTRATANTE 
+                   para obtenção da CNH, para ao final torna-lo apto na categoria <span t-field="o.partner_id.vat"/> .
+                   Neste ato, o Contratante se declara ciente de que as obrigações assumidas no presente 
+                   contrato se referem às obrigações de meio e não de resultado, sendo que a Contratada
+                   não se responsabiliza por eventual reprovação do Contratante na obtenção da CNH.</p>
+                   
+                   <p align="justify">III - DO PREÇO E FORMA DE PAGAMENTO <br></br>
+                   O valor total do objeto deste contrato, a ser suportado pelo Contratante corresponde
+                   à <span t-field="o.amount_total"/>, cujo pagamento será efetuado da seguinte forma:</p>
+                   <table class="table table-condensed" name="invoice_line_table">
+                        <thead>
+                            <tr>
+                                <th>Parcela</th>
+                                <th>Vencimento</th>
+                                <th>Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody class="invoice_tbody">
+                            <tr t-foreach="o.receivable_move_line_ids" t-as="l">
+                                <td><span t-field="l.name"/></td>
+                                <td><span t-field="l.date_maturity"/></td>
+                                <td><span t-field="l.debit"/></td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                   
+                   <p align="justify">IV DA VALIDADE <br></br>
+                   O presente contrato tem validade de 12 meses, à contar da data de assinatura do mesmo.<br></br>
+                   Importante salientar que, os exames estaduais são válidos por 12 meses a contar da data do prá cadastro, 
+                   portanto, caso o aluno por qualquer motivo ainda não tenha concluido seu processo de habilitação,
+                   o mesmo deverá pagar os valores referentes com o valor cotado no dia.</p>
+                   
+                   <p align="justify">V - DO ATRASO NO PAGAMENTO <br></br>
+                   Fica estabelecido que em caso demora, será cobrado multa de 7% (sete por cento) ao mês, 
+                   mais a correção monetária <br></br>
+                   Caso a demora seja superior a 30 (trinta) dias, ficará este contrato rescindido de pleno direito,
+                   independente de qualquer medida judicial ou extrajudicial, considerando-se vencidas as demais 
+                   obrigações vincendas, que serão exigidas de imediato. </p>
+                   
+                   <p align="justify">VI - DA REPROVAÇÃO <br></br>
+                   O valor correspondente deste contrato é referente ao custo de prestação de serviços para aprovação em um único exame.<br></br>
+                   No caso de reprovação do aluno(a), ser-lhe-ão cobradas adicionalmente as aulas necessárias para o novo exame,
+                   conforme tabela de preços vigentes. Correrão também por conta do aluno (a), as depesas com inscrição para novo
+                   exame, bem como as taxas governamentais(observar promoção adiquirida no ato da matrícula).<br></br>
+                   O aluno (a) que vier a reprovar só poderá realizar novo exame (prático ou teórico) após 15 dias a partir da data da reprova. </p>
+                   
+                   <p align="justify">VII - DAS AULAS E CANCELAMENTOS <br></br>
+                   Protocolado o pedido de exame oficial para o Contratante, teórico ou prático, no órgão aplicador, este não poderá ser cancelado,
+                   sob pena de arcar o Contratante com as despesas decorrentes do novo pedido.<br></br>
+                   A Contratada não se responsabiliza pelo cancelamento dos exames oficiais, por iniciativa do órgão
+                   aplicador, cabendo ao Contratante determinar data de seu interesse para realização de novo exame.
+                   As despesas decorrentes da marcação de novo exame oficial, cujo anterior tenha sido cancelado 
+                   por iniciativa da Contratada correrão por conta deste. <br></br>
+                   A(s) aula(s) previamente marcada(s) e não ministrada(s) por iniciativa da Contratada, será (ão) reposta (s) ao Contratante,
+                   em data de seu interesse, sem qualquer custo adicional. <br></br>
+                   O Contratante deverá comunicar a Contratada, com antecedência mínima de 24h (vinte e quatro) o cancelamento de aulas
+                   práticas previamente marcadas, sob pena de pagar a aula de reposição, cujo valor está expresso na tabela
+                   vigente do dia. <br></br>
+                   A duração das aulas práticas será de 50 (cinquenta) minutos, iniciando-se da saída do veículo das intalações da Contratada,
+                   e finalizando no mesmo local independente da situação do tráfego.<br></br>
+                   Sendo que em todas as aulas devem ser captadas as digitais em sistema PRODESP, e não é aceito atraso, sob pena de pagar a aula
+                   de reposição, cujo valor está expresso na tabela vigente do dia. </p>
+
+                   <p align="justify">VIII - DAS FALTAS <br></br>
+                   O não commparecimento do aluno nas aulas práticas, sem prévia comunicação antecipada de 24 horas, conforme clausula VIII deste contrato,
+                   será cobrado o valor de acordo com tabela de aulas vigente para a data. </p>
+                   
+                   <p align="justify">IX - DAS AULAS EXTRAS <br></br>
+                   O aluno que, posterior o cumprimento da carga horária total de 20 (vinte) horas diurnas e 05 (cinco) aulas noturnas
+                   categoria B e 16 (dezesseis) horas diurnas e 04 (quatro) aulas noturnas categoria A, após avaliação do instrutor, 
+                   necessitar complemento de aulas para melhorar seu aproveitamento prático para o exame final, 
+                   (Resolução 358/2010-Artigo 25º, parágrafo I, item G), será cobrado o valor de acordo com a tabela de aulas vigente para a data,
+                   por aula ministrada. </p>
+                   
+                   <p align="justify">X - DA RESPONSABILIDADE POR DANOS <br></br>
+                   O Contratente que desobedecer às orientações do Instrutor e provocar colisões, causando prejuízo à terceiros e/ou veículo de aprendizagem,
+                   responderá civil e criminalmente pelos danos recorrentes de sua conduta. </p>
+                   
+                   <p align="justify">XI - DAS TRANSFERÊNCIAS E RESCISÃO CONTRATUAL <br></br>
+                   No caso de interesse do aluno(a) em se transferir para outro CFC, deverá proceder a solicitação, por escrito, e lhe será cobrado o 
+                   valor de acordo com o serviço prestado até a data, mais o valor de transferência de R$50,00 (cinquenta reais), referente à taxa de 
+                   transferência que deverá ser paga integralmente à vista. <br></br>
+                   As despesas com aulas, exames e taxas estaduais serão descontadas integralmente do valor pago pelo Contratado. </p>
+                   
+                   <p align="justify"><b>XII - DA ENTREGA DA CNH <br></br>
+                   HABILITA CENTER AUTO ESCOLA entregará a CNH (permissão), ao aluno (a) aprovado(a), imediatamente após a emissão pelo órgão competente.<br></br>
+                   É de responsabilidade da contratada HABILITACENTER AUTO ESCOLA  a entrega da CNH (permissão) ao aluno, sendo que a mesma somente será entregue 
+                   após sua quitação total de débitos junto a contratada HABILITACENTER AUTO ESCOLA.</b></p>
+                   
+                   <p align="justify">XII - DO FORO DE ELEIÇÃO E HONORÁRIOS <br></br>
+                   Fica desde já eleito o foro da Comarca de Artur Nogueira - SP, em detrimento de qualquer outro, por mais privilegiado que seja para drimir quaisquer 
+                   questões ou dúvidas decorrentes deste contrato.<br></br>
+                   Se a via judicial for necesária para o cumprimento de quaisquer cláusulas neste instrumento avençadas, fica desde já estabelecido que os honorários 
+                   advocativos sejam cobrados na razão de 20% (vinte por cento).<br></br>
+                   E por estarem às partes justas e contratadas, firmam o presente em duas vias de igual teor na presença das testemunhas subscritas.</p>
+                   
+                   <p align="justify"> Artur Nogueira, <span t-field="o.date_invoice"/>.</p><br></br>
+                   
+                    _____________________________________________<br></br>          
+                   
+                    <span t-field="o.partner_id.name"/>  (Contratante)<br></br><br></br>
+                    _____________________________________________<br></br>
+                    HABILITACENTER AUTO ESCOLA  (Contratada)<br></br>
+                   
+                   
+                    
+                    <p t-if="o.payment_term_id">
+                        <span t-field="o.payment_term_id.note"/>
+                    </p>
+                    <p t-if="o.fiscal_position_id.note">
+                        <span t-field="o.fiscal_position_id.note"/>
+                    </p>
+                </div>
+            </t>
+            </t>
+     </t>  
+  </template>
+  
+</odoo>

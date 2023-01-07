@@ -1,0 +1,463 @@
+# -*- coding: utf-8 -*-
+
+from odoo import models, fields, api, _
+from odoo.addons.br_base.tools import fiscal
+import csv
+from datetime import datetime, date
+import tempfile
+import xlrd
+import re
+
+_TASK_STATE = [('open', 'Novo'),('done', 'Importado'), ('cancelled', 'Cancelado')]
+
+def unicode_csv_reader(unicode_csv_data, dialect=csv.excel, charset='utf-8', **kwargs):
+    # csv.py doesn't do Unicode; encode temporarily as UTF-8:
+    #csv_reader = csv.reader(utf_8_encoder(unicode_csv_data, charset),
+    #                        dialect=dialect, **kwargs)
+    #for row in csv_reader:
+        # decode UTF-8 back to Unicode, cell by cell:
+    #    yield [unicode(cell, charset) for cell in row]
+    print 'aqui'
+
+
+def utf_8_encoder(unicode_csv_data, charset):
+    #for line in unicode_csv_data:
+    #    yield line
+        #yield line.decode(charset).encode('utf-8', 'ignore')
+    print 'aqui'
+
+
+class import_client(models.Model):
+#class ea_import_chain(osv.osv):
+
+    _name = 'import.client'
+    
+    name = fields.Char('Descrição', size=256, required=True)
+    input_file = fields.Binary('Arquivo', required=False)
+    user_id = fields.Many2one('res.users', 'Inserido por', track_visibility='onchange'
+        )
+    header =  fields.Boolean('Header')
+    state = fields.Selection(_TASK_STATE, 'Situacao', required=True, default='open')
+
+    def set_done(self, cr, uid, ids, context=None):
+        return self.write(cr, uid, ids, {'state':'done'}, context=context)
+
+    def set_open(self, cr, uid, ids, context=None):
+        return self.write(cr, uid, ids, {'state':'open'}, context=context)
+
+    def set_cancelled(self, cr, uid, ids, context=None):
+        return self.write(cr, uid, ids, {'state':'cancelled'}, context=context)
+
+    def criar_contratos(self):
+        client_id = 0
+        contract_obj = self.env['account.analytic.account']
+        #context['result_ids'] = []
+        if self.input_file:
+            file_path = '/home/publico/tmp/intersafe.xls'
+            #file_path = '/home/odoo/intersafe.xls'
+            book = xlrd.open_workbook(file_path)
+            first_sheet = book.sheet_by_index(0)
+            conta_registros = 0
+            vendedor_id = 0
+            for rownum in range(first_sheet.nrows):                                                                                                       
+                rowValues = first_sheet.row_values(rownum)
+                if rownum > 1549 and rownum < 2550 and rowValues[72] != '' and rowValues[75] > 0 and rowValues[231] == 0:
+                    vals = {}
+                    contact_values = {}
+                    anotacoes = ''
+                    cobranca = {}
+                    cnpj_cpf = rowValues[3]  
+                    parent_id = 0
+                    emp_cob = rowValues[72]
+                    codigo = int(rowValues[0])
+                    if cnpj_cpf == '000.000.000-00':
+                        cnpj_cpf = ''
+                    #partner = self.env['res.partner'].search([('cnpj_cpf','=',cnpj_cpf)])
+                    partner = self.env['res.partner'].search([('cod_service','=',codigo)])
+                    if not partner:
+                        print ('Cliente nao localizado : %s') %(parnter.name)
+                    """ VER SE O CONTRATO JA EXISTE """
+                    contrato = '17-%s' %(str(codigo).zfill(6))
+                    partner = self.env['account.analytic.account'].search([('name','=',cnpj_cpf)])
+                     
+                    if partner:
+                        client_id = sql_cnpj['id']
+                        cod_ref = float(str(sql_cnpj['ref']))
+
+                        values = {
+                            'name': '%s-%s' %(str(codigo), nome),
+                            'type': 'contract',
+                            'partner_id': client_id,
+                            'manager_id': vendedor_id,
+                            'code': str(codigo),
+                            'parent_id': conta_analitica,
+                            'company_id': empresa_cob,
+                            'quantity_max': dia_vencimento,
+                            'recurring_next_date': '2015-12-01',
+                        }
+                        if rowValues[122]:
+                            data_1 = rowValues[122]
+                            data_reajuste = datetime(*xlrd.xldate_as_tuple(data_1, book.datemode))
+                            values['date_start'] = data_reajuste
+                        if rowValues[92]:
+                            #import pudb;pudb.set_trace()
+                            if rowValues[156]:
+                                values['motivo_encerramento']= str(int(rowValues[156]))
+                            values['state'] = 'close'
+                            if rowValues[92]:
+                                data_1 = rowValues[92]
+                                values['date'] = datetime(*xlrd.xldate_as_tuple(data_1, book.datemode))
+                        if vendedor_id > 0:
+                            values['user_id'] = vendedor_id
+                        descricao = 'Servicos de Monitoramento'
+                        if rowValues[157]:
+                            descricao = rowValues[157]
+                        line_ids = {
+                            'product_id': 22,
+                            'name': descricao,
+                            'quantity': 1,
+                            'uom_id': 1,
+                            'price_unit': valor, 
+                        }
+                        
+                        print values
+                           
+                        contract_id =  contract_obj.create(cr, uid, values, context=None)
+                        contract_cad = {'recurring_invoices': True,'recurring_invoice_line_ids':[(0,0,line_ids)]}
+                        contract_obj.write(cr, uid, contract_id, contract_cad, context=context)
+
+
+    def import_to_xls(self):
+        client_id = 0
+        client_obj = self.env['res.partner']
+        if not self.env['res.partner']:
+            #file_path = tempfile.gettempdir()+'/file.xls'
+            file_path = '/home/publico/tmp/intersafe.xls'
+            #file_path = '/home/odoo/intersafe.xls'
+            #data = self.input_file
+            #f = open(file_path,'wb')
+            #f.write(data.decode('base64'))
+            #f.close()
+            book = xlrd.open_workbook(file_path)
+            first_sheet = book.sheet_by_index(0)
+            cnpj_jafoi = ''
+            parent_id = 0
+            vendedor_id = 0
+            conta_registros = 0
+            for rownum in range(first_sheet.nrows):                                                                                                       
+                rowValues = first_sheet.row_values(rownum)
+                """ #################    Importar cadastro sem EMPRESA ??????????? ################# """
+                #if rownum > 3 and rownum > 50 and rowValues[3] != '':
+                # rowValues[231] = INATIVO 
+                if rownum > 1549 and rownum < 2550 and rowValues[72] != '' and rowValues[75] > 0 and rowValues[231] == 0:
+                    vals = {}
+                    contact_values = {}
+                    anotacoes = ''
+                    cobranca = {}
+                    cnpj_cpf = rowValues[3]  
+                    parent_id = 0
+                    emp_cob = rowValues[72]
+                    if cnpj_cpf == '000.000.000-00':
+                        cnpj_cpf = ''
+
+                    if cnpj_cpf == '':
+                        cnpj_jafoi = 'Diferente'
+
+                    # Pulando CNPJ Repetidos ##########  PARA INSERIR OS CONTATOS COMENTE AS 2 LINHAS ABAIXO
+                    if cnpj_jafoi == cnpj_cpf:
+                        continue
+                    
+                    partner = self.env['res.partner'].search([('cnpj_cpf','=',cnpj_cpf)])
+                    nome = u'%s' %(rowValues[2])
+                    codigo = int(rowValues[0])
+                    if partner:
+                        continue
+                    partner = self.env['res.partner'].search([('cod_service','=',codigo)])
+                    if partner:
+                        continue
+                    empresa = False
+                    if rowValues[3] == '000.000.000-00' or str(rowValues[3]).strip() == 'EM ANDAMENTO':
+                        print 'sem cnpj_cpf, %s' % rowValues[2]
+                    else:
+                        vals['cnpj_cpf'] = rowValues[3]
+                        if len(rowValues[3]) < 15:
+                            vals['company_type'] = 'person'
+                            if not fiscal.validate_cpf(vals['cnpj_cpf']):
+                                anotacoes = ' CPF Invalido : %s \n' %(vals['cnpj_cpf'])
+                                vals['cnpj_cpf'] = ''
+                        else:
+                            vals['company_type'] = 'company'
+                            vals['is_company'] = True
+                            if not fiscal.validate_cnpj(vals['cnpj_cpf']):
+                                anotacoes = ' CNPJ Invalido : %s \n' %(vals['cnpj_cpf'])
+                                vals['cnpj_cpf'] = ''
+        
+
+                    vals['cod_service'] = codigo
+                    if rowValues[227]:
+                        vals['internal_number'] = rowValues[227]
+                    legalname = u'%s' %(rowValues[1])
+                    #+ '-' + str(rowValues[14]) + '-' + str(rowValues[15])
+                    ie = str(rowValues[4])  
+                    endereco = rowValues[8]  
+                    if (rowValues[9]):
+                        vals['number'] = rowValues[9]
+                    bairro = rowValues[15]  
+                    cidade = rowValues[16]
+                    #+ '-' + str(rowValues[14]) + '-' + str(rowValues[15])
+                    vals['name'] = nome
+                    vals['legal_name'] = legalname
+                    if rowValues[18]:
+                        uf = rowValues[18]
+                    else:
+                        uf = 'SP'
+                    anotacoes = anotacoes + rowValues[12]
+                    complemento = rowValues[18]
+                    if rowValues[20]:
+                        try:
+                            if len(rowValues[20]) == 8:
+                                zip = "%s-%s" %(str(rowValues[20])[0:5],str(rowValues[20])[5:8])
+                            elif len(rowValues[20]) == 9:
+                                zip = rowValues[20]
+                            res = self.env['br.zip'].search_by_zip(zip_code=zip)
+                            if res:
+                                vals['zip'] = res['zip']
+                                vals['district'] = res['district']
+                                vals['city_id'] = res['city_id']
+                                vals['country_id'] = res['country_id']
+                                vals['street'] = res['street']
+                                vals['state_id'] = res['state_id']
+                        except:
+                            pass
+                    else:
+                        if rowValues[23]:
+                            vals['country_id'] = self.env['res.country'].search([('name','ilike',str(rowValues[23]).lower())],limit=1).id
+                        if rowValues[18]:
+                            vals['state_id'] = self.env['res.country.state'].search([('code','=',str(rowValues[23]))]).id
+                        if rowValues[16]:
+                            vals['city_id'] = self.env['res.state.city'].search([('name','ilike',str(rowValues[16]))],limit=1).id
+                        if rowValues[15]:
+                            vals['district'] = rowValues[15]
+                    if 'country_id' not in vals:
+                        vals['country_id'] = self.env['res.country'].search([('name','=','Brasil')],limit=1).id 
+                    # complemento endereco
+                    if rowValues[70]:
+                        vals['street2'] = rowValues[70]
+                    if rowValues[21]:
+                        vals['phone'] = rowValues[21]
+                    if rowValues[22]:
+                        vals['fax'] = str(rowValues[22])
+                    #@@@ ?
+                    if rowValues[47]:
+                        vals['email'] = rowValues[47]
+                    if rowValues[74]:
+                        data_pagamento = 'Vencimento dia ' + str(int(rowValues[74]))
+                        vals['property_payment_term_id'] = self.env['account.payment.term'].search([('name','=',data_pagamento)]).id
+                    if rowValues[190]:
+                        vals['inscr_mun'] = rowValues[190]
+                    #contato?
+                    if rowValues[31]:
+                        try:
+                            if len(rowValues[33]) == 8:
+                                zip = "%s-%s" % (str(rowValues[33])[0:5], str(rowValues[33])[5:8])
+                            elif len(rowValues[33]) == 9:
+                                zip = rowValues[33]
+                            res = self.env['br.zip'].search_by_zip(zip_code=zip)
+                            if res:
+                                contact_values['zip'] = res['zip']
+                                if res['district']:
+                                    contact_values['district'] = res['district']
+                                contact_values['city_id'] = res['city_id']
+                                contact_values['country_id'] = res['country_id']
+                                contact_values['street'] = res['street']
+                                contact_values['state_id'] = res['state_id']
+                        except:
+                            if rowValues[32]:
+                                contact_values['district'] = rowValues[32]
+                            if rowValues[31]:
+                                contact_values['street'] = rowValues[31]
+                        if rowValues[57]:
+                            contact_values['number'] = rowValues[57]
+                        if rowValues[195]:
+                            contact_values['email'] = rowValues[195]
+                        if rowValues[207]:
+                            contact_values['phone'] = rowValues[207]
+                        if len(contact_values):
+                            contact_values['name'] = u'Endereço de cobrança'
+                            contact_values['type'] = 'invoice'
+                        if rowValues[51] != 'C':
+                            vals['customer'] = False
+                            vals['supplier'] = True
+                    if not 'comment' in vals and anotacoes:
+                        vals['comment'] = anotacoes.encode('utf8')
+                    elif not 'comment' in vals and not anotacoes:
+                        vals['comment'] = ''
+                    print vals
+                    #import pudb;pu.db
+                    empresa_cob = self.env['company.type'].search([('name','=', str(int(emp_cob)))])
+                    if empresa_cob:
+                        vals['company_id'] = empresa_cob.company_id.id
+                    p_id =  client_obj.sudo().create(vals)
+                    if len(contact_values):
+                        contact_values['parent_id'] = p_id.id
+                        client_obj.create(contact_values)
+                    # contato 1
+                    if rowValues[49]:
+                        contact_values = {}
+                        contact_values['name'] = rowValues[49]
+                        contact_values['parent_id'] = p_id.id
+                        client_obj.create(contact_values)
+                    if rowValues[50]:
+                        contact_values = {}
+                        contact_values['name'] = rowValues[50]
+                        contact_values['parent_id'] = p_id.id
+                        client_obj.create(contact_values)
+                    conta_registros += 1
+                    
+
+                    # @@@@@@@@@@@@@@@@@  SUBSTITUIR os CODIGOS DO VENCIMENTO PELO QUE ESTA NA BASE A SER IMPORTADA
+                    #vencimento = 2
+                    #if dia_vencimento == 15.0:
+                    #    vencimento = 2
+                    #if dia_vencimento == 18.0:
+                    #    vencimento = 3
+                    #if dia_vencimento == 20.0:
+                    #    vencimento = 5
+                    #if dia_vencimento == 25.0:
+                    #    vencimento = 4
+                    #import pudb;pu.db
+                    #data_vencimento = 'Vencimento dia ' + str(int(data_pagamento))
+                    #vencimento = self.env['account.payment.term'].search([('name','=',data_vencimento)]).id
+                    #if not vencimento:
+                    #    vencimento = 1
+
+
+                    # @@@@@@@@@@@@@@@@@  SUBSTITUIR os CODIGOS DAS TAGS PELA DA BASE
+                    """
+                    empresa_cob = 7
+                    if emp_cob == 1.0:
+                        empresa_cob = 1
+                    if emp_cob == 1001.0:
+                        empresa_cob = 2
+                    if emp_cob == 41.0:
+                        empresa_cob = 4
+                    if emp_cob == 1041.0:
+                        empresa_cob = 5
+                    if emp_cob == 1141.0:
+                        empresa_cob = 6
+                    """ 
+
+
+        return client_id
+
+
+    #def import_to_db(self, cr, uid, ids, context={}):
+    #    print 'aqui'
+
+    '''    
+    def import_to_db(self, cr, uid, ids, context={}):
+
+        context['result_ids'] = []
+        result_pool = self.pool.get('ea_import.chain.result')
+        for chain in self.browse(cr, uid, ids, context=context):
+            csv_reader=unicode_csv_reader(StringIO(base64.b64decode(chain.input_file)),delimiter=str(";"),quoting=(not
+chain.delimiter and csv.QUOTE_NONE) or csv.QUOTE_MINIMAL,quotechar=chain.delimiter and str("'") or None, charset=chain.charset)
+
+            strstate = 'normal'
+            if chain.state == 'done':
+               strstate = 'Importado'
+
+            if chain.state == 'cancelled':
+               strstate = 'Suspenso'
+
+            strmsg = 'Situacao do arquivo : %s ' % (strstate,)
+            if chain.state in ('done','cancelled'):
+                raise osv.except_osv(strmsg,'Ative o novamente para poder importar.')
+
+            #if chain.header:
+            #    csv_reader.next()
+            result_ids = {}
+
+            #'student_id': fields.many2one('op.student',string='Student', required=True),
+            #'session_id':fields.many2one('op.exam.session','Exam Session', required=True, select=True, readonly=True),
+            #'avaliacao':fields.float('Avaliação'),
+            #'falta':fields.float('Faltas')
+            
+            #apont_obj = self.pool.get('project.task.work')
+            apont_obj = self.pool.get('op.exam')
+
+            #return res
+            primeira_linha = 0
+            for row in csv_reader:
+                if primeira_linha == 0:
+                    primeira_linha = 1
+                else:
+                    if primeira_linha == 1:
+                        sql_req= """
+                            SELECT c.id, c.course_id, c.classroom_id 
+                            FROM op_exam_session c
+                            WHERE
+                            (c.name = '%s')
+                            """ % (row[0])
+
+                        cr.execute(sql_req)
+                        sql_res = cr.dictfetchone()
+
+                        if sql_res:
+                            session_id = sql_res['id']
+                            course_id  = sql_res['course_id']
+                            classroom_id  = sql_res['classroom_id']
+                        if not sql_res:
+                            strmsg = 'Exame : %s '
+                            raise osv.except_osv(strmsg,' nao localizado no sistema.')
+                        primeira_linha = 2
+                
+                    #csv_reader.next()
+                    # for row in csv_reader:
+                    if len(row)>0:
+                        sql_usu= """
+                            SELECT u.id, op.id as exam 
+                            FROM op_exam op, op_student u
+                            WHERE
+                            (op.student_id = u.id)
+                            AND 
+                            (op.session_id = %s)
+                            AND
+                            (u.roll_number = '%s')
+                            AND
+                            (u.course_id = '%s')
+                            AND 
+                            (u.classroom_id = '%s')
+                            """ % (session_id, row[2], course_id, classroom_id)
+                        cr.execute(sql_usu)
+                        sql_resusu = cr.dictfetchone()
+               
+                        #pdb.set_trace()
+                        if sql_resusu:
+                            user_id = sql_resusu['id']
+                            exam_id = sql_resusu['exam']
+
+                        else:
+                            strmsg = 'Aluno : %s ' % (row[0],)
+                            raise osv.except_osv(strmsg,'nao localizado o aluno com este numero.') 
+                            user_id = 0
+                    #work = self.pool.get('project.task.work')
+                    vals = {'session_id': session_id,
+                        'student_id': user_id,
+                        'avaliacao': row[3],
+                        'falta': row[4],
+                    }
+                    #apont_obj.create(cr, uid, vals, context)
+                    apont_obj.write(cr, uid, exam_id, vals)
+
+
+                #pdb.set_trace()
+                #for [nada,nome,os,categoria] in csv_reader:
+                #print 'nada=%s | nome=%s | os=%s | categoria=%s' %(nada,nome,os,categoria)
+
+        #return True:w
+        return self.write(cr, uid, ids, {'state':'done'}, context=context)
+    '''
+
+
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

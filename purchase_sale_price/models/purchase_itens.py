@@ -41,12 +41,12 @@ class PurchaseItens(models.Model):
         default='new',
         track_visibility='onchange')
 
+    @api.multi
     def save_product_changes(self):
         for l in self.purchase_lines:
             product = self.env['product.template'].browse(l.product_id.product_tmpl_id.id)
             if l.new_price > 0:
                 product.list_price = l.new_price
-                product.standard_price = l.product_cst
             if l.new_margin > 0:
                 product.margin = l.new_margin
         self.state = 'done'

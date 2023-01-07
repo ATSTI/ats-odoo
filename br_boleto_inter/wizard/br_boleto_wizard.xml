@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record model="ir.ui.view" id="br_boleto_form_view_wizard">
+        <field name="name">view_br_boleto.form</field>
+        <field name="model">br.boleto.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Alterar / Reimprimir Boleto">
+                <group>
+                    <group>
+                        <field name="move_line_id" string='Vencimento'/>
+                        <field name="date_change" />
+                    </group>
+                </group>
+                <footer>
+                    <button name="imprimir_boleto" type="object" string="Reimprimir" class="oe_highlight"/>
+                        or
+                    <button special="cancel" string="Cancelar"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

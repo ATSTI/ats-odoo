@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="contract_contract_form_view" model="ir.ui.view">
+        <field name="name">contract.contract.form.contract.sale</field>
+        <field name="model">contract.contract</field>
+        <field name="inherit_id" ref="contract_novo.contract_contract_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[last()]" position="after">
+                <button
+                    name="action_draft"
+                    type="object"
+                    string="Apólice Transmitida"
+                    states="cancel"
+                />
+                <button
+                    name="action_confirm"
+                    type="object"
+                    string="Apólice Emitida"
+                    states="draft"
+                />
+                <button
+                    name="action_cancel"
+                    type="object"
+                    string="Apólice Vencida"
+                    states="confirm"
+                />
+                <field
+                    name="state"
+                    widget="statusbar"
+                    statusbar_visible="draft,confirm"
+                />
+            </xpath>
+        </field>
+    </record>
+    <record id="corretora_state_contract_contract_tree_view" model="ir.ui.view">
+        <field name="name">Lista Apolices Corretora</field>
+        <field name="model">contract.contract</field>
+        <field name="inherit_id" ref="contract_corretora.corretora_contract_contract_tree_view" />
+        <field name="arch" type="xml">
+            <field name="date_end" position="after">
+                <field name="state" />
+            </field>
+        </field>
+    </record>
+</odoo>

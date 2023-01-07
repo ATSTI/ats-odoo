@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sped_piscofins_view" model="ir.ui.view">
+        <field name="name">SPED PIS COFINS</field>
+        <field name="model">sped.piscofins</field>
+        <field name="arch" type="xml">
+        <form string="Gerar arquivo SPED PIS COFINS">
+            <group>
+                <field name="company_id" options='{"no_create" : 1, "no_create_edit" : 1}'/>    
+                <field name="tipo_escrit" widget="radio" />
+            </group>
+            <group col="4">
+                <field name="date_start"/>
+                <field name="date_end"/>
+            </group>
+            <group col="4">
+                <field name="num_rec_anterior"/>
+                <field name="ind_nat_pj"/>
+                <field name="ind_ativ"/>
+            </group>    
+            <group col="4">
+                <field name="cod_inc_trib"/>
+                <field name="ind_apro_cred"/>
+                <field name="cod_tipo_cont"/>
+                <field name="ind_reg_cum"/>
+            </group>
+            <group>
+                <field name="sped_file_name" invisible="1"/>
+                <field widget="binary" height="64" name="sped_file" filename="sped_file_name" />
+            </group>
+            <field name="log_faturamento" readonly="1"/>
+            <footer>
+                <button name="create_file" string="Gerar Arquivo" type="object" default_focus="1" class="oe_highlight"/>
+                ou
+                <button string="Cancelar" class="oe_link" special="cancel" />
+            </footer>
+        </form>
+        </field>
+    </record>
+    <!--
+    <record id="action_sped_piscofins_create" model="ir.actions.act_window">
+        <field name="name">Sped PIS/COFINS</field>
+        <field name="res_model">sped.piscofins</field>
+        <field name="view_mode">tree,form</field>
+    </record>-->
+    
+    <record id="view_sped_piscofins_file_tree" model="ir.ui.view">
+        <field name="name">view_sped_piscofins_file_tree</field>
+        <field name="model">sped.piscofins</field>
+        <field name="arch" type="xml">
+            <tree string="Gerar arquivo SPED Pis/Cofins">
+                <field name="company_id"/>    
+                <field name="tipo_escrit" />
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="sped_file_name"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="action_sped_piscofins_tree_menu" model="ir.actions.act_window">
+        <field name="name">Sped PIS/COFINS</field>
+        <field name="res_model">sped.piscofins</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_general_sped_piscofins" action="action_sped_piscofins_tree_menu" parent="account.menu_finance_receivables" sequence="99" groups="account.group_account_invoice"/>
+</odoo>

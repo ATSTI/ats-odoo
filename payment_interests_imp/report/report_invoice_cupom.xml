@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+            id="report_invoice_cupom"
+            string="Imprimir Recibo"
+            model="payment.account.move.line"
+            report_type="qweb-pdf"
+            file="payment_interests.report_invoice_cupom_main"
+            name="payment_interests.report_invoice_cupom_main"
+        />
+    </data>
+</odoo>

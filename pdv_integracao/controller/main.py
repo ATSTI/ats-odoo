@@ -30,7 +30,7 @@ class IntegracaoPdv(http.Controller):
         data = request.jsonrequest
         # TODO testar aqui se e a empresa mesmo
         hj = datetime.now()
-        hj = hj - timedelta(days=180)
+        hj = hj - timedelta(days=20)
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
         prod_tmpl = http.request.env['product.template'].sudo().search([
             ('write_date', '>=', hj),
@@ -116,19 +116,28 @@ class IntegracaoPdv(http.Controller):
             lista.append(prod)
         return json.dumps(lista)      
 
-    @http.route('/cliente_cnpj', type='json', auth="public", csrf=False)
-    def website_cliente_cnpj(self, **kwargs):
-        data = request.jsonrequest
-        cnpj = re.sub('[^0-9]', '', data['params']['cnpj'])
+    #@http.route('/clientecnpj', type='http', auth="public", csrf=False)
+    #def website_clientecnpj(self, **kwargs):
+
+    @http.route('/clientecnpj', type='http', auth="public", csrf=False)
+    def website_clientecnpj(self, **kwargs):
+        data = request.params
+        for emp in data:
+            cnpj = emp
+        data_emp = json.loads(emp)
+        cnpj = data_emp[0]['cnpj']                                                                                                   
+        #data = request.jsonrequest
+        #cnpj = re.sub('[^0-9]', '', data['params']['cnpj'])
+        cnpj = re.sub('[^0-9]', '', cnpj)
         # TODO testar aqui se e a empresa mesmo
         cnpj = '%s.%s.%s/%s-%s' %(cnpj[:2],cnpj[2:5],cnpj[5:8],cnpj[8:12],cnpj[12:14])
         cliente = http.request.env['res.partner']
-
         cli_ids = cliente.sudo().search([('cnpj_cpf', '=', cnpj),])
         lista = []
         cliente = 'N'
         for partner_id in cli_ids:
-            cliente = partner_id.ref
+            if partner_id.ref:
+                cliente = partner_id.ref
         return cliente
 
     @http.route('/clienteconsulta', type='json', auth="user", csrf=False)
@@ -185,7 +194,8 @@ class IntegracaoPdv(http.Controller):
         cj = http.request.env['account.journal'].search([
             ('name', 'ilike', 'Cliente'),
             ('company_id', '=', user_id.company_id.id),
-        ])        
+        ])
+        
         conta_obj = http.request.env['account.move.line']
         # rotina q testa se a conta ja foi baixada
         lista = []
@@ -201,10 +211,13 @@ class IntegracaoPdv(http.Controller):
                     return json.dumps(lista)
 
         if cod_cliente != '0':
-            conta_ids = conta_obj.sudo().search([('partner_id', '=',int(cod_cliente)), 
+            cliente_id = http.request.env['res.partner'].browse([int(cod_cliente)])
+            conta_ids = conta_obj.sudo().search([
+                '|', ('partner_id', '=',int(cod_cliente)), 
+                ('partner_id', '=', cliente_id.parent_id.id or 0), 
                 ('full_reconcile_id', '=', False), ('balance','!=', 0),
-                ('company_id', '=', user_id.company_id.id),
                 ('account_id.reconcile','=',True),
+                ('company_id', '=', user_id.company_id.id),
                 ('account_id', '=', cc.id),
                 ('journal_id', '=', cj.id),
             ], order='date_maturity')
@@ -292,7 +305,6 @@ class IntegracaoPdv(http.Controller):
 
     @http.route('/enviasangria', type='json', auth="user", csrf=False)
     def website_enviasangria(self, **kwargs):
-        #{"params": {"login": "ats@atsti.com.br", "password": "123456", "db": "21_vitton"}, "todos": [{9992, "Sangria", 1, "200,00"}, {9993, "Sangria", 1, "25,00"}]}
         user_id = http.request.env['res.users'].browse([request.uid])
         # receber todas as sangrias e reforco do caixa
         # verificar no odoo se existe       
@@ -660,7 +672,10 @@ class IntegracaoPdv(http.Controller):
             pedido['amount_paid'] = total
             pedido['statement_ids'] = pagamento
             pos = http.request.env['pos.order']
-            ord_ids = pos.sudo().create(pedido)
+            try:
+                ord_ids = pos.sudo().create(pedido)
+            except:
+                return "Erro pra inserir o pedido"
         return 'Sucesso'
 
     @http.route('/devolucao', type='json', auth="user", csrf=False)

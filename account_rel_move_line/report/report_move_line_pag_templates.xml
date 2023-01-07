@@ -1,0 +1,67 @@
+<?xml version="1.0" ?>
+<odoo>
+  <template id="report_move_line_pag_main_document">
+    <t t-call="web.html_container">
+        <t t-call="web.basic_layout">
+            <div class="page">
+            <table style="border: 1px solid black;" width="90%">
+                <title>Relatório de Contas a Pagar</title>
+                <tr>
+                    <th width="66%" align="left" style="border: 1px solid #000;">Fornecedor</th>
+                    <th width="12%" align="left" style="border: 1px solid #000;">Nota Fiscal</th>
+                    <th width="12%" align="left" style="border: 1px solid #000;">Vencimento</th>
+                    <th width="10%" align="right" style="border: 1px solid #000;">Valor</th>
+                </tr>
+                <t t-set="partner" t-value=""/>
+                <t t-set="total" t-value="0.0"/>
+                <t t-foreach="docs" t-as="o">
+                    <t t-set="mudou" t-value="False"/>
+                    <t t-if="partner != o.partner_id.name">
+                        <t t-set="mudou" t-value="True"/>
+                        <t t-set="partner" t-value="o.partner_id.name"/>
+                        <t t-if="partner != '' and total > 0.0">
+                            <tr style="background-color: #f2f2f2;">
+                                <td></td>
+                                <td></td>
+                                <td>Total</td>
+                                <td align="right"><span t-esc="total" t-options="{'widget': 'float', 'precision': 2}"/></td>
+                            </tr>
+                        </t>
+                        <t t-set="total" t-value="0.0"/>
+                    </t>
+                    <t t-set="total" t-value="total + o.credit"/>                    
+                    <tr>
+                        <t t-if="mudou == True">
+                            <td><span t-esc="partner"/></td>
+                        </t>
+                        <t t-if="mudou == False">
+                            <td></td>
+                        </t>
+                        <td><span t-field="o.invoice_id.nfe_number_static"/></td>
+                        <td><span t-field="o.date_maturity"/></td>
+                        <td align="right"><span t-field="o.credit" t-options="{'widget': 'float', 'precision': 2}"/></td>
+                    </tr>
+                </t>
+                <tr style="background-color: #f2f2f2;">
+                    <td></td>
+                    <td></td>
+                    <td>Total</td>
+                    <td align="right"><span t-esc="total" t-options="{'widget': 'float', 'precision': 2}"/></td>
+                </tr>
+            </table>
+            </div>
+        </t>
+    </t>
+  </template>
+
+
+  <template id="report_move_line_pag_main">
+    <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="account_rel_move_line.report_move_line_pag_main_document" t-lang="o.partner_id.lang"/>
+        </t>
+    </t>
+  </template>
+
+  
+</odoo>

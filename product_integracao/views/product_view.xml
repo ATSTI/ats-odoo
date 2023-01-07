@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<odoo>
+
+  
+    <record model="ir.ui.view" id="product_integra_form_view">
+      <field name="name">product_integra_form_view</field>
+      <field name="model">product.product</field>
+      <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
+      <field name="arch" type="xml">
+        <field name="currency_id" position="after">
+             <field name="item_id"/>
+             <field name="variant_id"/>
+        </field>
+        <field name="complemento" position="replace" />
+        <field name="default_code" position="after">
+            <field name="complemento" string="Tamanho"/>
+            <field name="online_preco"/>
+            <field name="online_estoque"/>
+        </field>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="product_template_integra_form_view">
+      <field name="name">product_template_form_view_integra</field>
+      <field name="model">product.template</field>
+      <field name="inherit_id" ref="product.product_template_form_view"/>
+      <field name="arch" type="xml">
+        <field name="company_id" position="after">
+            <field name="item_id"/>
+            <field name="variant_id"/> 
+            <field name="online_venda"/>
+            <field name="online_preco"/>
+            <field name="online_estoque"/>
+        </field>
+        <field name="complemento" position="replace">
+            <field name="complemento" string="Tamanho"/>
+            <field name="peso"/>
+            <field name="comprimento"/>
+            <field name="largura"/>
+            <field name="altura"/>
+        </field>
+      </field>
+    </record>
+
+
+</odoo>

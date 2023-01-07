@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="view_res_invoice_label">
+        <t t-call="web.basic_layout">
+            <t t-foreach="docs.with_context(show_address=True)" t-as="this">
+                <div t-attf-style="height: {{this.company_id.invoice_labels_height}}mm;
+                    width: {{this.company_id.invoice_labels_width}}mm;
+                    padding: {{this.company_id.invoice_labels_padding}}mm;
+                    margin-top: {{this.company_id.invoice_labels_margin_top}}mm;
+                    margin-bottom: {{this.company_id.invoice_labels_margin_bottom}}mm;
+                    margin-left: {{this.company_id.invoice_labels_margin_left}}mm;
+                    margin-right: {{this.company_id.invoice_labels_margin_right}}mm;
+                    display: inline-block;
+                    overflow: hidden;
+                    float:left;
+                    page-break-inside: avoid;">
+                    <h4 style="font-weight: bold;"  t-field="this.company_id.name" />
+                    <h4 style="font-weight: bold;" t-field="this.company_id.partner_id.cnpj_cpf" />
+                    <span style="font-weight: bold;" >EMPRESA: <h4 style="font-weight: bold;"  t-field="this.partner_id.name" /></span>
+                    <span style="font-weight: bold;" >ENDEREÇO: </span><span t-field="this.partner_id.street" />, <span t-field="this.partner_id.number" /><span t-field="this.partner_id.street2" /><br />
+                    <span style="font-weight: bold;" >BAIRRO: </span><span t-field="this.partner_id.district" /><br />
+                    <span style="font-weight: bold;" >CIDADE: </span><span t-field="this.partner_id.city_id.name"/><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]]> <span style="font-weight: bold;" >UF:</span> <span t-field="this.partner_id.state_id.code"/><br />
+                    <span style="font-weight: bold;" >TRANSPORTADORA: </span><span t-field="this.shipping_supplier_id.name"/><br />
+                    <span style="font-weight: bold;" >NOTA FISCAL: </span><span t-field="this.nfe_number_static" /><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]]><span style="font-weight: bold;" >VOLUME: </span><span t-field="this.number_of_packages"/><br />
+                </div>
+            </t>
+        </t>
+    </template>
+    <report id="report_res_invoice_label"
+        string="Etiqueta Transporte"
+        model="account.invoice"
+        name="invoice_label.view_res_invoice_label"
+        report_type="qweb-pdf"
+        paperformat="base.paperformat_euro"
+    />
+</odoo>

@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="account_analytic_account_payment_form" model="ir.ui.view">
+        <field name="name">account.analytic.account.payment.form</field>
+        <field name="model">account.analytic.account</field>
+        <field name="inherit_id" ref="contract.account_analytic_account_recurring_form_form" />
+        <field name="arch" type="xml">
+            <field name="contract_template_id" position="replace">
+                <field name="contract_template_id" invisible="1" />
+            </field>
+            <xpath expr='//group[@name="main"]/group' position='inside'>
+                <field name="payment_term_id" />
+                <field name="envia_email" />
+            </xpath>
+            <field name="company_id" position="after">
+                <field name="payment_mode_id" />
+                <field name="fiscal_position_id" />
+                <field name="amount_total"/>
+            </field>
+            <field name="pricelist_id" position="replace">
+                <field name="pricelist_id" invisible="1"/>
+            </field>
+            <field name="recurring_invoicing_type" position="replace">
+                <field name="recurring_invoicing_type" invisible="1"/>
+            </field>
+            <field name="currency_id" position="replace">
+                <field name="currency_id" invisible="1"/>
+            </field>
+            <field name="price_subtotal" position="after">
+                <field name="date_start"/>
+                <field name="date_stop"/>
+            </field>
+            <field name="recurring_invoice_line_ids" position="after">
+                <field name="msg_faturamento" readonly="1"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Inherited Analytic Account list for contracts -->
+    <record id="view_account_analytic_account_payment_tree" model="ir.ui.view">
+        <field name="name">account.analytic.account.payment.list</field>
+        <field name="model">account.analytic.account</field>
+        <field name="inherit_id" ref="analytic.view_account_analytic_account_list" />
+        <field name="arch" type="xml">
+            <field name="name" position="replace">
+                <field name="name" string="Titulo" />
+            </field>
+            <field name="partner_id" position="after">
+                <field name="payment_mode_id" />
+                <field name="payment_term_id" />
+            </field>
+            <field name="debit" position="replace"></field>
+            <field name="credit" position="replace" ></field>
+            <field name="balance" position="replace">
+                <field name="amount_total"/>
+            </field>
+            <!--<field name="balance" position="replace"></field>-->
+        </field>
+    </record>
+
+    <!-- Analytic Account search view for contract -->
+    <record id="view_account_analytic_account_payment_search" model="ir.ui.view">
+        <field name="name">account.analytic.account.payment.search</field>
+        <field name="model">account.analytic.account</field>
+        <field name="inherit_id" ref="analytic.view_account_analytic_account_search" />
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="payment_mode_id" />
+                <field name="payment_term_id" />
+            </field>
+        </field>
+    </record>
+
+</odoo>

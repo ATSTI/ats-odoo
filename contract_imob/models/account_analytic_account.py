@@ -177,7 +177,7 @@ class AccountAnalyticAccount(models.Model):
 
     @api.model
     def _prepare_invoice_line(self, line, invoice_id):
-        invoice_line = self.env['account.invoice.line'].new({
+        invoice_line = self.env['account.move.line'].new({
             'invoice_id': invoice_id,
             'product_id': line.product_id.id,
             'quantity': line.quantity,
@@ -230,7 +230,7 @@ class AccountAnalyticAccount(models.Model):
         invoice_type = 'out_invoice'
         if self.contract_type == 'purchase':
             invoice_type = 'in_invoice'
-        invoice = self.env['account.invoice'].new({
+        invoice = self.env['account.move'].new({
             'reference': self.code,
             'type': invoice_type,
             'partner_id': self.partner_id.address_get(
@@ -268,12 +268,12 @@ class AccountAnalyticAccount(models.Model):
         if invoice and invoice.state == 'draft':
             invoice.update(self._prepare_invoice_update(invoice))
         else:
-            invoice = self.env['account.invoice'].create(
+            invoice = self.env['account.move'].create(
                 self._prepare_invoice())
         for line in self.recurring_invoice_line_ids:
             invoice_line_vals = self._prepare_invoice_line(line, invoice.id)
             if invoice_line_vals:
-                self.env['account.invoice.line'].create(invoice_line_vals)
+                self.env['account.move.line'].create(invoice_line_vals)
         invoice.compute_taxes()
         return invoice
 
@@ -282,7 +282,7 @@ class AccountAnalyticAccount(models.Model):
 
         :return: invoices created
         """
-        invoices = self.env['account.invoice']
+        invoices = self.env['account.move']
         for contract in self:
             ref_date = contract.recurring_next_date or fields.Date.today()
             if (contract.date_start > ref_date or

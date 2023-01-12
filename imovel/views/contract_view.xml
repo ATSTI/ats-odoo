@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="account_analytic_account_imovel_form" model="ir.ui.view">
+        <field name="name">account.analytic.account.imovel.form</field>
+        <field name="model">account.analytic.account</field>
+        <field name="inherit_id" ref="contract_invoice.account_analytic_account_payment_form" />
+        <field name="arch" type="xml">
+            <field name="name" position="replace">
+                <field name="name" invisible="1" />
+                <field name="imovel_id" string="Imovel" domain="[('alugado','=',False)]"/>
+            </field>
+            <field name="automatic_price" position="after">
+                <field name="repassa_prop" />
+            </field>
+        </field>
+    </record>
+
+    <!-- Inherited Analytic Account list for contracts -->
+    <record id="view_account_analytic_account_imovel_tree" model="ir.ui.view">
+        <field name="name">account.analytic.account.payment.list</field>
+        <field name="model">account.analytic.account</field>
+        <field name="inherit_id" ref="contract_invoice.view_account_analytic_account_payment_tree" />
+        <field name="arch" type="xml">
+            <field name="name" position="replace">
+                <field name="name" string="Imovel" />
+            </field>
+        </field>
+    </record>
+
+</odoo>

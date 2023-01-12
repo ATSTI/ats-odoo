@@ -2,3 +2,4 @@
 
 from . import imovel
 from . import contract
+from . import account_move

@@ -1,14 +1,15 @@
 <?xml version="1.0"?>
 <odoo>
 
-    <record id="account_analytic_account_imovel_form" model="ir.ui.view">
-        <field name="name">account.analytic.account.imovel.form</field>
-        <field name="model">account.analytic.account</field>
-        <field name="inherit_id" ref="contract_invoice.account_analytic_account_payment_form" />
+    <record id="contract_imovel_form" model="ir.ui.view">
+        <field name="name">contract.contract.imovel.form</field>
+        <field name="model">contract.contract</field>
+        <field name="inherit_id" ref="contract.contract_contract_form_view" />
         <field name="arch" type="xml">
             <field name="name" position="replace">
                 <field name="name" invisible="1" />
                 <field name="imovel_id" string="Imovel" domain="[('alugado','=',False)]"/>
+                <field name="proprietario_id"/>
             </field>
             <field name="automatic_price" position="after">
                 <field name="repassa_prop" />
@@ -17,13 +18,14 @@
     </record>
 
     <!-- Inherited Analytic Account list for contracts -->
-    <record id="view_account_analytic_account_imovel_tree" model="ir.ui.view">
-        <field name="name">account.analytic.account.payment.list</field>
-        <field name="model">account.analytic.account</field>
-        <field name="inherit_id" ref="contract_invoice.view_account_analytic_account_payment_tree" />
+    <record id="view_contract_imovel_tree" model="ir.ui.view">
+        <field name="name">contract.contract.payment.list</field>
+        <field name="model">contract.contract</field>
+        <field name="inherit_id" ref="contract.contract_contract_tree_view" />
         <field name="arch" type="xml">
             <field name="name" position="replace">
                 <field name="name" string="Imovel" />
+                <field name="proprietario_id"/>
             </field>
         </field>
     </record>

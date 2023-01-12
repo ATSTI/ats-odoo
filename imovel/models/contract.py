@@ -1,19 +1,23 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
-import odoo.addons.decimal_precision as dp
 from odoo.exceptions import UserError, ValidationError
 from datetime import date
 
 
-class AccountAnalyticAccount(models.Model):
-    _inherit = 'account.analytic.account'
+class ContractContract(models.Model):
+    _inherit = "contract.contract"
 
     imovel_id = fields.Many2one(
         'imovel',
         string='Imovel',
         required=True
         )
-        
+
+    proprietario_id = fields.Many2one(
+        comodel_name='res.partner',
+        string='Proprietario',
+    )
+
     @api.onchange('imovel_id')
     def onchange_imovel_id(self):
         if self.imovel_id:
@@ -28,7 +32,7 @@ class AccountAnalyticAccount(models.Model):
         
     @api.model
     def _prepare_invoice(self):
-        invoice_vals = super(AccountAnalyticAccount, self).\
+        invoice_vals = super(ContractContract, self).\
             _prepare_invoice()
         if self.payment_mode_id:
             invoice_vals['payment_mode_id'] = self.payment_mode_id.id
@@ -49,7 +53,7 @@ class AccountAnalyticAccount(models.Model):
 
     @api.model
     def create(self, vals):
-        ctr = super(AccountAnalyticAccount, self).create(vals)
+        ctr = super(ContractContract, self).create(vals)
         if 'imovel_id' in vals:
             imovel = self.env['imovel'].browse(vals['imovel_id'])
             imovel.write({'alugado': True})
@@ -78,11 +82,11 @@ class AccountAnalyticAccount(models.Model):
             # altero o imovel atual
             imovel = self.env['imovel'].browse(values['imovel_id'])
             imovel.write({'alugado': True})
-        return super(AccountAnalyticAccount, self).write(values)
+        return super(ContractContract, self).write(values)
 
 
-class AccountAnalyticContractLine(models.Model):
-    _inherit = 'account.analytic.contract.line'
+class ContractLine(models.Model):
+    _inherit = "contract.line"
 
     repassa_prop = fields.Boolean(
         string="Repassa Propriet.?",

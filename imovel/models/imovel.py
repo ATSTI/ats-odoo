@@ -1,7 +1,4 @@
-# Copyright 2015 ADHOC SA  (http://www.adhoc.com.ar)
-# Copyright 2015-2016 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-
 
 from odoo import models, fields, api
 import re
@@ -33,12 +30,12 @@ class Imovel(models.Model):
     city_id = fields.Many2one(
         'res.state.city', u'Cidade',
         domain="[('state_id','=',state_id)]")
-    number = fields.Char(u'Numero', size=10)
-    zip = fields.Char('CEP', size=9)
+    number = fields.Char(u'Numero')
+    zip = fields.Char('CEP')
     # , required=True
-    street = fields.Char('Logradouro', size=72)
-    district = fields.Char('Bairro', size=40)
-    complemento = fields.Char('Complemento', size=80)
+    street = fields.Char('Logradouro')
+    district = fields.Char('Bairro')
+    complemento = fields.Char('Complemento')
     country_id = fields.Many2one('res.country', 'Pais', default=31)
     state_id = fields.Many2one(
         'res.country.state', 'Estado',

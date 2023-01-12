@@ -4,15 +4,16 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 {
     'name': 'Imovel',
-    'version': '12.0.1.0.0',
+    'version': '14.0.1.0.0',
     'category': 'Product',
     'author': 'Carlos R. Silveira '
               ,
     'license': 'AGPL-3',
-    'depends': ['account', 'product', 'br_base', 'br_zip', 'contract_invoice'],
+    'depends': ['account', 'product', 'br_base', 'br_zip', 'contract'],
     'data': [
         'views/imovel_view.xml',
         'views/contract_view.xml',
+        'views/account_invoice_view.xml',
         'views/report_invoice_document.xml',
         ],
     'installable': True,

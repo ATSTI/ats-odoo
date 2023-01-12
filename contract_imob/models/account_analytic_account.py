@@ -143,7 +143,6 @@ class AccountAnalyticAccount(models.Model):
                     % contract.name
                 )
 
-    @api.multi
     def _convert_contract_lines(self, contract):
         self.ensure_one()
         new_lines = []
@@ -202,7 +201,6 @@ class AccountAnalyticAccount(models.Model):
         })
         return invoice_line_vals
 
-    @api.multi
     def _prepare_invoice(self, journal=None):
         self.ensure_one()
         if not self.partner_id:
@@ -249,7 +247,6 @@ class AccountAnalyticAccount(models.Model):
         invoice._onchange_partner_id()
         return invoice._convert_to_write(invoice._cache)
 
-    @api.multi
     def _prepare_invoice_update(self, invoice):
         vals = self._prepare_invoice()
         update_vals = {
@@ -262,7 +259,6 @@ class AccountAnalyticAccount(models.Model):
         }
         return update_vals
 
-    @api.multi
     def _create_invoice(self, invoice=False):
         """
         :param invoice: If not False add lines to this invoice
@@ -281,7 +277,6 @@ class AccountAnalyticAccount(models.Model):
         invoice.compute_taxes()
         return invoice
 
-    @api.multi
     def recurring_create_invoice(self):
         """Create invoices from contracts
 
@@ -327,7 +322,6 @@ class AccountAnalyticAccount(models.Model):
         ])
         return contracts.recurring_create_invoice()
 
-    @api.multi
     def action_contract_send(self):
         self.ensure_one()
         template = self.env.ref(
@@ -354,7 +348,6 @@ class AccountAnalyticAccount(models.Model):
             'context': ctx,
         }
 
-    @api.multi
     def button_show_recurring_invoices(self):
         self.ensure_one()
         action = self.env.ref(

@@ -12,7 +12,6 @@
     'website': 'https://www.atsti.com.br',
     'depends': [
         'l10n_br_account',
-        'l10n_br_fiscal',
         'l10n_br_purchase',
     ],
     'data': [

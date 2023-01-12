@@ -65,7 +65,6 @@ class AccountAnalyticAccount(models.Model):
             self.name = ''
     """
                     
-    @api.multi
     def write(self, values):
         if 'imovel_id' in values and self.active:
             raise UserError(

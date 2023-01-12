@@ -116,7 +116,6 @@ class AccountAnalyticContractLine(models.Model):
         for line in self.filtered(lambda x: not x.automatic_price):
             line.specific_price = line.price_unit
 
-    @api.multi
     @api.depends('quantity', 'price_unit', 'discount')
     def _compute_price_subtotal(self):
         for line in self:
@@ -170,7 +169,6 @@ class AccountAnalyticContractLine(models.Model):
                 date_to = date_start
             line.date_to = fields.Date.to_string(date_to)
 
-    @api.multi
     @api.constrains('discount')
     def _check_discount(self):
         for line in self:
@@ -178,7 +176,6 @@ class AccountAnalyticContractLine(models.Model):
                 raise ValidationError(
                     _("Discount should be less or equal to 100"))
 
-    @api.multi
     @api.onchange('product_id')
     def _onchange_product_id(self):
         if not self.product_id:

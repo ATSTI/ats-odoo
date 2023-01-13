@@ -21,7 +21,7 @@ class MaintenanceRequest(models.Model):
         self.write({'stage_id': state.id})
         # TODO criar e concluir uma devolucao para o estoque
         type_operation = self.env['stock.picking.type'].search([
-                ('name', '=', 'Manutençao')])
+                ('name', '=', 'Manutenção')])
         line = []
         vals ={
             'location_id': type_operation.default_location_src_id.id,

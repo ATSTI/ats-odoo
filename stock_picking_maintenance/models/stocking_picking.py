@@ -13,12 +13,13 @@ class StockPicking(models.Model):
             if item.picking_id.picking_type_id.sequence_code == "IN":
                 vals = {}
                 equip_id = self.env['maintenance.equipment'].search([('product_id', '=', item.product_id.id)])
-                vals["name"] = f"{self.name} - {item.lot_id.id} "
-                vals["equipment_id"] = equip_id.id
-                vals["lot_id"] = item.lot_id.id
-                vals["maintenance_type"] = "preventive" 
-                # vals["user_id"] = self.user_id.id
-                # vals["schedule_date"] = self.scheduled_date
-                ordem = self.env['maintenance.request']        
-                ordem.create(vals)
+                if equip_id:
+                    vals["name"] = f"{self.name} - {item.lot_id.id} "
+                    vals["equipment_id"] = equip_id.id
+                    vals["lot_id"] = item.lot_id.id
+                    vals["maintenance_type"] = "preventive" 
+                    # vals["user_id"] = self.user_id.id
+                    # vals["schedule_date"] = self.scheduled_date
+                    ordem = self.env['maintenance.request']        
+                    ordem.create(vals)
         

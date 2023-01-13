@@ -31,6 +31,7 @@
     'depends': [
         'stock',
         'maintenance_product',
+        'maintenance_picking',
     ],
     'data': [
     ],

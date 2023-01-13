@@ -10,11 +10,12 @@
                 <button
                         string="Concluir OM" 
                         name="action_done" 
-                        type="object" 
-                        attrs="{'invisible': [('stage_id.done', '=', True)]}"/>
+                        type="object"
+                    />
             </xpath>
             <field name="maintenance_type" position="after">
                 <field name="origin" />
+                <field name="lot_id" />
             </field> 
         </field>
     </record>

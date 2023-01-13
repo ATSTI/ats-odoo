@@ -9,7 +9,7 @@
     "license": "LGPL-3",
     "depends": ["maintenance"],
     "data": [
-        "views/maintenance_status_views.xml",
+        "views/maintenance_picking_views.xml",
     ],
     "demo": [],
     "installable": True,

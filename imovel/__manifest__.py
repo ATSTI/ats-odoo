@@ -15,6 +15,7 @@
         'views/contract_view.xml',
         'views/account_invoice_view.xml',
         'views/ir_sequence_data.xml',
+        'wizard/imovel_alugarvender.xml',
         # 'views/report_invoice_document.xml',
         'security/res_groups.xml',
         'security/ir.model.access.csv',

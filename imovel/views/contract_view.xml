@@ -64,4 +64,12 @@
         </field>
     </record>
 
+    <!-- <record id="action_executar_contrato" model="ir.actions.act_window">
+        <field name="name">contrato aluguel</field>
+        <field name="res_model">imovel</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="imovel_form_view"/>
+        <field name="target">new</field>
+    </record> -->
+
 </odoo>

@@ -2,19 +2,19 @@
 <!-- Copyright 2020 ACSONE SA/NV
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 <odoo>
-    <record model="ir.ui.view" id="executar_faturamento_view">
-        <field name="model">executar.faturamento</field>
+    <record model="ir.ui.view" id="alugar_vender_view">
+        <field name="model">imovel.alugarvender</field>
         <field name="arch" type="xml">
             <form string="Executar Faturamento">
                 <group>
-                    <field name="data_faturar" />
-                    <field name="grupo" />
-                    <field name="buscar_grupo" />
-                    <field name="cobranca" />
-                    <field name="plano" />
-                    <field name="user_id" />
+                    <field name="imovel_id" />
+                    <field name="partner_id" />
+                    <field name="valor_aluguel" />
+                    <field name="payment_term_id" />
+                    <field name="comissao_percentual" />
+                    <field name="comissao_valor" />
                 </group>
-                <footer>
+                <!-- <footer>
                     <button
                         name="execute_faturamento"
                         string="Executar Faturamento"
@@ -23,16 +23,16 @@
                         type="object"
                     />
                     <button string="Cancel" class="btn-default" special="cancel" />
-                </footer>
+                </footer> -->
             </form>
         </field>
     </record>
 
-    <record id="action_executar_faturamento" model="ir.actions.act_window">
-        <field name="name">Executar Faturamento</field>
-        <field name="res_model">executar.faturamento</field>
+    <record id="action_alugar" model="ir.actions.act_window">
+        <field name="name">Alugar imovel</field>
+        <field name="res_model">imovel.alugarvender</field>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="executar_faturamento_view"/>
+        <field name="view_id" ref="alugar_vender_view"/>
         <field name="target">new</field>
     </record>
 </odoo>

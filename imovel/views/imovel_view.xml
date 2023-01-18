@@ -8,17 +8,12 @@
         <field name="arch" type="xml">
             <form string="Imovel">
                 <sheet>
-                    <div class="oe_button_box" name="button_box">
-                        <button name="toggle_active" type="object"
-                                class="oe_stat_button" icon="fa-archive">
-                            <field name="active" widget="boolean_button"
-                                options='{"terminology": "archive"}'/>
-                        </button>
-                    </div>                    
+                    <widget name="web_ribbon" title="Arquivado" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>                
+                    <field name="active" invisible="1" />
                     <field name="image_small" widget="image" class="oe_avatar"/>
                     <div class="oe_title">
                         <label class="oe_edit_only" for="name" string="Imovel"/>
-                        <h1><field name="name" placeholder="Codigo do Imovel"/></h1>
+                        <h1><field name="name" placeholder="Descrição"/></h1>
                         <div name="options" groups="base.group_user">
                             <div>
                                 <field name="alugado" readonly="1"/>
@@ -28,18 +23,27 @@
                     </div>
                             <group>
                                 <group name="group_general">
-                                    <field name="zip"/>
-                                    <field name="street"/>
+                                    <field name="code" />
+                                    <field name="zip_code"/>
+                                    <field name="street_name"/>
                                     <field name="number"/>
-                                    <field name="complemento"/>
+                                    <field name="zip_complement"/>
+                                </group>
+                                <group name="group_standard_price">
                                     <field name="district"/>
                                     <field name="city_id"/>
                                     <field name="state_id"/>
                                     <field name="country_id"/>
                                 </group>
-                                <group name="group_standard_price">
+                                <group name="group_tipo_imovel">
+                                    <field name="locacao" />
+                                    <field name="venda" />
                                     <field name="valor_aluguel"/>
-                                    <field name="area"/>
+                                    <field name="valor_venda"/>
+                                </group>
+                                <group name="group_areas">
+                                    <field name="areat"/>
+                                    <field name="areac" />
                                     <field name="quartos"/>
                                     <field name="banheiros"/>
                                 </group>
@@ -48,7 +52,8 @@
                         <page string="Imovel" name="general_information">
                             <field name="owner_ids" attrs="{'readonly': [('alugado', '=', True)]}">
                                  <tree string="Proprietários" editable="bottom">
-                                     <field name="partner_id" domain="[('supplier','=',True)]"/>
+                                     <field name="partner_id" />
+                                     <field name="name" invisible="1" />
                                      <field name="percentual_aluguel"/>
                                      <field name="payment_term_id"/>
                                      <field name="cota"/>
@@ -83,7 +88,7 @@
         <field name="arch" type="xml">
             <tree string="Imoveis">
                 <field name="name"/>
-                <field name="street"/>
+                <field name="street_name"/>
                 <field name="district"/>
                 <field name="quartos"/>
                 <field name="banheiros"/>
@@ -121,16 +126,16 @@
         </field>
     </record>
 
-
     <record id="imovel_search_view" model="ir.ui.view">
         <field name="name">imovel.search</field>
         <field name="model">imovel</field>
         <field name="arch" type="xml">
             <search string="Imovel">
                 <field name="name" string="Imovel"/>
+                <field name="product_id" invisible="1" />
                 <field name="district" string="Bairro"/>
                 <separator/>
-                <filter string="Para alugar" name="para_alugar" domain="[('alugado','=',False)]"/>
+                <filter string="Para alugar" name="para_alugar" domain="[('alugado','=',False), ('locacao','=',True)]"/>
                 <separator/>
                 <filter string="Alugados" name="nao_alugado" domain="[('alugado','=',True)]"/>
                 <filter string="Arquivado" name="active" domain="[('active','=',False)]"/>
@@ -138,14 +143,27 @@
         </field>
     </record>
 
-    <record id="imovel_action_all" model="ir.actions.act_window">
+    <record id="action_imovel" model="ir.actions.act_window">
         <field name="name">Imoveis</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">imovel</field>
-        <field name="view_mode">kanban,tree,form</field>
-        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,form,activity</field>
         <field name="search_view_id" ref="imovel_search_view"/>
-        <field name="view_id" eval="False"/> <!-- Force empty --> 
+        <field name="context">{'default_is_company': True}</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            Create a contact in your address book
+          </p><p>
+            Odoo helps you to easily track all activities related to a customer.
+          </p>
+        </field>
+    </record>
+
+    <record id="imovel_action_all" model="ir.actions.act_window">
+        <field name="name">Imoveis</field>
+        <field name="res_model">imovel</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="search_view_id" ref="imovel_search_view"/>
         <field name="context">{'search_default_para_alugar':1}</field>
         <!--<field name="context">{}</field>   "search_default_filter_alugado":1 -->
         <field name="help" type="html">
@@ -154,5 +172,56 @@
             </p>
         </field>
     </record>
+
+    <record id="action_imovel_view_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1" />
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="imovel_tree_view" />
+        <field name="act_window_id" ref="imovel_action_all" />
+    </record>
+    <record id="action_imovel_view_kanban" model="ir.actions.act_window.view">
+        <field name="sequence" eval="0" />
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="imovel_kanban_view" />
+        <field name="act_window_id" ref="imovel_action_all" />
+    </record>
+    <record id="action_imovel_view_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2" />
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="imovel_form_view" />
+        <field name="act_window_id" ref="imovel_action_all" />
+    </record>
+
+    <menuitem
+        id="imob_menu"
+        name="Imobiliária"
+        groups="base.group_user,imovel.group_imovel_manager"
+        web_icon="imovel,static/description/imob.png"
+        sequence="30" 
+    />
+
+    <menuitem
+        id="imovel_cadastro_menu"
+        name="Cadastros"
+        parent="imob_menu"
+        action="action_imovel"
+        sequence="2"
+    />
+
+    <menuitem
+        id="imovel_cad_menu"
+        action="imovel_action_all"
+        name="Imóveis"
+        parent="imovel_cadastro_menu"
+        sequence="10"
+    />
+
+    <menuitem
+        id="contract_menu"
+        action="contract.action_customer_contract"
+        name="Contratos"
+        parent="imob_menu"
+        sequence="20"
+    />
 
 </odoo>

@@ -1,0 +1,9 @@
+<odoo>
+
+    <!-- Animal groups -->
+    <record id="group_imovel_manager" model="res.groups">
+        <field name="name">Gerenciar Imobiliaria</field>
+        <field name="category_id" ref="base.module_category_hidden" />
+    </record>
+
+</odoo>

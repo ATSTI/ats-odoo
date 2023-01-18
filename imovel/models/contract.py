@@ -13,14 +13,17 @@ class ContractContract(models.Model):
         required=True
         )
 
-    proprietario_id = fields.Many2one(
-        comodel_name='res.partner',
+    proprietario_ids = fields.Many2many(
+        comodel_name='owner.line',
         string='Proprietario',
     )
 
     @api.onchange('imovel_id')
     def onchange_imovel_id(self):
         if self.imovel_id:
+            # for prop in self.imovel_id.owner_ids:
+            self.proprietario_ids = self.imovel_id.owner_ids
+            #     self.create({'proprietario_ids': [(0, prop.id)]})
             self.name = self.imovel_id.name
             today = date.today()
             self.code = '%s-%s-%s' %(
@@ -31,24 +34,27 @@ class ContractContract(models.Model):
         return {}
         
     @api.model
-    def _prepare_invoice(self):
+    def _prepare_invoice(self, date_invoice, journal=None):
         invoice_vals = super(ContractContract, self).\
-            _prepare_invoice()
-        if self.payment_mode_id:
-            invoice_vals['payment_mode_id'] = self.payment_mode_id.id
-            #invoice_vals['partner_bank_id'] = (
-            #    contract.partner_id.bank_ids[:1].id or
-            #    contract.payment_mode_id.bank_id.id)
-        if self.payment_term_id:
-            invoice_vals['payment_term_id'] = self.payment_term_id.id
-        if self.fiscal_position_id:
-            invoice_vals['fiscal_position_id'] = self.fiscal_position_id.id
-        invoice_vals['contract_id'] = self.id
+            _prepare_invoice(date_invoice, journal)
+        # if self.payment_mode_id:
+        #     invoice_vals['payment_mode_id'] = self.payment_mode_id.id
+        #     #invoice_vals['partner_bank_id'] = (
+        #     #    contract.partner_id.bank_ids[:1].id or
+        #     #    contract.payment_mode_id.bank_id.id)
+        # if self.payment_term_id:
+        #     invoice_vals['payment_term_id'] = self.payment_term_id.id
+        # if self.fiscal_position_id:
+        #     invoice_vals['fiscal_position_id'] = self.fiscal_position_id.id
         today = date.today()
-        tempo = str(self.tempo(self.mes_contrato, self.ano_contrato))
-        invoice_vals['reference'] = '%s(%s)-%s-%s' %(
-            self.name, tempo, str(today.month).zfill(2), today.year)
-        invoice_vals['type'] = 'out_invoice'
+        # tempo = str(self.mes_contrato, self.ano_contrato))
+        invoice_vals[0].update({
+            'contract_id': self.id,
+            'ref': '%s-%s-%s' %(
+                self.name, str(today.month).zfill(2), today.year),
+            
+        })
+        # 'type': 'out_invoice',
         return invoice_vals
 
     @api.model
@@ -59,15 +65,12 @@ class ContractContract(models.Model):
             imovel.write({'alugado': True})
         return ctr
         
-    """
     @api.onchange('active')
     def onchange_active(self):
-        import pudb;pu.db
         if not self.active:
             imovel = self.env['imovel'].browse([self.imovel_id.id])
             imovel.write({'alugado': False})
             self.name = ''
-    """
                     
     def write(self, values):
         if 'imovel_id' in values and self.active:

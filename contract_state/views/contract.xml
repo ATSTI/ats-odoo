@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="contract_contract_form_view" model="ir.ui.view">
+        <field name="name">contract.contract.form.contract.sale</field>
+        <field name="model">contract.contract</field>
+        <field name="inherit_id" ref="contract.contract_contract_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[last()]" position="after">
+                <button
+                    name="action_draft"
+                    type="object"
+                    string="Voltar Provisorio"
+                    states="cancel"
+                />
+                <button
+                    name="action_confirm"
+                    type="object"
+                    string="Em andamento"
+                    states="draft"
+                />
+                <button
+                    name="action_cancel"
+                    type="object"
+                    string="Finalizado"
+                    states="confirm"
+                />
+                <field
+                    name="state"
+                    widget="statusbar"
+                    statusbar_visible="draft,confirm"
+                />
+            </xpath>
+        </field>
+    </record>
+    <record id="contract_state_contract_contract_tree_view" model="ir.ui.view">
+        <field name="name">Lsita de Contratos</field>
+        <field name="model">contract.contract</field>
+        <field name="inherit_id" ref="contract.contract_contract_tree_view" />
+        <field name="arch" type="xml">
+            <field name="name" position="before">
+                <field name="date_end" />
+            </field>
+        </field>
+    </record>
+</odoo>

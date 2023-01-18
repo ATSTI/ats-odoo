@@ -18,7 +18,8 @@
 
 {
     'name': 'Cria ordem de manutenção',
-    'description' : 'Cria ordem de manutenção ao retorno de um equipamento',
+    'description' : 'Cria ordem de manutenção ao retorno de um equipamento. \
+        IMPORTANTE: e necessario que o item esteja informado como equipamento.',
     'version': '1.0',
     'category': 'Stock',
     'author': 'ATS Solucoes',
@@ -31,6 +32,7 @@
     'depends': [
         'stock',
         'maintenance_product',
+        'maintenance_picking',
     ],
     'data': [
     ],

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_invoice_date_due_tree" model="ir.ui.view">
+            <field name="name">account.invoice.date_due.tree</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_invoice_tree" />
+            <field name="arch" type="xml">   
+                <field name="invoice_date_due" position="replace">                    
+                    <field name="invoice_date_due" widget="date" string="xxx"  />
+                </field>
+            </field>
+        </record>      
+    </data>
+</odoo>

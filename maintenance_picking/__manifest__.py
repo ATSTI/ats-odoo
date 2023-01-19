@@ -5,8 +5,9 @@
     "version": "14.0.1.1.0",
     "category": "maintenance",
     "description" : "Cria retorno para o estoque quando a OM e concluida. \
-        IMPORTANTE: necessario criar um tipo de operação no inventário: \
-               Manutenção, com local origem Manutenção e destino Stock",
+        IMPORTANTE: necessario criar um tipo de operação \
+            no inventário: Manutenção \
+            com local origem Manutenção e destino Stock",
     "author": "Mauricio, ATSTi Soluções",
     "website": "",
     "license": "LGPL-3",

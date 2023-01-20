@@ -7,23 +7,26 @@
         <field name="arch" type="xml">
             <form string="Executar Faturamento">
                 <group>
-                    <field name="imovel_id" />
-                    <field name="partner_id" />
-                    <field name="valor_aluguel" />
-                    <field name="payment_term_id" />
-                    <field name="comissao_percentual" />
-                    <field name="comissao_valor" />
+                    <group>
+                        <field name="imovel_id" />
+                        <field name="partner_id" />
+                        <field name="valor_venda" />
+                    </group>
+                    <group>
+                        <field name="payment_term_id" />
+                        <field name="comissao_percentual" />
+                        <field name="comissao_valor" />
+                    </group>
                 </group>
-                <!-- <footer>
+                <footer>
                     <button
-                        name="execute_faturamento"
-                        string="Executar Faturamento"
-                        class="btn-primary"
-                        confirm="Confirma execução desse faturamento?"
+                        name="gera_fatura"
+                        string="Gerar Fatura"
+                        class="btn-success"
                         type="object"
                     />
                     <button string="Cancel" class="btn-default" special="cancel" />
-                </footer> -->
+                </footer>
             </form>
         </field>
     </record>
@@ -35,4 +38,13 @@
         <field name="view_id" ref="alugar_vender_view"/>
         <field name="target">new</field>
     </record>
+
+    <record id="action_gera_fatura" model="ir.actions.act_window">
+        <field name="name">Gerar Faturas</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="alugar_vender_view"/>
+        <field name="target">new</field>
+    </record>
+
 </odoo>

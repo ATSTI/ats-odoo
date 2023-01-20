@@ -7,20 +7,20 @@
         <field name="mode">primary</field>
         <field name="arch" type="xml">
             <form string="Imovel">
-                <footer>
+                <header>
                     <button
                         name="venda_executa"
                         string="Executar Faturamento de venda"
-                        class= "btn-light"
+                        class= "btn-primary"
                         type="object"
                     />
                     <button
                         name="aluga_executa"
-                        string="Executar Faturamento de aluguel"
-                        class="btn-light"
+                        string="Criar Contrato Aluguel"
+                        class="btn-primary"
                         type="object"
                     />
-                </footer>
+                </header>
                 <sheet>
                     <!-- <header>
                         <button name="alugar_bttn" string="Alugar" type="action" class="oe_highlight"/>

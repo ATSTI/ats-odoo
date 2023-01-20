@@ -72,4 +72,11 @@
         <field name="target">new</field>
     </record> -->
 
+    <record id="action_contract_alugar" model="ir.actions.act_window">
+        <field name="name">Alugar imovel</field>
+        <field name="res_model">contract.contract</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="contract_imovel_form"/>
+        <field name="target">new</field>
+    </record>
 </odoo>

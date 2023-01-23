@@ -4,6 +4,7 @@
 from odoo import fields, models, api, _
 from datetime import date, datetime
 from odoo.exceptions import UserError
+import logging
 
 _logger = logging.getLogger(__name__)
 
@@ -18,9 +19,11 @@ class ImovelAlugarvender(models.TransientModel):
         comodel_name="account.payment.term", string="Condição de Pagamento", index=True
     )
     valor_aluguel = fields.Float(u'Valor Aluguel')
+    journal_id = fields.Many2one('account.journal', string='Diario')
     valor_venda = fields.Float(u'Valor Venda')
     comissao_percentual = fields.Float(u'Comissão imob.')
     comissao_valor = fields.Float(u'Valor Comissão')
+    data_fatura = fields.Date(string='Data da Fatura', readonly=False)
 
     def action_aluga_executa(self):
         """ Opens a wizard to compose an email, with relevant mail template loaded by default """
@@ -55,23 +58,25 @@ class ImovelAlugarvender(models.TransientModel):
         vals['journal_id'] = self.journal_id.id
         vals['currency_id'] = 6
         vals['narration'] = f"Venda imovél"
-        vals['invoice_date'] = 1
-        vals['date'] = 2
+        vals['invoice_date'] = self.data_fatura
+        # vals['date'] = self.data_fatura
 
         # verifica se ja existe uma fatura criada nesta data
         # search_invoice = move.search(
         #                 [('ref', '=', vals['ref']), ('partner_id', '=', vals['partner_id'])], limit=1)
 
+        # import pudb;pu.db
         invoice = move.create(vals)
         if invoice:
             product_id = product.search([
                 ("name", "ilike", "comissão")
             ], limit=1)
             invoice.invoice_line_ids = [(0, 0, {
-                'product_id': product.id,
+                'product_id': product_id.id,
                 'quantity': 1,
                 'price_unit': self.comissao_valor,
-                'name': f"{product.name} - {self.imovel_id.name}"
+                'name': f"{product.name} - {self.imovel_id.name}",
+                'account_id': product_id.property_account_income_id.id,
                 # 'fiscal_operation_id': 14,
                 # 'fiscal_operation_line_id': 26,
                 # 'cfop_id': cfop_id.id if cfop_id else cfop_1949.id,
@@ -79,11 +84,14 @@ class ImovelAlugarvender(models.TransientModel):
             invoice._onchange_invoice_line_ids()
             _logger.info('Invoice created: %s', invoice.id)
 
+            # context = self.env.context
+            # imovel = context.get('imovel')
             msg += f"<br> Fatura criada: : {invoice.name}"
-            self.message_post(
+            self.imovel_id.message_post(
                 body=msg,
                 subject=_('Fatura criada pelo imovel.'),
                 message_type='notification'
+            )
 
     @api.onchange('comissao_percentual')
     def onchange_comissao_percentual(self):

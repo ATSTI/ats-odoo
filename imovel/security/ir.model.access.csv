@@ -1,4 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_imovel_user,imovel.user,model_imovel,base.group_user,1,0,0,0
-access_imovel_manager,imovel.manager,model_imovel,imovel.group_imovel_manager,1,1,1,1
-access_owner_line_manager,imovel.manager,model_owner_line,imovel.group_imovel_manager,1,1,1,1
+access_imovel_user,imovel.user,model_imovel,imovel.imovel_group_user,1,0,0,0
+access_imovel_manager,imovel.manager,model_imovel,imovel.imovel_group_manager,1,1,1,1
+access_owner_line_manager,imovel.manager,model_owner_line,imovel.imovel_group_manager,1,1,1,1
+access_imovel_alugarvender,imovel.manager,model_imovel_alugarvender,imovel.imovel_group_manager,1,1,1,1

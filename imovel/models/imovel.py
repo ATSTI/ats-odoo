@@ -1,6 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 import re
 
 
@@ -12,7 +13,8 @@ class OwnerLine(models.Model):
     name = fields.Char(string='Nome', related='partner_id.name', readonly=True)
     cota = fields.Float(u'Percentual Propriedade', default=100)
     owner_id = fields.Many2one('imovel', string='Imovél', index=True, required=True, ondelete='cascade')
-    percentual_aluguel = fields.Float(u'Percentual a Receber', default=10)
+    percentual_aluguel = fields.Float(' % locação', default=10)
+    percentual_venda = fields.Float(' % venda', default=6)
     payment_term_id = fields.Many2one(
         'account.payment.term',
         string='Dia Pagamento'
@@ -117,6 +119,45 @@ class Imovel(models.Model):
         prod = self.env['product.product'].create(values)
         res.product_id = prod.id
         return res
+
+    def venda_executa(self):
+        domain = []
+        ctx = {
+            'default_imovel_id': self.id,
+            'default_valor_venda': self.valor_venda,
+            'default_comissao_percentual': self.owner_ids[0].percentual_venda,
+        }
+        return {
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'imovel.alugarvender',
+            'views': [(False, 'form')],
+            'view_id': False,
+            'target': 'new',
+            'context': ctx,
+        } 
+    
+
+    def aluga_executa(self):
+        if self.alugado:
+            raise UserError(_("Imovel ja tem um contrato."))
+        if  not self.locacao:
+            raise UserError(_("Este Imovel não..."))
+        domain = []
+        ctx = {
+            'default_imovel_id': self.id,
+            'default_valor_aluguel': self.valor_aluguel,
+            'default_comissao_percentual': self.owner_ids[0].percentual_aluguel,
+        }
+        return {
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'contract.contract',
+            'views': [(False, 'form')],
+            'view_id': False,
+            'target': 'new',
+            'context': ctx,
+        } 
 
 """
     @api.multi

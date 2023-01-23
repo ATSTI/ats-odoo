@@ -7,7 +7,27 @@
         <field name="mode">primary</field>
         <field name="arch" type="xml">
             <form string="Imovel">
+                <header>
+                    <button
+                        name="venda_executa"
+                        string="Criar Fatura Venda"
+                        attrs="{'invisible': [('venda', '=', False)]}"
+                        class= "btn-primary"
+                        type="object"
+                    />
+                    <button
+                        name="aluga_executa"
+                        string="Criar Contrato Aluguel"
+                        attrs="{'invisible': [('locacao', '=', False)]}"
+                        class="btn-primary"
+                        type="object"
+                    />
+                </header>
                 <sheet>
+                    <!-- <header>
+                        <button name="alugar_bttn" string="Alugar" type="action" class="oe_highlight"/>
+                        <button name="vender_bttn" string="Vender" type="action" class="oe_highlight"/>
+                    </header>  -->
                     <widget name="web_ribbon" title="Arquivado" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>                
                     <field name="active" invisible="1" />
                     <field name="image_small" widget="image" class="oe_avatar"/>
@@ -55,6 +75,7 @@
                                      <field name="partner_id" />
                                      <field name="name" invisible="1" />
                                      <field name="percentual_aluguel"/>
+                                     <field name="percentual_venda"/>
                                      <field name="payment_term_id"/>
                                      <field name="cota"/>
                                  </tree>
@@ -116,6 +137,7 @@
                                 <strong class="o_kanban_record_title"><field name="name"/></strong>
                                 <ul>
                                     <li><strong>Aluguel: <field name="valor_aluguel"></field></strong></li>
+                                    <li><strong>Venda: <field name="valor_venda"></field></strong></li>
                                 </ul>
                                 <div name="tags"/>
                             </div>
@@ -136,6 +158,7 @@
                 <field name="district" string="Bairro"/>
                 <separator/>
                 <filter string="Para alugar" name="para_alugar" domain="[('alugado','=',False), ('locacao','=',True)]"/>
+                <filter string="Á Venda" name="para_venda" domain="[('alugado','=',False), ('venda','=',True)]"/>
                 <separator/>
                 <filter string="Alugados" name="nao_alugado" domain="[('alugado','=',True)]"/>
                 <filter string="Arquivado" name="active" domain="[('active','=',False)]"/>
@@ -195,7 +218,7 @@
     <menuitem
         id="imob_menu"
         name="Imobiliária"
-        groups="base.group_user,imovel.group_imovel_manager"
+        groups="imovel_group_user,imovel_group_manager"
         web_icon="imovel,static/description/imob.png"
         sequence="30" 
     />

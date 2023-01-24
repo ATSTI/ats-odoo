@@ -8,14 +8,16 @@
             <form string="Executar Faturamento">
                 <group>
                     <group>
-                        <field name="imovel_id" />
+                        <field name="imovel_id" readonly="1"/>
                         <field name="partner_id" />
                         <field name="valor_venda" />
+                        <field name="data_fatura" />
                     </group>
                     <group>
                         <field name="payment_term_id" />
                         <field name="comissao_percentual" />
                         <field name="comissao_valor" />
+                        <field name="journal_id" />
                     </group>
                 </group>
                 <footer>

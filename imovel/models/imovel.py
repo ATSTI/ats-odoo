@@ -123,7 +123,7 @@ class Imovel(models.Model):
     def venda_executa(self):
         domain = []
         ctx = {
-           'default_imovel_id': self.id,
+            'default_imovel_id': self.id,
             'default_valor_venda': self.valor_venda,
             'default_comissao_percentual': self.owner_ids[0].percentual_venda,
         }

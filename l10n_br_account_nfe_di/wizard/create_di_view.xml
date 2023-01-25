@@ -3,20 +3,21 @@
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 <odoo>
     <record model="ir.ui.view" id="create_di_view">
+        <field name="name">create.di_view</field>
         <field name="model">wizard.create.di</field>
         <field name="arch" type="xml">
-            <form string="Criar Di">
+            <form string="Declaração de Importação (NT 2011/004)">
                 <group>
                     <group>
                         <field name="nfe40_nDI" />
                         <field name="nfe40_dDI" />
                         <field name="nfe40_tpViaTransp" />
                         <field name="nfe40_tpIntermedio" />
-                        <field name="state_clearance_id" />
+                        <field name="state_clearance_id" /> 
                         <field name="partner_acquirer_id" />
-                        <field name="nfe40_CNPJ" invisible="1" />
-                        <field name="nfe40_UFTerceiro" invisible="1" />
-                        <field name="nfe40_cExportador" invisible="1" />
+                        <field name="nfe40_CNPJ" readonly="1" />
+                        <field name="nfe40_UFTerceiro" readonly="1" />
+                        <field name="nfe40_cExportador" readonly="1" />
                         <field name="nfe40_vAFRMM" />
                         <field name="aml_id" />
                     </group>
@@ -26,30 +27,22 @@
                         <field name="nfe40_dDesemb" />
                     </group>
                 </group>
-                <!-- <field name="nfe40_adi">
+                <field name="nfe40_adi">
                     <tree>
-                        <field name="nfe40_nSeqAdic" />
-                        <field name="nfe40_cFabricante" />
-                        <field name="nfe40_vDescDI" />
-                        <field name="nfe40_nDraw" />
+                        <field name="nSeqAdic" />
+                        <field name="cFabricante" />
+                        <field name="vDescDI" />
+                        <field name="nDraw" />
                     </tree>
-                    <form>
-                        <group>
-                            <field name="nfe40_nSeqAdic" />
-                            <field name="nfe40_cFabricante" />
-                            <field name="nfe40_vDescDI" />
-                            <field name="nfe40_nDraw" />
-                        </group>
-                    </form>
-                </field> -->
+                </field>
                 <footer>
                     <button
                         name="action_create_di"
-                        string="Create DI"
+                        string="SALVAR"
                         class="btn-success"
                         type="object"
                     />
-                    <button string="Cancel" class="btn-default" special="cancel" />
+                    <button string="DESCARTAR" class="btn-default" special="cancel" />
                 </footer>
             </form>
         </field>
@@ -63,4 +56,31 @@
         <field name="target">new</field>
     </record>
 
+    <record model="ir.ui.view" id="create_di_tree_view">
+        <field name="name">create.di_tree_view</field>
+        <field name="model">di.adi</field>
+        <field name="arch" type="xml">
+            <tree string="Adições (NT 2011/004)">
+                <field name="nSeqAdic" />
+                <field name="cFabricante" />
+                <field name="vDescDI" />
+                <field name="nDraw" />
+            </tree>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="create_di_form_view">
+        <field name="name">create.di_form_view</field>
+        <field name="model">di.adi</field>
+        <field name="arch" type="xml">
+            <form string="Adições (NT 2011/004)">
+                <group>
+                    <field name="nSeqAdic" />
+                    <field name="cFabricante" />
+                    <field name="vDescDI" />
+                    <field name="nDraw" />
+                    <field name="company_id" />
+                </group>
+            </form>
+        </field>
+    </record>
 </odoo>

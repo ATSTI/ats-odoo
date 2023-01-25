@@ -33,7 +33,7 @@ TPINTERMEDIO_DI = [
 class WizardCreateDi(models.TransientModel):
 
     _name = "wizard.create.di"
-    _description = "Faturar Contratos"
+    _description = "Declaração de Importação (NT 2011/004)"
     
     state_clearance_id = fields.Many2one(
         comodel_name="res.country.state",
@@ -75,32 +75,116 @@ class WizardCreateDi(models.TransientModel):
         'res.country.state', 'UF adquir./encomendante',
     )
 
+    nfe40_adi = fields.One2many(
+        "di.adi",
+        "DI_id",
+        string="Adições (NT 2011/004)",
+    )
 
-
+    @api.onchange('nfe40_nDI')
+    def onchange_nfe40_nDI(self):
+        ctx = self.env.context
+        di = ctx.get("di_id")
+        adi_ids = ctx.get("adi")
+        adi_line = []
+        if di:
+            adi_line.append((0, 0, adi_ids))
+            self.write({'nfe40_adi': adi_line})
 
     def action_create_di(self):
-        # import wdb
-        # wdb.set_trace()
-        # ctx = self.env.context
-        # aml = ctx.get("move_line")
-        self.aml_id.di_ids = [(0, 0, {
-                'name': self.nfe40_nDI,
-                'aml_id': self.aml_id.id,
-                'date_registration': self.nfe40_dDI,
-                'state_id': self.nfe40_UFDesemb.id,
-                'location': self.nfe40_xLocDesemb,
-                'date_release': self.nfe40_dDesemb,
-                'type_transportation': self.nfe40_tpViaTransp,
-                'afrmm_value': self.nfe40_vAFRMM,
-                'tpIntermedio': self.nfe40_tpIntermedio,
-                'thirdparty_cnpj': self.nfe40_CNPJ,
-                'thirdparty_state_id': self.nfe40_UFTerceiro.id,
-                'exporting_code': self.nfe40_cExportador,
-                'company_id': self.aml_id.company_id.id,
-                # 'adi_ids': self.aml_id.id,
+        ctx = self.env.context
+        di = ctx.get("di_id")
+        adi_id = ctx.get("adi_id")
+        adi_line = []
+        adi = {}
+        if di:
+            for line_adi in self.nfe40_adi:
+                adi["name"] = line_adi.nAdicao
+                adi["sequence_di"] = line_adi.nSeqAdic
+                adi["manufacturer_code"] = line_adi.cFabricante
+                adi["amount_discount"] = line_adi.vDescDI
+                adi["drawback_number"] = line_adi.nDraw
+                adi_line.append((1, adi_id, adi))
 
-                # 'fiscal_operation_id': 14,
-                # 'fiscal_operation_line_id': 26,
-                # 'cfop_id': cfop_id.id if cfop_id else cfop_1949.id,
-            })]
+            self.aml_id.di_ids = [(1, di, {
+                    'name': self.nfe40_nDI,
+                    'aml_id': self.aml_id.id,
+                    'date_registration': self.nfe40_dDI,
+                    'state_id': self.nfe40_UFDesemb.id,
+                    'location': self.nfe40_xLocDesemb,
+                    'date_release': self.nfe40_dDesemb,
+                    'type_transportation': self.nfe40_tpViaTransp,
+                    'afrmm_value': self.nfe40_vAFRMM,
+                    'tpIntermedio': self.nfe40_tpIntermedio,
+                    'thirdparty_cnpj': self.nfe40_CNPJ,
+                    'thirdparty_state_id': self.nfe40_UFTerceiro.id,
+                    'exporting_code': self.nfe40_cExportador,
+                    'company_id': self.aml_id.company_id.id,
+                    'adi_ids': adi_line,
+                })]
+        else:    
+            for line in self.nfe40_adi:
+                adi["name"] = line.nAdicao
+                adi["sequence_di"] = line.nSeqAdic
+                adi["manufacturer_code"] = line.cFabricante
+                adi["amount_discount"] = line.vDescDI
+                adi["drawback_number"] = line.nDraw
+                adi_line.append((0, 0, adi))
 
+            self.aml_id.di_ids = [(0, 0, {
+                    'name': self.nfe40_nDI,
+                    'aml_id': self.aml_id.id,
+                    'date_registration': self.nfe40_dDI,
+                    'state_id': self.nfe40_UFDesemb.id,
+                    'location': self.nfe40_xLocDesemb,
+                    'date_release': self.nfe40_dDesemb,
+                    'type_transportation': self.nfe40_tpViaTransp,
+                    'afrmm_value': self.nfe40_vAFRMM,
+                    'tpIntermedio': self.nfe40_tpIntermedio,
+                    'thirdparty_cnpj': self.nfe40_CNPJ,
+                    'thirdparty_state_id': self.nfe40_UFTerceiro.id,
+                    'exporting_code': self.nfe40_cExportador,
+                    'company_id': self.aml_id.company_id.id,
+                    'adi_ids': adi_line,
+                })]
+
+
+class DiAdi(models.TransientModel):
+
+    _name = "di.adi"
+    _description = "Adições (NT 2011/004)"
+
+    brl_currency_id = fields.Many2one(
+        comodel_name="res.currency",
+        string="Moeda",
+        compute="_compute_brl_currency_id",
+        default=lambda self: self.env.ref('base.BRL').id,
+    )
+
+    def _compute_brl_currency_id(self):
+        for item in self:
+            item.brl_currency_id = self.env.ref("base.BRL").id
+
+    DI_id = fields.Many2one("wizard.create.di")
+    nAdicao = fields.Char(
+        string="Número da Adição",
+    )
+    nSeqAdic = fields.Char(
+        string="Número seqüencial do item dentro da Adição",
+        required=True,
+    )
+    cFabricante = fields.Char(
+        string="Código do fabricante estrangeiro",
+        required=True,
+        help="Código do fabricante estrangeiro (usado nos sistemas internos"
+        "\nde informação do emitente da NF-e)"
+    )
+    vDescDI = fields.Monetary(
+        currency_field="brl_currency_id",
+        string="Valor do desconto do item da DI – adição",
+    )
+    nDraw = fields.Char(
+        string="Número do ato concessório de Drawback",
+    )
+
+    company_id = fields.Many2one(comodel_name='res.company', string='Company', store=True, readonly=True, default=lambda s: s.env.company)

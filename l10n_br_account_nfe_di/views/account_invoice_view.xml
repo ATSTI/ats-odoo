@@ -11,6 +11,12 @@
                 <field name="state_id" />
                 <field name="location" />
                 <field name="type_transportation" />
+                <button 
+                    name="edit_di"
+                    string="Editar" 
+                    type="object"
+                    class="oe_highlight"
+                />
             </tree>
         </field>
     </record>
@@ -41,8 +47,17 @@
                         <field name="thirdparty_cnpj" />
                         <field name="thirdparty_state_id" />
                         <field name="exporting_code" />
-                        <field name="company_id" />
-                        <field name="adi_ids" />
+                        <field name="company_id" invisible="1" />
+                        <field name="adi_ids">
+                            <tree>
+                                <field name="name" />
+                                <field name="sequence_di" />
+                                <field name="manufacturer_code" />
+                                <field name="amount_discount" />
+                                <field name="drawback_number" />
+                                <field name="company_id" invisible="1" />
+                            </tree>
+                        </field>
                     </group>
                 </sheet>
             </form>
@@ -91,15 +106,15 @@
         <field name="priority">399</field>
         <field name="arch" type="xml">
             <xpath expr="//page[@name='fiscal_taxes']" position="after">
-                <page name="d_importacao" string="Declaração Importaçao" attrs="{'invisible': [('cfop_destination', '!=', '3')]}">    
+                <page name="d_importacao" string="Declaração Importaçao" attrs="{'invisible': [('cfop_destination', '!=', '3'), ('fiscal_operation_type', '=', 'out')]}">    
                     <button
                         name="button_wizard_di"
-                        string="Create DI"
+                        string="Adicionar DI"
                         class="btn-success"
                         type="object"
                     />
-                    <field name="di_ids">
-                        <tree editable="bottom" string="Declaração importação">
+                    <field name="di_ids" context="{'default_aml_id': active_id}" readonly="1" >
+                        <tree string="Declaração importação">
                             <field name="name" string="Numero do Documento" force_save="1" />
                             <field name="date_registration" force_save="1" />
                             <field name="state_id" options="{'no_create': True, 'no_create_edit': True}" force_save="1" />
@@ -127,8 +142,9 @@
                                         <field name="exporting_code" force_save="1" />
                                         <field name="company_id" invisible="1" />
                                     </group>
+                                </group>
                                     <field name="adi_ids">
-                                        <tree editable="bottom" string="Declaração importação">
+                                        <tree>
                                             <field name="name" />
                                             <field name="sequence_di" />
                                             <field name="manufacturer_code" />
@@ -137,14 +153,13 @@
                                             <field name="company_id" invisible="1" />
                                         </tree>
                                     </field>
-                                </group>
                             </sheet>
                         </form>
                     </field>
                 </page>
-                <page name="d_exportacao" string="Detablhe Exportação" attrs="{'invisible': [('cfop_destination', '!=', '3')]}">
+                <page name="d_exportacao" string="Detalhe Exportação" attrs="{'invisible': [('cfop_destination', '!=', '3'), ('fiscal_operation_type', '=', 'in')]}">
                     <field name="exp_ids">
-                        <tree editable="bottom" string="Detablhe Exportação">
+                        <tree editable="bottom" string="Detalhe Exportação">
                             <field name="name" />
                             <field name="registro_exp" />
                             <field name="chava_nfe" />
@@ -153,7 +168,7 @@
                         </tree>
                         <form>
                             <sheet>
-                                <group string="Detablhe Exportação">
+                                <group string="Detalhe Exportação">
                                     <group>
                                         <field name="name" />
                                         <field name="registro_exp" />

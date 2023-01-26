@@ -71,12 +71,16 @@
             <form string="Adições">
                 <sheet>
                     <group>
-                        <field name="name" />
-                        <field name="sequence_di" />
-                        <field name="manufacturer_code" />
-                        <field name="amount_discount" />
-                        <field name="drawback_number" />
-                        <field name="company_id" />
+                        <group>
+                            <field name="name" />
+                            <field name="sequence_di" />
+                            <field name="manufacturer_code" />
+                        </group>
+                        <group>    
+                            <field name="amount_discount" />
+                            <field name="drawback_number" />
+                            <field name="company_id" invisible="1" />
+                        </group>
                     </group>
                 </sheet>
             </form>
@@ -105,15 +109,16 @@
         <field name="inherit_id" ref="l10n_br_account.invoice_form" />
         <field name="priority">399</field>
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='fiscal_taxes']" position="after">
-                <page name="d_importacao" string="Declaração Importaçao" attrs="{'invisible': [('cfop_destination', '!=', '3'), ('fiscal_operation_type', '=', 'out')]}">    
+            <xpath expr="//page[@name='other_info']" position="after">
+                <page name="d_importacao" string="Declaração Importaçao" attrs="{'invisible': [('fiscal_operation_type', '=', 'out')]}">
                     <button
                         name="button_wizard_di"
-                        string="Adicionar DI"
+                        string="Adicionar"
                         class="btn-success"
                         type="object"
+                        attrs="{'invisible': [('state', '!=', 'draft')]}"
                     />
-                    <field name="di_ids" context="{'default_aml_id': active_id}" readonly="1" >
+                    <field name="di_ids" context="{'default_am_id': active_id}" readonly="1" >
                         <tree string="Declaração importação">
                             <field name="name" string="Numero do Documento" force_save="1" />
                             <field name="date_registration" force_save="1" />
@@ -121,6 +126,12 @@
                             <field name="location" force_save="1" />
                             <field name="date_release" force_save="1" />
                             <field name="type_transportation" force_save="1" />
+                            <button 
+                                name="edit_di"
+                                string="Editar" 
+                                type="object"
+                                class="oe_highlight"
+                            />
                         </tree>
                         <form>
                             <sheet>
@@ -157,7 +168,12 @@
                         </form>
                     </field>
                 </page>
-                <page name="d_exportacao" string="Detalhe Exportação" attrs="{'invisible': [('cfop_destination', '!=', '3'), ('fiscal_operation_type', '=', 'in')]}">
+                <page
+                    name="d_exportacao"
+                    string="Detalhe Exportação"
+                    attrs="{'invisible': [('fiscal_operation_type', '=', 'in')]}"
+                >
+                <!-- attrs="{'invisible': [('cfop_destination', '!=', '3'), ('fiscal_operation_type', '=', 'in')]}" -->
                     <field name="exp_ids">
                         <tree editable="bottom" string="Detalhe Exportação">
                             <field name="name" />

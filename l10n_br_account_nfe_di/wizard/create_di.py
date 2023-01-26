@@ -34,52 +34,71 @@ class WizardCreateDi(models.TransientModel):
 
     _name = "wizard.create.di"
     _description = "Declaração de Importação (NT 2011/004)"
-    
-    state_clearance_id = fields.Many2one(
-        comodel_name="res.country.state",
-        string="State Clearance",
-    )
 
     partner_acquirer_id = fields.Many2one(
         comodel_name="res.partner",
-        string="Parceiro",
+        string="Adquirente/Encomendante",
     )
 
-    nfe40_nDI = fields.Char(string="Numero DI")
-    nfe40_dDI = fields.Date(string="Data DI")
-    nfe40_cExportador = fields.Char(string="Cod. Exportador")
-    nfe40_vAFRMM = fields.Float(string="Valor AFRMM")
-    nfe40_xLocDesemb = fields.Char(string="Local Desembaraço")
-    nfe40_dDesemb = fields.Date(string="Data Desembaraço")
+    nfe40_nDI = fields.Char(string="Número DI/DSI/DA/DRI", required=True)
+    nfe40_dDI = fields.Date(string="Data registro", required=True)
+    nfe40_cExportador = fields.Char(string="Cod. exportador", required=True)
+    nfe40_vAFRMM = fields.Float(string="Valor AFRMM", help="Valor adicional ao frete.")
+    nfe40_xLocDesemb = fields.Char(string="Local desembaraço", required=True)
+    nfe40_dDesemb = fields.Date(string="Data desembaraço", required=True)
 
-    nfe40_UFDesemb = fields.Many2one('res.country.state', 'UF desembaraço',domain="[('country_id.code', '=', 'BR')]")
+    nfe40_UFDesemb = fields.Many2one(
+        'res.country.state', 
+        'UF desembaraço',
+        domain="[('country_id.code', '=', 'BR')]",
+        required=True,
+    )
 
     nfe40_tpViaTransp = fields.Selection(
         selection=TPVIATRANSP_DI,
+        string="Via transporte",
+        required=True
     )
 
     nfe40_tpIntermedio = fields.Selection(
         selection=TPINTERMEDIO_DI,
+        string="Forma intermediação",
+        required=True,
+    )
+
+    am_id = fields.Many2one(
+        comodel_name="account.move",
+        string="Accoutn Move"
     )
 
     aml_id = fields.Many2one(
         comodel_name="account.move.line",
-        string="AML"
+        domain=[('display_type', 'in', ('product', 'line_section', 'line_note'))],
+        string="Produto",
+        required=True,
     )
 
     nfe40_CNPJ = fields.Char(
         related="partner_acquirer_id.nfe40_CNPJ",
+        string='CNPJ adquir./encomendante',
     )
 
     nfe40_UFTerceiro = fields.Many2one(
-        'res.country.state', 'UF adquir./encomendante',
+        'res.country.state', 
+        string='UF adquir./encomendante',
     )
 
     nfe40_adi = fields.One2many(
         "di.adi",
         "DI_id",
+        required=True,
         string="Adições (NT 2011/004)",
     )
+
+    @api.onchange('partner_acquirer_id')
+    def onchange_partner_acquirer_id(self):
+        if self.partner_acquirer_id:
+            self.nfe40_UFTerceiro = self.partner_acquirer_id.state_id.id
 
     @api.onchange('nfe40_nDI')
     def onchange_nfe40_nDI(self):
@@ -170,21 +189,21 @@ class DiAdi(models.TransientModel):
         string="Número da Adição",
     )
     nSeqAdic = fields.Char(
-        string="Número seqüencial do item dentro da Adição",
+        string="Número sequencial",
         required=True,
     )
     cFabricante = fields.Char(
-        string="Código do fabricante estrangeiro",
+        string="Código fabricante",
         required=True,
         help="Código do fabricante estrangeiro (usado nos sistemas internos"
         "\nde informação do emitente da NF-e)"
     )
     vDescDI = fields.Monetary(
         currency_field="brl_currency_id",
-        string="Valor do desconto do item da DI – adição",
+        string="Valor desconto",
     )
     nDraw = fields.Char(
-        string="Número do ato concessório de Drawback",
+        string="Número Drawback",
     )
 
     company_id = fields.Many2one(comodel_name='res.company', string='Company', store=True, readonly=True, default=lambda s: s.env.company)

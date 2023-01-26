@@ -3,6 +3,54 @@ from copy import deepcopy
 from lxml import etree
 from odoo import models, _, api, fields
 
+class AccountMove(models.Model):
+    _inherit = "account.move"
+    
+    di_ids = fields.One2many(
+        "declaracao.importacao",
+        compute="_compute_di_ids",
+        string='Delcaração de Importação (NT 2011/004)',
+    )
+
+    @api.depends("invoice_line_ids")
+    def _compute_di_ids(self):
+        di_ids = self.env["declaracao.importacao"].search([
+            ("aml_id", "in", self.invoice_line_ids._ids)
+        ])
+        for record in self:
+            record.di_ids = di_ids
+
+    exp_ids = fields.One2many(
+        "detalhe.exportacao",
+        compute="_compute_exp_ids",
+        string='Delcaração de Importação (NT 2011/004)',
+    )
+
+    @api.depends("invoice_line_ids")
+    def _compute_exp_ids(self):
+        exp_ids = self.env["detalhe.exportacao"].search([
+            ("aml_id", "in", self.invoice_line_ids._ids)
+        ])
+        for record in self:
+            record.exp_ids = exp_ids
+
+    def button_wizard_di(self):
+        for move in self:
+            ctx = {
+                'default_am_id': move.id,
+                # 'default_am_id': move.id,
+                'di_id': 0,
+            }
+        return {
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'wizard.create.di',
+            'views': [(False, 'form')],
+            'view_id': False,
+            'target': 'new',
+            'context': ctx,
+        }
+
 class AccountMoveLine(models.Model):
     _name = "account.move.line"
     _inherit = [_name, "l10n_br_fiscal.document.line.mixin.methods"]
@@ -21,22 +69,6 @@ class AccountMoveLine(models.Model):
         string='Detalhe da exportação',
         store=True, check_company=True, copy=True,
     )
-
-    def button_wizard_di(self):
-        for move in self:
-            ctx = {
-                'default_aml_id': move.id,
-                'di_id': 0,
-            }
-        return {
-            'type': 'ir.actions.act_window',
-            'view_mode': 'form',
-            'res_model': 'wizard.create.di',
-            'views': [(False, 'form')],
-            'view_id': False,
-            'target': 'new',
-            'context': ctx,
-        }
 
 class DeclaracaoImportacao(models.Model):
     _name = 'declaracao.importacao'
@@ -152,10 +184,12 @@ class DeclaracaoImportacao(models.Model):
             'default_nfe40_UFTerceiro': self.thirdparty_state_id.id,
             'default_nfe40_cExportador': self.exporting_code,
             'default_company_id': self.company_id.id,
+            'default_nfe40_dDesemb': self.date_release,
             'adi': adi,
             'default_aml_id': self.aml_id.id,
             'di_id': self.id,
             'adi_id': adi_id,
+            'default_am_id': self.aml_id.move_id.id,
         }
         return {
             'type': 'ir.actions.act_window',
@@ -187,10 +221,10 @@ class DeclaracaoAdicao(models.Model):
         for item in self:
             item.brl_currency_id = self.env.ref("base.BRL").id
 
-    name = fields.Char('Adição', size=3)
-    sequence_di = fields.Integer('Sequência', default=1, required=True)
-    manufacturer_code = fields.Char('Cód. Fabricante/Chave NFe', size=60, required=True)
-    amount_discount = fields.Monetary(string='Valor/Quantidade Exp.', currency_field="brl_currency_id", required=True)
+    name = fields.Char('Número da Adição', size=3)
+    sequence_di = fields.Integer('Número sequencial', default=1, required=True)
+    manufacturer_code = fields.Char('Código fabricante', size=60, required=True)
+    amount_discount = fields.Monetary(string='Valor desconto', currency_field="brl_currency_id", required=True)
     drawback_number = fields.Char('Número Drawback', size=11)
     company_id = fields.Many2one(comodel_name='res.company', string='Company', store=True, readonly=True, default=lambda s: s.env.company)
 

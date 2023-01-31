@@ -32,7 +32,8 @@
     'depends': ['account'],
     'data': [
         'report/report_saleorder_document.xml',
-        'report/report_locefaca.xml',
+        'report/report_delivery_document_locefaca.xml',
+        'report/report_layout_background.xml',
 
     ],
     'installable': True,

@@ -1,10 +1,13 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##############################################################################
 #
+#    OpenERP, Open Source Management Solution
+#    Copyright (C) 2010-Today OpenERP S.A. (<http://www.openerp.com>).
+#
 #    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as published
-#    by the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -17,23 +20,21 @@
 ##############################################################################
 
 {
-    'name': 'Cria ordem de manutenção',
-    'description' : 'Cria ordem de manutenção ao retorno de um equipamento',
+    'name': 'Relatorios LK-Flores',
     'version': '1.0',
-    'category': 'Stock',
-    'author': 'ATS Solucoes',
-    'website': 'http://www.atsti.com.br',
-    'license': 'AGPL-3',
-    'contributors': [
-        'Carlos Silveira<carlos@atsti.com.br>',
-        'Mauricio Silveira<maurs320@atsti.com.br>',
-    ],
-    'depends': [
-        'stock',
-        'maintenance_product',
-    ],
+    'category': 'Others',
+    'sequence': 2,
+    'summary': 'relatorios personalizadps',
+    'description': """
+    """,
+    'author': 'ATS Soluções',
+    'website': '',
+    'depends': ['account'],
     'data': [
+        'report/report_delivery_document_lk.xml',
+        'report/report_paper_format_lk.xml',
+
     ],
-    'demo': [],
     'installable': True,
+    'application': False,
 }

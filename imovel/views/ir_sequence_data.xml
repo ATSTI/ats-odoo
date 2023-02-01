@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="seq_imovel" model="ir.sequence">
+            <field name="name">Imovel</field>
+            <field name="code">imovel.code</field>
+            <field name="prefix">IM/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

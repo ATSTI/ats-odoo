@@ -343,8 +343,14 @@ class SpedEfdIcmsIpi(models.Model):
         cont = 1
         c100_icms_credito = 0.0
         c100_icms_debito = 0.0
+        c100_icms_st_credito = 0.0
+        c100_icms_st_debito = 0.0
+        c100_icms_uf_dest = 0.0
+        c100_icms_uf_rem = 0.0
         c170_icms = 0.0
         c190_icms = 0.0
+        c190_ipi_credito = 0.0
+        c190_ipi_debito = 0.0
         msg_post = ""
         for id in query_resposta:
             if id[2] == "company" and id[1] == "cancelada":
@@ -356,11 +362,21 @@ class SpedEfdIcmsIpi(models.Model):
                     if item_lista.IND_OPER == "0" and id[1] == "autorizada":
                         # Nota entrada
                         c100_icms_credito += float(item_lista.VL_ICMS)
+                        # TODO rever isso, tem q ver nota devoluçao
+                        if item_lista.IND_EMIT == "0":
+                            c100_icms_st_credito += float(item_lista.VL_ICMS_ST)
                     if item_lista.IND_OPER == "1" and id[1] == "autorizada":
                         # Nota saída
                         c100_icms_debito += float(item_lista.VL_ICMS)
+                        # TODO rever isso, tem q ver nota devoluçao
+                        if item_lista.IND_EMIT == "0":
+                            c100_icms_st_debito += float(item_lista.VL_ICMS_ST)
                 arq.read_registro(self.junta_pipe(item_lista))
                 for item_lista in self.query_registroC101(nf):
+                    if item_lista.VL_ICMS_UF_DEST:
+                        c100_icms_uf_dest += float(item_lista.VL_ICMS_UF_DEST)
+                    if item_lista.VL_ICMS_UF_REM:
+                        c100_icms_uf_rem += float(item_lista.VL_ICMS_UF_REM)
                     arq.read_registro(self.junta_pipe(item_lista))
             
             # TODO C110 - Inf. Adicional
@@ -375,6 +391,10 @@ class SpedEfdIcmsIpi(models.Model):
             for item_lista in self.query_registroC190(nf):
                 if item_lista.VL_ICMS:
                     c190_icms += float(item_lista.VL_ICMS)
+                if item_lista.CFOP[:1] in ('1','2','3') and item_lista.VL_IPI:
+                    c190_ipi_credito += float(item_lista.VL_IPI)
+                if item_lista.CFOP[:1] in ('5','6') and item_lista.VL_IPI:
+                    c190_ipi_debito += float(item_lista.VL_IPI)
                 arq.read_registro(self.junta_pipe(item_lista))
         msg_post += f"C100-ICMS Value Crédito : {str(c100_icms_credito)}<br>"
         msg_post += f"C100-ICMS Value Débito : {str(c100_icms_debito)}<br>"
@@ -420,7 +440,7 @@ class SpedEfdIcmsIpi(models.Model):
         for item_lista in self.query_registroE110(c100_icms_credito, c100_icms_debito):
             arq.read_registro(self.junta_pipe(item_lista))  
         
-        for item_lista in self.query_registroE200(periodo):
+        for item_lista in self.query_registroE200(c100_icms_st_credito, c100_icms_st_debito):
             arq.read_registro(self.junta_pipe(item_lista))
             for item in self.query_registroE210(item_lista.UF, periodo):
                 arq.read_registro(self.junta_pipe(item))
@@ -446,7 +466,7 @@ class SpedEfdIcmsIpi(models.Model):
             arq._blocos['E'].add(registro_E500)
             for item_lista in self.query_registroE510(periodo):
                 arq.read_registro(self.junta_pipe(item_lista))
-            for item_lista in self.query_registroE520(periodo):
+            for item_lista in self.query_registroE520(c190_ipi_credito, c190_ipi_debito):
                 arq.read_registro(self.junta_pipe(item_lista))
 
         # H001
@@ -473,7 +493,7 @@ class SpedEfdIcmsIpi(models.Model):
             arq.read_registro(self.junta_pipe(item_lista))
         
         arq.prepare()
-        data_mod = datetime.now().strftime("%d%M%y%H%M")
+        data_mod = datetime.now().strftime("%d%m%y%H%M")
         mes_ano = self.date_start.strftime("%m%y").zfill(4)
         self.sped_file_name = f"Sped-{mes_ano}-{data_mod}.txt"
         msg_post = f"Arquivo gerado : {self.sped_file_name}."
@@ -1268,82 +1288,6 @@ class SpedEfdIcmsIpi(models.Model):
         return lista
 
     def query_registroE110(self, icms_credito, icms_debito):
-        #SAIDA
-        # query = 
-        #         select  
-        #             sum(it.icms_value) as VL_ICMS 
-        #             from
-        #                 l10n_br_fiscal_document as ie
-        #             inner join
-        #                 l10n_br_fiscal_document_line it
-        #                 on it.document_id = ie.id
-        #             inner join
-        #                 l10n_br_fiscal_cfop cfop
-        #                 on it.cfop_id = cfop.id
-        #             where
-        #                 %s 
-        #                 and (ie.document_type in ('55','1','57','67'))
-        #                 and (ie.state_edoc = 'autorizada')
-        #                 and ((substr(cfop.code, 1,1) in ('5','6','7'))
-        #                   or 
-        #                     (cfop.code = '1605'))
-        #          % (periodo)
-        # self._cr.execute(query)
-        # query_resposta = self._cr.fetchall()
-        # lista = []
-        # registro_E110 = RegistroE110()
-        # sld_transp = 0.0
-        # sld_icms = 0.0
-        # for id in query_resposta:
-        #     if not id[0]:
-        #         continue
-        #     registro_E110.VL_TOT_DEBITOS = id[0]
-        #     if id[0]:
-        #         sld_icms = id[0]
-        #         sld_transp = id[0]
-        # #ENTRADA
-        # query = 
-        #         select  
-        #             sum(it.icms_value) as VL_ICMS 
-        #             from
-        #                 l10n_br_fiscal_document as ie
-        #             inner join
-        #                 l10n_br_fiscal_document_line it
-        #                 on it.document_id = ie.id
-        #             inner join
-        #                 l10n_br_fiscal_cfop cfop
-        #                 on it.cfop_id = cfop.id
-        #             where
-        #                 %s    
-        #                 and (ie.document_type in ('55','1','57','67'))
-        #                 and (ie.state_edoc = 'autorizada')
-        #                 and (((substr(cfop.code, 1,1) in ('1','2','3')) 
-        #                 and cfop.code not in ('1605')) or (cfop.code = '5605'))
-        #          % (periodo)
-        # self._cr.execute(query)
-        # query_resposta = self._cr.fetchall()
-        # for id in query_resposta:
-
-        #     registro_E110.VL_TOT_CREDITOS = self.transforma_valor(id[0])
-        #     if not id[0]:
-        #         registro_E110.VL_ICMS_RECOLHER = self.transforma_valor(sld_icms)
-        #         registro_E110.VL_SLD_APURADO = self.transforma_valor(sld_icms)
-        #         continue
-        #     if id[0] > sld_icms:
-        #         sld_icms = id[0] - sld_icms
-        #         registro_E110.VL_ICMS_RECOLHER = '0'
-        #         registro_E110.VL_SLD_APURADO = '0'
-        #     else:
-        #         sld_icms = sld_icms - id[0]
-        #         registro_E110.VL_ICMS_RECOLHER = self.transforma_valor(sld_icms)
-        #         registro_E110.VL_SLD_APURADO = self.transforma_valor(sld_icms)
-        #     sld_transp -= id[0]
-        # if sld_transp > 0.0:
-        #     sld_transp = 0.0
-        # else:
-        #     if sld_transp <  0.0:
-        #         sld_transp = sld_transp * (-1)
-
         lista = []
         registro_E110 = RegistroE110()
         sld_transp = 0.0
@@ -1377,11 +1321,6 @@ class SpedEfdIcmsIpi(models.Model):
             sld_icms = 0
         registro_E116.VL_OR = self.transforma_valor(sld_icms)
         registro_E116.DT_VCTO = self.data_vencimento_e316
-        # remover
-        #'%s%s%s' %(
-        #    str(self.data_vencimento_e316.day).zfill(2), 
-        #    str(self.data_vencimento_e316.month).zfill(2), 
-        #    str(self.data_vencimento_e316.year))
         registro_E116.COD_REC = self.cod_receita
         #registro_E116.NUM_PROC
         #registro_E116.IND_PROC 
@@ -1392,34 +1331,16 @@ class SpedEfdIcmsIpi(models.Model):
         #     str(self.date_start.month).zfill(2), 
         #     str(self.date_start.year))
 
-        registro_E116.MES_REF = self.date_start.strftime("%y%m").zfill(4)
+        registro_E116.MES_REF = self.date_start.strftime("%m%Y").zfill(4)
 
         lista.append(registro_E116)
         return lista
 
-    def query_registroE200(self, periodo):
-        query = """
-                select distinct
-                        rs.code
-                    from
-                        l10n_br_fiscal_document ie
-                    inner join
-                        res_partner rp
-                            on rp.id = ie.partner_id
-                    inner join
-                        res_country_state rs
-                            on rs.id = rp.state_id
-                    where
-                        %s
-                        and (ie.document_type in ('55','1'))
-                        and (ie.state_edoc = 'autorizada')
-                        and ie.amount_icmsst_value > 0
-                """ % (periodo)
-        self._cr.execute(query)
+    def query_registroE200(self, icms_st_credito, icms_st_debito):
         query_resposta = self._cr.fetchall()
         lista = []
         cont = 1
-        for id in query_resposta:
+        if icms_st_credito or icms_st_debito:
             registro_e200 = registros.RegistroE200()
             registro_e200.DT_INI = self.date_start
             registro_e200.DT_FIN = self.date_end
@@ -1591,8 +1512,9 @@ class SpedEfdIcmsIpi(models.Model):
         registro_e316 = registros.RegistroE316()
         if not self.data_vencimento_e316:
             raise UserError('Erro, a data de vencimento (E-316) não informada.')
-        import pudb;pu.db
-        mes_ref = f"{str(self.date_start.month).zfill(2), str(self.date_start.month).year}"
+        # import pudb;pu.db
+        # mes_ref = f"{str(self.date_start.month).zfill(2), str(self.date_start.month).year}"
+        mes_ref = self.date_start.strftime("%m%Y").zfill(4)
         for id in query_resposta:
             registro_e316.COD_OR = self.cod_obrigacao
             registro_e316.VL_OR = id[0]+id[2]
@@ -1731,69 +1653,26 @@ class SpedEfdIcmsIpi(models.Model):
             lista.append(registro_E510)
         return lista
 
-    def query_registroE520(self, periodo):
-        query = """
-                select 
-                       sum(COALESCE(ie.amount_ipi_value,0.0)) as VL_IPI
-                    from
-                        l10n_br_fiscal_document ie
-                    inner join
-                        l10n_br_fiscal_document_line it
-                        on it.document_id = ie.id
-                    inner join
-                        l10n_br_fiscal_cfop cfop
-                        on it.cfop_id = cfop.id
-                    where    
-                        %s
-                        and (ie.document_type in ('55','01'))
-                        and (ie.state_edoc = 'autorizada')
-                        and substr(cfop.code, 1,1) in ('5','6')
-                """ % (periodo)
-        self._cr.execute(query)
-        query_resposta = self._cr.fetchall()
+    def query_registroE520(self, ipi_credito, ipi_debito):
         lista = []
         registro_E520 = RegistroE520()
         sld_ipi = 0.0
         registro_E520.VL_DEB_IPI = '0'
-        for id in query_resposta:
-            if not id[0]:
-                continue
-            registro_E520.VL_DEB_IPI = self.transforma_valor(id[0])
-            if id[0]:
-                sld_ipi = id[0]
+        if ipi_debito:
+            registro_E520.VL_DEB_IPI = self.transforma_valor(ipi_debito)
+            sld_ipi = ipi_debito
         registro_E520.VL_SD_ANT_IPI = '0'            
         registro_E520.VL_OD_IPI = '0'
         registro_E520.VL_OC_IPI = '0'
-        query = """
-                select 
-                       sum(COALESCE(ie.amount_ipi_value,0.0)) as VL_IPI
-                    from
-                        l10n_br_fiscal_document ie
-                    inner join
-                        l10n_br_fiscal_document_line it
-                        on it.document_id = ie.id
-                    inner join
-                        l10n_br_fiscal_cfop cfop
-                        on it.cfop_id = cfop.id
-                    where    
-                        %s
-                        and (ie.document_type in ('55','01'))
-                        and (ie.state_edoc = 'autorizada')
-                        and substr(cfop.code, 1,1) in ('1','2','3')
-                """ % (periodo)
-        self._cr.execute(query)
-        query_resposta = self._cr.fetchall()
-        for id in query_resposta:            
-            registro_E520.VL_CRED_IPI = self.transforma_valor(id[0])
-            if id[0] and id[0] > sld_ipi:
-               sld_ipi = id[0] - sld_ipi
-               registro_E520.VL_SC_IPI = self.transforma_valor(sld_ipi)
-               registro_E520.VL_SD_IPI = '0'
-            else:
-               if id[0]:
-                   sld_ipi = sld_ipi - id[0]
-               registro_E520.VL_SD_IPI = self.transforma_valor(sld_ipi)
-               registro_E520.VL_SC_IPI = '0'
+        registro_E520.VL_CRED_IPI = self.transforma_valor(ipi_credito)
+        if ipi_credito > sld_ipi:
+            sld_ipi = ipi_credito - sld_ipi
+            registro_E520.VL_SC_IPI = self.transforma_valor(sld_ipi)
+            registro_E520.VL_SD_IPI = '0'
+        else:
+            sld_ipi = sld_ipi - ipi_credito
+            registro_E520.VL_SD_IPI = self.transforma_valor(sld_ipi)
+            registro_E520.VL_SC_IPI = '0'
         lista.append(registro_E520)
         return lista
 

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Customer Invoice views -->
+    <record id="invoice_costs_form" model="ir.ui.view">
+        <field name="name">l10n_br_account.invoice.costs.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form" />
+        <field name="priority">299</field>
+        <field name="arch" type="xml">
+            <field name="amount_discount_value" position="before">
+                <field name="delivery_costs" invisible="1" />
+                <field
+                    name="amount_freight_value"
+                    string="Frete"
+                    widget='monetary'
+                    options="{'currency_field': 'currency_id'}"
+                    attrs="{'readonly': [('delivery_costs', '=', 'line')]}"
+                />
+                <field
+                    name="amount_insurance_value"
+                    string="Seguro"
+                    widget='monetary'
+                    options="{'currency_field': 'currency_id'}"
+                    attrs="{'readonly': [('delivery_costs', '=', 'line')]}"
+                />
+                <field
+                    name="amount_other_value"
+                    string="Outros"
+                    widget='monetary'
+                    options="{'currency_field': 'currency_id'}"
+                    attrs="{'readonly': [('delivery_costs', '=', 'line')]}"
+                />
+            </field>
+        </field>
+    </record>
+
+</odoo>

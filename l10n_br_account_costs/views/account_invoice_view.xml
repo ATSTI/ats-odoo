@@ -10,6 +10,7 @@
         <field name="arch" type="xml">
             <field name="amount_discount_value" position="before">
                 <field name="delivery_costs" invisible="1" />
+                <field name="amount_icms_relief_value" invisible="1" />
                 <field
                     name="amount_freight_value"
                     string="Frete"

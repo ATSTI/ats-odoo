@@ -17,12 +17,11 @@ class NFeLine(spec_models.StackedModel):
 
     def _export_fields(self, xsd_fields, class_obj, export_dict):
         if class_obj._name == "nfe.40.prod":
-            # import pudb;pu.db
             for aml in self.account_line_ids:
                 if aml.move_id.move_type == "in_invoice":
                     for di in aml.di_ids:
                         vals_di_di = {
-                            "nfe40_DI_prod_id": di.id,
+                            "nfe40_DI_prod_id": di.aml_id.product_id.id,
                             "nfe40_nDI" : di.name,
                             "nfe40_dDI" : di.date_registration,
                             "nfe40_xLocDesemb" : di.location,

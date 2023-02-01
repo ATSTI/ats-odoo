@@ -26,7 +26,7 @@
         <field name="model">declaracao.importacao</field>
         <field name="arch" type="xml">
             <form string="Declaração Importação">
-                <header>
+                <!-- <header>
                     <button
                         name="copy_di"
                         string="Copiar para todos os itens"
@@ -34,7 +34,7 @@
                         default_focus="1"
                         class="oe_highlight"
                     />
-                </header>
+                </header> -->
                 <sheet>
                     <group>
                         <field name="name" />
@@ -111,6 +111,7 @@
         <field name="arch" type="xml">
             <xpath expr="//page[@name='other_info']" position="after">
                 <page name="d_importacao" string="Declaração Importaçao" attrs="{'invisible': [('fiscal_operation_type', '=', 'out')]}">
+                    <header>
                     <button
                         name="button_wizard_di"
                         string="Adicionar"
@@ -118,6 +119,14 @@
                         type="object"
                         attrs="{'invisible': [('state', '!=', 'draft')]}"
                     />
+                    <button
+                        name="button_copy_di"
+                        string="Copiar para todos produtos"
+                        class="btn-success"
+                        type="object"
+                        attrs="{'invisible': [('state', '!=', 'draft')]}"
+                    />
+                </header>
                     <field name="di_ids" context="{'default_am_id': active_id}" readonly="1" >
                         <tree string="Declaração importação">
                             <field name="name" string="Numero do Documento" force_save="1" />

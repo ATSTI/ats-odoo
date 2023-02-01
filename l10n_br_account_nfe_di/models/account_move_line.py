@@ -51,6 +51,43 @@ class AccountMove(models.Model):
             'context': ctx,
         }
 
+    def button_copy_di(self):
+        di = {}
+        with_copy = []
+        for record in self.di_ids:
+            with_copy.append(record.aml_id.id)
+            di["name"] = record.name
+            di["date_registration"] = record.date_registration
+            di["state_id"] = record.state_id.id
+            di["location"] = record.location
+            di["date_release"] = record.date_release
+            di["type_transportation"] = record.type_transportation
+            di["afrmm_value"] = record.afrmm_value
+            di["tpIntermedio"] = record.tpIntermedio
+            di["thirdparty_state_id"] = record.thirdparty_state_id.id
+            di["thirdparty_cnpj"] = record.thirdparty_cnpj
+            di["exporting_code"] = record.exporting_code
+            di["company_id"] = record.company_id.id
+            adicao = []
+            for adic in record.adi_ids:
+                vals = {}
+                if adic.name:
+                    vals["name"] = adic.name
+                vals["sequence_di"] = adic.sequence_di + 1
+                vals["manufacturer_code"] = adic.manufacturer_code
+                vals["amount_discount"] = adic.amount_discount
+                if adic.drawback_number:
+                    vals["drawback_number"] = adic.drawback_number
+                vals["company_id"] = adic.company_id.id
+                adicao.append((0, 0, vals))
+        for item in self.invoice_line_ids:
+            if item.id in with_copy:
+                continue
+            di["aml_id"] = item.id
+            di["adi_ids"] = adicao
+            declaracao = self.env["declaracao.importacao"].create(di)
+
+
 class AccountMoveLine(models.Model):
     _name = "account.move.line"
     _inherit = [_name, "l10n_br_fiscal.document.line.mixin.methods"]
@@ -60,14 +97,13 @@ class AccountMoveLine(models.Model):
         'declaracao.importacao',
         'aml_id',
         string='Delcaração de Importação (NT 2011/004)',
-        copy=True
     )
 
     exp_ids = fields.One2many(
         'detalhe.exportacao',
         'aml_id',
         string='Detalhe da exportação',
-        store=True, check_company=True, copy=True,
+        store=True, check_company=True,
     )
 
 class DeclaracaoImportacao(models.Model):
@@ -126,40 +162,6 @@ class DeclaracaoImportacao(models.Model):
         string='Adições (NT 2011/004',
         store=True, check_company=True, copy=True,
         )
-
-    def copy_di(self):
-        di = {}
-        with_copy = []
-        for record in self:
-            with_copy.append(record.aml_id.id)
-            di["name"] = record.name
-            di["date_registration"] = record.date_registration
-            di["state_id"] = record.state_id.id
-            di["location"] = record.location
-            di["date_release"] = record.date_release
-            di["type_transportation"] = record.type_transportation
-            di["afrmm_value"] = record.afrmm_value
-            di["tpIntermedio"] = record.tpIntermedio
-            di["thirdparty_state_id"] = record.thirdparty_state_id.id
-            di["thirdparty_cnpj"] = record.thirdparty_cnpj
-            di["exporting_code"] = record.exporting_code
-            di["company_id"] = record.company_id.id
-            adicao = []
-            for adic in record.adi_ids:
-                vals = {}
-                vals["name"] = adic.name
-                vals["sequence_di"] = adic.sequence_di
-                vals["manufacturer_code"] = adic.manufacturer_code
-                vals["amount_discount"] = adic.amount_discount
-                vals["drawback_number"] = adic.drawback_number
-                vals["company_id"] = adic.company_id.id
-                adicao.append((0, 0, vals))
-        for item in self.aml_id.move_id.invoice_line_ids:
-            if item.id in with_copy:
-                continue
-            di["aml_id"] = item.id
-            di["adi_ids"] = adicao
-            declaracao = self.env["declaracao.importacao"].create(di)
 
     def edit_di(self):
         adi = {}

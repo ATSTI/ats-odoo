@@ -1,0 +1,6 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"l10n_br_account_di_user","Declarao importacao Account User","model_declaracao_importacao","account.group_account_invoice",1,1,1,1
+"l10n_br_account_di_adicao_user","Adicoes DI","model_declaracao_adicao","account.group_account_invoice",1,1,1,1
+"l10n_br_account_det_export","Detalhe Exportacao","model_detalhe_exportacao","account.group_account_invoice",1,1,1,1
+"l10n_br_account_wizard_di","criar di","model_wizard_create_di","account.group_account_invoice",1,1,1,1
+"l10n_br_account_wizard_di_adi","Di Adi","model_di_adi","account.group_account_invoice",1,1,1,1

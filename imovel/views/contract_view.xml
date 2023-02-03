@@ -13,9 +13,9 @@
                 <field name="imovel_id" string="Imovel" domain="[('alugado','=',False)]"/>
                 <field name="proprietario_ids" widget="many2many_tags" readonly="1" />
             </field>
-            <xpath expr="//label[@for='line_recurrence']" position="replace">
+            <!-- <xpath expr="//label[@for='line_recurrence']" position="replace">
                 <label for="line_recurrence" invisible="1"/>      
-            </xpath>
+            </xpath> -->
             <field name="pricelist_id" position="replace">
                 <field name="pricelist_id" invisible="1" />
             </field>

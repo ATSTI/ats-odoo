@@ -4,49 +4,54 @@
         <field name="name">SPED ICMS IPI</field>
         <field name="model">sped.efd.icms.ipi</field>
         <field name="arch" type="xml">
-        <form string="Gerar arquivo SPED">
-            <group>
-            <group>
-                <field name="company_id" options='{"no_create" : 1, "no_create_edit" : 1}'/> 
-                <field name="date_start"/>
-                <field name="date_end"/>
-                <field name="tipo_arquivo" widget="radio" />
-            </group>
-            <group col="4">
-                <field name="inventario"/>
-                <field name="date_stock"/>
-                <field name="stock_inv_mov"/>
-                <field name="cod_cta"/>
-            </group>
-            <group col="4">
-                <field name="ind_ativ"/>
-                <field name="cod_obrigacao"/>
-                <field name="cod_receita"/>
-                <field name="ind_apur"/>
-                <field name="clas_estab_ind"/>
-            </group> 
-            <group col="4">
-                <field name="data_vencimento_e316"/>
-                <field name="vl_sld_cred_ant_difal"/>
-                <field name="vl_sld_cred_transp_difal"/>
-                <field name="vl_sld_cred_ant_fcp"/>
-                <field name="vl_sld_cred_transp_fcp"/>
-            </group>
-            <group>
-                <field name="sped_file_name" invisible="1"/>
-                <field widget="binary" height="64" name="sped_file" filename="sped_file_name" />
-            </group>
-            </group>
-            <field name="log_faturamento" readonly="1"/>
-            <footer>
-                <button name="create_file" string="Gerar Arquivo" type="object" default_focus="1" class="oe_highlight"/>
+            <form string="Gerar arquivo SPED">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="company_id" options='{"no_create" : 1, "no_create_edit" : 1}'/>
+                            <field name="date_start" required="1"/>
+                            <field name="date_end" required="1"/>
+                            <field name="tipo_arquivo" widget="radio" />
+                            <field name="ind_ativ"/>
+                            <field name="cod_obrigacao" required="1"/>
+                            <field name="data_vencimento_e316" required="1"/>
+                            <field name="ind_tp_leiaute" required="1"/>
+                        </group>
+                        <group col="3">
+                            <field name="inventario"/>
+                            <field name="date_stock" attrs="{'invisible': [('inventario', '=', False)], 'required': [('inventario', '=', True)]}"/>
+                            <field name="stock_inv_mov" attrs="{'invisible': [('inventario', '=', False)], 'required': [('inventario', '=', True)]}"/>
+                            <field name="cod_cta" attrs="{'invisible': [('inventario', '=', False)]}"/>
+                            <field name="ind_apur"/>
+                            <field name="cod_receita" required="1"/>
+                            <field name="clas_estab_ind" required="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="vl_sld_cred_ant_difal"/>
+                            <field name="vl_sld_cred_transp_difal"/>
+                        </group>
+                        <group>
+                            <field name="vl_sld_cred_ant_fcp"/>
+                            <field name="vl_sld_cred_transp_fcp"/>
+                        </group>
+                        <group col="3">
+                            <field name="sped_file_name" invisible="1"/>
+                            <field widget="binary" height="64" name="sped_file" filename="sped_file_name" readonly="1" />
+                        </group>
+                    </group>
+                    <field name="log_faturamento" readonly="1"/>
+                    <footer>
+                        <button name="create_file" string="Gerar Arquivo" type="object" default_focus="1" class="oe_highlight"/>
                 ou
-                <button string="Cancelar" class="oe_link" special="cancel" />
-            </footer>
-            <div class="oe_chatter">
-                <field name="message_ids"/>
-            </div>
-        </form>
+                        <button string="Cancelar" class="oe_link" special="cancel" />
+                    </footer>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_ids"/>
+                </div>
+            </form>
         </field>
     </record>
 
@@ -58,13 +63,13 @@
         <field name="view_id" ref="sped_icms_ipi_view"/>
         <field name="target">new</field>
     </record> -->
-    
+
     <record id="view_sped_icms_ipi_tree" model="ir.ui.view">
         <field name="name">view_sped_icms_ipi_tree</field>
         <field name="model">sped.efd.icms.ipi</field>
         <field name="arch" type="xml">
             <tree string="Gerar arquivo SPED ICMS IPI">
-                <field name="company_id"/>    
+                <field name="company_id"/>
                 <field name="tipo_arquivo"/>
                 <field name="date_start"/>
                 <field name="date_end"/>
@@ -94,12 +99,5 @@
     </record>
 
     <!-- <menuitem id="menu_general_sped_icms_ipi" action="action_sped_icms_ipi_tree_menu" parent="br_account_einvoice.menu_eletronic_doc_base" sequence="99" /> -->
-    <menuitem
-        id="menu_general_sped_icms_ipi"
-        action="action_sped_icms_ipi_menu"
-        name="Sped ICMS/IPI"
-        groups="l10n_br_nfe.group_user"
-        parent="l10n_br_fiscal.document_menu"
-        sequence="20"
-    />    
+    <menuitem id="menu_general_sped_icms_ipi" action="action_sped_icms_ipi_menu" name="Sped ICMS/IPI" groups="l10n_br_nfe.group_user" parent="l10n_br_fiscal.document_menu" sequence="20" />
 </odoo>

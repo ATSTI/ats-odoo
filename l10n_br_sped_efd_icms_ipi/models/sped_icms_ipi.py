@@ -1,6 +1,6 @@
 # Copyright (C) 2020 - Carlos R. Silveira - ATSti Soluções
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
-
+import logging
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from unidecode import unidecode
@@ -40,16 +40,17 @@ from sped.efd.icms_ipi.registros import RegistroE520
 from sped.efd.icms_ipi.registros import RegistroH001
 from sped.efd.icms_ipi.registros import RegistroH005
 from sped.efd.icms_ipi.registros import RegistroH010
+from sped.efd.icms_ipi.registros import RegistroK010
 from sped.efd.icms_ipi.registros import RegistroK100
 from sped.efd.icms_ipi.registros import RegistroK200
 from sped.efd.icms_ipi.registros import Registro1001
 from sped.efd.icms_ipi.registros import Registro1010
 
-
+_logger = logging.getLogger(__name__)
 class SpedEfdIcmsIpi(models.Model):
     _name = "sped.efd.icms.ipi"
     _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin']
-    _description = "Cria o arquivo para o Sped ICMS / IPI"
+    _description = "Cria o arquivo para o SPED ICMS / IPI"
     _rec_name = "sped_file_name"
     _order = "date_start desc"
 
@@ -121,9 +122,9 @@ class SpedEfdIcmsIpi(models.Model):
     log_faturamento = fields.Text('Log de Faturamento', copy=False)
     company_id = fields.Many2one('res.company', string='Empresa', required=True,
         default=lambda self: self.env['res.company']._company_default_get('account.account'))
-    sped_file = fields.Binary(string=u"Sped")
+    sped_file = fields.Binary(string=u"SPED")
     sped_file_name = fields.Char(
-        string=u"Arquivo Sped")
+        string=u"Arquivo SPED-EFD ICMS IPI")
     vl_sld_cred_ant_difal = fields.Float('Saldo Credor per. ant. Difal', default=0.0)
     vl_sld_cred_transp_difal = fields.Float('Saldo Credor per. seguinte Difal', default=0.0)
     vl_sld_cred_ant_fcp = fields.Float('Saldo Credor per. ant. FCP', default=0.0)
@@ -153,7 +154,14 @@ class SpedEfdIcmsIpi(models.Model):
         ], string='Motivo do Inventário')
     cod_cta = fields.Char(string=u"Conta Contabil Estoque")
 
+    ind_tp_leiaute = fields.Selection([
+        ('0', 'Leiaute simplificado'),
+        ('1', 'Leiaute completo'),
+        ('2', 'Leiaute restrito aos saldos de estoque')
+        ], string='Tipo de leiaute')
     def create_file(self):
+        if not self.date_start or not self.date_end:
+            raise UserError('Erro, data de início ou data de encerramento não informadas!')
         if self.date_start > self.date_end:
             raise UserError('Erro, a data de início é maior que a data de encerramento!')
         # self.log_faturamento = 'Gerando arquivo .. <br />'
@@ -164,6 +172,8 @@ class SpedEfdIcmsIpi(models.Model):
         # }
 
     def versao(self):
+        if not self.date_start:
+            raise UserError('Erro, data de início não informada!')
         if self.date_start.year == 2018:
             return '012'
         elif self.date_start.year == 2019:
@@ -186,7 +196,7 @@ class SpedEfdIcmsIpi(models.Model):
 
     def limpa_formatacao(self, data):
         if data:
-            replace = ['-', ' ', '(', ')', '/', '.', ':','º']
+            replace = ['-', ' ', '(', ')', '/', '.', ':','º','+55']
             for i in replace:
                 data = data.replace(i, '')
         return data
@@ -266,12 +276,12 @@ class SpedEfdIcmsIpi(models.Model):
                 msg_err = 'Cadastre o contador Pessoa Fisica dentro do Contato da Contabilidade'
                 raise UserError(msg_err)
             contador = ctd.name
-            cod_mun = '%s%s' %(esc.state_id.ibge_code, esc.city_id.ibge_code)
+            cod_mun = esc.city_id.ibge_code
             contabilista.NOME = contador
             contabilista.CNPJ = self.limpa_formatacao(self.company_id.accountant_id.cnpj_cpf)
             contabilista.CPF = self.limpa_formatacao(ctd.cnpj_cpf)
-            contabilista.CRC = self.limpa_formatacao(ctd.rg)
-            contabilista.END = esc.street
+            contabilista.CRC = self.limpa_formatacao(ctd.crc_code)
+            contabilista.END = esc.street_name
             contabilista.CEP = self.limpa_formatacao(esc.zip)
             contabilista.NUM = esc.street_number
             contabilista.COMPL = esc.street2
@@ -353,7 +363,9 @@ class SpedEfdIcmsIpi(models.Model):
         c190_ipi_debito = 0.0
         msg_post = ""
         for id in query_resposta:
-            if id[2] == "company" and id[1] == "cancelada":
+            # A partir de janeiro de 2023, os códigos de situação de documento 04 (NF-e ou CT-e denegado) e 
+            # 05 (NF-e ou CT-e Numeração inutilizada) da tabela 4.1.2 - Tabela Situação do Documento serão descontinuados.
+            if id[2] == "company" and id[1] in ("cancelada", "denegada", "inutilizada"):
                 continue
             nf = id[0]
             for item_lista in self.query_registroC100(nf):
@@ -450,13 +462,14 @@ class SpedEfdIcmsIpi(models.Model):
             for uf_lista in self.query_registroE310(
                 self.company_id.state_id.code,
                 item_lista.UF,
-                perido):
-                arq.read_registro(self.junta_pipe(uf_lista))
-            for uf_lista in self.query_registroE316(
-                self.company_id.state_id.code,
-                item_lista.UF,
                 periodo):
                 arq.read_registro(self.junta_pipe(uf_lista))
+            # Rotina abaixo chamando no for acima
+            # for uf_lista in self.query_registroE316(
+            #     self.company_id.state_id.code,
+            #     uf_lista.UF,
+            #     periodo):
+            #     arq.read_registro(self.junta_pipe(uf_lista))
 
         if self.ind_ativ == '0':
             registro_E500 = RegistroE500()
@@ -481,6 +494,10 @@ class SpedEfdIcmsIpi(models.Model):
                 arq.read_registro(self.junta_pipe(item_lista))
             for item_lista in bloco_h[1]:
                 arq.read_registro(self.junta_pipe(item_lista))
+        # K010
+        registro_K010 = RegistroK010()
+        registro_K010.IND_LEIAUTE = self.ind_tp_leiaute
+        arq._blocos['K'].add(registro_K010)
             
         # K100
         registro_K100 = RegistroK100()
@@ -672,10 +689,10 @@ class SpedEfdIcmsIpi(models.Model):
             registro_0200.DESCR_ITEM = unidecode(desc_item)
             if resposta_produto.barcode != resposta_produto.default_code:
                 registro_0200.COD_BARRA = resposta_produto.barcode
-            if resposta_produto.uom_id.code.find('-') != -1:
-                unidade = resposta_produto.uom_id.code[:resposta_produto.uom_id.code.find('-')]
-            else:
-                unidade = resposta_produto.uom_id.code
+            # if resposta_produto.uom_id.code.find('-') != -1:
+            #     unidade = resposta_produto.uom_id.code[:resposta_produto.uom_id.code.find('-')]
+            # else:
+            unidade = resposta_produto.uom_id.code
             unidade = unidade.strip()
             unidade = unidade.upper()
             unidade = unidade[:6]
@@ -852,6 +869,7 @@ class SpedEfdIcmsIpi(models.Model):
             # TODO Não podem ser informados GTINs iguais para fatores de conversões de produtos 
             # if resposta[5]:
             #     registro_0220.COD_BARRA = resposta[5]
+            registro_0220.COD_BARRA = ""
             lista.append(registro_0220)
         return lista
         
@@ -920,12 +938,14 @@ class SpedEfdIcmsIpi(models.Model):
             elif nfe.state_edoc == "autorizada" and nfe.edoc_purpose in ("2", "3"):
                 # Documento complementar/ajuste
                 registro_c100.COD_SIT = "06"
-            elif nfe.state_edoc == "denegada" and nfe.edoc_purpose == "1":
-                registro_c100.COD_SIT = "04"
-            elif nfe.state_edoc == "inutilizada":
-                registro_c100.COD_SIT = "05"
-                registro_c100.SER = ""
-                registro_c100.CHV_NFE = ""
+            # A partir de janeiro de 2023, os códigos de situação de documento 04 (NF-e ou CT-e denegado) e 
+            # 05 (NF-e ou CT-e Numeração inutilizada) da tabela 4.1.2 - Tabela Situação do Documento serão descontinuados.
+            # elif nfe.state_edoc == "denegada" and nfe.edoc_purpose == "1":
+            #     registro_c100.COD_SIT = "04"
+            # elif nfe.state_edoc == "inutilizada":
+            #     registro_c100.COD_SIT = "05"
+            #     registro_c100.SER = ""
+            #     registro_c100.CHV_NFE = ""
             # if nfe.emissao_doc == '1' and not nfe.state == 'cancel' \
             #     and nfe.chave_nfe[6:20] != \
             #     self.limpa_formatacao(nfe.partner_id.company_id.cnpj_cpf):
@@ -1174,10 +1194,10 @@ class SpedEfdIcmsIpi(models.Model):
                registro_d100.COD_SIT = '02'
             elif cte.tp_emiss_cte == '4':
                registro_d100.COD_SIT = '03'
-            elif cte.tp_emiss_cte == '5':
-               registro_d100.COD_SIT = '04'
-            elif cte.tp_emiss_cte == '6':
-               registro_d100.COD_SIT = '05'
+            # elif cte.tp_emiss_cte == '5':
+            #    registro_d100.COD_SIT = '04'
+            # elif cte.tp_emiss_cte == '6':
+            #    registro_d100.COD_SIT = '05'
             elif cte.tp_emiss_cte == '7':
                registro_d100.COD_SIT = '06'
             elif cte.tp_emiss_cte == '8':
@@ -1483,30 +1503,39 @@ class SpedEfdIcmsIpi(models.Model):
         self._cr.execute(query)
         query_resposta = self._cr.fetchall()
         registro_e310 = registros.RegistroE310()
+        registro_e310.IND_MOV_FCP_DIFAL = tipo_mov
+        registro_e310.VL_SLD_CRED_ANT_DIFAL = 0.0
+        registro_e310.VL_TOT_DEBITOS_DIFAL = 0.0
+        registro_e310.VL_OUT_DEB_DIFAL = 0.0
+        registro_e310.VL_TOT_DEB_FCP = 0.0
+        registro_e310.VL_TOT_CREDITOS_DIFAL = 0.0
+        registro_e310.VL_TOT_CRED_FCP = 0.0
+        registro_e310.VL_OUT_CRED_DIFAL = 0.0
+        registro_e310.VL_SLD_DEV_ANT_DIFAL = 0.0
+        registro_e310.VL_DEDUCOES_DIFAL = '0'
+        registro_e310.VL_RECOL_DIFAL = 0.0
+        registro_e310.VL_SLD_CRED_TRANSPORTAR_DIFAL = '0'
+        registro_e310.DEB_ESP_DIFAL = '0'
+        registro_e310.VL_SLD_CRED_ANT_FCP = '0'
+        registro_e310.VL_OUT_DEB_FCP = '0'
+        registro_e310.VL_TOT_CRED_FCP = '0'
+        registro_e310.VL_OUT_CRED_FCP = '0'
+        registro_e310.VL_SLD_DEV_ANT_FCP = '0'
+        registro_e310.VL_DEDUCOES_FCP = '0'
+        registro_e310.VL_RECOL_FCP = '0'
+        registro_e310.VL_SLD_CRED_TRANSPORTAR_FCP = '0'
+        registro_e310.DEB_ESP_FCP = '0'        
         lista = []
         for id in query_resposta:
-            registro_e310.IND_MOV_FCP_DIFAL = tipo_mov
             registro_e310.VL_SLD_CRED_ANT_DIFAL = self.vl_sld_cred_ant_difal
             registro_e310.VL_TOT_DEBITOS_DIFAL = id[0]
-            registro_e310.VL_OUT_DEB_DIFAL = '0'
+            registro_e310.VL_OUT_DEB_DIFAL = 0.0
             registro_e310.VL_TOT_DEB_FCP = id[2]
-            registro_e310.VL_TOT_CREDITOS_DIFAL = '0'
-            registro_e310.VL_TOT_CRED_FCP = '0'
-            registro_e310.VL_OUT_CRED_DIFAL = '0'
+            registro_e310.VL_TOT_CREDITOS_DIFAL = 0.0
+            registro_e310.VL_TOT_CRED_FCP = 0.0
+            registro_e310.VL_OUT_CRED_DIFAL = 0.0
             registro_e310.VL_SLD_DEV_ANT_DIFAL = id[0]
-            registro_e310.VL_DEDUCOES_DIFAL = '0'
             registro_e310.VL_RECOL_DIFAL = id[0]
-            registro_e310.VL_SLD_CRED_TRANSPORTAR_DIFAL = '0'
-            registro_e310.DEB_ESP_DIFAL = '0'
-            registro_e310.VL_SLD_CRED_ANT_FCP = '0'
-            registro_e310.VL_OUT_DEB_FCP = '0'
-            registro_e310.VL_TOT_CRED_FCP = '0'
-            registro_e310.VL_OUT_CRED_FCP = '0'
-            registro_e310.VL_SLD_DEV_ANT_FCP = '0'
-            registro_e310.VL_DEDUCOES_FCP = '0'
-            registro_e310.VL_RECOL_FCP = '0'
-            registro_e310.VL_SLD_CRED_TRANSPORTAR_FCP = '0'
-            registro_e310.DEB_ESP_FCP = '0'
         lista.append(registro_e310)
         
         registro_e316 = registros.RegistroE316()
@@ -1515,16 +1544,17 @@ class SpedEfdIcmsIpi(models.Model):
         # import pudb;pu.db
         # mes_ref = f"{str(self.date_start.month).zfill(2), str(self.date_start.month).year}"
         mes_ref = self.date_start.strftime("%m%Y").zfill(4)
+        registro_e316.COD_OR = self.cod_obrigacao
+        registro_e316.VL_OR = 0.0
+        registro_e316.DT_VCTO = self.data_vencimento_e316.strftime("%d%m%Y").zfill(8)
+        registro_e316.COD_REC = self.cod_receita
+        registro_e316.NUM_PROC = ''
+        registro_e316.IND_PROC = ''
+        registro_e316.PROC = ''
+        registro_e316.TXT_COMPL = ''
+        registro_e316.MES_REF = mes_ref
         for id in query_resposta:
-            registro_e316.COD_OR = self.cod_obrigacao
             registro_e316.VL_OR = id[0]+id[2]
-            registro_e316.DT_VCTO = self.data_vencimento_e316
-            registro_e316.COD_REC = self.cod_receita
-            registro_e316.NUM_PROC = ''
-            registro_e316.IND_PROC = ''
-            registro_e316.PROC = ''
-            registro_e316.TXT_COMPL = ''
-            registro_e316.MES_REF = mes_ref
         lista.append(registro_e316)
         return lista
 
@@ -1686,15 +1716,18 @@ class SpedEfdIcmsIpi(models.Model):
         resposta_inv = product.search([])
         valor_total = 0.0
         for inv in resposta_inv:
-            if inv.qty_available > 0.0 and \
-                inv.l10n_br_sped_type in ('00','01','02','03','04','05','06','10'):
-                valor_total += inv.stock_value
+            # TODO: Verificar - AttributeError: 'product.product' object has no attribute 'l10n_br_sped_type'
+            # if inv.qty_available > 0.0 and inv.l10n_br_sped_type in ('00','01','02','03','04','05','06','10'):
+            if inv.qty_available > 0.0:
+                #TODO: Verificar qual é o valor de estoque a ser considerado, utilizando Custo
+                #TODO: Tratar erro O valor total do estoque (VL_INV do Registro H005) deve ser igual à soma dos valores dos itens (VL_ITEM) dos Registros H010.
+                valor_total += inv.standard_price
                 registro_H010 = RegistroH010()                                                                                                           
                 registro_H010.COD_ITEM = inv.default_code
-                registro_H010.UNID = inv.uom_id.name
+                registro_H010.UNID = inv.uom_id.code
                 registro_H010.QTD = inv.qty_available
-                registro_H010.VL_UNIT = inv.stock_value/inv.qty_available
-                registro_H010.VL_ITEM = inv.stock_value
+                registro_H010.VL_UNIT = inv.standard_price
+                registro_H010.VL_ITEM = inv.standard_price
                 registro_H010.IND_PROP = '0'
                 registro_H010.COD_CTA = self.cod_cta
                 listah10.append(registro_H010)

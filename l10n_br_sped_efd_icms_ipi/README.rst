@@ -6,6 +6,7 @@ SPED EFD ICMS/IPI
 
 * Este modulo gera o arquivo do SPED EFD ICMS/IPI
 * Depende da biblioteca : https://github.com/sped-br/python-sped
+           atualizada em: https://github.com/ATSTI/python-sped
 
 Contributors
 ------------

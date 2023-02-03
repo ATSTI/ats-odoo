@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_layout_background" inherit_id="web.external_layout_background">
+        <xpath expr="//div[@class='float-left company_address']" position="replace">
+            <div>
+                <strong t-field="company.partner_id.name"/><br></br> 
+                <strong t-field="company.partner_id.cnpj_cpf"/>
+            </div>
+            <span t-field="company.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;], &quot;no_marker&quot;: true}"/>
+        </xpath>
+    </template>
+</odoo>

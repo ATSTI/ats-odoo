@@ -16,6 +16,7 @@ class CashFlowReportAbstract(models.AbstractModel):
             ("account_id", "in", account_ids),
             ("company_id", "=", company_id),
             ("reconciled", "=", False),
+            ("move_id.financial_move_line_ids", "!=", False)
         ]
         if partner_ids:
             domain += [("partner_id", "in", partner_ids)]
@@ -35,6 +36,7 @@ class CashFlowReportAbstract(models.AbstractModel):
             ("account_id", "in", account_ids),
             ("company_id", "=", company_id),
             ("id", "in", new_ml_ids),
+            ("move_id.financial_move_line_ids", "!=", False)
         ]
         if partner_ids:
             domain += [("partner_id", "in", partner_ids)]

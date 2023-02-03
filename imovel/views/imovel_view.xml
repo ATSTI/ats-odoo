@@ -10,13 +10,15 @@
                 <header>
                     <button
                         name="venda_executa"
-                        string="Executar Faturamento de venda"
+                        string="Criar Fatura Venda"
+                        attrs="{'invisible': [('venda', '=', False)]}"
                         class= "btn-primary"
                         type="object"
                     />
                     <button
                         name="aluga_executa"
                         string="Criar Contrato Aluguel"
+                        attrs="{'invisible': [('locacao', '=', False)]}"
                         class="btn-primary"
                         type="object"
                     />
@@ -216,7 +218,7 @@
     <menuitem
         id="imob_menu"
         name="Imobiliária"
-        groups="base.group_user,group_imovel_manager"
+        groups="imovel_group_user,imovel_group_manager"
         web_icon="imovel,static/description/imob.png"
         sequence="30" 
     />

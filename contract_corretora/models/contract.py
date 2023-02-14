@@ -3,6 +3,7 @@
 
 from odoo import api, fields, models
 from datetime import datetime, date, timedelta
+from dateutil.relativedelta import *
 
 
 class AccountAnalyticAccount(models.Model):
@@ -104,16 +105,6 @@ class AccountAnalyticAccount(models.Model):
 
     @api.model
     def enviar_email_lembrete(self):
-        # su_id = self.env['account.analytic.account'].browse(SUPERUSER_ID)
-        #domain=[('name','like','Email_Lembrete_Boleto')]
-        #template_browse = self.env['mail.template'].search(domain, limit=1)
-        #import pudb;pu.db
-        #invoice_ids = self.env['contract.contract'].search([])
-        #for ids in invoice_ids:
-        #    for linha in ids.contract_line_ids:
-        #        if linha.dia_vencimento:
-        #            ids.vencimentos = linha.dia_vencimento
-        #return True
         template_id = self.env['ir.model.data'].get_object_reference('contract_corretora',
                                                                      'email_lembrete_parcela')[1]
         template_browse = self.env['mail.template'].browse(template_id)
@@ -142,6 +133,13 @@ class AccountAnalyticAccount(models.Model):
             if inv.date_end and inv.date_end < data_fim:
                 #print("nao enviado %s" %(inv.contract_id.partner_id.name))
                 continue
+
+            # o campo quantidade e usado para o numero de parcelas
+            mes_hoje = inv.date_start + relativedelta(months=+inv.quantity)
+            mes_hoje = mes_hoje + relativedelta(day=31)
+            if data_hoje > mes_hoje:
+                continue
+
             prt = inv.contract_id.partner_id
             if not prt.email:
                 continue

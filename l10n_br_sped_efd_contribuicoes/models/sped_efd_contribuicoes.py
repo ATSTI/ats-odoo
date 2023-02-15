@@ -53,8 +53,12 @@ class SpedEfdContribuicoes(models.Model):
         ('0', 'Original'),
         ('1', 'Retificadora'),
         ], string='Tipo Escrituração', default='0')
+    cod_receita_pis = fields.Char(
+        string=u"Código receita Pis(Débito DCTF)", default="810902")
+    cod_receita_cofins = fields.Char(
+        string=u"Código receita Cofins(Débito DCTF)", default="217201")
     num_rec_anterior = fields.Char(
-        string=u"Número recibo anterior")    
+        string=u"Número recibo anterior")
     ind_nat_pj = fields.Selection([
         ('0', 'Sociedade empresárial geral'),
         ('1', 'Sociedade Cooperativa'),
@@ -336,14 +340,6 @@ class SpedEfdContribuicoes(models.Model):
             registro_D001.IND_MOV = '1'
 
         # TODO PAREI AQUI
-        """
-        resposta_cte = self.env['invoice.eletronic'].search([
-            ('model','in',('57','67')),
-            ('state', '=','done'),
-            ('data_fatura','>=',g_intervalo[0]),
-            ('data_fatura','<=',g_intervalo[1]),
-            ])
-        """
         #for cte in resposta_cte:
             # TODO D100 - Documentos Transporte
             #TODO DEIXAMOS FORA POIS NAO EXISTE NO ATS ADMIN
@@ -874,22 +870,22 @@ class SpedEfdContribuicoes(models.Model):
 
     def query_registroM200(self, periodo):
         query = """
-                    select 
-                        sum(det.valor_liquido),
-                        det.pis_aliquota,
-                        sum(det.pis_valor)
+                    select
+                        sum(det.pis_base),
+                        det.pis_percent,
+                        sum(det.pis_value)
                     from
-                        invoice_eletronic as ie
+                        l10n_br_fiscal_document as ie
                     inner join
-                        invoice_eletronic_item as det 
-                            on ie.id = det.invoice_eletronic_id
+                        l10n_br_fiscal_document_line as det 
+                            on ie.id = det.document_id
                     where
                         %s
-                        and (ie.model in ('55','01'))
-                        and ie.state = 'done'
-                        and det.pis_valor > 0
-                        and (det.cofins_cst in ('01','02','03'))
-                    group by det.pis_aliquota
+                        and (ie.document_type in ('55','01'))
+                        and (ie.state_edoc = 'autorizada')
+                        and det.pis_value > 0
+                        and (det.pis_cst_code in ('01','02','03'))
+                    group by det.pis_percent
                 """ % (periodo)
         self._cr.execute(query)
         query_resposta = self._cr.fetchall()
@@ -914,7 +910,7 @@ class SpedEfdContribuicoes(models.Model):
 
             regM205 = RegistroM205()
             regM205.NUM_CAMPO = '12'
-            regM205.COD_REC = '810902'
+            regM205.COD_REC = self.cod_receita_pis
             regM205.VL_DEBITO = resposta[2]
             lista.append(regM205)
 
@@ -946,19 +942,23 @@ class SpedEfdContribuicoes(models.Model):
     def query_registroM400(self, periodo):
         query = """
                     select 
-                        det.pis_cst,
-                        sum(det.valor_liquido)
+                        det.pis_cst_code,
+                        sum(det.pis_base),
+                        aa.code AS cod_cta
                     from
-                        invoice_eletronic as ie
+                        l10n_br_fiscal_document as ie
                     inner join
-                        invoice_eletronic_item as det 
-                            on ie.id = det.invoice_eletronic_id
+                        l10n_br_fiscal_document_line as det 
+                            on ie.id = det.document_id
+                    inner join
+                        account.account AS aa
+                            on aa.id det.account_id
                     where
                         %s
-                        and (ie.model in ('55','01'))
-                        and ie.state = 'done'
-                        and (det.pis_cst in ('04','06','07','08','09'))
-                    group by det.pis_cst
+                        and (ie.document_type in ('55','01'))
+                        and (ie.state_edoc = 'autorizada')
+                        and (det.pis_cst_code in ('04','06','07','08','09'))
+                    group by det.pis_cst_code, aa.code
                 """ % (periodo)
         self._cr.execute(query)
         query_resposta = self._cr.fetchall()
@@ -969,38 +969,31 @@ class SpedEfdContribuicoes(models.Model):
             registro_M400 = registros.RegistroM400()
             registro_M400.CST_PIS = resposta[0]
             registro_M400.VL_TOT_REC = self.transforma_valor(resposta[1])
-            registro_M400.COD_CTA = '1.1.06.11.00.00'
+            registro_M400.COD_CTA = resposta[2]
             lista.append(registro_M400)
         return lista
 
     def query_registroM410(self, cst_pis, periodo):
+        # TODO validar isso
         query = """
                     select distinct
-                        substr(pr.name, 1,3),
-                        sum(det.valor_liquido)
+                        det.ncm_id,
+                        sum(det.valor_liquido),
+                        aa.code AS cod_cta
                     from
-                        invoice_eletronic as ie
+                        l10n_br_fiscal_document as ie
                     inner join
-                        invoice_eletronic_item as det 
-                            on ie.id = det.invoice_eletronic_id
+                        l10n_br_fiscal_document_line as det 
+                            on ie.id = det.document_id
                     inner join
-                        product_product as pp
-                            on pp.id = det.product_id
-                    inner join
-                        product_template as pt
-                            on pt.id = pp.product_tmpl_id
-                    inner join
-                        product_category as pc
-                            on pc.id = pt.categ_id
-                    inner join
-                        product_category as pr
-                            on pr.id = pc.parent_id
+                        account.account AS aa
+                            on aa.id det.account_id
                     where
                         %s
-                        and (ie.model in ('55','01'))
-                        and ie.state = 'done'
-                        and (det.pis_cst = \'%s\')
-                    group by substr(pr.name, 1,3)
+                        and (ie.document_type in ('55','01'))
+                        and (ie.state_edoc = 'autorizada')
+                        and (det.pis_cst_code = \'%s\')
+                    group by det.ncm_id
                 """ % (periodo, cst_pis)
         self._cr.execute(query)
         query_resposta = self._cr.fetchall()
@@ -1008,30 +1001,36 @@ class SpedEfdContribuicoes(models.Model):
         lista_item = []
         cont = 1
         for resposta in query_resposta:
+            resp_ncm = self.env['l10n_br_fiscal.tax.pis.cofins'].search([
+                ('ncm_id', '=', resposta[0])
+            ])
             registro_M410 = registros.RegistroM410()
-            registro_M410.NAT_REC = resposta[0]
+            if resp_ncm:
+                registro_M410.NAT_REC = resp_ncm.code
             registro_M410.VL_REC = self.transforma_valor(resposta[1])
-            registro_M410.COD_CTA = '1.1.06.11.00.00'
+            # TODO rever esta conta
+            registro_M410.COD_CTA = resposta[2]
             lista.append(registro_M410)                        
         return lista
 
     def query_registroM600(self, periodo):
         query = """
                     select
-                        sum(det.valor_liquido),
-                        det.cofins_aliquota,
-                        sum(det.cofins_valor)
+                        sum(det.cofins_base),
+                        det.cofins_percent,
+                        sum(det.cofins_value)
                     from
-                        invoice_eletronic as ie
+                        l10n_br_fiscal_document as ie
                     inner join
-                        invoice_eletronic_item as det 
-                            on ie.id = det.invoice_eletronic_id
+                        l10n_br_fiscal_document_line as det 
+                            on ie.id = det.document_id
                     where
                         %s
-                        and (ie.model in ('55','01'))
-                        and ie.state = 'done'
-                        and (det.cofins_cst in ('01','02','03'))
-                    group by det.cofins_aliquota
+                        and (ie.document_type in ('55','01'))
+                        and (ie.state_edoc = 'autorizada')
+                        and det.cofins_value > 0
+                        and (det.cofins_cst_code in ('01','02','03'))
+                    group by det.cofins_percent
                 """ % (periodo)
         self._cr.execute(query)
         query_resposta = self._cr.fetchall()
@@ -1056,7 +1055,7 @@ class SpedEfdContribuicoes(models.Model):
 
             regM605 = RegistroM605()
             regM605.NUM_CAMPO = '12'
-            regM605.COD_REC = '217201'
+            regM605.COD_REC = self.cod_receita_cofins
             regM605.VL_DEBITO = self.transforma_valor(resposta[2])
             lista.append(regM605)
 
@@ -1082,19 +1081,23 @@ class SpedEfdContribuicoes(models.Model):
     def query_registroM800(self, periodo):
         query = """
                     select 
-                        det.cofins_cst,
-                        sum(det.valor_liquido)
+                        det.cofins_cst_code,
+                        sum(det.cofins_base),
+                        aa.code AS cod_cta
                     from
-                        invoice_eletronic as ie
+                        l10n_br_fiscal_document as ie
                     inner join
-                        invoice_eletronic_item as det 
-                            on ie.id = det.invoice_eletronic_id
+                        l10n_br_fiscal_document_line as det 
+                            on ie.id = det.document_id
+                    inner join
+                        account.account AS aa
+                            on aa.id det.account_id
                     where
                         %s
-                        and (ie.model in ('55','01'))
-                        and ie.state = 'done'
-                        and (det.cofins_cst in ('04','06','07','08','09'))
-                    group by det.cofins_cst
+                        and (ie.document_type in ('55','01'))
+                        and (ie.state_edoc = 'autorizada')
+                        and (det.cofins_cst_code in ('04','06','07','08','09'))
+                    group by det.cofins_cst_code, aa.code
                 """ % (periodo)
         self._cr.execute(query)
         query_resposta = self._cr.fetchall()
@@ -1105,38 +1108,30 @@ class SpedEfdContribuicoes(models.Model):
             registro_M800 = registros.RegistroM800()
             registro_M800.CST_COFINS = resposta[0]
             registro_M800.VL_TOT_REC = self.transforma_valor(resposta[1])
-            registro_M800.COD_CTA = '1.1.06.11.00.00'
+            registro_M800.COD_CTA = resposta[2]
             lista.append(registro_M800)
         return lista
 
     def query_registroM810(self, cofins_cst, periodo):
         query = """
-                    select 
-                        substr(pr.name,1,3),
-                        sum(det.valor_liquido)
+                    select distinct
+                        det.ncm_id,
+                        sum(det.valor_liquido),
+                        aa.code AS cod_cta
                     from
-                        invoice_eletronic as ie
+                        l10n_br_fiscal_document as ie
                     inner join
-                        invoice_eletronic_item as det 
-                            on ie.id = det.invoice_eletronic_id
+                        l10n_br_fiscal_document_line as det 
+                            on ie.id = det.document_id
                     inner join
-                        product_product as pp
-                            on pp.id = det.product_id
-                    inner join
-                        product_template as pt
-                            on pt.id = pp.product_tmpl_id
-                    inner join
-                        product_category as pc
-                            on pc.id = pt.categ_id
-                    inner join
-                        product_category as pr
-                            on pr.id = pc.parent_id
+                        account.account AS aa
+                            on aa.id det.account_id
                     where
                         %s
-                        and (ie.model in ('55','01'))
-                        and ie.state = 'done'
-                        and (det.cofins_cst = \'%s\')
-                    group by substr(pr.name,1,3)
+                        and (ie.document_type in ('55','01'))
+                        and (ie.state_edoc = 'autorizada')
+                        and (det.cofins_cst_code = \'%s\')
+                    group by det.ncm_id
                 """ % (periodo, cofins_cst)
         self._cr.execute(query)
         query_resposta = self._cr.fetchall()
@@ -1145,9 +1140,13 @@ class SpedEfdContribuicoes(models.Model):
         cont = 1
         for resposta in query_resposta:
             registro_M810 = registros.RegistroM810()
-            cod_nat = resposta[0]
-            registro_M810.NAT_REC = cod_nat[:3]
+            resp_ncm = self.env['l10n_br_fiscal.tax.pis.cofins'].search([
+                ('ncm_id', '=', resposta[0])
+            ])
+            if resp_ncm:
+                registro_M810.NAT_REC = resp_ncm.code
             registro_M810.VL_REC = self.transforma_valor(resposta[1])
-            registro_M810.COD_CTA = '1.1.06.11.00.00'
+            # TODO rever esta conta
+            registro_M810.COD_CTA = resposta[2] 
             lista.append(registro_M810)                        
         return lista

@@ -94,15 +94,10 @@ class SpedEfdContribuicoes(models.Model):
         ('2', 'Regime de Competência -Escrituração consolidada (Registro F550)'),
         ('9', 'Regime de Competência -Escrituração detalhada, com base nos registros dos Blocos “A”, “C”, “D” e “F”'),
         ], string='Critério de Escrituração e Apuração Adotado')
-    contas_saida = fields.Many2many(
+    contas_entrada_saida = fields.Many2many(
         comodel_name="account.account",
         string="Contas Contábeis(Saída/Receita)(0500)",
         # domain=[("user_type_id.internal_group", "=", "income")],
-    )
-    contas_entrada = fields.Many2many(
-        comodel_name="account.account",
-        string="Contas Contábeis(Aquisição/Custo/Despesa)(0500)",
-        # domain=[("user_type_id.internal_group", "=", "expense")],
     )
     
     log_faturamento = fields.Text('Log de Faturamento', copy=False)
@@ -229,7 +224,7 @@ class SpedEfdContribuicoes(models.Model):
         for item_lista in self.query_registro0400(periodo):
             arq.read_registro(self.junta_pipe(item_lista))
            
-        for conta in self.contas_saida:
+        for conta in self.contas_entrada_saida:
             reg500 = Registro0500()
             reg500.DT_ALT = datetime.strptime(conta.write_date, '%Y-%m-%d')
             # Conta de resultado
@@ -251,28 +246,6 @@ class SpedEfdContribuicoes(models.Model):
             reg500.NOME_CTA = conta.name
             arq._blocos['0'].add(reg500)
 
-        for conta in self.contas_entrada:
-            reg500 = Registro0500()
-            reg500.DT_ALT = datetime.strptime(conta.write_date, '%Y-%m-%d')
-            # Conta de Arquisicao/Custo/Despesa
-            if conta.internal_group == "asset":
-                reg500.COD_NAT_CC = '01'
-            elif conta.internal_group == "liability":
-                reg500.COD_NAT_CC = '02'
-            elif conta.internal_group == "equity":
-                reg500.COD_NAT_CC = '03'
-            elif conta.internal_group == "income":
-                reg500.COD_NAT_CC = '04'
-            elif conta.internal_group == "expense":
-                reg500.COD_NAT_CC = '04'
-            # TODO Sintetica / Analitica
-            reg500.IND_CTA = 'S'
-            # TODO confirmar nivel
-            reg500.NÍVEL = '5'
-            reg500.COD_CTA = conta.code
-            reg500.NOME_CTA = conta.name
-            arq._blocos['0'].add(reg500)
-       
         query = """
                     select distinct
                         ie.id, ie.state_edoc, ie.issuer

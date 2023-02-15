@@ -63,13 +63,19 @@
         </field>
     </record>
 
-
-    <record id="action_sped_efd_contribuicoes_menu" model="ir.actions.act_window">
-        <field name="name">Sped Contruibuições(PIS/COFINS)</field>
+    <record id="action_sped_contribuicoes_menu" model="ir.actions.act_window">
+        <field name="name">SPED contribuições PIS/COFINS</field>
+        <field name="type">ir.actions.act_window</field>
         <field name="res_model">sped.efd.contribuicoes</field>
-        <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+              Gerar novo arquivo SPED contribuições PIS/COFINS
+            </p>
+        </field>
     </record>
 
-    <menuitem id="menu_general_sped_contribuicoes" action="action_sped_efd_contribuicoes_menu" parent="br_account_einvoice.menu_eletronic_doc_base" sequence="99" />
+    <menuitem id="menu_general_sped_contribuicoes" action="action_sped_contribuicoes_menu" name="Sped contribuições PIS/COFINS" groups="l10n_br_nfe.group_user" parent="l10n_br_fiscal.document_menu" sequence="21" />
+
+
 </odoo>

@@ -12,6 +12,10 @@
     'contributors': [
         'Carlos R. Silveira<carlos@atsti.com.br>',
     ],
+    'depends': [
+        'l10n_br_fiscal',
+        'l10n_br_nfe',
+    ],
     'data': [
         'security/ir.model.access.csv',
         'views/sped_contribuicoes_view.xml',

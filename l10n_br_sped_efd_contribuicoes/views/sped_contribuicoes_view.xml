@@ -9,29 +9,29 @@
                     <group>
                         <group>
                             <field name="company_id" options='{"no_create" : 1, "no_create_edit" : 1}'/>
-                            <field name="tipo_escrit" widget="radio" />
+                            <field name="date_start" required="1"/>
+                            <field name="date_end" required="1"/>
                             <field name="cod_receita_pis"/>
-                            <field name="contas_entrada_saida"/>
+                            <field name="contas_entrada_saida" widget="many2many_tags"/>
                         </group>
-                        <group col="4">
-                            <field name="date_start"/>
-                            <field name="date_end"/>
-                            <field name="cod_receita_cofins"/>
-                        </group>
-                        <group col="4">
-                            <field name="num_rec_anterior"/>
+                        <group col="3">
                             <field name="ind_nat_pj"/>
                             <field name="ind_ativ"/>
+                            <field name="cod_receita_cofins"/>
+                            <field name="tipo_escrit" widget="radio" />
                         </group>
-                        <group col="4">
+                        <group>
+                            <field name="num_rec_anterior"/>
                             <field name="cod_inc_trib"/>
+                        </group>
+                        <group col="3">
                             <field name="ind_apro_cred"/>
                             <field name="cod_tipo_cont"/>
                             <field name="ind_reg_cum"/>
                         </group>
                         <group>
                             <field name="sped_file_name" invisible="1"/>
-                            <field widget="binary" height="64" name="sped_file" filename="sped_file_name" />
+                            <field widget="binary" height="64" name="sped_file" filename="sped_file_name" readonly="1" />
                         </group>
                     </group>
                     <field name="log_faturamento" readonly="1"/>
@@ -47,7 +47,6 @@
             </form>
         </field>
     </record>
-
     <record id="sped_efd_contribuicoes_tree" model="ir.ui.view">
         <field name="name">view_sped_efd_contribuicoes_tree</field>
         <field name="model">sped.efd.contribuicoes</field>
@@ -61,7 +60,6 @@
             </tree>
         </field>
     </record>
-
     <record id="action_sped_contribuicoes_menu" model="ir.actions.act_window">
         <field name="name">SPED contribuições PIS/COFINS</field>
         <field name="type">ir.actions.act_window</field>
@@ -73,8 +71,5 @@
             </p>
         </field>
     </record>
-
     <menuitem id="menu_general_sped_contribuicoes" action="action_sped_contribuicoes_menu" name="Sped contribuições PIS/COFINS" groups="l10n_br_nfe.group_user" parent="l10n_br_fiscal.document_menu" sequence="21" />
-
-
 </odoo>

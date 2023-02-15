@@ -555,124 +555,137 @@ class SpedEfdContribuicoes(models.Model):
 
     def query_registroC100(self, doc):
         lista = []
-        nfe_ids = self.env['invoice.eletronic'].browse(doc)
-        for nf in nfe_ids:    
-            if (nf.state == 'done') and (nf.model == '55'):
-                cancel = False 
-                registro_c100 = registros.RegistroC100()
-                if nf.tipo_operacao == 'entrada':
-                    registro_c100.IND_OPER = '0'
-                else:
-                    registro_c100.IND_OPER = '1'
-                if nf.emissao_doc == '1':    
-                    registro_c100.IND_EMIT = '0'
-                else:
-                    registro_c100.IND_EMIT = '1'
-                registro_c100.COD_MOD = nf.model
-                if nf.state == 'cancel':
-                    registro_c100.COD_SIT = '02'
-                    cancel = True
-                else:
-                    registro_c100.COD_SIT = '00'
-                registro_c100.SER = nf.serie_documento
-                registro_c100.CHV_NFE = nf.chave_nfe
-                registro_c100.NUM_DOC = self.limpa_formatacao(str(nf.numero))
-                if not cancel:
-                    registro_c100.DT_DOC  = nf.data_emissao
-                    if nf.data_fatura:
-                        registro_c100.DT_E_S  = nf.data_fatura
-                    else:
-                        registro_c100.DT_E_S  = nf.data_emissao
-                    if nf.metodo_pagamento:
-                        registro_c100.IND_PGTO = nf.metodo_pagamento
-                    registro_c100.VL_MERC = self.transforma_valor(nf.valor_bruto)
-                    registro_c100.IND_FRT = str(nf.modalidade_frete)
-                    registro_c100.VL_FRT = self.transforma_valor(nf.valor_frete)
-                    registro_c100.VL_SEG = self.transforma_valor(nf.valor_seguro)
-                    registro_c100.VL_OUT_DA = self.transforma_valor(nf.valor_despesas)
-                    registro_c100.VL_DESC = self.transforma_valor(nf.valor_desconto)
-                    registro_c100.VL_DOC  = self.transforma_valor(nf.valor_final)
-                    registro_c100.VL_BC_ICMS = self.transforma_valor(nf.valor_bc_icms)
-                    registro_c100.VL_ICMS = self.transforma_valor(nf.valor_icms)
-                    registro_c100.VL_BC_ICMS_ST = self.transforma_valor(nf.valor_bc_icmsst)
-                    registro_c100.VL_ICMS_ST = self.transforma_valor(nf.valor_icmsst)
-                    registro_c100.VL_IPI = self.transforma_valor(nf.valor_ipi)
-                    registro_c100.VL_PIS = self.transforma_valor(nf.valor_pis)
-                    registro_c100.VL_COFINS = self.transforma_valor(nf.valor_cofins)
-                    registro_c100.COD_PART = str(nf.partner_id.id)
-                lista.append(registro_c100)
+        nfe_ids = self.env['l10n_br_fiscal.document'].browse(doc)
+        for nfe in nfe_ids:    
+            # removendo Emissao de Terceiros canceladas
+            if nfe.issuer == "partner" and nfe.state_edoc == "cancelada":
+                return True
+            # Ajustes SINIEF 34/2021 e 38/2021 (01/12/2021)
+            if nfe.state_edoc == "denegada":
+                return True
+            cancel = False
+            # Obrigatorio para todos STATE_EDOC, exceto a CHV_NF-e nao obrig. INUTLIZADA
+            # REG, IND_OPER,IND_EMIT, COD_MOD, COD_SIT, SER, NUM_DOC e CHV_NF-e
+            registro_c100 = registros.RegistroC100()
+            if nfe.fiscal_operation_type == "in":
+                registro_c100.IND_OPER = "0"
+            else:
+                registro_c100.IND_OPER = "1"
+            if nfe.issuer == "company":    
+                registro_c100.IND_EMIT = "0"
+            else:
+                registro_c100.IND_EMIT = "1"
+            registro_c100.COD_MOD = nfe.document_type_id.code
+            registro_c100.SER = nfe.document_serie
+            if nfe.document_key:
+                registro_c100.CHV_NFE = nfe.document_key
+            registro_c100.NUM_DOC = self.limpa_formatacao(str(nfe.document_number))
+            if nfe.state_edoc == "cancelada":
+                registro_c100.COD_SIT = "02"
+                cancel = True
+            elif nfe.state_edoc == "autorizada" and nfe.edoc_purpose in ("1", "4"):
+                # Documento normal ou devolucao
+                registro_c100.COD_SIT = "00"
+            elif nfe.state_edoc == "autorizada" and nfe.edoc_purpose in ("2", "3"):
+                # Documento complementar/ajuste
+                registro_c100.COD_SIT = "06"
+            # A partir de janeiro de 2023, os códigos de situação de documento 04 (NF-e ou CT-e denegado) e 
+            # 05 (NF-e ou CT-e Numeração inutilizada) da tabela 4.1.2 - Tabela Situação do Documento serão descontinuados.
+            # elif nfe.state_edoc == "denegada" and nfe.edoc_purpose == "1":
+            #     registro_c100.COD_SIT = "04"
+            # elif nfe.state_edoc == "inutilizada":
+            #     registro_c100.COD_SIT = "05"
+            #     registro_c100.SER = ""
+            #     registro_c100.CHV_NFE = ""
+            # if nfe.emissao_doc == '1' and not nfe.state == 'cancel' \
+            #     and nfe.chave_nfe[6:20] != \
+            #     self.limpa_formatacao(nfe.partner_id.company_id.cnpj_cpf):
+            #     registro_c100.COD_SIT = '08'                    
+            if not cancel and nfe.state_edoc not in ("inutilizada", "cancelada"):
+                registro_c100.DT_DOC = nfe.document_date
+                registro_c100.DT_E_S = nfe.date_in_out
+                registro_c100.IND_PGTO = '1'
+                # if nfe.nfe40_pag:
+                #     if len(nfe.duplicata_ids) == 1:
+                #         if nfe.duplicata_ids.data_vencimento == nfe.data_agendada:
+                #             registro_c100.IND_PGTO = '0'
+                #         else:
+                #             registro_c100.IND_PGTO = '1'
+                #     else:
+                #         registro_c100.IND_PGTO = '1'
+                # else:
+                #     registro_c100.IND_PGTO = '2'
+                registro_c100.VL_MERC = nfe.amount_price_gross
+                registro_c100.IND_FRT = str(nfe.nfe40_modFrete)
+                registro_c100.VL_FRT = nfe.amount_freight_value
+                registro_c100.VL_SEG = nfe.amount_insurance_value
+                registro_c100.VL_OUT_DA = nfe.amount_other_value
+                registro_c100.VL_DESC = nfe.amount_discount_value
+                registro_c100.VL_DOC  = nfe.amount_total
+                registro_c100.VL_BC_ICMS = nfe.amount_icms_base
+                registro_c100.VL_ICMS = self.transforma_valor(nfe.amount_icms_value)
+                registro_c100.VL_BC_ICMS_ST = nfe.amount_icmsst_base
+                registro_c100.VL_ICMS_ST = nfe.amount_icmsst_value
+                registro_c100.VL_IPI = nfe.amount_ipi_value
+                registro_c100.VL_PIS = nfe.amount_pis_value
+                registro_c100.VL_COFINS = nfe.amount_cofins_value
+                registro_c100.COD_PART = str(nfe.partner_id.id)
+            lista.append(registro_c100)                
         return lista
 
     def query_registroC170(self, doc):
         lista = []
-        nfe_line = self.env['invoice.eletronic.item'].search([
-                ('invoice_eletronic_id','=', doc),
-                ], order='num_item')
+        nfe_line = self.env['l10n_br_fiscal.document.line'].search([
+                ('document_id','=', nf),
+                ], order='nfe40_nItem, id')
         n_item = 1
-        for item in nfe_line:
+        for item in nfe_line:     
             registro_c170 = registros.RegistroC170()
-            if item.num_item > 1:
-                registro_c170.NUM_ITEM = str(item.num_item)
-            else:
-                registro_c170.NUM_ITEM = str(n_item) # str(item.num_item_xml or n_item)                
-            cprod = item.product_id.default_code #.replace('.','')
-            registro_c170.COD_ITEM = cprod
+            # saida
+            registro_c170.NUM_ITEM = str(item.nfe40_nItem or n_item)
+            registro_c170.COD_ITEM = item.product_id.default_code
             registro_c170.DESCR_COMPL = self.limpa_caracteres(item.name.strip())
-            registro_c170.QTD = self.transforma_valor(item.quantidade)
-            if item.uom_id.name.find('-') != -1:
-                unidade = item.uom_id.name[:item.uom_id.name.find('-')]
+            registro_c170.QTD = self.transforma_valor(item.fiscal_quantity)
+            if item.uom_id.code.find('-') != -1:
+                unidade = item.uom_id.code[:item.uom_id.code.find('-')]
             else:
-                unidade = item.uom_id.name
-            registro_c170.UNID = unidade[:6]
-            registro_c170.VL_DESC = self.transforma_valor(item.desconto)
-            registro_c170.VL_ITEM = self.transforma_valor(item.valor_bruto)
-            if item.cfop in ['5922', '6922']:
-                registro_c170.IND_MOV = '1'
+                unidade = item.uom_id.code
+            registro_c170.UNID = unidade.strip()
+            registro_c170.VL_DESC = item.discount_value
+            registro_c170.VL_ITEM = item.fiscal_price * item.fiscal_quantity
+            if item.cfop_id.stock_move:
+                registro_c170.IND_MOV = "0"
             else:
-                registro_c170.IND_MOV = '0'
+                registro_c170.IND_MOV = "1"
             try:
-                registro_c170.CST_ICMS = '%s%s' %(str(item.origem), str(item.icms_cst))
+                registro_c170.CST_ICMS = item.icms_origin + item.icms_cst_code
             except:
-                msg_err = 'Sem CST na Fatura %s. <br />' %(str(resposta.number or resposta.id))
-                #raise UserError(msg_err)
+                msg_err = 'Sem CST no Documento Fiscal %s. \n' %(
+                    str(item.product_id.default_code))
                 self.log_faturamento += msg_err
-            if item.cfop:
-                registro_c170.CFOP = str(item.cfop)
-            else:
-                registro_c170.CFOP = '0000'
-            #if r_nfe.id == 407:
-            #    import pudb;pu.db
-            registro_c170.COD_NAT = str(item.invoice_eletronic_id.fiscal_position_id.id)
-            registro_c170.VL_BC_ICMS = self.transforma_valor(item.icms_base_calculo)
-            registro_c170.ALIQ_ICMS = '0'
-            registro_c170.ALIQ_ICMS = self.transforma_valor(item.icms_aliquota)
-            
-            registro_c170.VL_ICMS = self.transforma_valor(item.icms_valor)
-            registro_c170.VL_BC_ICMS_ST = self.transforma_valor(item.icms_st_base_calculo)
-            if item.icms_st_aliquota:
-                registro_c170.ALIQ_ST = self.transforma_valor(item.icms_st_aliquota)
-            registro_c170.VL_ICMS_ST = self.transforma_valor(item.icms_st_valor)
-            # TODO incluir na empresa o IND_APUR
-            registro_c170.IND_APUR = '0'
-            registro_c170.CST_IPI = item.ipi_cst
-            registro_c170.VL_BC_IPI = self.transforma_valor(item.ipi_base_calculo)
-            if item.ipi_aliquota:
-                registro_c170.ALIQ_IPI = self.transforma_valor(item.ipi_aliquota)
-            registro_c170.VL_IPI = self.transforma_valor(item.ipi_valor)
-            registro_c170.CST_PIS = item.pis_cst
-            registro_c170.VL_BC_PIS = self.transforma_valor(item.pis_base_calculo)
-            registro_c170.ALIQ_PIS = self.transforma_valor(item.pis_aliquota)
-            #registro_c170.QUANT_BC_PIS = self.transforma_valor(
-            registro_c170.VL_PIS = self.transforma_valor(item.pis_valor)
-            registro_c170.CST_COFINS = item.cofins_cst
-            registro_c170.VL_BC_COFINS = self.transforma_valor(item.cofins_base_calculo)
-            registro_c170.ALIQ_COFINS = self.transforma_valor(item.cofins_aliquota)
-            #registro_c170.QUANT_BC_COFINS = self.transforma_valor(
-            registro_c170.VL_COFINS = self.transforma_valor(item.cofins_valor)
+            registro_c170.CFOP = str(item.cfop_id.code)
+            registro_c170.COD_NAT = str(item.fiscal_operation_id.id)
+            registro_c170.VL_BC_ICMS = item.icms_base
+            registro_c170.ALIQ_ICMS = item.icms_percent
+            registro_c170.VL_ICMS = self.transforma_valor(item.icms_value)
+            registro_c170.VL_BC_ICMS_ST = item.icmsst_base
+            registro_c170.ALIQ_ST = item.icmsst_percent
+            registro_c170.VL_ICMS_ST = item.icmsst_value
+            registro_c170.IND_APUR = self.ind_apur
+            registro_c170.CST_IPI = item.ipi_cst_code
+            registro_c170.VL_BC_IPI = item.ipi_base
+            registro_c170.ALIQ_IPI = item.ipi_percent
+            registro_c170.VL_IPI = item.ipi_value
+            registro_c170.CST_PIS = item.pis_cst_code
+            registro_c170.VL_BC_PIS = item.pis_base
+            registro_c170.ALIQ_PIS = item.pis_percent
+            registro_c170.VL_PIS = item.pis_value
+            registro_c170.CST_COFINS = item.cofins_cst_code
+            registro_c170.VL_BC_COFINS = item.cofins_base
+            registro_c170.ALIQ_COFINS = item.cofins_percent
+            registro_c170.VL_COFINS = item.cofins_value
             n_item += 1
-       
             lista.append(registro_c170)
-
         return lista
 
     # transporte

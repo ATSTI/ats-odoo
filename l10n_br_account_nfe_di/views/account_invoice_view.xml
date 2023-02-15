@@ -26,15 +26,6 @@
         <field name="model">declaracao.importacao</field>
         <field name="arch" type="xml">
             <form string="Declaração Importação">
-                <!-- <header>
-                    <button
-                        name="copy_di"
-                        string="Copiar para todos os itens"
-                        type="object"
-                        default_focus="1"
-                        class="oe_highlight"
-                    />
-                </header> -->
                 <sheet>
                     <group>
                         <field name="name" />
@@ -95,6 +86,9 @@
                 <sheet>
                     <group>
                         <field name="name" />
+                        <field name="registro_exp" />
+                        <field name="chava_nfe" />
+                        <field name="q_export" />
                         <field name="company_id" />
                     </group>
                 </sheet>
@@ -141,6 +135,7 @@
                                 type="object"
                                 class="oe_highlight"
                             />
+                            <button type="object" icon="fa-trash-o" name="unlink"/>
                         </tree>
                         <form>
                             <sheet>
@@ -183,23 +178,39 @@
                     attrs="{'invisible': [('fiscal_operation_type', '=', 'in')]}"
                 >
                 <!-- attrs="{'invisible': [('cfop_destination', '!=', '3'), ('fiscal_operation_type', '=', 'in')]}" -->
-                    <field name="exp_ids">
-                        <tree editable="bottom" string="Detalhe Exportação">
+                <header>
+                    <button
+                        name="button_wizard_detexp"
+                        string="Adicionar"
+                        class="btn-success"
+                        type="object"
+                        attrs="{'invisible': [('state', '!=', 'draft')]}"
+                    />
+                </header>                    
+                <field name="exp_ids" context="{'default_am_id': active_id}" readonly="1" >
+                        <tree string="Detalhe Exportação">
                             <field name="name" />
+                            <field name="company_id" invisible="1" />
                             <field name="registro_exp" />
                             <field name="chava_nfe" />
                             <field name="q_export" />
-                            <field name="company_id" invisible="1" />
+                            <button 
+                                name="edit_detexp"
+                                string="Editar" 
+                                type="object"
+                                class="oe_highlight"
+                            />
+                            <button type="object" icon="fa-trash-o" name="unlink"/>
                         </tree>
                         <form>
                             <sheet>
                                 <group string="Detalhe Exportação">
                                     <group>
                                         <field name="name" />
+                                        <field name="company_id" invisible="1" /> 
                                         <field name="registro_exp" />
                                         <field name="chava_nfe" />
-                                        <field name="q_export" />
-                                        <field name="company_id" invisible="1" />            
+                                        <field name="q_export" />           
                                     </group>
                                 </group>
                             </sheet>

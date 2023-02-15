@@ -117,6 +117,9 @@ class WizardCreateDi(models.TransientModel):
         adi_line = []
         adi = {}
         if di:
+            if self.aml_id.move_id.state != "draft":
+                raise UserError(_("Documento confirmado, alteração não permitida."))
+               
             for line_adi in self.nfe40_adi:
                 adi["name"] = line_adi.nAdicao
                 adi["sequence_di"] = line_adi.nSeqAdic
@@ -126,21 +129,21 @@ class WizardCreateDi(models.TransientModel):
                 adi_line.append((1, adi_id, adi))
 
             self.aml_id.di_ids = [(1, di, {
-                    'name': self.nfe40_nDI,
-                    'aml_id': self.aml_id.id,
-                    'date_registration': self.nfe40_dDI,
-                    'state_id': self.nfe40_UFDesemb.id,
-                    'location': self.nfe40_xLocDesemb,
-                    'date_release': self.nfe40_dDesemb,
-                    'type_transportation': self.nfe40_tpViaTransp,
-                    'afrmm_value': self.nfe40_vAFRMM,
-                    'tpIntermedio': self.nfe40_tpIntermedio,
-                    'thirdparty_cnpj': self.nfe40_CNPJ,
-                    'thirdparty_state_id': self.nfe40_UFTerceiro.id,
-                    'exporting_code': self.nfe40_cExportador,
-                    'company_id': self.aml_id.company_id.id,
-                    'adi_ids': adi_line,
-                })]
+                'name': self.nfe40_nDI,
+                'aml_id': self.aml_id.id,
+                'date_registration': self.nfe40_dDI,
+                'state_id': self.nfe40_UFDesemb.id,
+                'location': self.nfe40_xLocDesemb,
+                'date_release': self.nfe40_dDesemb,
+                'type_transportation': self.nfe40_tpViaTransp,
+                'afrmm_value': self.nfe40_vAFRMM,
+                'tpIntermedio': self.nfe40_tpIntermedio,
+                'thirdparty_cnpj': self.nfe40_CNPJ,
+                'thirdparty_state_id': self.nfe40_UFTerceiro.id,
+                'exporting_code': self.nfe40_cExportador,
+                'company_id': self.aml_id.company_id.id,
+                'adi_ids': adi_line,
+            })]
         else:    
             for line in self.nfe40_adi:
                 adi["name"] = line.nAdicao

@@ -65,7 +65,7 @@ class SpedEfdIcmsIpi(models.Model):
         ('005', 'Antecipação tributária'),
         ('006', 'ICMS resultante da alíquota adicional dos itens incluídos no Fundo de Combate à Pobreza'),
         ('090', 'Outras obrigações do ICMS'),       
-        ], string= 'Código Obrigação', dafault='000')
+        ], string= 'Código Obrigação', default='000')
         
     cod_receita = fields.Selection([     
         ('046-2', 'Regime Periódico de Apuração'),

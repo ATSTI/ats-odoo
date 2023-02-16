@@ -23,6 +23,7 @@
                         <group>
                             <field name="num_rec_anterior"/>
                             <field name="cod_inc_trib"/>
+                            <field name="ind_apur"/>
                         </group>
                         <group col="3">
                             <field name="ind_apro_cred"/>

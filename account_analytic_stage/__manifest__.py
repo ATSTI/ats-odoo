@@ -1,15 +1,14 @@
-# Copyright 2017 ACSONE SA/NV
-# Copyright 2020 Brainbean Apps (https://brainbeanapps.com)
+# Copyright 2023 ATSTi
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    "name": "Account Analytic Sequence",
+    "name": "Account Analytic Stage",
     "summary": """
-        Restore the analytic account sequence""",
-    "version": "14.0.1.0.1",
+        Add stage""",
+    "version": "14.0.1.0.0",
     "license": "AGPL-3",
-    "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
-    "website": "https://github.com/OCA/account-analytic",
+    "author": "ATSTi",
+    "website": "https://github.com/ATSTI/ats-odoo/account_analytic_stage",
     "depends": [
         "analytic",
     ],

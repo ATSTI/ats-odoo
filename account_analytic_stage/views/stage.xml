@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!--
+        License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
+    -->
+    <record id="view_account_analytic_stage_tree" model="ir.ui.view">
+        <field name="name">account.analytic.stage.tree</field>
+        <field name="model">account.analytic.account</field>
+        <field name="inherit_id" ref="analytic.view_account_analytic_account_list" />
+        <field name="arch" type="xml">
+            <field name="balance" position="after">
+                <field name="date_start" />
+                <field name="date_end" />
+                <field name="state_id" widget="badge" 
+                decoration-success="state_id == 'concluido'" 
+                decoration-warning="state_id == 'andamento'"    />
+            </field>
+        </field>
+    </record>
+    <record id="view_account_analytic_stage_form" model="ir.ui.view">
+        <field name="name">account.analytic.stage.form</field>
+        <field name="model">account.analytic.account</field>
+        <field name="inherit_id" ref="analytic.view_account_analytic_account_form" />
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="date_start" />
+                <field name="date_end" />
+                <field name="state_id" />
+            </field>
+        </field>
+    </record>
+</odoo>

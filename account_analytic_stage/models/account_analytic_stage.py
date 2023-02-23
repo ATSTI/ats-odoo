@@ -13,7 +13,7 @@ class AccountAnalyticAccount(models.Model):
             ('concluido', 'Concluido'),
             ('nao_iniciado', 'Não iniciado'),
         ],
-        string="Estágio"
+        string="Estágio", default="nao_iniciado", readonly="1"
     )
 
     # @api.model
@@ -30,3 +30,20 @@ class AccountAnalyticAccount(models.Model):
     # def _assign_default_codes(self):
     #     for aaa in self.with_context(active_test=False).search([("code", "=", False)]):
     #         aaa.code = self._default_code()
+
+    @api.onchange('date_start')
+    def _onchange_date_start(self):
+        # import wdb
+        # wdb.set_trace()
+        if self.date_start:
+            self.write({'state_id': 'andamento'})
+
+    @api.onchange('date_end')
+    def _onchange_date_end(self):
+        if self.date_end and self.state_id == 'andamento':
+            self.state_id = 'concluido'
+
+    #     @api.onchange('date_end')
+    # def _onchange_date_end(self):
+    #     if not self.date_end or self.date_end > self.date_start:
+    #         self.state_id = 'andamento'

@@ -11,9 +11,7 @@
             <field name="balance" position="after">
                 <field name="date_start" />
                 <field name="date_end" />
-                <field name="state_id" widget="badge" 
-                decoration-success="state_id == 'concluido'" 
-                decoration-warning="state_id == 'andamento'"    />
+                <field name="state_id" widget="badge" decoration-success="state_id == 'concluido'" decoration-warning="state_id == 'andamento'" />
             </field>
         </field>
     </record>
@@ -25,8 +23,21 @@
             <field name="partner_id" position="after">
                 <field name="date_start" />
                 <field name="date_end" />
-                <field name="state_id" />
+                <field name="state_id" force_save="1" />
             </field>
+        </field>
+    </record>
+    <record id="view_account_analytic_filter_state" model="ir.ui.view">
+        <field name="name">account.analytic.stage.filter</field>
+        <field name="model">account.analytic.account</field>
+        <field name="inherit_id" ref="analytic.view_account_analytic_account_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="state_id"/>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <filter string="Estagio" name="state_id" context="{'group_by':'state_id'}"/>
+            </xpath>
         </field>
     </record>
 </odoo>

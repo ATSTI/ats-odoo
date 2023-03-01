@@ -2,4 +2,4 @@
 
 from . import pos_order
 from . import product
-
+from . import stock

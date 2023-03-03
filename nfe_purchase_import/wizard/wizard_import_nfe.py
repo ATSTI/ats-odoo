@@ -124,24 +124,50 @@ class WizardImportNfe(models.TransientModel):
             # issuer = chave,
         )
 
-    def create_order_line(self, item, nfe, order_id, nitem):
-        emit = nfe.NFe.infNFe.emit
-        partner_doc = emit.CNPJ if hasattr(emit, 'CNPJ') else emit.CPF
-        partner_id = self.env['res.partner'].search([('cnpj_cpf', '=', self.arruma_cpf_cnpj(str(partner_doc)))]).id
-        uom_id = self.env['uom.uom'].search([
-            ('name', '=', str(item.prod.uCom))], limit=1).id
+    def busca_produto_cadastro(self, item, nfe):
         product = self.env['product.product'].search([
-            ('default_code', '=', item.prod.cProd)], limit=1)
+            ('default_code', '=', str(item.prod.cProd))], limit=1)
         if not product:
             if item.prod.cEAN != 'SEM GTIN':
                 product = self.env['product.product'].search([
                     ('barcode', '=', item.prod.cEAN)], limit=1)
         if not product:
+            emit = nfe.NFe.infNFe.emit
+            partner_doc = emit.CNPJ if hasattr(emit, 'CNPJ') else emit.CPF
+            partner_id = self.env['res.partner'].search([('cnpj_cpf', '=', self.arruma_cpf_cnpj(str(partner_doc)))]).id
             product_code = self.env['product.supplierinfo'].search([
-                ('product_code', '=', item.prod.cProd), ('name', '=', partner_id)
-            ])
+                ('product_code','=', str(item.prod.cProd)),
+                ('name','=',partner_id)
+            ], limit=1)
             product = self.env['product.product'].browse(product_code.product_tmpl_id.id)
+        if not product:
+            product = self.env['product.product'].search([
+                ('name', '=', str(item.prod.xProd))], limit=1)
+            if product:
+                if product.default_code in str(item.prod.cProd):
+                    product.write({'default_code': str(item.prod.cProd)})
+        return product
 
+
+    def create_order_line(self, item, nfe, order_id, nitem, estoque):
+        emit = nfe.NFe.infNFe.emit
+        partner_doc = emit.CNPJ if hasattr(emit, 'CNPJ') else emit.CPF
+        partner_id = self.env['res.partner'].search([('cnpj_cpf', '=', self.arruma_cpf_cnpj(str(partner_doc)))]).id
+        uom_id = self.env['uom.uom'].search([
+            ('name', '=', str(item.prod.uCom))], limit=1).id
+        # comentei abaixo pq criei a funcao busca_produto_cadastro 03/03/2023
+        #product = self.env['product.product'].search([
+        #    ('default_code', '=', str(item.prod.cProd))], limit=1)
+        #if not product:
+        #    if item.prod.cEAN != 'SEM GTIN':
+        #        product = self.env['product.product'].search([
+        #            ('barcode', '=', item.prod.cEAN)], limit=1)
+        #if not product:
+        #    product_code = self.env['product.supplierinfo'].search([
+        #        ('product_code', '=', str(item.prod.cProd)), ('name', '=', partner_id)
+        #    ])
+        #    product = self.env['product.product'].browse(product_code.product_tmpl_id.id)
+        product = self.busca_produto_cadastro(item, nfe)
         if not product:
             if self.not_found_product:
                 for line in self.not_found_product:
@@ -165,16 +191,18 @@ class WizardImportNfe(models.TransientModel):
                                 vals['uom_id'] = uom_id
                             else:
                                 vals['uom_id'] = 1
-                            vals['type'] = 'product'
+                            if estoque:
+                                vals['type'] = 'product'
+                            else:
+                                vals['type'] = 'consu'
                             vals['list_price'] = float(item.prod.vUnCom)
-                            vals['purchase_method'] = 'receive'
+                            vals['purchase_method'] = 'purchase'
                             # vals['tracking'] = 'none'
                             try:
                                 if item.prod.cEAN != 'SEM GTIN':
                                     vals['barcode'] = item.prod.cEAN
                             except:
                                 pass
-                            vals['type'] = 'product'
                             vals['fiscal_type'] = '00'
                             ncm = str(item.prod.NCM).zfill(8)
                             ncm = f"{ncm[:4]}.{ncm[4:6]}.{ncm[6:8]}"
@@ -188,19 +216,22 @@ class WizardImportNfe(models.TransientModel):
         preco_unitario = item.prod.vUnCom
         uom_xml = self.env['uom.uom'].search([('name','=',str(item.prod.uCom))],limit=1)
         datetime_obj = self.retorna_data(nfe)
-        return self.env['purchase.order.line'].create({
+        order_line = self.env['purchase.order.line'].create({
             'product_id': product_id,'name':item.prod.xProd,'date_planned':datetime_obj,
             'product_qty': quantidade, 'price_unit': preco_unitario, 'product_uom':product.uom_id.id,
             'order_id':order_id,'partner_id':partner_id, 'product_qty_xml':float(quantidade), 'product_uom_xml':uom_xml.id,
             'num_item_xml':nitem
         })
+        return order_line
 
     def get_items_purchase(self, nfe, order_id):
         items = []
         cont = 0
+        # controla estoque
+        estoque = self.env['ir.module.module'].search([('name','=','stock'),('state','=','installed')])
         for det in nfe.NFe.infNFe.det:
             cont = cont + 1;
-            item = self.create_order_line(det, nfe, order_id, cont)
+            item = self.create_order_line(det, nfe, order_id, cont, estoque)
             items.append((4, item.id, False))
         return {'order_line': items}
 
@@ -221,21 +252,7 @@ class WizardImportNfe(models.TransientModel):
         order._compute_tax_id()
 
     def carrega_produtos(self, item, nfe):
-        product = self.env['product.product'].search([
-            ('default_code', '=', item.prod.cProd)], limit=1)
-        if not product:
-            if item.prod.cEAN != 'SEM GTIN':
-                product = self.env['product.product'].search([
-                    ('barcode', '=', item.prod.cEAN)], limit=1)
-        if not product:
-            emit = nfe.NFe.infNFe.emit
-            partner_doc = emit.CNPJ if hasattr(emit, 'CNPJ') else emit.CPF
-            partner_id = self.env['res.partner'].search([('cnpj_cpf', '=', self.arruma_cpf_cnpj(str(partner_doc)))]).id
-            product_code = self.env['product.supplierinfo'].search([
-                ('product_code','=',item.prod.cProd),
-                ('name','=',partner_id)
-            ], limit=1)
-            product = self.env['product.product'].browse(product_code.product_tmpl_id.id)
+        product = self.busca_produto_cadastro(item, nfe)
         if not product:
             return self.env['not.found.products'].create({
                 'name':item.prod.xProd

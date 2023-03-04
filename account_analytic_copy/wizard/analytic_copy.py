@@ -30,6 +30,7 @@ class AnalyticCopy(models.TransientModel):
                     continue
                 analytic.create({
                     'name': conta.name,
+                    'code': conta.code,
                     'partner_id': self.partner_id.id,
                     'group_id': conta.group_id.id,
                 })

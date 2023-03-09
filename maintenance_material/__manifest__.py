@@ -9,5 +9,8 @@
     "license": "AGPL-3",
     "installable": True,
     "depends": ["maintenance", "product"],
-    "data": ["security/ir.model.access.csv", "views/maintenance_view.xml"],
+    "data": [
+        "security/ir.model.access.csv",
+        "views/maintenance_view.xml"
+    ],
 }

@@ -17,11 +17,10 @@ class MaintenanceRequest(models.Model):
 
     @api.depends('material_ids')
     def _compute_amount(self):
+        totals = 0 
         for line in self.material_ids:
             totals = line.price_unit * line.product_qty
-            line.update({
-                'price_total': totals,
-            })
+        self.price_total  = totals
 
 class MaintenanceCost(models.Model):
     """Added Product and Quantity in the Task Material Used."""
@@ -33,7 +32,7 @@ class MaintenanceCost(models.Model):
         comodel_name="maintenance.request", string="OM", ondelete="cascade", required=True
     )
     product_id = fields.Many2one(
-        comodel_name="product.product", string="Product", required=True,
+        comodel_name="product.product", string="Produto", required=True,
         tracking=True,
     )
     currency_id = fields.Many2one(related='maintenance_id.currency_id', store=True, string='Currency', readonly=True)

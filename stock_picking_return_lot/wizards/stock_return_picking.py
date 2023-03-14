@@ -11,7 +11,6 @@ class ReturnPicking(models.TransientModel):
 
     
     def _create_returns(self):
-        # import pudb;pu.db
         for return_move in self.product_return_moves.mapped('move_id'):
             return_move.move_dest_ids.filtered(lambda m: m.state not in ('done', 'cancel'))._do_unreserve()
 
@@ -62,68 +61,30 @@ class ReturnPicking(models.TransientModel):
                     .mapped('move_dest_ids').filtered(lambda m: m.state not in ('cancel'))
                 vals['move_orig_ids'] = [(4, m.id) for m in move_orig_to_link]
                 vals['move_dest_ids'] = [(4, m.id) for m in move_dest_to_link]
-                # import pudb;pu.db
+                lote_ids = []
                 for lines in return_line.move_id.move_line_nosuggest_ids:
-                    # lines.lot_id = return_line.move_id.move_line_nosuggest_ids.lot_id.id
-
                     line = {}
                     line["date"] = fields.Datetime.now()
                     line["reference"] = lines.picking_id.name
                     line["origin"] = lines.picking_id.origin
-                    line["product_id"] = lines.picking_id.product_id.id
-                    line["location_id"] = lines.location_dest_id.id
-                    line["location_dest_id"] = lines.location_id.id
+                    line["product_id"] = lines.product_id.id
+                    line["location_id"] = self.picking_id.location_dest_id.id
+                    line["location_dest_id"] = self.location_id.id
                     line["qty_done"] = lines.qty_done
                     line["lot_id"] = lines.lot_id.id
                     line["company_id"] = lines.company_id.id
                     line["picking_id"] = new_picking.id
                     line["product_uom_id"] = lines.product_uom_id.id
-                    stock_line = lines.env['stock.move.line']
-                    line_id = stock_line.create(line).id
-
-                    vals["move_line_nosuggest_ids"] = [(6,0,[line_id])]
+                    stock_line = self.env['stock.move.line']
+                    if lines.lot_id:
+                        lote_ids.append(stock_line.create(line).id)
+                if len(lote_ids):
+                    vals["move_line_nosuggest_ids"] = [(6,0,lote_ids)]
 
                 r.write(vals)
         if not returned_lines:
             raise UserError(_("Please specify at least one non-zero quantity."))
 
-        # import pudb;pu.db
         new_picking.action_confirm()
         new_picking.action_assign()
         return new_picking.id, picking_type_id
-
-
-        # result = super(ReturnPicking, self)._create_returns()
-        # # return result
-        # vals = {}
-        # if self.product_return_moves.lot_ids:
-        #     vals["product_id"] = self.product_return_moves.product_id.id
-        #     vals["product_uom_qty"] = self.product_return_moves.quantity
-        #     vals["quantity_done"] = self.product_return_moves.quantity
-        #     vals["name"] = self.picking_id.name
-        #     vals["product_uom"] = self.picking_id.product_id.uom_id.id
-        #     vals["location_id"] = self.original_location_id.id
-        #     vals["location_dest_id"] = self.parent_location_id.id
-        #     vals["picking_id"] = self.picking_id.id
-        #     vals["partner_id"] = self.picking_id.partner_id.id
-
-            
-        #     line = {}
-        #     line["date"] = fields.Datetime.now()
-        #     line["reference"] = self.picking_id.name
-        #     line["origin"] = self.picking_id.origin
-        #     line["product_id"] = self.picking_id.product_id.id
-        #     line["location_id"] = self.original_location_id.id
-        #     line["location_dest_id"] = self.parent_location_id.id
-        #     line["qty_done"] = self.product_return_moves.quantity
-        #     line["lot_id"] = self.product_return_moves.lot_ids.id
-        #     line["company_id"] = self.picking_id.company_id.id
-        #     line["picking_id"] = self.picking_id.id
-        #     line["product_uom_id"] = self.picking_id.product_id.uom_id.id
-        #     stock_line = self.env['stock.move.line']
-        #     line_id = stock_line.create(line).id
-
-        #     vals["move_line_nosuggest_ids"] = [(6,0,[line_id])]
-        #     stock = self.env['stock.move']
-        #     stock.create(vals)
-        # return result

@@ -6,13 +6,13 @@
         <field name="model">maintenance.request</field>
         <field name="inherit_id" ref="maintenance.hr_equipment_request_view_form" />
         <field name="arch" type="xml">
-            <xpath expr="header" position="inside">
+            <!-- <xpath expr="header" position="inside">
                 <button
                         string="Concluir" 
                         name="action_done" 
                         type="object"
                     />
-            </xpath>
+            </xpath> -->
             <field name="maintenance_type" position="after">
                 <field name="origin" />
                 <field name="lot_id" />

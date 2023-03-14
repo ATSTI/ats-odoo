@@ -13,14 +13,15 @@ class MaintenanceRequest(models.Model):
     )
     currency_id = fields.Many2one('res.currency', 'Currency', required=True,
         default=lambda self: self.env.company.currency_id.id)
-    price_total = fields.Monetary(compute='_compute_amount', string='Total', store=True)
+    price_total = fields.Monetary(compute='_compute_amount_material', string='Total', store=True)
 
-    @api.depends('material_ids')
-    def _compute_amount(self):
-        totals = 0 
-        for line in self.material_ids:
-            totals = line.price_unit * line.product_qty
-        self.price_total  = totals
+    @api.depends('material_ids.price_subtotal')
+    def _compute_amount_material(self):
+        totals = 0
+        for om in self:
+            for line in om.material_ids:
+                totals += line.price_subtotal
+            self.price_total  = totals
 
 class MaintenanceCost(models.Model):
     """Added Product and Quantity in the Task Material Used."""

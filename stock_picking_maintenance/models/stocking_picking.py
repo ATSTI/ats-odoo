@@ -12,7 +12,7 @@ class StockPicking(models.Model):
         for item in self.move_line_ids_without_package:
             if item.picking_id.picking_type_id.sequence_code == "IN":
                 vals = {}
-                equip_id = self.env['maintenance.equipment'].search([('product_id', '=', item.product_id.id)])
+                equip_id = self.env['maintenance.equipment'].search([('product_id', '=', item.product_id.id)], limit=1)
                 if equip_id:
                     vals["name"] = f"{self.name} - {item.lot_id.id} "
                     vals["equipment_id"] = equip_id.id

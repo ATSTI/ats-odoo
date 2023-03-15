@@ -17,8 +17,6 @@ class MaintenanceRequest(models.Model):
     )
 
     def action_done(self):
-        # state = self.env['maintenance.stage'].search([('done', '=', True)],limit=1)
-        # self.write({'stage_id': state.id})
         # TODO criar e concluir uma devolucao para o estoque
         type_operation = self.env['stock.picking.type'].search([
                 ('name', '=', 'Manutenção')])

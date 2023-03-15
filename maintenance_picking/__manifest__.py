@@ -11,7 +11,7 @@
     "author": "Mauricio, ATSTi Soluções",
     "website": "",
     "license": "LGPL-3",
-    "depends": ["maintenance"],
+    "depends": ["maintenance", "maintenance_request_stage_transition"],
     "data": [
         "views/maintenance_picking_views.xml",
     ],

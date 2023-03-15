@@ -1,7 +1,7 @@
 # Copyright 2020 ForgeFlow S.L. (https://forgeflow.com)
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo import fields, models
+from odoo import fields, models, _
 
 
 class MaintenanceRequest(models.Model):
@@ -17,8 +17,8 @@ class MaintenanceRequest(models.Model):
     )
 
     def action_done(self):
-        state = self.env['maintenance.stage'].search([('done', '=', True)],limit=1)
-        self.write({'stage_id': state.id})
+        # state = self.env['maintenance.stage'].search([('done', '=', True)],limit=1)
+        # self.write({'stage_id': state.id})
         # TODO criar e concluir uma devolucao para o estoque
         type_operation = self.env['stock.picking.type'].search([
                 ('name', '=', 'Manutenção')])
@@ -40,3 +40,18 @@ class MaintenanceRequest(models.Model):
         vals["move_line_ids_without_package"] = line
         pick = self.env["stock.picking"].create(vals)
         pick.button_validate()
+        self.message_post(
+            body=f"Criado movimento de estoque - {pick.name}",
+            subject=_('Equipamento movido para o estoque!'),
+            message_type='notification'
+        )
+
+    def set_maintenance_stage(self):
+        if not self.env.context.get("next_stage_id"):
+            return {}
+        if self.env['maintenance.stage'].browse([self.env.context.get("next_stage_id")]).done:
+            res = self._set_maintenance_stage(self.env.context.get("next_stage_id"))
+            self.action_done()
+        else:
+            res = self._set_maintenance_stage(self.env.context.get("next_stage_id"))
+        return res

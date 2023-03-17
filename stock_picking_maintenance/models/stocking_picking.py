@@ -22,4 +22,5 @@ class StockPicking(models.Model):
                     # vals["schedule_date"] = self.scheduled_date
                     ordem = self.env['maintenance.request']        
                     ordem.create(vals)
+        return result
         

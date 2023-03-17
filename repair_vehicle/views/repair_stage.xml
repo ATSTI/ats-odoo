@@ -21,11 +21,6 @@
         <field name="model">repair.stage</field>
         <field name="arch" type="xml">
             <form string="Stage">
-                <header>
-                    <field name="stage_id" widget="statusbar"
-                           options="{'fold_field': 'fold'}"
-                           domain="[('stage_type', '=', 'order')]"/>
-                </header>
                 <sheet>
                     <group>
                         <group>
@@ -76,5 +71,8 @@
             </search>
         </field>
     </record>
+
+
+        <menuitem action="action_repair_stage" id="menu_repair_stage" groups="stock.group_stock_user" name="Estagio" sequence="36" parent="repair.menu_repair_order"/>
 
 </odoo>

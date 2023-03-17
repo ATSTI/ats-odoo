@@ -28,6 +28,16 @@ class Repair(models.Model):
             index=True, copy=False,
             group_expand='_read_group_stage_ids',
             default=lambda self: self._default_stage_id())
+    vehicle_id = fields.Many2one(
+        'repair.vehicle', string='Veículo',
+        required=True, states={'draft': [('readonly', False)]})
+
+    cliente_id = fields.Many2one(
+        'res.partner', 'Cliente',
+        index=True, states={'confirmed': [('readonly', True)]}, check_company=True, change_default=True,
+        )
+
+    contas_pendentes = fields.Char('Contas')
 
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
@@ -38,5 +48,36 @@ class Repair(models.Model):
             ] + search_domain
         return stages.search(search_domain, order=order)
 
+    @api.onchange('vehicle_id')
+    def onchange_vehicle_id(self):
+        prod_id = self.env["product.product"].search([('type', 'in', ['product', 'consu'])], limit=1)
+        self.product_id = prod_id.id
+        self.product_uom = prod_id.uom_id.id
 
+    @api.onchange('cliente_id')
+    def onchange_cliente_id(self):
+        contas = self.env["account.move.line"].search([('date_maturity', '<', fields.Date.today()), ('partner_id', '=', self.cliente_id.id)])
+        # fatura = ""
+        # for ct in contas:
+        #     fatura += ct.name + ", "
+        self.contas_pendentes = contas.ids 
+        
+    # @api.model
+    # def _cliente_id_stage_ids(self):
+    #     if self.cliente_id = "":
+    #         raise ValidationError(
+    #             _('Cliente Arquivado'))
+    #     return
 
+    def action_open_invoice(self):
+        contas = self.env["account.move.line"].search([('date_maturity', '<', fields.Date.today()), ('partner_id', '=', self.cliente_id.id)])
+        domain = [("id", "in", contas.ids)]
+        return {
+            'name': 'CA par adhérent',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'tree',
+            'view_type': 'form',
+            'res_model': 'account.move.line',
+            'view_id': self.env.ref('br_account_payment.view_payments_tree_a_receber').id,
+            'domain': domain,
+        }

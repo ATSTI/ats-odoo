@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Field Service Vehicle -->
+    <record id="repair_vehicle_tree_view" model="ir.ui.view">
+        <field name="name">repair.vehicle.tree</field>
+        <field name="model">repair.vehicle</field>
+        <field name="arch" type="xml">
+            <tree string="Stages">
+                <field name="name"/>
+                <field name="active"/>
+                <field name="acquisition_date"/>
+                <field name="placa"/>
+                <field name="modelo"/>
+                <field name="ano"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="repair_vehicle_form_view" model="ir.ui.view">
+        <field name="name">repair.vehicle.form</field>
+        <field name="model">repair.vehicle</field>
+        <field name="arch" type="xml">
+            <form string="Stage">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="active"/>
+                            <field name="acquisition_date"/>
+                        </group>
+                        <group>
+                            <field name="placa"/>
+                            <field name="modelo"/>
+                            <field name="ano"/>
+                        </group>
+                    </group>
+                    <group string="Descrição do Veículo">
+                        <p class="text-muted" colspan="2">
+                            Descreva o veiculo.
+                        </p>
+                        <field name="description" placeholder="Add a description..." nolabel="1" colspan="2"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_repair_vehicle" model="ir.actions.act_window">
+        <field name="name">Cadastro de veículos</field>
+        <field name="res_model">repair.vehicle</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <!-- <field name="context">{'search_default_group_stage_type': 1}</field> -->
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a Stage.
+            </p>
+        </field>
+    </record>
+
+        <menuitem action="action_repair_vehicle" id="menu_repair_vehicle" groups="stock.group_stock_user" name="Veículos" sequence="36" parent="repair.menu_repair_order"/>
+
+</odoo>

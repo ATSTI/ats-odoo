@@ -17,4 +17,5 @@
 ##############################################################################
 
 from . import repair_stage
+from . import repair_vehicle
 from . import repair

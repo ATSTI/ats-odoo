@@ -1,32 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <record id="view_repair_order_tree" model="ir.ui.view">
-            <field name="name">repair.tree</field>
+        <record id="view_repair_order_tree_view" model="ir.ui.view">
+            <field name="name">repair.order.tree</field>
             <field name="model">repair.order</field>
+            <field name="inherit_id" ref="repair.view_repair_order_tree" />
             <field name="arch" type="xml">
-                <tree string="Repairs order" decoration-muted="state in ('done','cancel')" decoration-info="state=='draft'">
-                    <field name="name" />
-                    <field name="product_id" />
-                    <field name="partner_id"/>
-                    <field name="address_id"/>
-                    <field name="company_id" groups="base.group_multi_company" invisible="1"/>
-                    <field name="guarantee_limit"/>
-                    <field name="state"/>
-                </tree>
+                <field name="state" position="after">
+                    <field name="stage_id"/>
+                </field>
             </field>
         </record>
         <record id="view_repair_order_form" model="ir.ui.view">
-            <field name="name">repair.form</field>
+            <field name="name">repair.order.form</field>
             <field name="model">repair.order</field>
+            <field name="inherit_id" ref="repair.view_repair_order_form" />
             <field name="arch" type="xml">
-                <form string="Repair Order">
-                    <header>
-                        <field name="stage_id" widget="statusbar"
-                           options="{'fold_field': 'fold'}"
-                           domain="[('stage_type', '=', 'order')]"/>
-                        <button name="action_send_mail" states="draft" string="Send Quotation" type="object"/>
-                        <button name="print_repair_order" states="draft" string="Print Quotation" type="object"/>
+                        <button name="action_send_mail" position="before" >
+                            <field name="stage_id" widget="statusbar"
+                               options="{'fold_field': 'fold'}"
+                               domain="[('stage_type', '=', 'order')]"/>
+                        </button>
+                        <field name="product_id" position="replace">
+                            <field name="product_id" invisible="1"/>
+                            <field name="vehicle_id" />
+                        </field>
+                        <field name="partner_id" position="replace">
+                            <field name="partner_id" invisible="1"/>
+                            <field name="cliente_id" />
+                            <field name="contas_pendentes" />
+                            <button name="action_open_invoice" 
+                                string="Ver Faturas"
+                                type="object"
+                            />
+                        </field>
+                        <!-- <button name="action_send_mail" states="draft" string="Send Quotation" type="object"/> -->
+                        <!-- <button name="print_repair_order" states="draft" string="Print Quotation" type="object"/>
                         <button name="action_validate" states="draft" type="object" string="Confirm Repair" class="oe_highlight"/>
                         <button name="action_repair_start" attrs="{'invisible': ['&amp;', ('state','!=','confirmed'), '!', '&amp;', ('state','=','ready'), ('invoice_method','=','b4repair')]}"
                     type="object" string="Start Repair" class="oe_highlight"/>
@@ -34,10 +43,10 @@
                         <button name="action_repair_end" states="under_repair" type="object" string="End Repair" class="oe_highlight"/>
                         <button name="action_repair_invoice_create" states="2binvoiced" type="object" string="Create Invoice" class="oe_highlight" groups="account.group_account_invoice"/>
                         <button name="action_repair_cancel" string="Cancel Repair" type="object" attrs="{'invisible':['|',('invoice_method','!=','none'), ('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/>
-                        <button name="action_repair_cancel" states="draft" type="object" string="Cancel Repair"/>
-                        <!-- <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/> -->
-                    </header>
+                        <button name="action_repair_cancel" states="draft" type="object" string="Cancel Repair"/> -->
+                    <!-- </header>
                     <sheet string="Repairs order">
+                        <field name="state" invisible="1"/>
                         <div class="oe_button_box" name="button_box">
                             <button name="action_created_invoice"
                             type="object"
@@ -134,7 +143,7 @@
                                 <div class="oe_clear"/>
                             </page>
                             <page string="Operations">
-                                <!-- <field name="invoice_id"/> -->
+                                <field name="invoice_id"/> 
                                 <field name="fees_lines">
                                     <form string="Fees">
                                         <group>
@@ -183,15 +192,24 @@
                         <field name="activity_ids" widget="mail_activity"/>
                         <field name="message_ids" widget="mail_thread"/>
                     </div>
-                </form>
+                </form>v -->
             </field>
         </record>
         
         <!-- Dashboard -->
-        <record id="view_repair_kanban" model="ir.ui.view">
-            <field name="name">repair.kanban</field>
+        <record id="view_repair_order_kanban" model="ir.ui.view">
+            <field name="name">repair.order.kanban</field>
             <field name="model">repair.order</field>
+            <field name="inherit_id" ref="repair.view_repair_kanban" />
             <field name="arch" type="xml">
+                <field name="name" position='before'>
+                    <field name="stage_id" />
+                </field>
+                <xpath expr="//kanban" position="attributes">
+                    <attribute name="default_group_by">stage_id</attribute>
+                </xpath>
+            </field>
+            <!-- <field name="arch" type="xml">
                 <kanban default_group_by="stage_id" class="o_kanban_small_column">
                     <field name="stage_id"
                        options='{"group_by_tooltip": {"description": "Description"}}'/>
@@ -264,8 +282,8 @@
                         </t>
                     </templates>
                 </kanban>
-            </field>
-        </record>
+            </field>-->
+        </record> 
         <!-- <record id="view_repair_kanban" model="ir.ui.view">
         <field name="name">repair.kanban</field>
         <field name="model">repair.order</field>
@@ -307,7 +325,7 @@
             </kanban>
         </field>
     </record> -->
-        <record id="view_repair_order_form_filter" model="ir.ui.view">
+        <!-- <record id="view_repair_order_form_filter" model="ir.ui.view">
             <field name="name">repair.select</field>
             <field name="model">repair.order</field>
             <field name="arch" type="xml">
@@ -335,6 +353,7 @@
                         ]"/>
                     <group expand="0" string="Group By">
                         <filter string="Partner" name="partner" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="Estagio" name="stage_id" domain="[]" context="{'group_by':'stage_id'}"/>
                         <filter string="Product" name="product" domain="[]" context="{'group_by':'product_id'}"/>
                         <filter string="Status" name="status" domain="[]" context="{'group_by':'state'}"/>
                         <filter string="Warranty Expiration" name="guarantee_limit" domain="[]" context="{'group_by':'guarantee_limit'}"/>
@@ -342,8 +361,8 @@
                     </group>
                 </search>
             </field>
-        </record>
-        <record id="action_repair_order_tree" model="ir.actions.act_window">
+        </record> -->
+        <!-- <record id="action_repair_order_tree" model="ir.actions.act_window">
             <field name="name">Repair Orders</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">repair.order</field>
@@ -365,6 +384,6 @@
                 customer or not.
               </p>
             </field>
-        </record>
+        </record> -->
     </data>
 </odoo>

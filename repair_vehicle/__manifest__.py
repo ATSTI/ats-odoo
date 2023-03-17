@@ -16,11 +16,13 @@
         'Carlos Silveira<carlos@atsti.com.br>',
     ],
     'depends': [
-        'repair',
+        'repair', 'stock',
     ],
     'data': [
         'views/repair_stage.xml',
+        'views/repair_vehicle.xml',
         'views/repair_views.xml',
+        'security/ir.model.access.csv'
     ],
     'demo': [],
     'installable': True,

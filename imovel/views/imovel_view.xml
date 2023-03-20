@@ -1,0 +1,250 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="imovel_form_view" model="ir.ui.view">
+        <field name="name">imovel.form</field>
+        <field name="model">imovel</field>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <form string="Imovel">
+                <header>
+                    <button
+                        name="venda_executa"
+                        string="Criar Fatura Venda"
+                        attrs="{'invisible': [('venda', '=', False)]}"
+                        class= "btn-primary"
+                        type="object"
+                    />
+                    <button
+                        name="aluga_executa"
+                        string="Criar Contrato Aluguel"
+                        attrs="{'invisible': [('locacao', '=', False)]}"
+                        class="btn-primary"
+                        type="object"
+                    />
+                </header>
+                <sheet>
+                    <!-- <header>
+                        <button name="alugar_bttn" string="Alugar" type="action" class="oe_highlight"/>
+                        <button name="vender_bttn" string="Vender" type="action" class="oe_highlight"/>
+                    </header>  -->
+                    <widget name="web_ribbon" title="Arquivado" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>                
+                    <field name="active" invisible="1" />
+                    <field name="image_small" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label class="oe_edit_only" for="name" string="Imovel"/>
+                        <h1><field name="name" placeholder="Descrição"/></h1>
+                        <div name="options" groups="base.group_user">
+                            <div>
+                                <field name="alugado" readonly="1"/>
+                                <label for="alugado"/>
+                            </div>
+                        </div>
+                    </div>
+                            <group>
+                                <group name="group_general">
+                                    <field name="code" />
+                                    <field name="zip_code"/>
+                                    <field name="street_name"/>
+                                    <field name="number"/>
+                                    <field name="zip_complement"/>
+                                </group>
+                                <group name="group_standard_price">
+                                    <field name="district"/>
+                                    <field name="city_id"/>
+                                    <field name="state_id"/>
+                                    <field name="country_id"/>
+                                </group>
+                                <group name="group_tipo_imovel">
+                                    <field name="locacao" />
+                                    <field name="venda" />
+                                    <field name="valor_aluguel"/>
+                                    <field name="valor_venda"/>
+                                </group>
+                                <group name="group_areas">
+                                    <field name="areat"/>
+                                    <field name="areac" />
+                                    <field name="quartos"/>
+                                    <field name="banheiros"/>
+                                </group>
+                            </group>                    
+                    <notebook>
+                        <page string="Imovel" name="general_information">
+                            <field name="owner_ids" attrs="{'readonly': [('alugado', '=', True)]}">
+                                 <tree string="Proprietários" editable="bottom">
+                                     <field name="partner_id" />
+                                     <field name="name" invisible="1" />
+                                     <field name="percentual_aluguel"/>
+                                     <field name="percentual_venda"/>
+                                     <field name="payment_term_id"/>
+                                     <field name="cota"/>
+                                 </tree>
+                            </field>
+                        </page>
+                        <page string="Documentos" name="imovel_doc">
+                            <group name="doc">
+                                <field name="codigo_agua"/>
+                                <field name="codigo_energia"/>
+                                <field name="matricula"/>
+                            </group>
+                        </page>
+                    </notebook>
+                    <group string="Descrição">
+                        <field name="description" nolabel="1" placeholder="Informações adicionais do imovel."/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="imovel_tree_view" model="ir.ui.view">
+        <field name="name">imovel.tree</field>
+        <field name="model">imovel</field>
+        <field eval="7" name="priority"/>
+        <field name="arch" type="xml">
+            <tree string="Imoveis">
+                <field name="name"/>
+                <field name="street_name"/>
+                <field name="district"/>
+                <field name="quartos"/>
+                <field name="banheiros"/>
+                <field name="valor_aluguel"/>
+                <field name="active" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="imovel_kanban_view" model="ir.ui.view">
+        <field name="name">Imovel Kanban</field>
+        <field name="model">imovel</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="id"/>
+                <field name="image_small"/>
+                <field name="valor_aluguel"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('imovel', 'image_small', record.id.raw_value)" alt="Imovel"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title"><field name="name"/></strong>
+                                <ul>
+                                    <li><strong>Aluguel: <field name="valor_aluguel"></field></strong></li>
+                                    <li><strong>Venda: <field name="valor_venda"></field></strong></li>
+                                </ul>
+                                <div name="tags"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="imovel_search_view" model="ir.ui.view">
+        <field name="name">imovel.search</field>
+        <field name="model">imovel</field>
+        <field name="arch" type="xml">
+            <search string="Imovel">
+                <field name="name" string="Imovel"/>
+                <field name="product_id" invisible="1" />
+                <field name="district" string="Bairro"/>
+                <separator/>
+                <filter string="Para alugar" name="para_alugar" domain="[('alugado','=',False), ('locacao','=',True)]"/>
+                <filter string="Á Venda" name="para_venda" domain="[('alugado','=',False), ('venda','=',True)]"/>
+                <separator/>
+                <filter string="Alugados" name="nao_alugado" domain="[('alugado','=',True)]"/>
+                <filter string="Arquivado" name="active" domain="[('active','=',False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_imovel" model="ir.actions.act_window">
+        <field name="name">Imoveis</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">imovel</field>
+        <field name="view_mode">kanban,tree,form,activity</field>
+        <field name="search_view_id" ref="imovel_search_view"/>
+        <field name="context">{'default_is_company': True}</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            Create a contact in your address book
+          </p><p>
+            Odoo helps you to easily track all activities related to a customer.
+          </p>
+        </field>
+    </record>
+
+    <record id="imovel_action_all" model="ir.actions.act_window">
+        <field name="name">Imoveis</field>
+        <field name="res_model">imovel</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="search_view_id" ref="imovel_search_view"/>
+        <field name="context">{'search_default_para_alugar':1}</field>
+        <!--<field name="context">{}</field>   "search_default_filter_alugado":1 -->
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Criar um novo cadastro de imovél.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_imovel_view_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1" />
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="imovel_tree_view" />
+        <field name="act_window_id" ref="imovel_action_all" />
+    </record>
+    <record id="action_imovel_view_kanban" model="ir.actions.act_window.view">
+        <field name="sequence" eval="0" />
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="imovel_kanban_view" />
+        <field name="act_window_id" ref="imovel_action_all" />
+    </record>
+    <record id="action_imovel_view_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2" />
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="imovel_form_view" />
+        <field name="act_window_id" ref="imovel_action_all" />
+    </record>
+
+    <menuitem
+        id="imob_menu"
+        name="Imobiliária"
+        groups="imovel_group_user,imovel_group_manager"
+        web_icon="imovel,static/description/imob.png"
+        sequence="30" 
+    />
+
+    <menuitem
+        id="imovel_cadastro_menu"
+        name="Cadastros"
+        parent="imob_menu"
+        action="action_imovel"
+        sequence="2"
+    />
+
+    <menuitem
+        id="imovel_cad_menu"
+        action="imovel_action_all"
+        name="Imóveis"
+        parent="imovel_cadastro_menu"
+        sequence="10"
+    />
+
+    <menuitem
+        id="contract_menu"
+        action="contract.action_customer_contract"
+        name="Contratos"
+        parent="imob_menu"
+        sequence="20"
+    />
+
+</odoo>

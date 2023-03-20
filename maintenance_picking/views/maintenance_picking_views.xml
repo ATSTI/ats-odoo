@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- equipment : views -->
+    <record id="maintenance_request_status" model="ir.ui.view">
+        <field name="name">equipment.form</field>
+        <field name="model">maintenance.request</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_request_view_form" />
+        <field name="arch" type="xml">
+            <!-- <xpath expr="header" position="inside">
+                <button
+                        string="Concluir" 
+                        name="action_done" 
+                        type="object"
+                    />
+            </xpath> -->
+            <field name="maintenance_type" position="after">
+                <field name="origin" />
+                <field name="lot_id" />
+            </field> 
+        </field>
+    </record>
+</odoo>

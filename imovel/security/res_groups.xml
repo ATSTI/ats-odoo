@@ -1,0 +1,17 @@
+<odoo>
+    <record id="module_imovel_category" model="ir.module.category">
+        <field name="name">Imobiliaria</field>
+        <field name="sequence">17</field>
+    </record>
+    <record id="imovel_group_user" model="res.groups">
+        <field name="name">Imobiliaria usuario</field>
+        <field name="category_id" ref="module_imovel_category"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="imovel_group_manager" model="res.groups">
+        <field name="name">Administrator</field>
+        <field name="implied_ids" eval="[(4, ref('imovel_group_user'))]"/>
+        <field name="category_id" ref="module_imovel_category"/>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+</odoo>

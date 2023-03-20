@@ -3,6 +3,7 @@
 from odoo import api, fields, models, _
 from odoo.addons import decimal_precision as dp
 
+"""
 class PurchaseOrder(models.Model):
     _inherit = "purchase.order"
     
@@ -15,7 +16,7 @@ class PurchaseOrder(models.Model):
         res['document_key'] = self.document_key
         res['issuer'] = self.issuer
         return res        
-
+"""
 
 class PurchaseOrderLine(models.Model):
     _inherit = "purchase.order.line"

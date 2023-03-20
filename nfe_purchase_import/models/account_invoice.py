@@ -8,13 +8,12 @@ from odoo.addons import decimal_precision as dp
 class AccountMove(models.Model):
     _inherit = 'account.move'
     
-
     def _prepare_edoc_vals(self, inv, inv_lines, serie_id):
         res = super(AccountMove, self)._prepare_edoc_vals(inv, inv_lines, serie_id)
         res['data_fatura'] = inv.nfe_data_entrada
         return res
 
-
+    """
     @api.model
     def create(self, vals):
         invoice = super(AccountMove, self).create(vals)
@@ -29,6 +28,7 @@ class AccountMove(models.Model):
             message = _("This vendor bill has been created from: %s") % (",".join(["<a href=# data-oe-model=purchase.order data-oe-id="+str(order.id)+">"+order.name+"</a>" for order in purchase]))
             invoice.message_post(body=message)
         return invoice
+    """
         
     def _prepare_invoice_line_from_po_line(self, line):
         res = super(AccountMove, self)._prepare_invoice_line_from_po_line(

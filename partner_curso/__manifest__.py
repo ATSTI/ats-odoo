@@ -19,7 +19,7 @@
 {
     'name': 'Partner Curso',
     'version': '1.0',
-    'category': 'Localisation',
+    'category': 'Res Partner',
     'author': 'ATS Solucoes',
     'website': 'http://www.atsti.com.br',
     'license': 'AGPL-3',
@@ -27,7 +27,7 @@
         'Carlos Silveira<carlos@atsti.com.br>',
     ],
     'depends': [
-        'br_base',
+        'base_setup',
     ],
     'data': [
         'views/res_partner_view.xml',
@@ -35,3 +35,4 @@
     'demo': [],
     'installable': True,
 }
+

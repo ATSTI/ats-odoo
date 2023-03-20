@@ -26,5 +26,3 @@ class Partner(models.Model):
     _inherit = 'res.partner'
 
     curso = fields.Boolean(string="Cliente Curso")
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

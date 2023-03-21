@@ -32,12 +32,7 @@ class Repair(models.Model):
         'repair.vehicle', string='Veículo',
         required=True, states={'draft': [('readonly', False)]})
 
-    cliente_id = fields.Many2one(
-        'res.partner', 'Cliente',
-        index=True, states={'confirmed': [('readonly', True)]}, check_company=True, change_default=True,
-        )
-
-    contas_pendentes = fields.Char('Contas')
+    contas_pendentes = fields.Char('Faturas')
 
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
@@ -54,13 +49,13 @@ class Repair(models.Model):
         self.product_id = prod_id.id
         self.product_uom = prod_id.uom_id.id
 
-    @api.onchange('cliente_id')
-    def onchange_cliente_id(self):
-        contas = self.env["account.move.line"].search([('date_maturity', '<', fields.Date.today()), ('partner_id', '=', self.cliente_id.id)])
-        # fatura = ""
-        # for ct in contas:
-        #     fatura += ct.name + ", "
-        self.contas_pendentes = contas.ids 
+    @api.onchange('partner_id')
+    def onchange_partner_id(self):
+        contas = self.env["account.move.line"].search([('date_maturity', '<', fields.Date.today()), ('partner_id', '=', self.partner_id.id)])
+        valor = 0.0
+        for ct in contas:
+            valor += ct.amount_residual
+        self.contas_pendentes = f" Total: {'{0:.2f}'.format(valor)}"
         
     # @api.model
     # def _cliente_id_stage_ids(self):
@@ -70,7 +65,7 @@ class Repair(models.Model):
     #     return
 
     def action_open_invoice(self):
-        contas = self.env["account.move.line"].search([('date_maturity', '<', fields.Date.today()), ('partner_id', '=', self.cliente_id.id)])
+        contas = self.env["account.move.line"].search([('date_maturity', '<', fields.Date.today()), ('partner_id', '=', self.partner_id.id)])
         domain = [("id", "in", contas.ids)]
         return {
             'name': 'CA par adhérent',

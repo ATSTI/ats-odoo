@@ -19,3 +19,7 @@ class RepairVehicle(models.Model):
         help='License plate number of the vehicle (i = plate number for a car)')
     modelo = fields.Char("Modelo do veículo")
     ano = fields.Char("Ano/Modelo do veículo")
+    partner_id = fields.Many2one(
+        'res.partner', 'Cliente',
+        index=True,
+    )

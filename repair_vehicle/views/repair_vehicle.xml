@@ -7,6 +7,7 @@
         <field name="model">repair.vehicle</field>
         <field name="arch" type="xml">
             <tree string="Stages">
+                <field name="partner_id"/>
                 <field name="name"/>
                 <field name="active"/>
                 <field name="acquisition_date"/>
@@ -25,6 +26,7 @@
                 <sheet>
                     <group>
                         <group>
+                            <field name="partner_id"/>
                             <field name="name"/>
                             <field name="active"/>
                             <field name="acquisition_date"/>

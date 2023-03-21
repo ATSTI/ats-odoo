@@ -16,43 +16,41 @@
             <field name="model">repair.order</field>
             <field name="inherit_id" ref="repair.view_repair_order_form" />
             <field name="arch" type="xml">
-                        <button name="action_send_mail" position="before" >
-                            <field name="stage_id" widget="statusbar"
-                               options="{'fold_field': 'fold'}"
-                               domain="[('stage_type', '=', 'order')]"/>
-                        </button>
-                        <field name="product_id" position="replace">
-                            <field name="product_id" invisible="1"/>
-                            <field name="vehicle_id" />
-                        </field>
-                        <field name="partner_id" position="replace">
-                            <field name="partner_id" invisible="1"/>
-                            <field name="cliente_id" />
-                            <field name="contas_pendentes" />
-                            <button name="action_open_invoice" 
-                                string="Ver Faturas"
-                                type="object"
-                            />
-                        </field>
-                        <!-- <button name="action_send_mail" states="draft" string="Send Quotation" type="object"/> -->
-                        <!-- <button name="print_repair_order" states="draft" string="Print Quotation" type="object"/>
+                <button name="action_send_mail" position="before">
+                    <field name="stage_id" widget="statusbar" options="{'fold_field': 'fold'}" domain="[('stage_type', '=', 'order')]"/>
+                </button>
+                <field name="product_id" position="replace">
+                    <field name="product_id" invisible="1"/>
+                </field>
+                <field name="product_uom" position="replace">
+                    <field name="product_uom" invisible="1"/>
+                </field>
+                <field name="product_qty" position="replace">
+                    <field name="product_qty" invisible="1"/>
+                </field>
+                <field name="lot_id" position="replace">
+                    <field name="lot_id" invisible="1"/>
+                </field>
+                <field name="partner_id" position="replace">
+                    <field name="partner_id" widget="res_partner_many2one" attrs="{'required':[('invoice_method','!=','none')]}"/>
+                    <field name="vehicle_id" domain="[('partner_id', '=', partner_id)]" />
+                    <field name="contas_pendentes" />
+                    <button name="action_open_invoice" string="Ver Faturas" type="object" />
+                </field>
+                <!-- <button name="action_send_mail" states="draft" string="Send Quotation" type="object"/> -->
+                <!-- <button name="print_repair_order" states="draft" string="Print Quotation" type="object"/>
                         <button name="action_validate" states="draft" type="object" string="Confirm Repair" class="oe_highlight"/>
-                        <button name="action_repair_start" attrs="{'invisible': ['&amp;', ('state','!=','confirmed'), '!', '&amp;', ('state','=','ready'), ('invoice_method','=','b4repair')]}"
-                    type="object" string="Start Repair" class="oe_highlight"/>
+                        <button name="action_repair_start" attrs="{'invisible': ['&amp;', ('state','!=','confirmed'), '!', '&amp;', ('state','=','ready'), ('invoice_method','=','b4repair')]}" type="object" string="Start Repair" class="oe_highlight"/>
                         <button name="action_repair_cancel_draft" states="cancel" string="Set to Draft" type="object"/>
                         <button name="action_repair_end" states="under_repair" type="object" string="End Repair" class="oe_highlight"/>
                         <button name="action_repair_invoice_create" states="2binvoiced" type="object" string="Create Invoice" class="oe_highlight" groups="account.group_account_invoice"/>
                         <button name="action_repair_cancel" string="Cancel Repair" type="object" attrs="{'invisible':['|',('invoice_method','!=','none'), ('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/>
                         <button name="action_repair_cancel" states="draft" type="object" string="Cancel Repair"/> -->
-                    <!-- </header>
+                <!-- </header>
                     <sheet string="Repairs order">
                         <field name="state" invisible="1"/>
                         <div class="oe_button_box" name="button_box">
-                            <button name="action_created_invoice"
-                            type="object"
-                            class="oe_stat_button"
-                            icon="fa-pencil-square-o" string="Invoice" attrs="{'invisible': ['|',('invoice_method','=','none'), ('state','in',('confirmed','2binvoiced','draft'))]}"
-                            groups="account.group_account_invoice">
+                            <button name="action_created_invoice" type="object" class="oe_stat_button" icon="fa-pencil-square-o" string="Invoice" attrs="{'invisible': ['|',('invoice_method','=','none'), ('state','in',('confirmed','2binvoiced','draft'))]}" groups="account.group_account_invoice">
                         </button>
                         </div>
                         <label for="name"/>
@@ -135,8 +133,7 @@
                                     <field name="amount_tax"/>
                                     <div class="oe_subtotal_footer_separator oe_inline">
                                         <label for="amount_total" />
-                                        <button name="button_dummy"
-                                    states="draft" string="(update)" type="object" class="oe_edit_only oe_link"/>
+                                        <button name="button_dummy" states="draft" string="(update)" type="object" class="oe_edit_only oe_link"/>
                                     </div>
                                     <field name="amount_total" nolabel="1" sum="Total amount" class="oe_subtotal_footer_separator"/>
                                 </group>
@@ -195,7 +192,7 @@
                 </form>v -->
             </field>
         </record>
-        
+
         <!-- Dashboard -->
         <record id="view_repair_order_kanban" model="ir.ui.view">
             <field name="name">repair.order.kanban</field>
@@ -211,8 +208,7 @@
             </field>
             <!-- <field name="arch" type="xml">
                 <kanban default_group_by="stage_id" class="o_kanban_small_column">
-                    <field name="stage_id"
-                       options='{"group_by_tooltip": {"description": "Description"}}'/>
+                    <field name="stage_id" options='{"group_by_tooltip": {"description": "Description"}}'/>
                     <field name="name"/>
                     <field name="product_id"/>
                     <field name="partner_id"/>
@@ -223,28 +219,19 @@
                     <field name="activity_state"/>
                     <templates>
                         <t t-name="kanban-box">
-                            <div t-attf-class="#{kanban_color(record.color.raw_value)} oe_kanban_global_click"
-                             name="fsm_equipment">
+                            <div t-attf-class="#{kanban_color(record.color.raw_value)} oe_kanban_global_click" name="fsm_equipment">
                                 <div class="o_dropdown_kanban dropdown">
-                                    <a role="button"
-                                   class="dropdown-toggle o-no-caret btn"
-                                   data-toggle="dropdown" href="#"
-                                   aria-label="Dropdown menu"
-                                   title="Dropdown menu">
+                                    <a role="button" class="dropdown-toggle o-no-caret btn" data-toggle="dropdown" href="#" aria-label="Dropdown menu" title="Dropdown menu">
                                         <span class="fa fa-ellipsis-v"/>
                                     </a>
                                     <div class="dropdown-menu" role="menu">
-                                        <a t-if="widget.editable" role="menuitem"
-                                       type="edit" class="dropdown-item">Edit
+                                        <a t-if="widget.editable" role="menuitem" type="edit" class="dropdown-item">Edit
                                     </a>
-                                        <a t-if="widget.deletable" role="menuitem"
-                                       type="delete" class="dropdown-item">
+                                        <a t-if="widget.deletable" role="menuitem" type="delete" class="dropdown-item">
                                         Delete
                                     </a>
-                                        <div role="separator"
-                                         class="dropdown-divider"></div>
-                                        <ul class="oe_kanban_colorpicker"
-                                        data-field="color"/>
+                                        <div role="separator" class="dropdown-divider"></div>
+                                        <ul class="oe_kanban_colorpicker" data-field="color"/>
                                     </div>
                                 </div>
                                 <div class="oe_kanban_content">
@@ -254,26 +241,17 @@
                                         </strong>
                                     </div>
                                     <div>
-                                        <field name="tag_ids"
-                                           widget="many2many_tags"
-                                           options="{'color_field': 'color'}"/>
+                                        <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                                     </div>
                                     <div>
                                         <field name="location_id"/>
                                     </div>
                                     <div class="o_kanban_record_bottom">
                                         <div class="oe_kanban_bottom_left">
-                                            <field name="priority"
-                                               widget="priority"
-                                               groups="fieldservice.group_fsm_dispatcher"/>
+                                            <field name="priority" widget="priority" groups="fieldservice.group_fsm_dispatcher"/>
                                         </div>
                                         <div class="oe_kanban_bottom_right">
-                                            <img t-att-src="kanban_image('person', 'image_small', record.person_id.name)"
-                                             t-att-title="record.person_id.name"
-                                             t-att-alt="record.person_id.name"
-                                             width="24"
-                                             height="24"
-                                             class="oe_kanban_avatar"/>
+                                            <img t-att-src="kanban_image('person', 'image_small', record.person_id.name)" t-att-title="record.person_id.name" t-att-alt="record.person_id.name" width="24" height="24" class="oe_kanban_avatar"/>
                                         </div>
                                     </div>
                                 </div>
@@ -283,7 +261,7 @@
                     </templates>
                 </kanban>
             </field>-->
-        </record> 
+        </record>
         <!-- <record id="view_repair_kanban" model="ir.ui.view">
         <field name="name">repair.kanban</field>
         <field name="model">repair.order</field>
@@ -340,16 +318,11 @@
                     <field name="product_id"/>
                     <field name="partner_id" filter_domain="[('partner_id', 'child_of', self)]"/>
                     <separator/>
-                    <filter string="My Activities" name="activities_my"
-                      domain="[('activity_ids.user_id', '=', uid)]"/>
+                    <filter string="My Activities" name="activities_my" domain="[('activity_ids.user_id', '=', uid)]"/>
                     <separator/>
-                    <filter string="Late Activities" name="activities_overdue"
-                      domain="[('activity_ids.date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]"
-                      help="Show all records which has next action date is before today"/>
-                    <filter string="Today Activities" name="activities_today"
-                      domain="[('activity_ids.date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
-                    <filter string="Future Activities" name="activities_upcoming_all"
-                        domain="[('activity_ids.date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))
+                    <filter string="Late Activities" name="activities_overdue" domain="[('activity_ids.date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]" help="Show all records which has next action date is before today"/>
+                    <filter string="Today Activities" name="activities_today" domain="[('activity_ids.date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter string="Future Activities" name="activities_upcoming_all" domain="[('activity_ids.date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))
                         ]"/>
                     <group expand="0" string="Group By">
                         <filter string="Partner" name="partner" domain="[]" context="{'group_by':'partner_id'}"/>

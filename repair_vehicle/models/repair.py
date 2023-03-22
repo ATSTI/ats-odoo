@@ -45,9 +45,10 @@ class Repair(models.Model):
         'res.users',
         string='Responsável',)
     
-    sale_ids = fields.Many2one(
-        'sale.order', 'Cotações',
-        copy=False, track_visibility="onchange")
+    sale_ids = fields.Many2many(
+        "sale.order", string='Cotações',
+        copy=False
+    )
 
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
@@ -126,10 +127,21 @@ class Repair(models.Model):
 
     @api.multi
     def action_create_sale_order(self):
+        quotations = self.mapped('sale_ids')
+        sale_name = f"{self.name}-1"
+        if len(quotations):
+            sale_name = f"{self.name}-{str(len(quotations)+1)}"
         vals={
-            "name": self.name,
+            "name": sale_name,
             "partner_id": self.partner_id.id,
         }
         sale = self.env["sale.order"].create(vals)
-        self.sale_ids = sale.id        
-    # return res
+        lista = quotations.ids
+        lista.append(sale.id)    
+        self.sale_ids = [(6, 0, lista)]
+        self.message_post(
+            body=_("Criado a Cotação <b>%s<b> " %(sale_name)),
+            subject=_("Gerado uma cotação"),
+            message_type="notification"
+        )
+    

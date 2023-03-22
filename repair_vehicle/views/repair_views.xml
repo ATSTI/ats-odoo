@@ -57,7 +57,7 @@
                 </xpath>
                 <field name="guarantee_limit" position="after">
                     <field name="user_id"/>
-                    <field name="sale_ids"/>
+                    <field name="sale_ids" widget="many2many_tags" readonly="1" />
                 </field>
                 <button name="action_send_mail" position="before">
                     <field name="stage_id" widget="statusbar" options="{'fold_field': 'fold'}" domain="[('stage_type', '=', 'order')]"/>
@@ -77,7 +77,7 @@
                     <field name="currency_id" invisible="1"/>
                     <label for="contas_pendentes" />
                     <div class="o_row" >
-                        <field name="contas_pendentes" style="color:Orange;" class="oe_inline" widget='monetary' options="{'currency_field': 'currency_id'}" attrs="{'invisible': [('contas_pendentes', '=', 0.0)]}" />
+                        <field name="contas_pendentes" style="color:Orange;" class="oe_inline" widget='monetary' options="{'currency_field': 'currency_id'}" attrs="{'invisible': [('contas_pendentes', '=', 0.0)]}" readonly="1" />
                         <button name="action_open_invoice" type="object" attrs="{'invisible': [('contas_pendentes', '=', 0.0)]}" icon="fa-external-link" />
                     </div>
                 </field>
@@ -227,8 +227,8 @@
             <field name="model">repair.order</field>
             <field name="arch" type="xml">
                 <pivot string="Ordem Serviço" >
-                    <field name="vehicle_id" type="row"/>
-                    <field name="partner_id" type="measure"/>
+                    <field name="partner_id" type="row"/>
+                    <field name="vehicle_id" type="measure"/>
                     <field name="amount_total" type="measure"/>
                 </pivot>
             </field>

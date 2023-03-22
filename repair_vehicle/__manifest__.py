@@ -16,7 +16,7 @@
         'Carlos Silveira<carlos@atsti.com.br>',
     ],
     'depends': [
-        'repair', 'stock',
+        'repair', 'stock', 'sale'
     ],
     'data': [
         'views/repair_stage.xml',

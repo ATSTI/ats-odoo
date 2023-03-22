@@ -2,6 +2,7 @@
 # © 2018  Carlos R. Silveira
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+from ast import literal_eval
 from odoo import api, fields, models, _
 from datetime import datetime
 from odoo.exceptions import UserError, ValidationError
@@ -30,9 +31,23 @@ class Repair(models.Model):
             default=lambda self: self._default_stage_id())
     vehicle_id = fields.Many2one(
         'repair.vehicle', string='Veículo',
-        required=True, states={'draft': [('readonly', False)]})
+        states={'draft': [('readonly', False)]})
 
-    contas_pendentes = fields.Char('Faturas')
+    contas_pendentes = fields.Monetary('Faturas')
+
+    currency_id = fields.Many2one(
+        comodel_name="res.currency",
+        default=lambda self: self.env.user.company_id.currency_id,
+        store=True,
+        readonly=True,
+    )
+    user_id = fields.Many2one(
+        'res.users',
+        string='Responsável',)
+    
+    sale_ids = fields.Many2one(
+        'sale.order', 'Cotações',
+        copy=False, track_visibility="onchange")
 
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
@@ -51,11 +66,15 @@ class Repair(models.Model):
 
     @api.onchange('partner_id')
     def onchange_partner_id(self):
-        contas = self.env["account.move.line"].search([('date_maturity', '<', fields.Date.today()), ('partner_id', '=', self.partner_id.id)])
+        contas = self.env["account.move.line"].search([
+            ('date_maturity', '<', fields.Date.today()),
+            ('partner_id', '=', self.partner_id.id),
+            ('reconciled', '=', False)
+        ])
         valor = 0.0
         for ct in contas:
             valor += ct.amount_residual
-        self.contas_pendentes = f" Total: {'{0:.2f}'.format(valor)}"
+        self.contas_pendentes = valor
         
     # @api.model
     # def _cliente_id_stage_ids(self):
@@ -65,7 +84,11 @@ class Repair(models.Model):
     #     return
 
     def action_open_invoice(self):
-        contas = self.env["account.move.line"].search([('date_maturity', '<', fields.Date.today()), ('partner_id', '=', self.partner_id.id)])
+        contas = self.env["account.move.line"].search([
+            ('date_maturity', '<', fields.Date.today()),
+            ('partner_id', '=', self.partner_id.id),
+            ('reconciled', '=', False)
+        ])
         domain = [("id", "in", contas.ids)]
         return {
             'name': 'CA par adhérent',
@@ -76,3 +99,27 @@ class Repair(models.Model):
             'view_id': self.env.ref('br_account_payment.view_payments_tree_a_receber').id,
             'domain': domain,
         }
+
+    def write(self, vals):
+        if 'state' in vals:
+            if vals['state'] == 'draft':
+                vals['stage_id'] = 1
+        res = super().write(vals)
+        return res
+
+    @api.multi
+    def action_view_sale_order(self):
+        quotations = self.mapped('sale_ids')
+        action = self.env.ref('sale.action_orders').read()[0]
+        if len(quotations) > 1:
+            action['domain'] = [('id', 'in', quotations.ids)]
+        elif len(quotations) == 1:
+            form_view = [(self.env.ref('sale.view_order_form').id, 'form')]
+            if 'views' in action:
+                action['views'] = form_view + [(state,view) for state,view in action['views'] if view != 'form']
+            else:
+                action['views'] = form_view
+            action['res_id'] = quotations.ids[0]
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+        return action

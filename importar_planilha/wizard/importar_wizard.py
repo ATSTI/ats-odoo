@@ -43,7 +43,7 @@ class ImportarWizard(models.TransientModel):
                 arq.write("\n")
                 arq.write("c_categoria=9")
                 arq.write("\n")
-            if self.tipo == "cliente":
+            if self.tipo == "cliente" or self.tipo == "fornecedor":
                 arq.write("c_ref=0")
                 arq.write("\n")
                 arq.write("c_name=2")

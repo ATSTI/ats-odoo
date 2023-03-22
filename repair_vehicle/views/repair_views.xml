@@ -22,14 +22,15 @@
                     <header>
                         <button name="action_send_mail" string="Enviar orçamento" type="object"/>
                         <button name="print_repair_order" string="Imprimir orçamento" type="object"/>
-                        <!-- <button name="action_validate" states="draft" type="object" string="Confirm Repair" class="oe_highlight"/>
+                        <button name="action_validate" states="draft" type="object" string="Confirm Repair" class="oe_highlight"/>
                         <button name="action_repair_start" attrs="{'invisible': ['&amp;', ('state','!=','confirmed'), '!', '&amp;', ('state','=','ready'), ('invoice_method','=','b4repair')]}"
                         type="object" string="Start Repair" class="oe_highlight"/>
                         <button name="action_repair_cancel_draft" states="cancel" string="Set to Draft" type="object"/>
                         <button name="action_repair_end" states="under_repair" type="object" string="End Repair" class="oe_highlight"/>
                         <button name="action_repair_invoice_create" states="2binvoiced" type="object" string="Create Invoice" class="oe_highlight" groups="account.group_account_invoice"/>
                         <button name="action_repair_cancel" string="Cancel Repair" type="object" attrs="{'invisible':['|',('invoice_method','!=','none'), ('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/>
-                        <button name="action_repair_cancel" states="draft" type="object" string="Cancel Repair"/> -->
+                        <button name="action_create_sale_order" type="object" string="Criar Cotação"/>
+                        <field name="state" invisible="1"/>
                     </header>
                 </xpath>
                 <div name="button_box" position="inside">
@@ -74,8 +75,11 @@
                 <field name="partner_id" position="after">
                     <field name="vehicle_id" domain="[('partner_id', '=', partner_id)]" context="{'default_partner_id': partner_id}" />
                     <field name="currency_id" invisible="1"/>
-                    <field name="contas_pendentes" style="color:Red;" class="oe_inline" widget='monetary' options="{'currency_field': 'currency_id'}" attrs="{'invisible': [('contas_pendentes', '=', 0.0)]}" />
-                    <button name="action_open_invoice" string="Ver Faturas" class="oe_highlight" type="object" attrs="{'invisible': [('contas_pendentes', '=', 0.0)]}" />
+                    <label for="contas_pendentes" />
+                    <div class="o_row" >
+                        <field name="contas_pendentes" style="color:Orange;" class="oe_inline" widget='monetary' options="{'currency_field': 'currency_id'}" attrs="{'invisible': [('contas_pendentes', '=', 0.0)]}" />
+                        <button name="action_open_invoice" type="object" attrs="{'invisible': [('contas_pendentes', '=', 0.0)]}" icon="fa-external-link" />
+                    </div>
                 </field>
                 <xpath expr="//form/sheet/notebook/page" position="replace">
                     <page string="Peças">
@@ -231,6 +235,11 @@
         
         <menuitem action="action_repair_order_vehicle_tree" id="menu_repair_order" groups="stock.group_stock_user" name="Ordem serviço" sequence="36"
             web_icon="repair,static/description/icon.png"/>
+        <menuitem action="action_repair_vehicle" id="menu_dados_principais" groups="stock.group_stock_user" name="Dados Principais" sequence="36" parent="repair_vehicle.menu_repair_order"/>
+        <menuitem action="action_repair_vehicle" id="menu_configuracoes" groups="stock.group_stock_user" name="Configurações" sequence="36" parent="repair_vehicle.menu_repair_order"/>
+        <menuitem action="action_repair_vehicle" id="menu_relatorios" groups="stock.group_stock_user" name="Relatorios" sequence="36" parent="repair_vehicle.menu_repair_order"/>
+        <menuitem action="action_repair_vehicle" id="menu_repair_vehicle" groups="stock.group_stock_user" name="Veículos" sequence="36" parent="repair_vehicle.menu_dados_principais"/>
+        <menuitem action="action_repair_stage" id="menu_repair_stage" groups="stock.group_stock_user" name="Estagio" sequence="36" parent="repair_vehicle.menu_configuracoes"/>
 
     </data>
 </odoo>

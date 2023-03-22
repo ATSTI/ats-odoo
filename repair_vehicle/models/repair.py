@@ -91,7 +91,7 @@ class Repair(models.Model):
         ])
         domain = [("id", "in", contas.ids)]
         return {
-            'name': 'CA par adhérent',
+            'name': 'Contas a receber',
             'type': 'ir.actions.act_window',
             'view_mode': 'tree',
             'view_type': 'form',
@@ -123,3 +123,13 @@ class Repair(models.Model):
         else:
             action = {'type': 'ir.actions.act_window_close'}
         return action
+
+    @api.multi
+    def action_create_sale_order(self):
+        vals={
+            "name": self.name,
+            "partner_id": self.partner_id.id,
+        }
+        sale = self.env["sale.order"].create(vals)
+        self.sale_ids = sale.id        
+    # return res

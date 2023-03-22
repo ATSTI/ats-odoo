@@ -41,7 +41,7 @@ hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
 cadastra = 0
 #a_todos_cli = a_cliente.search([('id', '=',1671)])
 #a_todos_cli = a_cliente.search([], limit=50)
-a_todos_cli = a_cliente.search([('id', '>',1), ('id', '<', 100)], order = "id")
+a_todos_cli = a_cliente.search([('id', '>',100), ('id', '<',500)], order = "id")
 #import pudb;pu.db
 #a_todos_cli = a_cliente.search([('name', '=', cli.name)])
 for cli in a_cliente.browse(a_todos_cli): 
@@ -64,10 +64,10 @@ for cli in a_cliente.browse(a_todos_cli):
 
         # Pegar as ID esta cadastrado (1)CLIENTE e (184)CURSO falta (221)FATURA
         if cli.customer:
-            cli_odoo['category_id'] = [(6, 0, [1])]
+            cli_odoo['category_id'] = [(6, 0, [105])]
                      
         if cli.supplier:
-            cli_odoo['category_id'] = [(6, 0 , [2])]
+            cli_odoo['category_id'] = [(6, 0 , [106])]
         
         #tag = a_tag.search([('name', '=', cli.category_id.name)])
         
@@ -77,12 +77,12 @@ for cli in a_cliente.browse(a_todos_cli):
             if tag:
                 for vtag in a_tag.browse(tag):
                     tags.append(vtag.id)
-                if cli.customer and not 1 in tags:
-                    tags.append(1)
+                if cli.customer and not 105 in tags:
+                    tags.append(105)
                     #cli_odoo['category_id'] = [(6, 0, [1,vtag.id])]
                      
-                if cli.supplier and not 2 in tags:
-                    tags.append(2)
+                if cli.supplier and not 106 in tags:
+                    tags.append(106)
                     #cli_odoo['category_id'] = [(6, 0 , [2])]
                 cli_odoo['category_id'] = [(6, 0 , tags)]
                             

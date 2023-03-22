@@ -45,7 +45,8 @@ b_cat = dest.env['product.category']
 
 
 #import pudb;pu.db
-prd_ids = a_prod.search([], offset=50,limit=150, order = "default_code" )
+#prd_ids = a_prod.search([('active', '=', False)])
+prd_ids = a_prod.search([], offset=0,limit=150, order = "default_code")
 #prd_ids = a_prod.search([], limit=10,order=prd)
 cadastra = 0
 for prd in a_prod.browse(prd_ids):

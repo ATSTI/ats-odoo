@@ -53,68 +53,94 @@ cadastra = 0
 
 #a_todos_cli = a_cliente.search([], limit=50)
 #a_todos_cli = a_cliente.search([('id', '>',3000), ('id', '<', 3500)], order = "id")
-#import pudb;pu.db
+
 #a_todos_cli = a_cliente.search([('name', '=', cli.name)])
-#import pudb;pu.db
-a_ses = a_session.search([('id', '>',30), ('id', '<', 40)], order = "id")
+
+a_ses = a_session.search([('id', '>',30), ('id', '<', 40)], order = "id") #30 ao 40 
 def insere_pedido(sNova,sVelha):
     pedidos = a_pedido.search([('session_id', '=', sVelha)])
     
     for ped in a_pedido.browse(pedidos):
         pedb = b_pedido.search([('name', '=', ped.name )])
+        #import pudb;pu.db
+        
         if pedb:
             continue
+        
         vals = {}
         vals['name'] = ped.name
         vals['session_id'] = sNova
         vals['date_order'] = datetime.strftime(ped.date_order,'%Y-%m-%d')
-        vals['partner_id'] = ped.partner_id.id
-        '''
+
+        part = dest.env['res.partner'].search([('name', '=', ped.partner_id.name)])
+        if len(part):
+            vals['partner_id'] = part[0]   
+        vals['amount_tax'] = ped.amount_total
+        vals['amount_total'] = ped.amount_total
+        vals['amount_paid'] = ped.amount_paid
+        vals['amount_return'] = ped.amount_return
+        vals['company_id'] = 1
+        vals['pricelist_id'] = 1
+        #import pudb;pu.db
+        ped_id = b_pedido.create(vals) 
         list_adi = []
         for line in ped.lines:
+            prod = dest.env['product.product'].search([('default_code', 'ilike', line.product_id.default_code)])
             vals_iten = {
+                #"id" : line.id,
                 "name": line.name,
-                "product_id": line.id,
+                "product_id": prod[0], 
+                "full_product_name" :line.product_id.name,
                 "discount": line.discount,
                 "qty": line.qty,
                 "price_unit": line.price_unit,
                 "tipo_venda": line.tipo_venda,
                 "price_subtotal": line.price_subtotal,
                 "price_subtotal_incl": line.price_subtotal_incl,
-                "order_id": line.order_id.id,
+                "order_id": ped_id,
                 
             }
-            import pudb;pu.db
+            #import pudb;pu.db
             vLine = b_pedidoLine.create(vals_iten)            
            
-            list_adi.append(vLine[0])
+            #list_adi.append(vLine[0])
             
-        vals['lines'] = [(6, 0, list_adi)] 
-
-        b_pedido.create(vals)  
-        '''
-        ###
-        list_pag = []
-        for payment_ids in  :
-            vals_pag = {
-                "pos_order_id": ,
-                "amount": ,
-                "payment_method_id": ,
-                "payment_date": ,
-                "session_id": ,
-            }
-            import pudb;pu.db
-            vLine = b_pedidoPag.create(vals_pag)            
-           
-            list_pag.append(vLine[0])
-            
-        vals['lines'] = [(6, 0, list_pag)] 
-
-        b_pedidoPag.create(vals)         
-        ###
+        #vals['lines'] = [(6, 0, list_adi)]          
         
+        #  aqui aba pagamento 
+        #import pudb;pu.db      
+        list_pag = []
+        for pag in ped.statement_ids :
+            metodo_pag = dest.env['pos.payment.method'].search([('name', 'ilike', pag.journal_id.name[:2])])       
+            vals_pag = {
+                "name": pag.name,                
+                "pos_order_id": ped_id,
+                "amount": pag.amount,                     
+                "payment_method_id": metodo_pag[0],     
+                "payment_date": datetime.strftime(pag.date,'%Y-%m-%d'),
+                "session_id": sNova ,
+            }
+            #import pudb;pu.db
+            vLine = b_pedidoPag.create(vals_pag)            
+               
+        '''
+        # aba informacao adicionais
+        list_inf = []
+        for inf in ped.pos.order :
+            vals_inf = {
+                "session_move_id": inf.picking_id ,                
+                "pos_reference": inf.pos_reference,    
+            }
+            #import pudb;pu.db
+            vLine = b_pedidoPag.create(vals_inf)            
            
+        #    list_inf.append(vLine[0])
+            
+        #vals['account_move'] = [(6, 0, list_inf)] 
 
+        #b_pedidoPag.create(vals_inf)             
+        S'''    
+        
 for ses in a_session.browse(a_ses): 
     #import pudb;pu.db
     #cli_id = b_cliente.search([('name', '=', cli.name)])
@@ -134,108 +160,10 @@ for ses in a_session.browse(a_ses):
     vals['config_id'] = ses.config_id.id
     vals['start_at'] = datetime.strftime(ses.start_at,'%Y-%m-%d')
     vals['stop_at'] = datetime.strftime(ses.stop_at,'%Y-%m-%d')
-    vals['state'] = 'closed'
-    
+    vals['state'] = 'closed'    
     
 
     pSession_id = b_session.create(vals)
-    insere_pedido(pSession_id[0],ses.id)
-    
-    
-
-'''    
-    if not cli_id:
-        # INCLUIR
-        cli_odoo = {}      
-        
-        cli_odoo['company_type'] = cli.company_type
-        tipo = cli.company_type     
-          
-        #import pudb;pu.db
-        
-        if cnpj_cpf.validar(cli.cnpj_cpf):
-            cli_odoo['cnpj_cpf'] = cli.cnpj_cpf 
-        else:
-            cli_odoo['comment'] = cli.cnpj_cpf 
-        
-
-        # Pegar as ID esta cadastrado (1)CLIENTE e (184)CURSO falta (221)FATURA
-        if cli.customer:
-            cli_odoo['category_id'] = [(6, 0, [1])]
-                     
-        if cli.supplier:
-            cli_odoo['category_id'] = [(6, 0 , [2])]
-        
-        #tag = a_tag.search([('name', '=', cli.category_id.name)])
-        
-        tags = []
-        for cat in cli.category_id:
-            tag = a_tag.search([('name', '=', cat.name)])
-            if tag:
-                for vtag in a_tag.browse(tag):
-                    tags.append(vtag.id)
-                if cli.customer and not 1 in tags:
-                    tags.append(1)
-                    #cli_odoo['category_id'] = [(6, 0, [1,vtag.id])]
-                     
-                if cli.supplier and not 2 in tags:
-                    tags.append(2)
-                    #cli_odoo['category_id'] = [(6, 0 , [2])]
-                cli_odoo['category_id'] = [(6, 0 , tags)]
-                            
-        
-       
-        
-        cli_odoo['ref'] = cli.ref
-        cli_odoo['name'] = cli.name
-        cli_odoo['legal_name'] = cli.legal_name
-        #if cli.cpf_cnpj:
-        #    cli_odoo['cnpj_cpf'] = cli.cnpj_cpf
-        cli_odoo['inscr_est'] = cli.inscr_est
-        cli_odoo['inscr_mun'] = cli.inscr_mun
-        #cli_odoo['indicador_ie_dest'] = cli.indicador_ie_dest        
-       
-        #if tipo == 'person':
-        #    cli_odoo['rg'] = cli.cnpj_cpf 
-        #import pudb;pu.db
-
-        cli_odoo['zip'] = cli.zip 
-        cli_odoo['street'] = cli.street
-        cli_odoo['street_number'] = cli.number
-        
-        cli_odoo['district'] = cli.district
-        
-        cli_odoo['country_id'] = 31
-        cli_odoo['street2'] = cli.street2 
-        
-        
-        city = a_city.search([('name', '=', cli.city_id.name)])
-        for vcity in a_city.browse(city):      
-              
-            cli_odoo['city_id'] = vcity.id        
-            cli_odoo['state_id'] = vcity.state_id.id  
-       
-        
-        cli_odoo['phone'] = cli.phone
-        cli_odoo['mobile'] = cli.mobile
-        cli_odoo['email'] = cli.email
-        #cli_odoo['fiscal_profile_id'] = cli.fiscal_profile_id
-         
-        
-        
-        #abaixo inclui
-        #import pudb;pu.db
-        id_cli = b_cliente.create(cli_odoo)
-        cadastra += 1 
-
-    print ('Codigo : %s , Nome : %s.' % (cli.id,cli.name))
- 
-
-if cadastra > 0:
-    print (' Cadastrado %s clientes' % (str(cadastra)))
-else:
-    print ('Nenhum cadastro Cliente a ser feito.')
-'''
-
-        
+    insere_pedido(pSession_id,ses.id)   
+  
 

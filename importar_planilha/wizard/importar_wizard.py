@@ -9,6 +9,7 @@ import time
 import xlrd
 import re
 import os.path
+from erpbrasil.base.fiscal import cnpj_cpf, ie
 
 
 class ImportarWizard(models.TransientModel):
@@ -149,6 +150,7 @@ class ImportarWizard(models.TransientModel):
     tipo = fields.Selection([
             ("produto", "Produto"),
             ("cliente", "Cliente"),
+            ("fornecedor", "Fornecedor"),
             ("dependente", "Dependente"),
         ],
         string="Tipo Importação",
@@ -261,7 +263,6 @@ class ImportarWizard(models.TransientModel):
                         vals['type'] = rowValues[c_tipo]
                     
                     # UNIDADE
-                    # import pudb;pu.db 
                     # if rowValues[c_unidade] and type(rowValues[c_unidade]) == str:
                     #     d_uom = self.env['uom.uom']
                     #     uni_id = d_uom.search([('code', 'ilike', rowValues[c_unidade])], limit=1)
@@ -273,7 +274,6 @@ class ImportarWizard(models.TransientModel):
 
                     # NCM
                     # if vals['default_code'] == '2000000000275':
-                    #     import pudb;pu.db
                     if rowValues[c_ncm]:
                         ncm = rowValues[c_ncm]
                         if type(ncm) == str:
@@ -412,9 +412,13 @@ class ImportarWizard(models.TransientModel):
                     c_id = cli_obj.search([('ref', '=', vals['ref'])])
                     if c_id:
                         continue
+                    if self.tipo == "cliente":
+                        vals['customer_rank'] = 1
+                    if self.tipo == "fornecedor":
+                        vals['supplier_rank'] = 1
 
                     if vals['name']:
-                        print ("Cliente: {}".format(vals['name']))                        
+                        print ("Cliente/Fornecedor: {}".format(vals['name']))                        
                                                                     
                     if rowValues[c_razao]:
                        vals['legal_name'] = rowValues[c_razao]
@@ -423,10 +427,10 @@ class ImportarWizard(models.TransientModel):
                     # category = []
                     # category.append((0, 0, [1]))
                     # vals['category_id'] = category
-
                     if rowValues[c_cnpj_cpf]:
                         cnpj_cpf = rowValues[c_cnpj_cpf]
                         if type(cnpj_cpf) == float:
+                            cnpj_cpf = str(int(cnpj_cpf))
                             vals['cnpj_cpf'] = str(int(cnpj_cpf))
                         else:
                             cnpj_cpf = re.sub('[^0-9]', '', cnpj_cpf)
@@ -436,12 +440,6 @@ class ImportarWizard(models.TransientModel):
                             cnpj_cpf = f"{cnpj_cpf[:3]}.{cnpj_cpf[3:6]}.{cnpj_cpf[6:9]}-{cnpj_cpf[9:12]}"
                         vals['cnpj_cpf'] = str(cnpj_cpf)
 
-                    if len(rowValues) > c_inscrest-1 and rowValues[c_inscrest]:
-                        inscrest = rowValues[c_inscrest]
-                        if type(inscrest) == float:
-                            vals['inscr_est'] = str(int(inscrest))
-                        else:
-                            vals['inscr_est'] = inscrest
 
                     if len(rowValues) > c_rg-1 and rowValues[c_rg]:
                         rg = rowValues[c_rg]
@@ -500,6 +498,11 @@ class ImportarWizard(models.TransientModel):
                                 ('code', '=', rowValues[c_state_id]),
                                 ('country_id', '=', 31)
                             ])
+                            if not uf:
+                                uf = self.env['res.country.state'].search([
+                                    ('name', '=', rowValues[c_state_id]),
+                                    ('country_id', '=', 31)
+                                ])
                             if uf:
                                 vals['state_id'] = uf.id
                                 if rowValues[c_city_id]:
@@ -516,27 +519,26 @@ class ImportarWizard(models.TransientModel):
                     # else:
                     #     # Nao Contribuinte
                     #     vals['fiscal_profile_id'] = 8
-
                     try:
                         c_id =  cli_obj.create(vals)
-                        vals = {}
+                        vals_u = {}
                         if c_id and len(rowValues) > c_company_type-1 and rowValues[c_company_type]:
-                            vals['company_type'] = rowValues[c_company_type]
+                            vals_u['company_type'] = rowValues[c_company_type]
                         else:
                             if 'cnpj_cpf' in vals and len(vals['cnpj_cpf']) > 14:
-                                vals['company_type'] = 'company'
-                                vals['ind_final'] = "0"
-                                vals['fiscal_profile_id'] = 8
-                                vals['ind_ie_dest'] = "1"
+                                vals_u['company_type'] = 'company'
+                                vals_u['ind_final'] = "0"
+                                vals_u['fiscal_profile_id'] = 4
+                                vals_u['ind_ie_dest'] = "1"
                             else:
-                                vals['company_type'] = 'person'
+                                vals_u['company_type'] = 'person'
                                 # Consumidor Final
-                                vals['ind_final'] = "1"
+                                vals_u['ind_final'] = "1"
                                 # Nao Contribuinte
-                                vals['fiscal_profile_id'] = 8
-                                vals['ind_ie_dest'] = "9"
-                        if len(vals):
-                            c_id.write(vals)
+                                vals_u['fiscal_profile_id'] = 8
+                                vals_u['ind_ie_dest'] = "9"
+                        if len(vals_u):
+                            c_id.write(vals_u)
                     except Exception as error:
                         if mensagem == "":
                             mensagem += "Erro cadastro : <br>"
@@ -544,21 +546,21 @@ class ImportarWizard(models.TransientModel):
                             mensagem += f"{str(error)} - {vals['name']}"  + "<br>"
                         else:
                             mensagem += str(error)  + "<br>"
+
                     vals = {
                         'category_id': [(6,0,[1])]
                     }
-                    # if c_id and c_id.zip:
-                        # try:
-                        #     # c_id.zip_search()
-                        #     self.env["l10n_br.zip"].zip_search(c_id)
-                        # except:
-                        # if not 'city_id' in vals:
                     vals['country_id'] = 31
-                    if rowValues[c_state_id]:
+                    if rowValues[c_state_id] and (not c_id.state_id or not c_id.city_id):
                         uf = self.env['res.country.state'].search([
                             ('code', '=', rowValues[c_state_id]),
                             ('country_id', '=', 31)
                         ])
+                        if not uf:
+                            uf = self.env['res.country.state'].search([
+                                    ('name', '=', rowValues[c_state_id]),
+                                    ('country_id', '=', 31)
+                            ])
                         if uf:
                             vals['state_id'] = uf.id
                             if rowValues[c_city_id]:
@@ -569,9 +571,37 @@ class ImportarWizard(models.TransientModel):
                                 ])
                                 if city:
                                     vals['city_id'] = city.id
+                                    vals['city'] = city.name
                     if c_id:
                         c_id.write(vals)
                         conta_registros += 1
+
+                    if len(rowValues) > c_inscrest-1 and rowValues[c_inscrest]:
+                        inscrest = rowValues[c_inscrest]
+                        vl_ie = {}
+                        if type(inscrest) == float:
+                            inscrest = str(int(inscrest))
+                            vl_ie['inscr_est'] = str(int(inscrest))
+                            vl_ie['ind_ie_dest'] = '1'
+                        else:
+                            vl_ie['inscr_est'] = inscrest
+                            vl_ie['ind_final'] = '1'
+                        if c_id.state_id:
+                            ie_valido = ie.validar(c_id.state_id.code, inscrest)
+                            if ie_valido:
+                                c_id.write(vl_ie)
+                            else:
+                                inscrest = 'IE: ' + inscrest
+                                if c_id.comment:
+                                    inscrest = c_id.comment + 'IE: ' + inscrest
+                                c_id.write({'comment': inscrest})
+
+                    # if c_id and c_id.zip:
+                        # try:
+                        #     # c_id.zip_search()
+                        #     self.env["l10n_br.zip"].zip_search(c_id)
+                        # except:
+                        # if not 'city_id' in vals:
 
             mensagem += 'TOTAL DE REGISTROS INCLUIDOS : {}'.format(str(conta_registros))
             self.write({'mensagem': mensagem})
@@ -762,7 +792,7 @@ class ImportarWizard(models.TransientModel):
                         if 'cnpj_cpf' in vals and len(vals['cnpj_cpf']) > 14:
                             vals['company_type'] = 'company'
                             vals['ind_final'] = "0"
-                            vals['fiscal_profile_id'] = 8
+                            vals['fiscal_profile_id'] = 4
                             vals['ind_ie_dest'] = "1"
                         else:
                             vals['company_type'] = 'person'
@@ -805,6 +835,8 @@ class ImportarWizard(models.TransientModel):
                             mensagem += f"{str(error)} - {vals['name']}"  + "<br>"
                         else:
                             mensagem += str(error)  + "<br>"
+
+
 
                     vals = {
                         'category_id': [(6,0,[2])]

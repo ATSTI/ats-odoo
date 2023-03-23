@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Field Service Vehicle -->
+    <record id="repair_vehicle_tree_view" model="ir.ui.view">
+        <field name="name">repair.vehicle.tree</field>
+        <field name="model">repair.vehicle</field>
+        <field name="arch" type="xml">
+            <tree string="Veículo">
+                <field name="partner_id"/>
+                <field name="name"/>
+                <field name="active" invisible="1" />
+                <field name="acquisition_date"/>
+                <field name="placa"/>
+                <field name="modelo"/>
+                <field name="ano"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="repair_vehicle_form_view" model="ir.ui.view">
+        <field name="name">repair.vehicle.form</field>
+        <field name="model">repair.vehicle</field>
+        <field name="arch" type="xml">
+            <form string="Veículo">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object"
+                                class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"
+                                options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="name"/>
+                            <field name="acquisition_date"/>
+                        </group>
+                        <group>
+                            <field name="placa"/>
+                            <field name="modelo"/>
+                            <field name="ano"/>
+                        </group>
+                    </group>
+                    <group string="Descrição do Veículo">
+                        <p class="text-muted" colspan="2">
+                            Descreva o veiculo.
+                        </p>
+                        <field name="description" placeholder="Adicior descrição..." nolabel="1" colspan="2"/>
+                    </group>
+                    <notebook>
+                        <page string="Ordem de Serviços" name="veiculos">
+                            <field name="repair_ids" readonly="1" />
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="repair_vehicle_search_view" model="ir.ui.view">
+        <field name="name">repair.vehicle.search</field>
+        <field name="model">repair.vehicle</field>
+        <field name="arch" type="xml">
+            <search string="Veículos">
+                <field name="name" string="Veículo" filter_domain="['|', ('placa', 'ilike', self), ('name', 'ilike', self)]"/>
+                <field name="partner_id"/>
+                <separator/>
+                <filter string="Arquivado" name="inactive" domain="[('active','=',False)]"/>                
+                <separator/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_repair_vehicle" model="ir.actions.act_window">
+        <field name="name">Cadastro de veículos</field>
+        <field name="res_model">repair.vehicle</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="repair_vehicle_search_view"/>
+        <!-- <field name="context">{'search_default_group_stage_type': 1}</field> -->
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Cadastrar um veículo.
+            </p>
+        </field>
+    </record>
+
+    <menuitem action="action_repair_vehicle" id="menu_repair_vehicle" groups="stock.group_stock_user" name="Veículos" sequence="36" parent="repair_vehicle.menu_repair_order"/>
+
+</odoo>

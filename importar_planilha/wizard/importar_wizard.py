@@ -581,13 +581,16 @@ class ImportarWizard(models.TransientModel):
                         vl_ie = {}
                         if type(inscrest) == float:
                             inscrest = str(int(inscrest))
-                            vl_ie['inscr_est'] = str(int(inscrest))
+                            vl_ie['inscr_est'] = inscrest
                             vl_ie['ind_ie_dest'] = '1'
                         else:
                             vl_ie['inscr_est'] = inscrest
                             vl_ie['ind_final'] = '1'
                         if c_id.state_id:
-                            ie_valido = ie.validar(c_id.state_id.code, inscrest)
+                            if len(inscrest) > 13 and c_id.state_id.code == 'MG':
+                                inscrest = inscrest[1:len(inscrest)]
+                                vl_ie['inscr_est'] = inscrest
+                            ie_valido = ie.validar(c_id.state_id.code.lower(), inscrest)
                             if ie_valido:
                                 c_id.write(vl_ie)
                             else:

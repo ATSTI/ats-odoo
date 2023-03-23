@@ -56,6 +56,53 @@ cadastra = 0
 
 #a_todos_cli = a_cliente.search([('name', '=', cli.name)])
 
+def baixa_pagamentos(move_line_id, journal_id, caixa, valor, cod_forma, juros):
+    if journal_id:
+        invoices = move_line_id.invoice_id
+        # amount = self._compute_payment_amount(invoices=invoices) if self.multi else self.amount
+        if move_line_id.amount_residual > valor or ((move_line_id.amount_residual - valor) > 0.01):
+            baixar_tudo = 'open'
+        else:
+            baixar_tudo = 'reconcile'
+        bank_account = invoices[0].partner_bank_id or self.partner_bank_account_id
+        # pmt_communication = self._prepare_communication(invoices)
+
+        payment_type = 'inbound'# if move_line_id.debit else 'outbound'
+        payment_methods = \
+            payment_type == 'inbound' and \
+            journal_id.inbound_payment_method_ids or \
+            journal_id.outbound_payment_method_ids
+        payment_method_id = payment_methods and payment_methods[0] or False
+        conta_juros = ''
+        juros_desc = ''
+        if juros:
+            cc = self.env['account.account'].search([
+                    ('name', 'ilike', 'Juros Recebidos'),
+                    ('company_id', '=', journal_id.company_id.id),
+            ])
+            conta_juros = cc.id
+            juros_desc = 'Juros recebido %s - %s' %(move_line_id.partner_id.name, move_line_id.name or '')
+        vals = {
+            'journal_id': journal_id.id,
+            'payment_method_id': payment_method_id.id,
+            'payment_date': datetime.now(),
+            'communication': invoices.name,
+            'invoice_ids': [(6, 0, invoices.ids)],
+            'payment_type': payment_type,
+            'amount': valor+juros,
+            'currency_id': journal_id.company_id.currency_id.id,
+            'partner_id': move_line_id.partner_id.id,
+            'partner_type': 'customer',
+            'partner_bank_account_id': bank_account.id,
+            'multi': False,
+            'payment_difference_handling': baixar_tudo,
+            'writeoff_account_id': conta_juros,
+            'writeoff_label': juros_desc
+        }
+        Payment = self.env['account.payment']        
+        pay = Payment.create(vals)
+        pay.post()
+
 a_ses = a_session.search([('id', '>',45), ('id', '<',50)], order = "id") #30 ao 40 
 def insere_pedido(sNova,sVelha):
     pedidos = a_pedido.search([('session_id', '=', sVelha)])
@@ -124,20 +171,29 @@ def insere_pedido(sNova,sVelha):
             vLine = b_pedidoPag.create(vals_pag)
             
         # mudando o status pra pago
-        b_pedidoPag.action_pos_order_paid()
-        
+        ped_id.action_pos_order_paid()
         
         # se a prazo criando a Fatura
         if metodo_pag == '4-':
-            b_pedidoPag.write({'to_invoice': True})
-            move_vals = b_pedidoPag._prepare_invoice_vals()
-            new_move = b_pedidoPag._create_invoice(move_vals)
-            b_pedidoPag.write({'account_move': new_move.id, 'state': 'invoiced'})
-            new_move.sudo().with_company(b_pedidoPag.company_id)._post()
+            vLine.write({'to_invoice': True})
+            move_vals = vLine._prepare_invoice_vals()
+            new_move = vLine._create_invoice(move_vals)
+            vLine.write({'account_move': new_move.id, 'state': 'invoiced'})
+            new_move.sudo().with_company(vLine.company_id)._post()
          
             # ver se esta paga
-            #if ped.invoice_id.state == 'paid':
-                
+            # if ped.invoice_id.state == 'paid':
+            for ct in ped.invoice_id.receivable_move_line_ids:
+                if ct.reconciled:
+                    bancos = origem.env['account.journal'].search([
+                        ('type', 'in', ('cash', 'bank'))])
+                    aml = origem.env['account.move.line'].search([
+                        ('ref','=',ped.name),
+                        ('journal_id', 'in', bancos)
+                    ])
+                    for l in aml:
+                        aml_id = origem.env['account.move.line'].browse(l)
+                        baixa_pagamentos(new_move, l.journal_id, 0, aml_id.debit, 0, 0)
                
         '''
         # aba informacao adicionais

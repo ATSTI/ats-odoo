@@ -27,7 +27,7 @@
         'Carlos Silveira<carlos@atsti.com.br>',
     ],
     'depends': [
-        'br_base',
+        'base_setup',
     ],
     'data': [
         'views/res_partner_view.xml',

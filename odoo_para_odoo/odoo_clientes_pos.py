@@ -56,7 +56,7 @@ cadastra = 0
 
 #a_todos_cli = a_cliente.search([('name', '=', cli.name)])
 
-a_ses = a_session.search([('id', '>',30), ('id', '<', 40)], order = "id") #30 ao 40 
+a_ses = a_session.search([('id', '>',45), ('id', '<',50)], order = "id") #30 ao 40 
 def insere_pedido(sNova,sVelha):
     pedidos = a_pedido.search([('session_id', '=', sVelha)])
     
@@ -121,7 +121,23 @@ def insere_pedido(sNova,sVelha):
                 "session_id": sNova ,
             }
             #import pudb;pu.db
-            vLine = b_pedidoPag.create(vals_pag)            
+            vLine = b_pedidoPag.create(vals_pag)
+            
+        # mudando o status pra pago
+        b_pedidoPag.action_pos_order_paid()
+        
+        
+        # se a prazo criando a Fatura
+        if metodo_pag == '4-':
+            b_pedidoPag.write({'to_invoice': True})
+            move_vals = b_pedidoPag._prepare_invoice_vals()
+            new_move = b_pedidoPag._create_invoice(move_vals)
+            b_pedidoPag.write({'account_move': new_move.id, 'state': 'invoiced'})
+            new_move.sudo().with_company(b_pedidoPag.company_id)._post()
+         
+            # ver se esta paga
+            #if ped.invoice_id.state == 'paid':
+                
                
         '''
         # aba informacao adicionais
@@ -139,7 +155,7 @@ def insere_pedido(sNova,sVelha):
         #vals['account_move'] = [(6, 0, list_inf)] 
 
         #b_pedidoPag.create(vals_inf)             
-        S'''    
+        '''    
         
 for ses in a_session.browse(a_ses): 
     #import pudb;pu.db

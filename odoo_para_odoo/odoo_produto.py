@@ -17,10 +17,11 @@ origem = odoorpc.ODOO('felicita.atsti.com.br', port=48069)
 #CONEXAO ODOO DESTINO
 # Prepare the connection to the server
 #odoo = odoorpc.ODOO('192.168.6.100', port=8069)
-dest = odoorpc.ODOO('127.0.0.1', port=14069)
+dest = odoorpc.ODOO('felicita14.atsti.com.br', port=48069)
+#dest = odoorpc.ODOO('127.0.0.1', port=14069)
 # Login
 origem.login('felicita_atsti_com_br', 'ats@atsti.com.br', 'a2t00s7')
-dest.login('felicita', 'ats@atsti.com.br', 'a2t00s7')
+dest.login('felicita14', 'ats@atsti.com.br', 'a2t00s7')
 
 # odoo_user = odoo.env['res.users']
 
@@ -45,8 +46,8 @@ b_cat = dest.env['product.category']
 
 
 #import pudb;pu.db
-#prd_ids = a_prod.search([('active', '=', False)])
-prd_ids = a_prod.search([], offset=0,limit=150, order = "default_code")
+prd_ids = a_prod.search([('active', '=', False)])
+#prd_ids = a_prod.search([], offset=0,limit=150, order = "default_code")
 #prd_ids = a_prod.search([], limit=10,order=prd)
 cadastra = 0
 for prd in a_prod.browse(prd_ids):

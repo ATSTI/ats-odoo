@@ -58,6 +58,7 @@
                 <field name="guarantee_limit" position="after">
                     <field name="user_id"/>
                     <field name="sale_ids" widget="many2many_tags" readonly="1" />
+                    <field name="date_repair_closed"/>
                 </field>
                 <button name="action_send_mail" position="before">
                     <field name="stage_id" widget="statusbar" options="{'fold_field': 'fold'}" domain="[('stage_type', '=', 'order')]"/>
@@ -74,6 +75,7 @@
                 </field>
                 <field name="partner_id" position="after">
                     <field name="vehicle_id" domain="[('partner_id', '=', partner_id)]" context="{'default_partner_id': partner_id}" />
+                    <field name="date_repair"/>
                     <field name="currency_id" invisible="1"/>
                     <label for="contas_pendentes" />
                     <div class="o_row" >

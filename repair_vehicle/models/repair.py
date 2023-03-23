@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # © 2018  Carlos R. Silveira
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
@@ -24,6 +23,11 @@ class Repair(models.Model):
             raise ValidationError(_(
                 "You must create an FSM order stage first."))
     
+    date_repair = fields.Date(string='Data ordem serviço',
+        index=True, readonly=True, default=fields.Date.context_today)
+    date_repair_closed = fields.Date(string='Data fechamento',
+        index=True, readonly=True,)
+
     stage_id = fields.Many2one('repair.stage', string='Stage',
             track_visibility='onchange',
             index=True, copy=False,
@@ -31,7 +35,7 @@ class Repair(models.Model):
             default=lambda self: self._default_stage_id())
     vehicle_id = fields.Many2one(
         'repair.vehicle', string='Veículo',
-        states={'draft': [('readonly', False)]})
+    )
 
     contas_pendentes = fields.Monetary('Faturas')
 
@@ -102,9 +106,10 @@ class Repair(models.Model):
         }
 
     def write(self, vals):
-        if 'state' in vals:
-            if vals['state'] == 'draft':
-                vals['stage_id'] = 1
+        if 'stage_id' in vals:
+            stage = self.env['repair.stage'].browse(vals['stage_id']).is_closed
+            if stage:
+                vals['date_repair_closed'] = fields.Date.context_today(self)
         res = super().write(vals)
         return res
 

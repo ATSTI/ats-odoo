@@ -1,7 +1,6 @@
-from dateutil.relativedelta import relativedelta
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
-from odoo import api, fields, models, _
-from odoo.osv import expression
+from odoo import fields, models, _
 
 
 class RepairVehicle(models.Model):
@@ -22,4 +21,10 @@ class RepairVehicle(models.Model):
     partner_id = fields.Many2one(
         'res.partner', 'Cliente',
         index=True,
+    )
+    repair_ids = fields.One2many(
+        "repair.order",
+        "vehicle_id",
+        string="Ordem Serviço",
+        copy=False, readonly=True
     )

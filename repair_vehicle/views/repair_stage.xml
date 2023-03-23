@@ -73,6 +73,6 @@
     </record>
 
 
-        <menuitem action="action_repair_stage" id="menu_repair_stage" groups="stock.group_stock_user" name="Estagio" sequence="36" parent="repair_vehicle.menu_repair_order"/>
+    <menuitem action="action_repair_stage" id="menu_repair_stage" groups="stock.group_stock_user" name="Estagio" sequence="36" parent="repair_vehicle.menu_repair_order"/>
 
 </odoo>

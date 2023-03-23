@@ -56,6 +56,43 @@ cadastra = 0
 
 #a_todos_cli = a_cliente.search([('name', '=', cli.name)])
 
+def baixa_pagamentos(move_line_id, journal_id, caixa, valor, cod_forma, juros):
+    if journal_id:
+        invoices = move_line_id
+        # amount = self._compute_payment_amount(invoices=invoices) if self.multi else self.amount
+        if move_line_id.amount_residual > valor or ((move_line_id.amount_residual - valor) > 0.01):
+            baixar_tudo = 'open'
+        else:
+            baixar_tudo = 'reconcile'
+        bank_account = invoices.partner_bank_id or invoices.partner_bank_account_id
+        # pmt_communication = self._prepare_communication(invoices)
+
+        payment_type = 'inbound'# if move_line_id.debit else 'outbound'
+        payment_methods = \
+            payment_type == 'inbound' and \
+            journal_id.inbound_payment_method_ids or \
+            journal_id.outbound_payment_method_ids
+        payment_method_id = payment_methods and payment_methods[0] or False
+        vals = {
+            'journal_id': journal_id.id,
+            'payment_method_id': payment_method_id.id,
+            'payment_date': datetime.now(),
+            'communication': invoices.name,
+            'invoice_ids': [(6, 0, invoices.ids)],
+            'payment_type': payment_type,
+            'amount': valor,
+            'currency_id': journal_id.company_id.currency_id.id,
+            'partner_id': move_line_id.partner_id.id,
+            'partner_type': 'customer',
+            'partner_bank_account_id': bank_account.id,
+            'multi': False,
+            'payment_difference_handling': baixar_tudo,
+            'writeoff_label': 'importados'
+        }
+        Payment = dest.env['account.payment']        
+        pay = Payment.create(vals)
+        pay.post()
+
 a_ses = a_session.search([('id', '>',45), ('id', '<',50)], order = "id") #30 ao 40 
 def insere_pedido(sNova,sVelha):
     pedidos = a_pedido.search([('session_id', '=', sVelha)])
@@ -108,7 +145,7 @@ def insere_pedido(sNova,sVelha):
         #vals['lines'] = [(6, 0, list_adi)]          
         
         #  aqui aba pagamento 
-        #import pudb;pu.db      
+        import pudb;pu.db      
         list_pag = []
         for pag in ped.statement_ids :
             metodo_pag = dest.env['pos.payment.method'].search([('name', 'ilike', pag.journal_id.name[:2])])       
@@ -122,24 +159,36 @@ def insere_pedido(sNova,sVelha):
             }
             #import pudb;pu.db
             vLine = b_pedidoPag.create(vals_pag)
-        '''    
+  
         # mudando o status pra pago
-        b_pedidoPag.action_pos_order_paid()
-        
+        ped_id.action_pos_order_paid()
         
         # se a prazo criando a Fatura
         if metodo_pag == '4-':
-            b_pedidoPag.write({'to_invoice': True})
-            move_vals = b_pedidoPag._prepare_invoice_vals()
-            new_move = b_pedidoPag._create_invoice(move_vals)
-            b_pedidoPag.write({'account_move': new_move.id, 'state': 'invoiced'})
-            new_move.sudo().with_company(b_pedidoPag.company_id)._post()
+            vLine.write({'to_invoice': True})
+            move_vals = vLine._prepare_invoice_vals()
+            new_move = vLine._create_invoice(move_vals)
+            vLine.write({'account_move': new_move.id, 'state': 'invoiced'})
+            new_move.sudo().with_company(vLine.company_id)._post()
          
             # ver se esta paga
-            #if ped.invoice_id.state == 'paid':
-        '''        
-               
-        '''
+
+            # if ped.invoice_id.state == 'paid':
+            for ct in ped.invoice_id.receivable_move_line_ids:
+                if ct.reconciled:
+                    bancos = origem.env['account.journal'].search([
+                        ('type', 'in', ('cash', 'bank'))])
+                    aml = origem.env['account.move.line'].search([
+                        ('ref','=',ped.name),
+                        ('journal_id', 'in', bancos)
+                    ])
+                    for ml in aml:
+                        aml_id = origem.env['account.move.line'].browse(ml)
+                        jrn = dest.env['account.journal'].search([('name', 'ilike', ml.journal_id.name[:2])])
+                        jrn_id = dest.env['account.journal'].browse(jrn)
+                        baixa_pagamentos(new_move, jrn_id, 0, aml_id.debit, 0, 0)
+
+        """
         # aba informacao adicionais
         list_inf = []
         for inf in ped.pos.order :
@@ -155,7 +204,7 @@ def insere_pedido(sNova,sVelha):
         #vals['account_move'] = [(6, 0, list_inf)] 
 
         #b_pedidoPag.create(vals_inf)             
-        '''    
+        """   
         
 for ses in a_session.browse(a_ses): 
     #import pudb;pu.db

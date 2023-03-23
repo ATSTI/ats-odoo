@@ -122,7 +122,7 @@ def insere_pedido(sNova,sVelha):
             }
             #import pudb;pu.db
             vLine = b_pedidoPag.create(vals_pag)
-            
+        '''    
         # mudando o status pra pago
         b_pedidoPag.action_pos_order_paid()
         
@@ -137,7 +137,7 @@ def insere_pedido(sNova,sVelha):
          
             # ver se esta paga
             #if ped.invoice_id.state == 'paid':
-                
+        '''        
                
         '''
         # aba informacao adicionais

@@ -93,7 +93,7 @@ def baixa_pagamentos(move_line_id, journal_id, caixa, valor, cod_forma, juros):
         pay = Payment.create(vals)
         pay.post()
 
-a_ses = a_session.search([('id', '>',45), ('id', '<',50)], order = "id") #30 ao 40 
+a_ses = a_session.search([('id', '>',2213), ('id', '<',2215)], order = "id") #52 ao 55
 def insere_pedido(sNova,sVelha):
     pedidos = a_pedido.search([('session_id', '=', sVelha)])
     
@@ -111,7 +111,8 @@ def insere_pedido(sNova,sVelha):
 
         part = dest.env['res.partner'].search([('name', '=', ped.partner_id.name)])
         if len(part):
-            vals['partner_id'] = part[0]   
+            vals['partner_id'] = part[0]
+
         vals['amount_tax'] = ped.amount_total
         vals['amount_total'] = ped.amount_total
         vals['amount_paid'] = ped.amount_paid
@@ -145,7 +146,6 @@ def insere_pedido(sNova,sVelha):
         #vals['lines'] = [(6, 0, list_adi)]          
         
         #  aqui aba pagamento 
-        import pudb;pu.db      
         list_pag = []
         for pag in ped.statement_ids :
             metodo_pag = dest.env['pos.payment.method'].search([('name', 'ilike', pag.journal_id.name[:2])])       
@@ -161,15 +161,17 @@ def insere_pedido(sNova,sVelha):
             vLine = b_pedidoPag.create(vals_pag)
   
         # mudando o status pra pago
-        ped_id.action_pos_order_paid()
+        pd = b_pedido.browse([ped_id])
+        pd.action_pos_order_paid()
         
         # se a prazo criando a Fatura
         if metodo_pag == '4-':
-            vLine.write({'to_invoice': True})
-            move_vals = vLine._prepare_invoice_vals()
-            new_move = vLine._create_invoice(move_vals)
-            vLine.write({'account_move': new_move.id, 'state': 'invoiced'})
-            new_move.sudo().with_company(vLine.company_id)._post()
+            import pudb;pu.db
+            pd.write({'to_invoice': True})
+            move_vals = pd._prepare_invoice_vals()
+            new_move = pd._create_invoice(move_vals)
+            pd.write({'account_move': new_move.id, 'state': 'invoiced'})
+            new_move.sudo().with_company(pd.company_id)._post()
          
             # ver se esta paga
 

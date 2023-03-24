@@ -93,7 +93,7 @@ def baixa_pagamentos(move_line_id, journal_id, caixa, valor, cod_forma, juros):
         pay = Payment.create(vals)
         pay.post()
 
-a_ses = a_session.search([('id', '>',2213), ('id', '<',2215)], order = "id") #52 ao 55
+a_ses = a_session.search([('id', '>',2142), ('id', '<',2145)], order = "id") #52 ao 55 2213  2215
 def insere_pedido(sNova,sVelha):
     pedidos = a_pedido.search([('session_id', '=', sVelha)])
     

@@ -18,8 +18,8 @@ origem = odoorpc.ODOO('felicita.atsti.com.br', port=48069)
 #CONEXAO ODOO DESTINO
 # Prepare the connection to the server
 #odoo = odoorpc.ODOO('192.168.6.100', port=8069)
-#dest = odoorpc.ODOO('felicita14.atsti.com.br', port=48069)
-dest = odoorpc.ODOO('127.0.0.1', port=14069)
+dest = odoorpc.ODOO('felicita14.atsti.com.br', port=48069)
+#dest = odoorpc.ODOO('127.0.0.1', port=14069)
 # Login
 origem.login('felicita_atsti_com_br', 'ats@atsti.com.br', 'a2t00s7')
 dest.login('felicita14', 'ats@atsti.com.br', 'a2t00s7')
@@ -41,7 +41,7 @@ hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
 cadastra = 0
 #a_todos_cli = a_cliente.search([('id', '=',1671)])
 #a_todos_cli = a_cliente.search([], limit=50)
-a_todos_cli = a_cliente.search([('id', '>',100), ('id', '<',500)], order = "id")
+a_todos_cli = a_cliente.search([('id', '>',11499), ('id', '<',11800)], order = "id") # ultimo cliente Rosângela  Simioni  Alves
 #import pudb;pu.db
 #a_todos_cli = a_cliente.search([('name', '=', cli.name)])
 for cli in a_cliente.browse(a_todos_cli): 

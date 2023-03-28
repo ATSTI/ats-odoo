@@ -58,13 +58,13 @@ cadastra = 0
 
 def baixa_pagamentos(move_line_id, journal_id, caixa, valor, cod_forma, juros):
     if journal_id:
-        invoices = move_line_id.invoice_id
+        invoices = move_line_id
         # amount = self._compute_payment_amount(invoices=invoices) if self.multi else self.amount
         if move_line_id.amount_residual > valor or ((move_line_id.amount_residual - valor) > 0.01):
             baixar_tudo = 'open'
         else:
             baixar_tudo = 'reconcile'
-        bank_account = invoices[0].partner_bank_id or self.partner_bank_account_id
+        bank_account = invoices.partner_bank_id or invoices.partner_bank_account_id
         # pmt_communication = self._prepare_communication(invoices)
 
         payment_type = 'inbound'# if move_line_id.debit else 'outbound'
@@ -73,15 +73,6 @@ def baixa_pagamentos(move_line_id, journal_id, caixa, valor, cod_forma, juros):
             journal_id.inbound_payment_method_ids or \
             journal_id.outbound_payment_method_ids
         payment_method_id = payment_methods and payment_methods[0] or False
-        conta_juros = ''
-        juros_desc = ''
-        if juros:
-            cc = self.env['account.account'].search([
-                    ('name', 'ilike', 'Juros Recebidos'),
-                    ('company_id', '=', journal_id.company_id.id),
-            ])
-            conta_juros = cc.id
-            juros_desc = 'Juros recebido %s - %s' %(move_line_id.partner_id.name, move_line_id.name or '')
         vals = {
             'journal_id': journal_id.id,
             'payment_method_id': payment_method_id.id,
@@ -89,21 +80,20 @@ def baixa_pagamentos(move_line_id, journal_id, caixa, valor, cod_forma, juros):
             'communication': invoices.name,
             'invoice_ids': [(6, 0, invoices.ids)],
             'payment_type': payment_type,
-            'amount': valor+juros,
+            'amount': valor,
             'currency_id': journal_id.company_id.currency_id.id,
             'partner_id': move_line_id.partner_id.id,
             'partner_type': 'customer',
             'partner_bank_account_id': bank_account.id,
             'multi': False,
             'payment_difference_handling': baixar_tudo,
-            'writeoff_account_id': conta_juros,
-            'writeoff_label': juros_desc
+            'writeoff_label': 'importados'
         }
-        Payment = self.env['account.payment']        
+        Payment = dest.env['account.payment']        
         pay = Payment.create(vals)
         pay.post()
 
-a_ses = a_session.search([('id', '>',45), ('id', '<',50)], order = "id") #30 ao 40 
+a_ses = a_session.search([('id', '>',2142), ('id', '<',2145)], order = "id") #52 ao 55 2213  2215
 def insere_pedido(sNova,sVelha):
     pedidos = a_pedido.search([('session_id', '=', sVelha)])
     
@@ -121,7 +111,8 @@ def insere_pedido(sNova,sVelha):
 
         part = dest.env['res.partner'].search([('name', '=', ped.partner_id.name)])
         if len(part):
-            vals['partner_id'] = part[0]   
+            vals['partner_id'] = part[0]
+
         vals['amount_tax'] = ped.amount_total
         vals['amount_total'] = ped.amount_total
         vals['amount_paid'] = ped.amount_paid
@@ -155,7 +146,6 @@ def insere_pedido(sNova,sVelha):
         #vals['lines'] = [(6, 0, list_adi)]          
         
         #  aqui aba pagamento 
-        #import pudb;pu.db      
         list_pag = []
         for pag in ped.statement_ids :
             metodo_pag = dest.env['pos.payment.method'].search([('name', 'ilike', pag.journal_id.name[:2])])       
@@ -169,19 +159,22 @@ def insere_pedido(sNova,sVelha):
             }
             #import pudb;pu.db
             vLine = b_pedidoPag.create(vals_pag)
-            
+  
         # mudando o status pra pago
-        ped_id.action_pos_order_paid()
+        pd = b_pedido.browse([ped_id])
+        pd.action_pos_order_paid()
         
         # se a prazo criando a Fatura
         if metodo_pag == '4-':
-            vLine.write({'to_invoice': True})
-            move_vals = vLine._prepare_invoice_vals()
-            new_move = vLine._create_invoice(move_vals)
-            vLine.write({'account_move': new_move.id, 'state': 'invoiced'})
-            new_move.sudo().with_company(vLine.company_id)._post()
+            import pudb;pu.db
+            pd.write({'to_invoice': True})
+            move_vals = pd._prepare_invoice_vals()
+            new_move = pd._create_invoice(move_vals)
+            pd.write({'account_move': new_move.id, 'state': 'invoiced'})
+            new_move.sudo().with_company(pd.company_id)._post()
          
             # ver se esta paga
+
             # if ped.invoice_id.state == 'paid':
             for ct in ped.invoice_id.receivable_move_line_ids:
                 if ct.reconciled:
@@ -191,11 +184,13 @@ def insere_pedido(sNova,sVelha):
                         ('ref','=',ped.name),
                         ('journal_id', 'in', bancos)
                     ])
-                    for l in aml:
-                        aml_id = origem.env['account.move.line'].browse(l)
-                        baixa_pagamentos(new_move, l.journal_id, 0, aml_id.debit, 0, 0)
-               
-        '''
+                    for ml in aml:
+                        aml_id = origem.env['account.move.line'].browse(ml)
+                        jrn = dest.env['account.journal'].search([('name', 'ilike', ml.journal_id.name[:2])])
+                        jrn_id = dest.env['account.journal'].browse(jrn)
+                        baixa_pagamentos(new_move, jrn_id, 0, aml_id.debit, 0, 0)
+
+        """
         # aba informacao adicionais
         list_inf = []
         for inf in ped.pos.order :
@@ -211,7 +206,7 @@ def insere_pedido(sNova,sVelha):
         #vals['account_move'] = [(6, 0, list_inf)] 
 
         #b_pedidoPag.create(vals_inf)             
-        '''    
+        """   
         
 for ses in a_session.browse(a_ses): 
     #import pudb;pu.db

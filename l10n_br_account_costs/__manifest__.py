@@ -8,7 +8,7 @@
     "author": "ATSTi, ",
     "website": "",
     "version": "14.0.1.0.0",
-    "depends": ["l10n_br_fiscal", "l10n_br_sale", "l10n_br_account"],
+    "depends": ["l10n_br_fiscal", "l10n_br_sale", "l10n_br_account", "l10n_br_purchase"],
     "data": [
         # Data
         # "data/company.xml",

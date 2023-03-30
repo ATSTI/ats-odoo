@@ -75,12 +75,13 @@
                 </field>
                 <field name="partner_id" position="after">
                     <field name="vehicle_id" domain="[('partner_id', '=', partner_id)]" context="{'default_partner_id': partner_id}" />
+                    <field name="quilometragem"/>
                     <field name="date_repair"/>
                     <field name="currency_id" invisible="1"/>
                     <label for="contas_pendentes" />
                     <div class="o_row" >
                         <field name="contas_pendentes" style="color:Orange;" class="oe_inline" widget='monetary' options="{'currency_field': 'currency_id'}" attrs="{'invisible': [('contas_pendentes', '=', 0.0)]}" readonly="1" />
-                        <button name="action_open_invoice" type="object" attrs="{'invisible': [('contas_pendentes', '=', 0.0)]}" icon="fa-external-link" />
+                        <button name="action_open_invoice" type="object" icon="fa-external-link" />
                     </div>
                 </field>
                 <xpath expr="//form/sheet/notebook/page" position="replace">
@@ -165,8 +166,11 @@
             <field name="model">repair.order</field>
             <field name="inherit_id" ref="repair.view_repair_kanban" />
             <field name="arch" type="xml">
+                <kanban position="attributes" >
+                    <attribute name="group_create">false</attribute>
+                </kanban>
                 <field name="name" position='after'>
-                    <field name="stage_id" />
+                    <field name="stage_id" readonly="1"/>
                 </field>
                 <field name="name" position='after'>
                     <field name="vehicle_id" />

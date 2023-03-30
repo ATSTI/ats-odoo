@@ -37,6 +37,8 @@ class Repair(models.Model):
         'repair.vehicle', string='Veículo',
     )
 
+    quilometragem = fields.Char('Quilometragem')
+
     contas_pendentes = fields.Monetary('Faturas')
 
     currency_id = fields.Many2one(

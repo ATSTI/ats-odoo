@@ -143,6 +143,17 @@ class Repair(models.Model):
             "partner_id": self.partner_id.id,
         }
         sale = self.env["sale.order"].create(vals)
+        sale.onchange_partner_id()
+        if not sale.fiscal_position_id:
+            fiscal_id = self.env['account.fiscal.position'].with_context(force_company=self.company_id.id).get_fiscal_position(self.partner_id.id, self.partner_id.id)
+            if not fiscal_id:
+                fiscal_id = self.env['account.fiscal.position'].search([
+                    ('fiscal_type','=', 'saida'),
+                    ('auto_apply', '=', True),
+                ], limit=1)
+            if fiscal_id:
+                sale.write({'fiscal_position_id': fiscal_id.id})
+
         lista = quotations.ids
         lista.append(sale.id)    
         self.sale_ids = [(6, 0, lista)]

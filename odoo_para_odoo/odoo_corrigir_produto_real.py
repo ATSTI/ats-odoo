@@ -17,11 +17,11 @@ origem = odoorpc.ODOO('felicita.atsti.com.br', port=48069)
 #CONEXAO ODOO DESTINO
 # Prepare the connection to the server
 #odoo = odoorpc.ODOO('192.168.6.100', port=8069)
-#dest = odoorpc.ODOO('127.0.0.1', port=14069)
-dest = odoorpc.ODOO('felicita14.atsti.com.br', port=48069)
+dest = odoorpc.ODOO('127.0.0.1', port=14069)
+#dest = odoorpc.ODOO('felicita14.atsti.com.br', port=48069)
 # Login
 origem.login('felicita_atsti_com_br', 'ats@atsti.com.br', 'a2t00s7')
-dest.login('felicita14', 'ats@atsti.com.br', 'a2t00s7')
+dest.login('felicita1', 'ats@atsti.com.br', 'a2t00s7')
 
 # odoo_user = odoo.env['res.users']
 

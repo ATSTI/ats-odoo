@@ -19,11 +19,11 @@ origem = odoorpc.ODOO('felicita.atsti.com.br', port=48069)
 #CONEXAO ODOO DESTINO
 # Prepare the connection to the server
 #odoo = odoorpc.ODOO('192.168.6.100', port=8069)
-#dest = odoorpc.ODOO('felicita14.atsti.com.br', port=48069)
-dest = odoorpc.ODOO('127.0.0.1', port=14069)
+dest = odoorpc.ODOO('felicita14.atsti.com.br', port=48069)
+#dest = odoorpc.ODOO('127.0.0.1', port=14069)
 # Login
 origem.login('felicita_atsti_com_br', 'ats@atsti.com.br', 'a2t00s7')
-dest.login('felicita', 'ats@atsti.com.br', 'a2t00s7')
+dest.login('felicita14', 'ats@atsti.com.br', 'a2t00s7')
 
 # odoo_user = odoo.env['res.users']
 
@@ -92,8 +92,8 @@ def baixa_pagamentos(move_line_id, journal_id, caixa, valor, cod_forma, juros):
         Payment = dest.env['account.payment']        
         pay = Payment.create(vals)
         pay.post()
-
-a_ses = a_session.search([('id', '>',2142), ('id', '<',2145)], order = "id") #52 ao 55 2213  2215
+ses_num = 466
+a_ses = a_session.search([('id', '>',ses_num-1), ('id', '<',ses_num+1)], order = "id") #feito hj 29 ate o 463
 def insere_pedido(sNova,sVelha):
     pedidos = a_pedido.search([('session_id', '=', sVelha)])
     
@@ -124,6 +124,8 @@ def insere_pedido(sNova,sVelha):
         list_adi = []
         for line in ped.lines:
             prod = dest.env['product.product'].search([('default_code', 'ilike', line.product_id.default_code)])
+            if not prod:
+                prod = dest.env['product.product'].search([('name', '=', line.product_id.name)]) 
             vals_iten = {
                 #"id" : line.id,
                 "name": line.name,
@@ -221,7 +223,8 @@ for ses in a_session.browse(a_ses):
     vals = {}
     
     user = a_user.search([('name', '=', ses.user_id.name)])
-    
+
+    #if ses.stop_at:
     vals['user_id'] = user[0]
     vals['name'] = ses.name
     vals['config_id'] = ses.config_id.id
@@ -229,6 +232,14 @@ for ses in a_session.browse(a_ses):
     vals['stop_at'] = datetime.strftime(ses.stop_at,'%Y-%m-%d')
     vals['state'] = 'closed'    
     
+    '''
+    if ses.stop_at == False:
+        vals['user_id'] = user[0]
+        vals['name'] = ses.name
+        vals['config_id'] = ses.config_id.id
+        vals['start_at'] = datetime.strftime(ses.start_at,'%Y-%m-%d')
+        vals['state'] = 'opened'
+    '''
 
     pSession_id = b_session.create(vals)
     insere_pedido(pSession_id,ses.id)   

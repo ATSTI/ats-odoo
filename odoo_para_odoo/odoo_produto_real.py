@@ -17,8 +17,8 @@ origem = odoorpc.ODOO('felicita.atsti.com.br', port=48069)
 #CONEXAO ODOO DESTINO
 # Prepare the connection to the server
 #odoo = odoorpc.ODOO('192.168.6.100', port=8069)
-#dest = odoorpc.ODOO('127.0.0.1', port=59069)
-dest = odoorpc.ODOO('felicita14.atsti.com.br', port=49069)
+#dest = odoorpc.ODOO('127.0.0.1', port=14069)
+dest = odoorpc.ODOO('felicita14.atsti.com.br', port=48069)
 # Login
 origem.login('felicita_atsti_com_br', 'ats@atsti.com.br', 'a2t00s7')
 dest.login('felicita14', 'ats@atsti.com.br', 'a2t00s7')
@@ -46,12 +46,12 @@ b_cat = dest.env['product.category']
 
 
 #import pudb;pu.db
-prd_ids = a_prod.search([('id', '>', 30000), ('id', '<', 40000)], order = "default_code" )
+prd_ids = a_prod.search([('default_code', '=', 2317495)])
 #prd_ids = a_prod.search([], limit=10,order=prd)
 cadastra = 0
 for prd in a_prod.browse(prd_ids):
-    #prod_id = b_prod.search([('name', '=', prd.name)])
-    prod_id = b_prod.search([('default_code', '=', prd.default_code)]) 
+    prod_id = b_prod.search([('name', '=', prd.name)])
+    #prod_id = b_prod.search([('default_code', '=', prd.default_code)]) 
     #print ('Codigo : %s , Produto : %s.' % (prd.id, prd.name))
     
     if not prod_id:

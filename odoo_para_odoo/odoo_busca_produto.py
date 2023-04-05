@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import odoorpc
-# import fiscal
 import re
 from datetime import datetime
 from datetime import date
@@ -17,11 +16,11 @@ origem = odoorpc.ODOO('felicita.atsti.com.br', port=48069)
 #CONEXAO ODOO DESTINO
 # Prepare the connection to the server
 #odoo = odoorpc.ODOO('192.168.6.100', port=8069)
-#dest = odoorpc.ODOO('felicita14.atsti.com.br', port=48069)
-dest = odoorpc.ODOO('127.0.0.1', port=14069)
+#dest = odoorpc.ODOO('127.0.0.1', port=14069)
+dest = odoorpc.ODOO('felicita14.atsti.com.br', port=48069)
 # Login
 origem.login('felicita_atsti_com_br', 'ats@atsti.com.br', 'a2t00s7')
-dest.login('felicita1', 'ats@atsti.com.br', 'a2t00s7')
+dest.login('felicita14', 'ats@atsti.com.br', 'a2t00s7')
 
 # odoo_user = odoo.env['res.users']
 
@@ -46,15 +45,15 @@ b_cat = dest.env['product.category']
 
 
 #import pudb;pu.db
-#prd_ids = a_prod.search([('active', '=', False)])
-#prd_ids = a_prod.search([], offset=0,limit=150, order = "default_code")
+prd_ids = a_prod.search([('barcode', '=', 31301404)])
 #prd_ids = a_prod.search([], limit=10,order=prd)
-prd_ids = a_prod.search([('id', '>',29600), ('id', '<', 29800)], order = "default_code" )
-cadastra = 0
+
 for prd in a_prod.browse(prd_ids):
-    prod_id = b_prod.search([('name', '=', prd.name)])
-    #print ('Codigo : %s , Produto : %s.' % (prd.id, prd.name))
+    prod_id = a_prod.search([('name', '=', prd.name)])
+    #prod_id = b_prod.search([('default_code', '=', prd.default_code)]) 
+    print ('Codigo : %s , Produto : %s.' % (prd.id, prd.name))
     
+'''    
     if not prod_id:
         prod_odoo = {}            
         cadastra += 1   
@@ -72,10 +71,9 @@ for prd in a_prod.browse(prd_ids):
         prod_odoo['barcode'] = prd.barcode
         prod_odoo['type'] = prd.type
         prod_odoo['fiscal_type'] = '00'
-        #prod_odoo['fiscal_category_id'] =  1 
         prod_odoo['margin'] = prd.margin  
         prod_odoo['qtde_atacado'] = prd.qtde_atacado
-        prod_odoo['preco_atacado'] = prd.preco_atacado  
+        prod_odoo['preco_atacado'] = prd.preco_atacado             
         prod_odoo['icms_origin'] = prd.origin
         prod_odoo['invoice_policy'] = 'order'
         
@@ -100,8 +98,7 @@ for prd in a_prod.browse(prd_ids):
         prod_odoo['lst_price'] = prd.lst_price
         prod_odoo['standard_price'] = prd.standard_price       
         
-        #print ('Categoria :%s , Produto : %s.' % (prd.categ_id.name, prd.name))
-        print ('Codigo : %s ,Categoria :%s , Produto : %s.' % (prd.categ_id.id,prd.categ_id.name, prd.name))
+        print ('Categoria :%s , Produto : %s.' % (prd.categ_id.name, prd.name))
         # Descomentar se quiser inserir o produto
         id_prod = b_prod.create(prod_odoo)
   
@@ -109,5 +106,5 @@ if cadastra > 0:
     print ('Cadastrado %s produtos' % (str(cadastra)))
 else:
     print ('Nenhum cadastro PRODUTO a ser feito.')
-
+'''
 

@@ -20,11 +20,11 @@
 ##############################################################################
 
 {
-    'name': 'Relatorios Claudio',
+    'name': 'Relatorio de Recibos',
     'version': '1.0',
     'category': 'Others',
     'sequence': 2,
-    'summary': 'relatorios personalizados',
+    'summary': 'relatorios recibos',
     'description': """
     """,
     'author': 'ATS Soluções',

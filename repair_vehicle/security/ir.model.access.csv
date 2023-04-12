@@ -1,3 +1,0 @@
-"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
-"repair_vehicle_stage","Reparo de Veiculos","model_repair_stage","stock.group_stock_user",1,1,1,0
-"repair_vehicle","Cadastro do Veiculos","model_repair_vehicle","stock.group_stock_user",1,1,1,0

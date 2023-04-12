@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <report 
+            string="Relatorio" 
+            id="action_report_contas_pr" 
+            model="account.move.line" 
+            report_type="qweb-pdf"
+            name="contas_receber.report_contaspr" 
+            file="contas_receber.report_contaspr" 
+        />
+
+</odoo>

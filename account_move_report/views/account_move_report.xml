@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<odoo>
+    <!-- Form view Action for Account Move Report -->
+    <record id="action_account_move_report_view" model="ir.actions.act_window">
+        <field name="type">ir.actions.act_window</field>
+        <field name="name">Contas a Pagar</field>
+        <field name="res_model">account.move.report</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_type">form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Create the first milestone</p>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="action_account_move_report_tree">
+        <field name="name">Contas a Pagar</field>
+        <field name="model">account.move.report</field>
+        <field name="arch" type="xml">
+            <tree string="Relatório Contas a Pagar" create="false">
+                <field name="fornecedor"/>
+                <field name="fatura" />
+                <field name="lancamento" />
+                <field name="date" />
+                <field name="data_vcto" />
+                <field name="data_pagto" />
+                <field name="forma_pagto" />
+                <field name="vlr_fatura" />
+                <field name="saldo" />
+                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_account_move_report_search">
+        <field name="name">account.move.report.search</field>
+        <field name="model">account.move.report</field>
+        <field name="arch" type="xml">
+            <search string="Procura Contas a Pagar">
+                <filter string="Em aberto" domain="[('saldo','>', 0.0)]" />
+                <filter string="Pago" domain="[('saldo','=', 0.0)]" />
+                <filter string="Company" groups="base.group_multi_company" context="{'group_by':'company_id'}"/>
+                <field name="partner_id" string="Parceiro"/>
+                <group expand="0" string="Extended Filters">
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </group>
+
+                <group expand="0" string="Group By...">
+                    <filter string="Parceiro" domain="[]" context="{'group_by':'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Menu item for Project Milestone Invoicing-->
+    <menuitem name="Rel. Contas a Pagar"
+              action="action_account_move_report_view" id="menu_account_move_report_act" parent="account.menu_finance_reports" sequence="4"/>
+
+
+</odoo>

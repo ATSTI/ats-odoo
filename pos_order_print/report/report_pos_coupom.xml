@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+            id="report_pos_cupom"
+            string="Imprimir cupom fiscal"
+            model="pos.order"
+            report_type="qweb-pdf"
+            file="pos_order_print.report_pos_cupom_main"
+            name="pos_order_print.report_pos_cupom_main"
+        />
+    </data>
+</odoo>

@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<odoo>
+    <!-- Form view Action for Account Move Report -->
+    <record id="action_account_move_report_rec_view" model="ir.actions.act_window">
+        <field name="type">ir.actions.act_window</field>
+        <field name="name">Contas a Receber</field>
+        <field name="res_model">account.move.report.rec</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_type">form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Create the first milestone</p>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="action_account_move_report_rec_tree">
+        <field name="name">Contas a Pagar</field>
+        <field name="model">account.move.report.rec</field>
+        <field name="arch" type="xml">
+            <tree string="Relatório Contas a Receber" create="false">
+                <field name='cliente'/>
+                <field name='fatura' />
+                <field name='lancamento' />
+                <field name='date' />
+                <field name='data_vcto' />
+                <field name='data_pagto' />
+                <field name='forma_pagto' />
+                <field name='vlr_fatura' />
+                <field name='saldo' />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Menu item for Project Milestone Invoicing-->
+    <menuitem name="Rel. Contas a Receber"
+              action="action_account_move_report_rec_view" id="menu_account_move_report_rec_act" parent="account.menu_finance_reports" sequence="5"/>
+
+
+</odoo>

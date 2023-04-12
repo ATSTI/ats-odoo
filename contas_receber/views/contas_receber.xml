@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<odoo>
+
+ <record model="ir.ui.view" id="contas_receber_view_tree">
+        <field name="name">ContasReceberTree</field>
+        <field name="model">contas.receber</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="invoice_id"/>
+                <field name="name"/>
+                <field name="valor_titulo"/>
+                <field name="forma_pagamento"/>
+                <field name="valor_recebido"/>
+                <field name="data_recebido"/>
+                <field name="caixa_recebeu"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id='contas_receber_view_form' model='ir.ui.view'>
+        <field name="name">ContasReceberForm</field>
+        <field name="model">contas.receber</field>
+        <field name="arch" type="xml">
+            <form string="Model">
+                <group>
+                    <field name="invoice_id"/>
+                </group>
+                <group>
+                    <group>
+                        <field name="name"/>
+                        <field name="caixa_recebeu"/>
+                        <field name="valor_titulo"/>
+                    </group>
+                    <group>
+                        <field name="forma_pagamento"/>
+                        <field name="valor_recebido"/>
+                        <field name="valor_recebido"/>
+                    </group>
+                </group>
+            </form>
+        </field>
+    </record>
+
+</odoo>

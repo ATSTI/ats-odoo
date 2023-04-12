@@ -37,8 +37,8 @@
         'purchase','product_sale_margin'
     ],
     'data': [
-        'views/purchase_itens_view.xml',
         'views/purchase_views.xml',
+        'views/purchase_itens_view.xml',
     ],
     'demo': [],
     'installable': True,

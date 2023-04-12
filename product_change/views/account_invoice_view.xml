@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sped_einvoice_invoice_form" model="ir.ui.view">
+        <field name="name">sped_einvoice_invoice_form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="br_account.view_br_account_invoice_form"/>
+        <field name="arch" type="xml">
+            <field name="service_serie_id" position="after">
+                <field name="fiscal_position_type" />
+            </field>
+        </field>
+    </record>
+
+</odoo>

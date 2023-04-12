@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<template id="report_contasreceber_document">
+    <tr style="border:1px solid lightgray">
+        <td width="50%"><span t-field="o.cliente"/></td>
+        <td width="15%"><span t-field="o.fatura"/></td>
+        <td width="15%"><span t-field="o.forma_pagto"/></td>
+        <td width="10%"><span t-field="o.data_pagto"/></td>
+        <td width="10%" align="right"><span t-field="o.vlr_fatura" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.company_id.currency_id}"/></td>
+        <td width="10%" align="right"><span t-field="o.saldo" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.company_id.currency_id}"/></td>        
+        
+    </tr>
+    <tr><td colspan="5"><span t-field="o.lancamento"/></td></tr>   
+</template>
+
+
+<template id="report_contasreceber">
+    <t t-call="report.html_container">
+       <t t-call="report.external_layout">        
+           <div class="page">
+               <h2 align="center">Posição de Contas a Receber por Vencimento</h2>
+               <t t-set="vcto" t-value="[]"/>
+               <t t-set="vc" t-value="2010-01-01"/>
+               <t t-set="inicio" t-value="S"/>
+               <t t-set="tot" t-value="0.0"/>
+               <t t-set="totsld" t-value="0.0"/>
+               <table class="table table-condensed" width="90%" style="border:1px solid lightgray">
+                  <tbody>
+                      <t t-foreach="docs.sorted(key=lambda r: r.dias)" t-as="o">
+                          <t t-if="vc != o.data_vcto">
+                            <t t-if="inicio != 'S'">
+                              <t t-if="tot > 0.0">
+                                <t t-set="inicio" t-value="S"/>                     
+                                <tr style="border:1px solid lightgray">
+                                  <td align="right" colspan="6">
+                                      ________________________
+                                  </td>
+                                </tr>
+                                <tr style="border:1px solid lightgray">
+                                  <td align="right" colspan="5">
+                                      Total - <span t-esc="tot" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.company_id.currency_id}"/>
+                                  </td>
+                                  <td align="right" colspan="1">
+                                      <span t-esc="totsld" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.company_id.currency_id}"/>
+                                  </td>                                  
+                                </tr>
+                              </t>
+                            </t>
+                          </t>
+                          <t t-set="tot" t-value="tot + o.vlr_fatura"/>
+                          <t t-set="totsld" t-value="totsld + o.saldo"/>
+                          <t t-if="vc != o.data_vcto">
+                              <t t-set="vc" t-value="o.data_vcto"/>
+                              <t t-set="tot" t-value="o.vlr_fatura"/>
+                              <t t-set="totsld" t-value="o.saldo"/>
+                              <t t-set="inicio" t-value="N"/>
+                              <tr style="border:1px solid lightgray">
+                                  <td align="center" colspan="6" bgcolor="#B0C4DE">
+                                      Data Vencimento <span t-field="o.data_vcto" />
+                                  </td>
+                              </tr>
+                            <tr bgcolor="#D3D3D3">
+                               <th><strong>Cliente/Lançamento</strong></th>
+                               <th><strong>Duplicata</strong></th>
+                               <th><strong>F. Rec.</strong></th>
+                               <th><strong>Data rec.</strong></th>
+                               <th class="text-right"><strong>Valor</strong></th>
+                               <th class="text-right"><strong>Saldo</strong></th>
+                            </tr>                              
+                          </t>
+                          <t t-call="account_move_report.report_contasreceber_document"/>                          
+                          
+                      </t>
+                                <tr style="border:1px solid lightgray">
+                                  <td align="right" colspan="5">
+                                      Total - <span t-esc="tot" />
+                                  </td>
+                                  <td align="right" colspan="1">
+                                       <span t-esc="totsld" />
+                                  </td>                                  
+                                </tr>
+                      
+                   </tbody>
+               </table>
+           </div>
+       </t> 
+    </t>
+</template>
+</odoo>

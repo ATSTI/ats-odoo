@@ -1,2 +1,2 @@
-from . import purchase
-from . import purchase_itens
+import purchase
+import purchase_itens

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<template id="report_pos_coupon_main_document">
+      <t t-set="doc" t-value="doc.with_context({'lang':'pt_br'})" />
+        <div class="page">
+            <h6 style="text-align:center"><span t-esc="doc.date_order"/> <span t-esc="pos_reference"/> </h6>
+            <div class="oe_structure" />
+            <br/>
+            <br/>
+            <span t-esc="doc.company_id.name"/>
+            <br/>
+            Telefone: <span t-esc="doc.company_id.phone"/>
+            <br/>
+            Vendedor: <span t-esc="doc.user_id.name"/>
+            <br/>
+            <br/>
+            <t t-set="sub" t-value="0"/>
+            <t t-foreach="doc.lines" t-as="l">
+                <span t-esc="l.product_id.name"/> <span t-esc="l.qty"/> R$ <span t-esc="formatLang(l.qty*l.price_unit,digits=2)"/>
+                <t t-set="sub" t-value="sub + (l.qty * l.qty*l.price_unit) "/>
+                <br/>
+            </t>
+            <br/>
+            <br/>
+            <h4>Subtotal: </h4> R$<span t-esc="formatLang(sub,digits=2)"/>
+            <br/>
+            <h4>Desconto: </h4> R$<span t-esc="formatLang(sub - doc.amount_total,digits=2)"/>
+            <br/>
+            <h3>Total: </h3> R$<span t-esc="formatLang(doc.amount_total, digits=2)"/>
+            <br/>
+            <br/>
+            <t t-foreach="doc.statement_ids" t-as="d">
+                <span t-esc="d.journal_id.name"/> <span t-esc="d.journal_currency_id.name"/> R$<span t-esc="formatLang(d.amount,digits=2)"/>
+                <br/>
+            </t>
+            <br/>
+            Troco: R$<span t-esc="formatLang(doc.amount_return,digits=2)"/>
+            <div class="oe_structure"/>
+        </div>
+</template>
+
+
+<template id="report_pos_coupon_main">
+    <t t-call="report.html_container">
+        <t t-foreach="docs" t-as="doc">
+            <t t-call="felicita_templates.report_pos_coupon_main_document" t-lang="pt_br"/>
+        </t>
+    </t>
+</template>
+</odoo>

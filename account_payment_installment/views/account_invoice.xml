@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="view_br_account_payment_installment_supplier_form" model="ir.ui.view">
+        <field name="name">view.br_account_payment.installment.supplier.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="br_account.view_br_account_invoice_supplier_form"/>
+        <field name="arch" type="xml">
+            <page name="vencimentos" position="replace">
+                <page name="vencimentos" string="Vencimentos">
+                    <field nolabel="1" name="payable_move_line_ids">
+                        <tree name="vencimentos" editable="bottom" string="Vencimentos" colors="grey:reconciled==True;red:date_maturity&lt;current_date">
+                            <field name="date_maturity"/>
+                            <field name="name"/>
+                            <field name="ref"/>
+                            <field name="debit"/>
+                            <field name="credit"/>
+                            <field name="reconciled" string="Pago" />
+                            <button name="action_payment_installment" type="object" string="Editar Parcelas" groups="account.group_account_invoice" icon="fa-pencil-square-o"/>
+                        </tree>
+                    </field>
+                </page>
+            </page>
+
+
+        </field>
+    </record>
+
+    <record id="view_move_installment_form" model="ir.ui.view">
+        <field name="name">account.move.installment.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/notebook/page/field/tree" position="inside">
+                <field name="date_maturity"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

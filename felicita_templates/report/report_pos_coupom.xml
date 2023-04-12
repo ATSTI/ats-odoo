@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+            id="report_pos_coupom"
+            string="Imprimir coupom fiscal"
+            model="felicita.templates"
+            report_type="qweb-pdf"
+            file="felicita_templates.report_pos_coupom_main"
+            name="felicita_templates.report_pos_coupom_main"
+        />
+    </data>
+</odoo>

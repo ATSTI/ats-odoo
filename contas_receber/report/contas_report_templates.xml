@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<template id="report_contaspr">
+    <t t-call="report.html_container">
+        <div class="page">
+             <h2>Relatório Contas</h2>
+            <div style="overflow-x:auto;">
+            <table style="border: 1px solid black;" width="90%">
+                <tr>
+                        <th width="35%" align="left" style="border: 1px solid #000;"><strong>Fornecedor/Cliente</strong></th>
+                        <th width="20%" align="left" style="border: 1px solid #000;"><strong>Nota Fiscal/Fatura</strong></th>
+                        <th width="10%" align="left" style="border: 1px solid #000;"><strong>Conta</strong></th>
+                        <th width="15%" align="left" style="border: 1px solid #000;"><strong>Vencimento</strong></th>
+                        <th width="5%" align="left" style="border: 1px solid #000;"><strong>Parcela</strong></th>
+                        <th width="15%" align="right" style="border: 1px solid #000;"><strong>Valor</strong></th>
+                </tr>
+                <t t-set="total" t-value="0.0"/>
+                <t t-foreach="docs" t-as="ln">
+                    <t t-if="ln.debit == 0">
+                        <t t-set="total" t-value="total + ln.credit"/>
+                    </t>
+                    <t t-if="ln.credit == 0">
+                        <t t-set="total" t-value="total + ln.debit"/>
+                    </t>                    
+                    <tr style="background-color: #f2f2f2;">
+                        <td width="35%" class="text-left" style="border: 1px solid #000;">
+                            <span t-field="ln.partner_id.name"/>
+                        </td>
+                        <td width="20%" class="text-left" style="border: 1px solid #000;">
+                            <t t-if="ln.invoice_id.vendor_number">
+                               <span t-field="ln.invoice_id.vendor_number"/>
+                            </t>
+                            <t t-if="not ln.invoice_id.vendor_number">
+                               <span t-field="ln.invoice_id.number"/>
+                            </t>
+                        </td>
+                        <td width="10%" class="text-left" style="border: 1px solid #000;">
+                            <span t-field="ln.date_maturity"/>
+                        </td>
+                        <td width="15%" class="text-left" style="border: 1px solid #000;">
+                            <t t-if="ln.invoice_id.account_id.id != 72">
+                                Cheque
+                            </t>
+                        </td>
+                        <td width="5%" class="text-left" style="border: 1px solid #000;">
+                            <span t-field="ln.name"/>
+                        </td>
+                        <td width="15%" align="right" style="border: 1px solid #000;">
+                            <t t-if="ln.debit == 0">
+                               <span t-field="ln.credit" t-field-options='{"widget": "float", "precision":2}'/>
+                            </t>
+                            <t t-if="ln.credit == 0">
+                               <span t-field="ln.debit" t-field-options='{"widget": "float", "precision":2}'/>
+                            </t>                            
+                        </td>
+                    </tr>
+                </t>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td align="right">Total Geral</td>
+                    <td></td>
+                    <td align="right">
+                        <span t-esc="'{0:,.2f}'.format(total).replace(',', '.')"/>
+                    </td>
+                </tr>
+            </table>
+            </div>
+       </div>
+    </t>
+</template>
+</odoo>
+    

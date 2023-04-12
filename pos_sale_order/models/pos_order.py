@@ -23,13 +23,13 @@ class PosSession(models.Model):
     periodo_integracao = fields.Integer(string='Periodo Integração', default=1)
     integracao_andamento = fields.Datetime(string='Data Integracao', default=fields.Datetime.now)
     
-    #@api.multi
-    #def action_pos_session_closing_control(self):
-    #    if self.venda_finalizada:
-    #        super(PosSession, self).action_pos_session_closing_control()
-    #    else:
-    #        raise UserError(
-    #                'Encerre o Caixa no PDV.')
+    @api.multi
+    def action_pos_session_closing_control(self):
+        if self.venda_finalizada:
+            super(PosSession, self).action_pos_session_closing_control()
+        else:
+            raise UserError(
+                    u'Encerre o Caixa no PDV.')
 
     def cron_integra_caixas(self):
         session_ids = self.env['pos.session'].search([
@@ -58,10 +58,10 @@ class PosSession(models.Model):
         for usr in user_ids:
             sqlp = 'SELECT CODUSUARIO FROM USUARIO where CODUSUARIO = %s' %(str(usr.id))
             usrq = db.query(sqlp)
+            barcode = ''
+            if usr.barcode:
+                barcode = usr.barcode
             if not len(usrq):
-                barcode = ''
-                if usr.barcode:
-                    barcode = usr.barcode
                 #log = 'Cadastrando Usuario novo : %s\n' %(usr.name.encode('ascii', 'ignore').decode('ascii'))
                 #arq.write(log)
                 insere = 'INSERT INTO USUARIO (CODUSUARIO, NOMEUSUARIO, '
@@ -74,6 +74,17 @@ class PosSession(models.Model):
                 insere += ',\'%s\');'
                 insere = insere %(str(usr.id), str(usr.name), str(barcode))
                 db.insert(insere)
+            else:
+                if usr.pos_security_pin:
+                    altera = 'UPDATE USUARIO SET NOMEUSUARIO = \'%s\' \
+                       , PERFIL = \'GERENTE\' \
+                       , CODBARRA = \'%s\' WHERE CODUSUARIO = %s' %(
+                       str(usr.name), str(barcode), str(usr.id))
+                else:
+                    altera = 'UPDATE USUARIO SET NOMEUSUARIO = \'%s\' \
+                       , CODBARRA = \'%s\' WHERE CODUSUARIO = %s' %(
+                       str(usr.name), str(barcode), str(usr.id))
+                db.insert(altera)
 
         sessao_ids = self.env['pos.session'].search([
             ('create_date', '>=', hj),
@@ -199,7 +210,8 @@ class PosSession(models.Model):
                 #print ('Incluindo - %s-%s' %(str(product_id.id),product_id.name))
                 un = product_id.uom_id.name
                 insere = 'INSERT INTO PRODUTOS (CODPRODUTO, UNIDADEMEDIDA, PRODUTO, PRECOMEDIO, CODPRO,\
-                          TIPOPRECOVENDA, ORIGEM, NCM, VALORUNITARIOATUAL, VALOR_PRAZO, TIPO '
+                          TIPOPRECOVENDA, ORIGEM, NCM, VALORUNITARIOATUAL, VALOR_PRAZO, TIPO, RATEIO, \
+                          QTDEATACADO, PRECOATACADO'
                 if codbarra:
                     insere += ', COD_BARRA'
                 insere += ') VALUES ('
@@ -214,6 +226,9 @@ class PosSession(models.Model):
                 insere += ',' + str(p_custo)
                 insere += ',' + str(p_venda)
                 insere += ',\'' + str('PROD') + '\''
+                insere += ', \'' + product_id.tipo_venda + '\''
+                insere += ',' + str(product_id.qtde_atacado)
+                insere += ',' + str(product_id.preco_atacado)
                 if codbarra:
                     insere += ', \'' + str(unidecode(codbarra)) + '\''
                 insere += ')'
@@ -232,6 +247,9 @@ class PosSession(models.Model):
                 altera += ', CODPRO = ' +  '\'' + str(unidecode(codp)) + '\''
                 altera += ', ORIGEM = ' + str(product_id.origin) 
                 altera += ', USA = NULL '  
+                altera += ', RATEIO = \'' + str(product_id.tipo_venda) + '\''
+                altera += ', QTDEATACADO = ' + str(product_id.qtde_atacado) 
+                altera += ', PRECOATACADO = ' + str(product_id.preco_atacado) 
                 if codbarra:
                     altera += ', COD_BARRA = \'' + str(unidecode(codbarra)) + '\''
                 altera += ' WHERE CODPRODUTO = ' + str(product_id.id)
@@ -248,13 +266,13 @@ class PosSession(models.Model):
         session_ids = self.env['pos.session'].search([
                 ('state', '=', 'opened')])
         for ses in session_ids:
-             self.action_atualiza_clientes(ses)
+             self.action_atualiza_clientes(ses, False)
 
     def action_integra_clientes(self):
         # se nao for no pos enviar email com as msg_erro
-        self.msg_integracao = self.action_atualiza_clientes(self)
+        self.msg_integracao = self.action_atualiza_clientes(self, False)
 
-    def action_atualiza_clientes(self, session):  
+    def action_atualiza_clientes(self, session, cliente_n):  
         try:
             if session.config_id.ip_terminal:
                 db = con.Conexao(session.config_id.ip_terminal, session.config_id.database)
@@ -265,7 +283,7 @@ class PosSession(models.Model):
         msg_erro = ''
         msg_sis = 'Integrando Clientes para o PDV<br>'
         hj = datetime.now()
-        hj = hj - timedelta(days=self.periodo_integracao+2)
+        hj = hj - timedelta(days=self.periodo_integracao)
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
         cliente = self.env['res.partner']
         
@@ -284,8 +302,10 @@ class PosSession(models.Model):
                 retorno = db.insert(altera )
                 if retorno:
                     msg_erro += 'ERRO : %s<br>' %(retorno)
-
-        cli_ids = cliente.search([('write_date', '>=', hj), ('customer','=', True)])
+        if cliente_n:
+            cli_ids = cliente.search([('id', '=', cliente_n)])
+        else:
+            cli_ids = cliente.search([('write_date', '>=', hj), ('customer','=', True)])
         for partner_id in cli_ids:
             sqlc = 'select codcliente from clientes where codcliente = %s' %(partner_id.id)
             cli = db.query(sqlc)
@@ -311,9 +331,9 @@ class PosSession(models.Model):
                     ie = partner_id.inscr_est
                 fiscal = 'J'
                 
-                regiao = '1'
-                #if partner_id.curso:
-                #    regiao = '1'
+                regiao = '0'
+                if partner_id.curso:
+                    regiao = '1'
                 insere = 'insert into clientes (\
                             CODCLIENTE, NOMECLIENTE, RAZAOSOCIAL,\
                             TIPOFIRMA,CNPJ, INSCESTADUAL,\
@@ -343,9 +363,9 @@ class PosSession(models.Model):
                     ddd1 = partner_id.mobile[1:3]
                 fone2 = 'Null'
                 ddd2 = 'Null'
-                #if partner_id.fax:
-                #    fone2 = partner_id.fax[4:]
-                #    ddd2 = partner_id.fax[1:3]
+                if partner_id.fax:
+                    fone2 = partner_id.fax[4:]
+                    ddd2 = partner_id.fax[1:3]
                 #buscar Cidade/UF/Pais
                 cidade = 'Null'
                 ibge = 'Null'
@@ -464,7 +484,9 @@ class PosSession(models.Model):
                 if retorno:
                     msg_erro += 'ERRO : %s<br>' %(retorno)
             else:
-                regiao = '1'
+                regiao = '0'
+                if partner_id.curso:
+                    regiao = '1'
                 altera =  'UPDATE CLIENTES SET REGIAO = %s \
                     ,NOMECLIENTE = \'%s\', STATUS = 1 \
                     WHERE CODCLIENTE = %s' %(regiao, nome, str(partner_id.id))
@@ -485,12 +507,12 @@ class PosSession(models.Model):
 
     def action_integra_recebidos(self):
         # se nao for no pos enviar email com as msg_erro
-        if self.verifica_se_esta_rodando(self):
-            self.integracao_andamento = datetime.strftime(datetime.now(),'%Y-%m-%d %H:%M:%S')
-            self.msg_integracao = self.action_atualiza_recebidos(self)
-        else:
-            raise UserError(
-                    u'Já existe Atualização em Andamento, aguarde.')
+        #if self.verifica_se_esta_rodando(self):
+        #    self.integracao_andamento = datetime.strftime(datetime.now(),'%Y-%m-%d %H:%M:%S')
+        self.msg_integracao = self.action_atualiza_recebidos(self)
+        #else:
+        #    raise UserError(
+        #            u'Já existe Atualização em Andamento, aguarde.')
         
     def action_atualiza_recebidos(self, session):
         try:
@@ -503,11 +525,106 @@ class PosSession(models.Model):
         msg_erro = ''
         msg_sis = 'Integrando Contas a Receber para o PDV<br>'
         hj = datetime.now()
-        hj = hj - timedelta(days=session.periodo_integracao+3)
-        hj = datetime.strftime(hj,'%m-%d-%Y')
+        hj = hj - timedelta(days=session.periodo_integracao+10)
+        hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
+        # se dois bds, entao preciso verificar se o contas a receber esta correto
+        order_ids = self.env['pos.order'].search([
+            ('state','=', 'invoiced'),
+            ('date_order','>',hj),
+        ])
+        # repeti a variavel hj aqui, pq acima tem horas, minutos
+        hj = datetime.now()
+        hj = hj - timedelta(days=session.periodo_integracao)
+        hj = datetime.strftime(hj,'%Y-%m-%d')
+        
+        for odr in order_ids:
+            #verifico se existe no contas a receber
+            codmov = odr.pos_reference[odr.pos_reference.find('-')+1:]
+            #codcaixa = odr.pos_reference[:odr.pos_reference.find('-')]
+            codcaixa = odr.session_id.id
+            sqld = 'SELECT r.CODRECEBIMENTO, r.CODCLIENTE, r.STATUS FROM RECEBIMENTO r \
+                    LEFT OUTER JOIN VENDA v ON r.CODVENDA = v.CODVENDA \
+                    WHERE r.CODCLIENTE = %s AND r.CODALMOXARIFADO = %s \
+                    AND ((r.TITULO = \'%s\') \
+                     OR (v.CODMOVIMENTO = %s))' %(
+                   str(odr.partner_id.id), codcaixa, str(odr.name), codmov)
+            recs = db.query(sqld)
+            if len(recs):
+                # TODO
+                # recebido entao precisa colocar recebido aqui tbem
+                if recs[0][2] == '5-':
+                    faturas_ids = self.env['account.invoice'].search([
+                        ('state','=', 'paid'),
+                        ('partner_id','=', odr.partner_id.id),
+                        ('origin','=', odr.name), 
+                    ])
+                    if faturas_ids:
+                        recebe = 'UPDATE RECEBIMENTO SET STATUS = \'7-\' \
+                              WHERE CODRECEBIMENTO = %s' %(str(recs[0][0]))
+                        retorno = db.insert(recebe)
+                        if retorno:
+                            msg_erro += 'ERRO : %s<br>' %(retorno)
+                    """ PRECISO DISTO ABAIXO
+                    else:
+                        vlr := fatura_ids.amount_total - fatura_ids.residual
+                        recebe = 'UPDATE RECEBIMENTO SET VALOR_RESTO = %s \
+                              ,VALORTITULO = %s \
+                              WHERE CODRECEBIMENTO = %s' %(str(vlr),str(recs[0][0]))
+                        retorno = db.insert(recebe)
+                        if retorno:
+                            msg_erro += 'ERRO : %s<br>' %(retorno)
+                    """   
+                continue
+            else:
+                sqlc = 'SELECT CODCLIENTE FROM CLIENTES WHERE CODCLIENTE = %s' %(
+                    str(odr.partner_id.id))
+                clis = db.query(sqlc)
+                if not len(clis):
+                    self.action_atualiza_clientes(session, odr.partner_id.id)
+                sqld = 'SELECT r.CODRECEBIMENTO, r.CODCLIENTE, r.STATUS FROM RECEBIMENTO r \
+                    WHERE r.CODCLIENTE = %s AND r.CODALMOXARIFADO = %s \
+                    AND (r.TITULO = \'%s\')' %(
+                   str(odr.partner_id.id), codcaixa, str(odr.name))
+                recs = db.query(sqld)
+                if len(recs):
+                    continue
+                #incluindo no RECEBIMENTO
+                # ve se a fatura esta aberta
+                faturas_ids = self.env['account.invoice'].search([
+                    ('state','=', 'open'),
+                    ('partner_id','=', odr.partner_id.id),
+                    ('origin','=', odr.name), 
+                    ])
+                for ftr in faturas_ids:
+                    dt_vc = ftr.date_invoice
+                    if ftr.date_due:
+                        dt_vc = ftr.date_due
+                    ins_rec = 'INSERT INTO RECEBIMENTO (CODRECEBIMENTO, TITULO ' \
+                              ',EMISSAO, CODCLIENTE, DATAVENCIMENTO ' \
+                              ',STATUS, VIA, FORMARECEBIMENTO, HISTORICO' \
+                              ',CODALMOXARIFADO, CODVENDEDOR, CODUSUARIO' \
+                              ',VALORRECEBIDO, JUROS ' \
+                              ',DESCONTO, PERDA, TROCA, FUNRURAL ' \
+                              ',VALOR_PRIM_VIA, VALOR_RESTO, VALORTITULO' \
+                              ',OUTRO_CREDITO, OUTRO_DEBITO, PARCELAS)' \
+                              ' VALUES(' \
+                                  'GEN_ID(COD_AREC,1), \'%s\' ' \
+                                  ',\'%s\', %s, \'%s\'' \
+                                  ',\'5-\', \'1\', \'1\', \'Importado Odoo\'' \
+                                  ',%s, %s, %s, 0.0, 0.0, 0.0, 0.0, 0.0,0.0' \
+                                  ',%s, %s, %s, 0.0, 0.0, 1)' %(
+                                ftr.origin, ftr.date_invoice, ftr.partner_id.id, 
+                                dt_vc, codcaixa, ftr.user_id.id, 
+                                ftr.user_id.id, ftr.residual, 
+                                ftr.residual, ftr.residual)
+                    print(ins_rec)
+                    retorno = db.insert(ins_rec)
+                    if retorno:
+                        msg_erro += 'ERRO : %s<br>' %(retorno)
+        # contas recebidas colocar no PDV ODOO
         sqld = 'SELECT  r.CODRECEBIMENTO, r.DATARECEBIMENTO, \
                    r.CODALMOXARIFADO, r.FORMARECEBIMENTO, \
-                   r.VALORRECEBIDO, r.TITULO, r.CODCLIENTE  \
+                   r.VALORRECEBIDO, r.TITULO, r.CODCLIENTE \
                    , f.CAIXA , f.ID_ENTRADA \
                 FROM RECEBIMENTO r, FORMA_ENTRADA f  \
                 WHERE f.CODFORMA = CAST(r.N_DOCUMENTO AS INTEGER) \
@@ -550,7 +667,7 @@ class PosSession(models.Model):
             if lancado_id:
                 faturas_ids = self.env['account.invoice'].search([
                     ('partner_id','=', rcs[6]),
-                    ('origin', '=', ppdv.name),
+                    ('origin', '=', ppdv.name)
                     ('state','=', 'open'),
                 ])
                 for ftr in faturas_ids:
@@ -563,7 +680,7 @@ class PosSession(models.Model):
             values['move_name'] = str(rcs[0])
             values['name'] = 'Recebimento conta %s' %(str(rcs[5]))
             values['amount'] = rcs[4]
-            self.env['account.bank.statement.line'].create(values)
+            self.env['account.bank.statement.line'].create(values)                                        
             # baixar a fatura do cliente
             faturas_ids = self.env['account.invoice'].search([
                 ('partner_id','=', rcs[6]),
@@ -614,7 +731,8 @@ class PosSession(models.Model):
         hj = hj - timedelta(days=session.periodo_integracao)
         hj = datetime.strftime(hj,'%m-%d-%Y')
         caixa_usado = 'None'
-
+        #ord_ids = self.env['pos.order'].search([(
+        #    'session_id','=',session.id)])
         ord_ids = self.env['pos.order'].search([(
             'session_id','=',session.id)])
         str_ord = ",".join(str(x.sequence_number) for x in ord_ids)
@@ -638,6 +756,7 @@ class PosSession(models.Model):
             pos_ord = self.env['pos.order']
             ord_name = '%s-%s' %(str(session.id),str(mvs[0]))
             teve_desconto = 'n'
+            
             dt_ord = '2018.01.01'
             
             # coloquei so pra manter o if
@@ -659,6 +778,8 @@ class PosSession(models.Model):
                 vals['sequence_number'] = mvs[0]
                 
                 if cli != 1:
+                    if cli == 1609:
+                        cli = 1944
                     vals['partner_id'] = cli
                 else:
                     vals['partner_id'] = self.env['res.partner'].search([
@@ -712,8 +833,6 @@ class PosSession(models.Model):
                         pag_line.append((0, 0,pag))
 
                 #ord_id = pos_ord.create(vals)
-                #if mvs[0] == 61127:
-                #    import pudb;pu.db
                 order_line = []
                 sqld = 'SELECT md.CODDETALHE, md.CODPRODUTO, ' \
                     ' md.QUANTIDADE, md.PRECO, COALESCE(md.VALOR_DESCONTO,0),' \
@@ -757,8 +876,7 @@ class PosSession(models.Model):
                         desconto = md[4] / (vlr_totprod+md[4])
                         #else:
                         #    desconto = md[4] / (vlr_totprod+total_g)
-
-                    # 03/01/2020 maior que zero somente, o ultimo item fica com zero 
+                    
                     if num_linha > 0:
                         desconto = (desconto + desconto_t) * 100
                     else:
@@ -774,7 +892,7 @@ class PosSession(models.Model):
                     prd['discount'] = desconto
                     prd['qty'] = md[2]
                     prd['price_unit'] = md[3]
-                    #prd['tipo_venda'] = tipo
+                    prd['tipo_venda'] = tipo
                     prd['name'] = prdname
 
                     order_line.append((0, 0,prd))
@@ -787,7 +905,7 @@ class PosSession(models.Model):
                         prd['product_id'] = 2
                     prd['qty'] = 1
                     prd['price_unit'] = troca * (-1)
-                    #prd['tipo_venda'] = tipo
+                    prd['tipo_venda'] = tipo
                     prd['name'] = 'Troca/Devolucao'
                     order_line.append((0, 0,prd))
 
@@ -799,10 +917,12 @@ class PosSession(models.Model):
                 if teve_desconto == 's':
                     # uso nb_print pra saber q veio do pdv lazarus
                     vals['nb_print'] = 9
+
                 try:
                     ord_p = pos_ord.create(vals)
                 except:
                     msg_erro += 'ERRO, não integrado pedido : %s<br>' %(prdname)
+
                 if teve_desconto == 's' and linhas == 's':
                     #ord_p = pos_ord.browse(ords)
                     if (total_g != ord_p.amount_total):
@@ -839,10 +959,47 @@ class PosSession(models.Model):
                         pv_line.append((0, 0,pv_ln))
                     pv['order_line'] = pv_line
                     pedido_venda.create(pv)
+                    #ord_p.create_picking()
                 if teve_desconto == 's':
                     if jrn != '4-':
                         ord_p.action_pos_order_paid()
-                    
+        # 19/12/19
+        # CRIAR FATURA - coloquei isso pq faturado nao esta entrando em faturas            
+        ord_ids = self.env['pos.order'].search([(
+            'session_id','=',session.id)])
+        str_ord = ",".join(str(x.sequence_number) for x in ord_ids)
+        if not str_ord:
+            str_ord = '1'
+        sqld = 'SELECT m.CODMOVIMENTO, m.DATAMOVIMENTO, ' \
+               'm.CODCLIENTE, m.STATUS, m.CODUSUARIO, m.CODVENDEDOR, ' \
+               'm.CODALMOXARIFADO, DATEADD(3 hour to m.DATA_SISTEMA) ' \
+               '  FROM MOVIMENTO m ' \
+               ' WHERE m.STATUS = 1 ' \
+               '   AND m.CODNATUREZA = 3 ' \
+               '   AND m.CODCLIENTE > 1 ' \
+               '   AND m.CODMOVIMENTO IN (%s)' %(str_ord)
+        movs = db.query(sqld)
+
+        if not len(movs):
+            msg_sis = 'Sem Pedidos para importar.<br>'
+        for mvs in movs:
+            pos_ord = self.env['pos.order']
+            ord_name = '%s-%s' %(str(mvs[6]),str(mvs[0]))
+            ords = pos_ord.search([('pos_reference','=', ord_name)])
+            for pdv in ords:
+                for sttm in pdv.statement_ids:
+                    if sttm.journal_id.id == 10:
+                        # procuro se existe a fatura
+                        ftr = self.env['account.invoice'].search([('origin','=', pdv.name)])
+                        if ftr:
+                            continue
+                        #pdv.create_order(pdv.statement_ids, pdv)
+                        pdv.action_pos_order_invoice()
+                        pdv.invoice_id.sudo().action_invoice_open()
+                        pdv.create_picking()
+
+        # Fim CRIAR FATURA
+        
         #print ('Integracao realizada com sucesso.')
         msg_sis += 'Integracao Finalizada.<br>'
 
@@ -897,7 +1054,7 @@ class PosOrder(models.Model):
         order_ids = []
         to_invoice = False
         for stm in orders:
-            if stm[2]['journal_id'] == 14:
+            if stm[2]['journal_id'] == 10:
                 to_invoice = True
             amount = order.amount_total - order.amount_paid
             data = stm[2]
@@ -909,6 +1066,7 @@ class PosOrder(models.Model):
         if to_invoice:
             order.action_pos_order_invoice()
             order.invoice_id.sudo().action_invoice_open()
+            order.create_picking()
     
 
     @api.model

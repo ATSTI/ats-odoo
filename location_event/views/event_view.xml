@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="event_view_form" model="ir.ui.view">
+        <field name="name">event.view.form</field>
+        <field name="model">event.event</field>
+        <field name="inherit_id" ref="event.view_event_form"/>
+        <field name="arch" type="xml">
+            <field name="name" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="name" position="after">
+                <field name="product_id" options='{"no_create": 1, "no_create_edit": 1}' domain="[('is_location','=',True)]"/>
+            </field>
+            <xpath expr="//group[@name='main_field_group']" position="replace">
+                <group name="main_field_group">
+                    <group>
+                        <field name="address_id" context="{'show_address': 1}" options='{"always_reload": True}'/>
+                        <field name="organizer_id" string="Cliente"/>
+                        <field name="company_id" groups="base.group_multi_company" invisible="1"/>
+                        <field name="date_begin"/>
+                        <field name="date_end"/>
+                        <field name="qty" readonly="1" />
+                        <field name="date_tz" invisible="1" />
+                    </group>
+                    <group>
+                        <field name="user_id"/>
+                        <field name="event_type_id" options="{'no_create':True}"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+
+
+<!-- domain="[('customer','=',True), ('parent_id','=',False)]" -->

@@ -1,136 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 <template id="report_pos_cupom_main_document">
-    <t>
+    <t t-call="report.external_layout">
         <t t-set="doc" t-value="doc.with_context({'lang':'pt_br'})" />
         <div class="page">
-            <div class="pos-center-align" style="text-align:center">
-                <h6><span t-esc="doc.name"/> - <span t-field="doc.date_order" t-field-options='{"format":"dd/MM/YYYY"}'/></h6><br/>
-            </div>
-               <h5> <span t-esc="doc.company_id.name"/></h5>
-            <div class="receipt-phone">
-                <h5>Telefone: <span t-esc="doc.company_id.phone"/> </h5>
-            </div>
-            <div class="receipt-user">
-               <h5> Vendedor: <span t-esc="doc.user_id.name"/> </h5>
-            </div>
-            <t t-if="doc.partner_id">
-               <br />
-	       <br />
-               <h6>Cliente: <t t-esc="doc.partner_id.name" /> </h6>	   
+            <h6 style="text-align:center"><span t-esc="doc.date_order"/> <span t-esc="pos_reference"/> </h6>
+            <div class="oe_structure" />
+            <br/>
+            <br/>
+            <span t-esc="doc.company_id.name"/>
+            <br/>
+            Telefone: <span t-esc="doc.company_id.phone"/>
+            <br/>
+            Vendedor: <span t-esc="doc.user_id.name"/>
+            <br/>
+            <br/>
+            <t t-set="sub" t-value="0"/>
+            <t t-foreach="doc.lines" t-as="l">
+                <span t-esc="l.product_id.name"/> <span t-esc="l.qty"/> R$ <span t-esc="l.qty*l.price_unit"/>
+                <t t-set="sub" t-value="sub + (l.qty * l.qty*l.price_unit) "/>
+                <br/>
             </t>
             <br/>
-            <div>
-                <t t-set="sub" t-value="0"/>
-                <t t-foreach="doc.lines" t-as="l">
-                    <span t-esc="l.product_id.name"/>
-                    <br/>
-                    <span style="font-weigth:bold">
-                        <b>Qtde:
-                        <span t-esc="l.qty"/>
-                        Preço:
-                        <span t-esc="l.price_unit"/>
-                        Total:
-                        <span t-esc="l.qty * l.price_unit"/>
-                        </b>
-                        <t t-set="sub" t-value="sub + (l.qty * l.price_unit) "/>
-
-                    </span>
-                    <br/>
-                </t>
+            <br/>
+            <h4>Subtotal: </h4> R$<span t-esc="sub"/>
+            <br/>
+            <h4>Desconto: </h4> R$<span t-esc="sub - doc.amount_total"/>
+            <br/>
+            <h3>Total: </h3> R$<span t-esc="doc.amount_total"/>
+            <br/>
+            <br/>
+            <t t-foreach="doc.statement_ids" t-as="d">
+                <span t-esc="d.journal_id.name"/> <span t-esc="d.journal_currency_id.name"/> R$<span t-esc="d.amount"/>
                 <br/>
-                <br/>
-                <table class="receipt-total">
-                    <tr>
-                        <td><h4>Subtotal:</h4></td>
-                        <td><h4>R$ <span t-esc="'%.2f'%sub"/></h4> </td>
-                    </tr>
-                    <tr>
-                        <td><h4>Desconto:</h4></td>
-                        <td><h4>R$ <span t-esc="'%.2f' % (sub - doc.amount_total)"/></h4> </td>
-                    </tr>
-                    <tr>
-                        <td><h4>Total:</h4></td>
-                        <td><h4>R$ <span t-esc="'%.2f' % doc.amount_total"/> </h4></td>
-                    </tr>
-                </table>
-                <br/>
-                <br/>
-                 <table class='receipt-paymentlines'>
-                     <t t-foreach="doc.statement_ids" t-as="d">
-                         <t t-if="d.journal_id.name == 'A Prazo'">
-                               <tr>
-                                    Reconheco o valor acima e me comprometo<br />
-                                    a quita-lo ate a data do vencimento. <br />
-                                    <br />
-                                    <br />
-                                    <br />
-                                    -------------------------------------------
-                                    <br />
-                                    Assinatura do Cliente <br />
-                                    <!-- Imprimir o recibo para o Cliente -->
-                                    <br />
-                                    -------------------------------------------
-                               </tr>
-                              <!-- Imprimir o recibo para o Cliente -->
-                               <br />
-                               -------------------------------------------
-                               <br />
-                               Venda Cliente
-                               <br />
-                               -------------------------------------------
-                               <br />
-                               <t t-esc="doc.company_id.name"/><br />
-                               Telefone: <t t-esc="doc.company_id.phone"/><br />
-                               Vendedor: <t t-esc="doc.user_id.name"/><br />
-                               <t t-if="doc.partner_id">
-                                   <br />
-			                        -------------------------------------------
-                                    <br />
-		                            -------------------------------------------
-                                    <br />
-                                    Cliente: <t t-esc="doc.partner_id.name" /><br />
-			                        -------------------------------------------
-                   <table class='receipt-orderlines'>
-                   <colgroup>
-                    <col width='40%' />
-                    <col width='15%' />
-                    <col width='20%' />
-                    <col width='25%' />
-                    </colgroup>
-                    <tr t-foreach="doc.lines" t-as="orderline">
-                    <td>
-                        <t t-esc="orderline.product_id.name"/>
-                                </td>
-                                <td class="pos-right-align">
-                                    <span t-esc="orderline.qty"/>
-                                </td>
-                                <td class="pos-right-align">
-                                    <span t-esc="orderline.price_unit"/>
-                                </td>
-                                <td class="pos-right-align">
-                                    <span t-esc="orderline.qty * orderline.price_unit"/>
-                                </td>
-                            </tr>
-                        </table>
-                        <table class='receipt-change'>
-                            <tr class="emph">
-                                <td>Total:</td>
-                                <td class="pos-right-align">
-                                <span t-esc="doc.amount_total"/>
-                            </td>
-                        </tr>
-                        </table>
-                        </t>
-                        <br />
-                        -------------------------------------------
-                        <br />
-                     </t>
-                    
-                    </t>
-                 </table>
-
-            </div>
+            </t>
+            <br/>
+            Troco: R$<span t-esc="doc.amount_return"/>
             <div class="oe_structure"/>
         </div>
     </t>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="ManagerAuthenticationPopup">
+        <div class="modal-dialog">
+            <div class="popup popup-confirm">
+                <p class="title" style="border-bottom: solid 3px #6EC89B;">Authentication</p>
+                <div class="body">
+					<img src="/pos_operation_restrict/static/src/img/scan.png" />
+                    <p style="font-size:14px;">Manager Authentication Required.</p>
+                    <input id="manager_barcode" type="text" placeholder="Manager Barcode"/>
+                    <p id="discount_value" style="display:none"></p>
+                    <p id="manager_name"></p>
+                </div>
+                <div class="footer">
+                    <div class="button confirm">
+                        OK
+                    </div>
+                    <div class="button cancel">
+                        Cancel 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>

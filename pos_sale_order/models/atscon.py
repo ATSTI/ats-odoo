@@ -23,37 +23,40 @@ class Conexao:
             ##import pudb;pu.db
             #        except Database.IntegrityError, e:
             #raise utils.IntegrityError, utils.IntegrityError(*tuple(e)+('sql: '+query,)+args), sys.exc_info()[2]
-        except Database.DatabaseError as e:
+        except Database.DatabaseError, e:
             self.connection.rollback()
-            """
-            if 'IDX_CODPRO' in e:
-                x = e.find('=')
+            if 'IDX_CODPRO' in e[0]:
+                x = e[0].find('=')
                 if (x > 0):
                     x = 'Ja existe este Cod Produto : %s' %(
-                        e[e.find('=')+3:e.find('=')+16]
+                        e[0][e[0].find('=')+3:e[0].find('=')+16]
                     )
                     return x
-            if 'IDX_CODBARRA' in e:
-                x = e.find('=')
+            if 'IDX_CODBARRA' in e[0]:
+                x = e[0].find('=')
                 if (x > 0):
                     x = 'Ja existe este Cod Barra : %s' %(
-                        e[e.find('=')+3:e.find('=')+16]
+                        e[0][e[0].find('=')+3:e[0].find('=')+16]
                     )
                     return x
-            """
-            return str(e)
+                    
             #x = tuple(e)
-            #print ('Erro :%s' %(query))
+            print ('Erro :%s' %(query))
             
-        except Database.DatabaseError as e:
+        except Database.DatabaseError, e:
             self.connection.rollback()
             return e
             
 
     def query(self, query):
         #cursor = self.connection.cursor( MySQLdb.cursors.DictCursor )
-        cur = self.cursor.execute(query)
-        return cur.fetchall()
+        try:
+            cur = self.cursor.execute(query)
+            return cur.fetchall()
+        except Database.DatabaseError, e:
+            print ('Erro :%s' %(query))
+            self.connection.rollback()
+            return e
 
     #def sistema(self):
     #    return self.odoo     

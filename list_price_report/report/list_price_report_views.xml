@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_list_price_pivot" model="ir.ui.view">
+         <field name="name">list.price.report.pivot</field>
+         <field name="model">list.price.report</field>
+         <field name="arch" type="xml">
+             <pivot string="Lista de Precos" disable_linking="True">
+                 <field name="lista1" type="col"/>
+                 <field name="lista2" type="col"/>
+                 <field name="lista3" type="col"/>
+                 <field name="product_id" type="row"/>
+                 <field name="preco1" type="measure"/>
+                 <field name="preco2" type="measure"/>
+                 <field name="preco3" type="measure"/>
+             </pivot>
+         </field>
+    </record>
+
+    <record model="ir.ui.view" id="list_price_report_tree">
+        <field name="name">list.price.report.tree</field>
+        <field name="model">list.price.report</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Lista de Precos">
+                <field name="product_id"/>
+                <field name="categoria"/>
+                <field name="preco1"/>
+                <field name="preco2"/>
+                <field name="preco3"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_list_report_all" model="ir.actions.act_window">
+        <field name="name">Lista de Precos</field>
+        <field name="res_model">list.price.report</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id"></field>  <!-- force empty -->
+        <field name="help">Listas de Precos.</field>
+    </record>
+
+    <menuitem name="Relatorio Lista Preco" action="action_list_report_all" id="menu_report_list_price_all" parent="sales_team.menu_sale_report" sequence="10"/>
+
+</odoo>

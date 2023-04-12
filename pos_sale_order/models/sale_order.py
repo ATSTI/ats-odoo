@@ -12,8 +12,8 @@ class SaleOrder(models.Model):
             order_ref.write({'state': 'cancel'})
         order_id = self.create(orders)
         order_ref = orders['name']
-        return order_ref
-        """    
+        #return order_ref
+        # estava comentado daqui pra baixo, a linha acima esta descomentada 06/09/19    
         # Keep only new orders
         submitted_references = [o['data']['name'] for o in orders]
         pos_order = self.search([('pos_reference', 'in', submitted_references)])
@@ -43,4 +43,4 @@ class SaleOrder(models.Model):
                 pos_order.invoice_id.sudo().action_invoice_open()
                 pos_order.account_move = pos_order.invoice_id.move_id
         return order_ids
-        """
+

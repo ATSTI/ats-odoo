@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <record id="view_report_pos_tipo_pivot" model="ir.ui.view">
+            <field name="name">report.pos.tipo.pivot</field>
+            <field name="model">report.pos.order.tipo</field>
+            <field name="arch" type="xml">
+                <pivot string="Analise de Vendas">
+                    <field name="product_categ_id" type="row"/>
+                    <field name="date" interval="month" type="col"/>
+                    <field name="product_qty" type="measure"/>
+                    <field name="price_total" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <record id="view_report_pos_tipo_graph" model="ir.ui.view">
+            <field name="name">report.pos.tipo.graph</field>
+            <field name="model">report.pos.order.tipo</field>
+            <field name="arch" type="xml">
+                <graph string="Analise de Vendas">
+                    <field name="product_categ_id" type="row"/>
+                    <field name="price_total" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <record id="view_report_pos_tipo_search" model="ir.ui.view">
+            <field name="name">report.pos.tipo.search</field>
+            <field name="model">report.pos.order.tipo</field>
+            <field name="arch" type="xml">
+                <search string="Analise de Vendas">
+                    <field name="date"/>
+                    <filter string="Faturado" domain="[('state','=',('invoiced'))]"/>
+                    <filter string="Não Faturado" domain="[('state','=',('paid'))]"/>
+                    <separator/>
+                    <filter string="Ano" name="year" domain="[('date','&lt;=', time.strftime('%%Y-12-31')),('date','&gt;=',time.strftime('%%Y-01-01'))]" help="POS ordered created during current year"/>
+                    <separator/>
+                    <filter string="Minhas Vendas" help="My Sales" domain="[('user_id','=',uid)]"/>
+                    <field name="config_id"/>
+                    <field name="partner_id"/>
+                    <field name="user_id"/>
+                    <field name="product_id"/>
+                    <field name="tipo_venda"/>
+                    <field name="product_categ_id"/>
+                    <group expand="1" string="Group By">
+                        <filter string="Vendedor" name="User" context="{'group_by':'user_id'}"/>
+                        <filter string="Categoria" context="{'group_by':'product_categ_id'}"/>
+                        <filter string="Produto" context="{'group_by':'product_id'}"/>
+                        <separator/>
+                        <filter string="Venda Mes" context="{'group_by':'date:month'}" help="Month of order date"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="filter_orders_tipo_session" model="ir.filters">
+            <field name="name">Tipo session</field>
+            <field name="model_id">report.pos.order.tipo</field>
+            <field name="user_id" eval="False"/>
+            <field name="context">{'group_by': ['date', 'session_id'], 'measures': ['price_total']}</field>
+        </record>
+
+        <record id="action_report_pos_tipo_all" model="ir.actions.act_window">
+            <field name="name">Orders Analysis Tipo</field>
+            <field name="res_model">report.pos.order.tipo</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">pivot,graph</field>
+            <field name="search_view_id" ref="view_report_pos_tipo_search"/>
+            <field name="context">{'group_by_no_leaf':1,'group_by':[]}</field>
+        </record>
+
+        <menuitem id="menu_report_pos_tipo_all" name="Tipo Vendas" action="action_report_pos_tipo_all" parent="point_of_sale.menu_point_rep" sequence="3"/>
+
+</odoo>

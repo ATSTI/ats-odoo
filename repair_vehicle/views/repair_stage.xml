@@ -11,6 +11,7 @@
                 <field name="name"/>
                 <field name="stage_type"/>
                 <field name="is_closed"/>
+                <field name="state_stage" />
                 <field name="custom_color"/>
             </tree>
         </field>
@@ -27,6 +28,7 @@
                             <field name="name"/>
                             <field name="sequence"/>
                             <field name="stage_type"/>
+                            <field name="state_stage" />
                         </group>
                         <group>
                             <field name="custom_color"/>

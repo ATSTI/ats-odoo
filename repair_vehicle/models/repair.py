@@ -4,6 +4,7 @@
 from ast import literal_eval
 from odoo import api, fields, models, _
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from odoo.exceptions import UserError, ValidationError
 
 
@@ -28,11 +29,14 @@ class Repair(models.Model):
     date_repair_closed = fields.Date(string='Data fechamento',
         index=True, readonly=True,)
 
+    # data_garantia = datetime.strftime(repair.order.guarantee_limit(months=+1),'%Y-%m-%d')   
+
     stage_id = fields.Many2one('repair.stage', string='Stage',
             track_visibility='onchange',
             index=True, copy=False,
             group_expand='_read_group_stage_ids',
             default=lambda self: self._default_stage_id())
+    
     vehicle_id = fields.Many2one(
         'repair.vehicle', string='Veículo',
     )
@@ -100,6 +104,8 @@ class Repair(models.Model):
         return {
             'name': 'Contas a receber',
             'type': 'ir.actions.act_window',
+            'vehicle_id': 'user_id',
+            'vehicle_id': 'user_id',
             'view_mode': 'tree',
             'view_type': 'form',
             'res_model': 'account.move.line',
@@ -109,9 +115,11 @@ class Repair(models.Model):
 
     def write(self, vals):
         if 'stage_id' in vals:
-            stage = self.env['repair.stage'].browse(vals['stage_id']).is_closed
-            if stage:
+            stage = self.env['repair.stage'].browse(vals['stage_id'])
+            if stage.is_closed:
                 vals['date_repair_closed'] = fields.Date.context_today(self)
+                if stage.state_stage == 'done':
+                    vals['guarantee_limit'] = fields.Date.context_today(self)+relativedelta(months=+6)
         res = super().write(vals)
         return res
 
@@ -141,6 +149,8 @@ class Repair(models.Model):
         vals={
             "name": sale_name,
             "partner_id": self.partner_id.id,
+            "client_order_ref": self.vehicle_id.name,
+            "user_id": self.user_id.id,
         }
         sale = self.env["sale.order"].create(vals)
         sale.onchange_partner_id()

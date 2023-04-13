@@ -11,6 +11,10 @@
                     <field name="state" invisible="1"/>
                     <field name="activity_ids" widget="kanban_activity"/>
                 </field>
+                <field name="product_id" position="replace">
+                    <field name="date_repair" />
+                    <field name="address_id" invisible="1"/>
+                </field>
             </field>
         </record>
         <record id="view_repair_order_form" model="ir.ui.view">
@@ -30,6 +34,8 @@
                         <button name="action_repair_invoice_create" states="2binvoiced" type="object" string="Create Invoice" class="oe_highlight" groups="account.group_account_invoice"/>
                         <button name="action_repair_cancel" string="Cancel Repair" type="object" attrs="{'invisible':['|',('invoice_method','!=','none'), ('state', 'not in',('confirmed','2binvoiced','ready','under_repair'))]}"/> -->
                         <button name="action_create_sale_order" type="object" string="Criar Cotação" class="oe_highlight" />
+                        <!-- <button name="action_voltar" type="object" icon="fa-arrow-left" class="btn_info" />
+                        <button name="action_ir" type="object" icon="fa-arrow-right" class="btn_info" /> -->
                         <field name="state" invisible="1"/>
                     </header>
                 </xpath>
@@ -61,7 +67,7 @@
                     <field name="date_repair_closed"/>
                 </field>
                 <button name="action_send_mail" position="before">
-                    <field name="stage_id" widget="statusbar" options="{'fold_field': 'fold'}" domain="[('stage_type', '=', 'order')]"/>
+                    <field name="stage_id" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}" statusbar_color="{'Novo': 'red'}" domain="[('stage_type', '=', 'order')]"/>
                     <field name="state" invisible="1"/>
                 </button>
                 <label for="name" position="replace">

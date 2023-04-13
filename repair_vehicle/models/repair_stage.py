@@ -42,8 +42,15 @@ class RepairStage(models.Model):
     stage_type = fields.Selection([('order', 'Order'),
                                    ('equipment', 'Equipamento'),
                                    ('location', 'Lugar'),
-                                   ('worker', 'Trabalho')], 'Type',
+                                   ('worker', 'Trabalho')], 'Tipo',
                                   required=True)
+
+    state_stage = fields.Selection([('geral', 'Geral'),
+                                   ('done', 'Concluido'),
+                                   ('cancel', 'Cancelado')], 'Status do estagio',
+                                  required=True,
+                                  default="geral")
+
     company_id = fields.Many2one(
         'res.company', string='Empresa'
     )

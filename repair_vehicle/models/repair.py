@@ -136,11 +136,14 @@ class Repair(models.Model):
         sale_name = f"{self.name}-1"
         if len(quotations):
             sale_name = f"{self.name}-{str(len(quotations)+1)}"
+        fiscal_id = self.env['account.fiscal.position'].with_context(force_company=self.company_id.id).get_fiscal_position(self.partner_id.id, self.partner_id.id)
         vals={
             "name": sale_name,
             "partner_id": self.partner_id.id,
+            "fiscal_position_id": fiscal_id,
         }
         sale = self.env["sale.order"].create(vals)
+        sale.onchange_partner_id()
         lista = quotations.ids
         lista.append(sale.id)    
         self.sale_ids = [(6, 0, lista)]

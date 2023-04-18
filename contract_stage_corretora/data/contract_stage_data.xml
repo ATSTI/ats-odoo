@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record model="contract.stage" id="ctr_stage1">
+        <field name="name">Novo</field>
+        <field name="probability">10</field>
+        <field name="on_change">1</field>
+        <field name="is_default">True</field>
+        <field name="sequence">1</field>
+    </record>
+    <record model="contract.stage" id="ctr_stage2">
+        <field name="name">Cotação</field>
+        <field name="probability">30</field>
+        <field name="on_change">1</field>
+        <field name="sequence">2</field>
+    </record>
+    <record model="contract.stage" id="ctr_stage3">
+        <field name="name">Aguardando</field>
+        <field name="probability">40</field>
+        <field name="on_change">1</field>
+        <field name="sequence">3</field>
+    </record>
+    <record model="contract.stage" id="ctr_stage4">
+        <field name="name">Proposta</field>
+        <field name="fold" eval="False"/>
+        <field name="probability">50</field>
+        <field name="on_change">1</field>
+        <field name="sequence">4</field>
+    </record>
+    <record model="contract.stage" id="ctr_stage5">
+        <field name="name">Transmitida</field>
+        <field name="fold" eval="False"/>
+        <field name="probability">100</field>
+        <field name="is_closed">True</field>
+        <field name="on_change">1</field>
+        <field name="sequence">5</field>
+    </record>
+    <record model="contract.stage" id="ctr_stage6">
+        <field name="name">Perdido</field>
+        <field name="fold" eval="False"/>
+        <field name="probability">100</field>
+        <field name="is_closed">True</field>
+        <field name="on_change">1</field>
+        <field name="sequence">6</field>
+    </record>
+
+</odoo>

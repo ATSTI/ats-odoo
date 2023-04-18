@@ -46,7 +46,7 @@
     </record>
 
     <record id="action_contract_stage" model="ir.actions.act_window">
-        <field name="name">contract.estagio.action</field>
+        <field name="name">Estágio para Contratos</field>
         <field name="res_model">contract.stage</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>

@@ -1,8 +1,8 @@
 # Copyright 2021 Ecosoft Co., Ltd (https://ecosoft.co.th/)
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html)
 
-from odoo import fields, models
-from odoo.exceptions import UserError, ValidationError
+from odoo import fields, models, _
+from odoo.exceptions import ValidationError
 
 
 class AccountAnalyticAccount(models.Model):
@@ -34,9 +34,10 @@ class AccountAnalyticAccount(models.Model):
     )
 
     stage_id = fields.Many2one('contract.stage', string='Estágio',
-            track_visibility='onchange',
-            index=True, copy=False,
-            default=lambda self: self._default_stage_id())
+        track_visibility='onchange',
+        index=True, copy=False,
+        default=lambda self: self._default_stage_id()
+    )
 
     def action_draft(self):
         self.write({"state": "draft"})

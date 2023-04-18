@@ -30,7 +30,7 @@ class ProductTemplate(models.Model):
                  'Authentication': '%s' %(self.company_id.nuvem_shop_authentication) 
                  }
             if self.online_venda:
-                variant_ids = self.env['product.product'].search([('product_tmpl_id','=',self.id)])
+                variant_ids = self.env['product.product'].sudo().search([('product_tmpl_id','=',self.id)])
                 if not self.item_id:
                     values = """{"name": {"en": "%s","es": "%s","pt": "%s"},\
                             "description": {"en": "%s", "es": "%s", "pt": "%s"}, "variants":[""" %(
@@ -52,20 +52,15 @@ class ProductTemplate(models.Model):
                             descricao,descricao,descricao
                         )
 
-                    
                     var_prod = ''
                     estoque = self.online_estoque
                     preco = self.online_preco or self.lst_price
                     tamanho = self.complemento or 'null'
                     cor = ''
                     for variant in variant_ids:
-                        #import pudb;pu.db
-                        #if not variant.online_estoque:
-                        #    continue
-                        estoque = variant.online_estoque
+                        estoque = variant.qty_available or variant.online_estoque or 0.0
                         if variant.online_preco:
                             preco = variant.online_preco
-                        #import pudb;pu.db
                         for item in variant.attribute_value_ids:
                             if 'Tamanho' in item.attribute_id.name:
                                 tamanho = item.name
@@ -83,6 +78,7 @@ class ProductTemplate(models.Model):
                                 ,"width": %s, "height": %s, "depth": %s, "values": [{"pt": "%s"}]}' %(
                                 preco, str(int(estoque)), peso, self.default_code,
                                 largura, altura, comprimento, tamanho)
+                    # so entra aqui se nao tiver variant entao nao entra
                     if var_prod == '':
                         var_prod += '{"price": "%s","stock_management": true,"stock": %s,"weight": "%s","sku": "%s"\
                             ,"width": %s, "height": %s, "depth": %s}' %(
@@ -107,7 +103,6 @@ class ProductTemplate(models.Model):
                                         variant.write({'item_id': x['id'],
                                             'variant_id': z['id']})
                 else:   # atualiza o item
-                    #import pudb;pu.db
                     prod = self.item_id
                     if vals.get('name') or vals.get('description') or vals.get('complemento'):
                         values = """{"id": %s,"published": true, "name": {"en": "%s","es": "%s","pt": "%s"}, "description": {"pt": "<p>%s</p>"}}""" %(
@@ -123,33 +118,28 @@ class ProductTemplate(models.Model):
                     # Variantes
                     if self.qty_available or vals.get('online_preco') or vals.get('online_estoque') or vals.get('online_estoque') == 0  or vals.get('default_code'): 
                         estoque = 0
-                        # self.online_estoque
                         preco = self.online_preco or self.lst_price
                         variant_id = self.variant_id
                         tamanho = ''
                         cor = ''
                         for variant in variant_ids:
-                            #if not variant.online_estoque:
-                            #    continue
-                            #estoque = variant.online_estoque
                             estoque = variant.qty_available or variant.online_estoque
                             if variant.online_preco:
                                 preco = variant.online_preco
+                            else:
+                                preco = variant.lst_price
                             variant_id = variant.variant_id
                             for item in variant.attribute_value_ids:
                                 if 'Tamanho' in item.attribute_id.name:
                                     tamanho = item.name
                                 if 'Cor' in item.attribute_id.name:
                                     cor = item.name
-                            #values = """{"id": %s,"product_id": %s, "price": "%s","stock": %s,"weight": "%s","sku": "%s",\
-                            #"width": %s, "height": %s, "values":[{"tamanho": "%s"},{"cor": "%s"}]}""" %(
                             values = """{"id": %s,"product_id": %s, "price": "%s","stock": %s,"weight": "%s","sku": "%s",\
                                 "width": %s, "height": %s}""" %(
                                 variant_id, str(self.item_id), 
                                 preco, 
                                 str(int(estoque)), peso, self.default_code,
                                 largura, altura)
-                                #largura, altura, tamanho, cor)
                             link = '%s%s/variants/%s' %(  
                                 url,
                                 str(self.item_id), str(self.variant_id))
@@ -175,26 +165,6 @@ class ProductProduct(models.Model):
    
     @api.multi
     def write(self, vals):
-        #if len(self) == 1 and 'default_code' not in vals and self.product_tmpl_id.default_code:
-        #    if self.attribute_value_ids:
-        #        attr = ''
-        #        for att in self.attribute_value_ids:
-        #            if attr:
-        #                attr += '_'
-        #            attr += att.name
-        #        vals['default_code'] = '%s-%s' %(
-        #            self.product_tmpl_id.default_code, attr)
-        #if len(self) == 1 and 'default_code' not in vals and not self.default_code:
-        #    for vr in self.product_tmpl_id.product_variant_ids:
-        #        if vr.default_code:
-        #            attr = ''
-        #            for att in self.attribute_value_ids:
-        #                if attr:
-        #                    attr += '_'
-        #                attr += att.name
-        #            vals['default_code'] = '%s-%s' %(
-        #                vr.default_code[:vr.default_code.find('-')],
-        #                    attr)
         res = super(ProductProduct, self).write(vals)
         if len(self) > 1:
             return res
@@ -237,17 +207,11 @@ class ProductProduct(models.Model):
                             prod_name, prod_name, prod_name, 
                             descricao,descricao,descricao
                         )
-                    variant_ids = self.env['product.product'].search([('product_tmpl_id','=',self.id)])
-                    
+                    variant_ids = self.env['product.product'].sudo().search([('product_tmpl_id','=',self.id)])
                     var_prod = ''
-                    #self.online_estoque
-                    # estoque = self.qty_available
                     preco = self.online_preco or self.lst_price
                     for variant in variant_ids:
-                        #if not variant.online_estoque:
-                        #    continue
-                        #estoque = variant.online_estoque
-                        estoque = variant.qty_available   
+                        estoque = variant.qty_available
                         if variant.online_preco:
                             preco = variant.online_preco
                         tamanho = ''
@@ -292,7 +256,6 @@ class ProductProduct(models.Model):
                                     variant.write({'item_id': x['id'],
                                         'variant_id': z['id']})
                 else:
-                    #import pudb;pu.db
                     prod = self.item_id
                     # Variantes
                     if vals.get('online_preco') or vals.get('online_estoque') or vals.get('online_estoque') == 0  or vals.get('default_code'): 
@@ -303,10 +266,6 @@ class ProductProduct(models.Model):
                         link = '%s%s/variants/%s' %(  
                             url,
                             str(self.item_id), str(self.variant_id))
-                        #r = requests.put(link, headers=headers, data=values)
-                        #if r.status_code != 200:
-                        #    msg_err = 'Erro ao ativar produto na loja virtual: %s' %(r.status_code)
-                        #    raise UserError(msg_err)
             else:
                 if self.item_id and not self.online_venda:
                     prod = """{"id": %s, "published": "%s"}""" %(

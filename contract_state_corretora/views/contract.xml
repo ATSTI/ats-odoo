@@ -29,6 +29,7 @@
                     widget="statusbar"
                     statusbar_visible="draft,confirm"
                 />
+                <field name="stage_id" />
             </xpath>
         </field>
     </record>

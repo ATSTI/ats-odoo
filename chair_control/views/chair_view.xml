@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <record id="chair_control_tree" model="ir.ui.view">
+            <field name="name">chair.control.tree</field>
+            <field name="model">chair.control</field>
+            <field name="arch" type="xml">
+                <tree string="Cadeiras">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        <record id="chair_control_form" model="ir.ui.view">
+            <field name="name">chair.control.form</field>
+            <field name="model">chair.control</field>
+            <field name="arch" type="xml">
+                <form string="Cadeiras">
+                    <group>
+                        <field name="name"/>
+                        <field name="active"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record id="chair_control_action" model="ir.actions.act_window">
+            <field name="name">Cadastro de cadeiras</field>
+            <field name="res_model">chair.control</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+              </p>
+            </field>
+        </record>
+
+        <menuitem action="chair_control_action" id="menu_chair_control" parent="account.account_management_menu" sequence="5" groups="account.group_account_invoice"/>
+    </data>
+</odoo>

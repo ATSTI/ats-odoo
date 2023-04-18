@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_payment_receipt_recibo" inherit_id="account.report_payment_receipt">
+        <xpath expr="//t[@t-call='web.html_container']" position="replace">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                <t t-set="formato_moeda" t-value="" />
+                    <div class="page">
+                        <h3>
+                            <strong>Recibo:</strong>
+                        </h3>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <span>Data da Fatura:</span>
+                                    </th>
+                                    <th>
+                                        <span>Data do Pagamento:</span>
+                                    </th>
+                                    <th>
+                                        <span>Nº da Fatura:</span>
+                                    </th>
+                                    <th>
+                                        <span>Referencia:</span>
+                                    </th>
+                                    <th class="text-right">
+                                        <span>Valor original:</span>
+                                    </th>
+                                    <th class="text-right">
+                                        <span>Valor pago:</span>
+                                    </th>
+                                    <th class="text-right">
+                                        <span>Saldo</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <t t-set="total_geral" t-value="0.0"/>
+                            <t t-set="nome_cli" t-value=""/>
+                            <t t-foreach="docs" t-as="o">
+                                <t t-set="lang" t-value="o.partner_id.lang or o.company_id.partner_id.lang"/>
+                                <t t-set="o" t-value="o.with_context(lang=lang)"/>
+                                <t t-set="nome_cli" t-value="o.partner_id.name"/>
+                                <t t-set="formato_moeda" t-value="o.currency_id" />
+                                <tbody>
+                                    <tr t-foreach="o.move_id._get_reconciled_invoices_partials()" t-as="rec">
+                                        <t t-set="amount" t-value="rec[1]"/>
+                                        <t t-set="inv" t-value="rec[2].move_id"/>
+                                        <t t-set="total_geral" t-value="total_geral + inv.amount_total"/>
+                                        <t t-if="inv.move_type != 'entry'">
+                                            <td>
+                                                <span t-field="inv.invoice_date"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="inv.date"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="inv.name"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="inv.ref"/>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-field="inv.amount_total"/>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-esc="amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-field="inv.amount_residual"/>
+                                            </td>
+                                        </t>
+                                    </tr>
+                                </tbody>
+                            </t>
+                        </table>
+                        <table style="width:100%" border="0">
+                            <tr>
+                                <td style="width:70%"></td>
+                                <td class="text-right" style="width:30%" >
+                                    <span>Valor Total: </span>
+                                    <span t-esc="total_geral" t-options="{'widget': 'monetary', 'display_currency': formato_moeda}" />
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <br>
+                        <strong>Assinatura:</strong>
+                    </br>
+                    <br></br>
+                    <br>
+                        <strong>Nome: </strong>
+                        <span t-esc="nome_cli" />
+                    </br>
+                </t>
+            </t>
+        </xpath>
+    </template>
+</odoo>

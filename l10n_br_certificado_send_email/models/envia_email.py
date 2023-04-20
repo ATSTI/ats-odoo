@@ -8,10 +8,14 @@ from datetime import datetime, timedelta
 class CertificadoSendEmail(models.Model):
     _name = "send.email"
     
-    def send_email_certificado(self):
+    def send_email_certificado(self, user_id):
         hoje = fields.Date.context_today(self)+timedelta(days=+10)
-        company = self.env['res.company'].search([()])    
+        company = self.env['res.company'].search([()])
+        context['email_to'] = 'crsilveira@gmail.com'
+        context['user_name'] = user_id.name
+        context['email_from'] = user_id.email_from
         for cp in company:
             if cp.cert_expire_date == hoje:
+                context['date_expire'] = cp.cert_expire_date
                 mail_template = self.env['mail.template'].search([('name', '=', 'vencimento_certificado')])
-                mail_tempĺate.send_mail(cp.id)
+                mail_tempĺate.send_mail(cp.id, context=context)

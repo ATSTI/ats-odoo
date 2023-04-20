@@ -31,6 +31,7 @@
     'website': '',
     'depends': ['l10n_br_nfe'],
     'data': [
+        'data/certificado_email_template.xml'
     ],
     'installable': True,
     'application': False,

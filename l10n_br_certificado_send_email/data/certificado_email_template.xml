@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<odoo noupdate="1">
+<odoo>
 
-  <record id="verncimento_certificado_send_email" model="mail.template">
+  <record id="vencimento_certificado_send_email" model="mail.template">
     <field name="name"> vencimento_certificado</field>
-    <field name="model_id" ref="l10n_br_certificado_send_email.model_send_email" />
+    <field name="model_id" ref="l10n_br_certificado_send_email.model_certificado_send_email" />
     <field name="email_from">${ctx.get('email_from')}</field>
     <field name="subject">Certificado está vencendo.</field>
     <field name="auto_delete" eval="False" />
@@ -11,8 +11,8 @@
     <field name="body_html"><![CDATA[<html>
                 <head></head>
                 <body style="margin: 0; padding: 0;">
-                  <p>Olá ctx.get('user_name'}</p>
-                  <p>O seu certificado vence em ctx.get('date_expire'){</p>
+                  <p>Olá ${ctx.get('user_name')}</p>
+                  <p>O seu certificado digital vencerá no dia <b>${ctx.get('date_expire')}</b></p>
                 </body>
                 </html>
             ]]>    

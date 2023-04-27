@@ -19,5 +19,17 @@
       </field>
   </record>
 
+  	<record id="email_certificado_cron" model="ir.cron">
+        <field name="name">Envia emial vencimento certificado.</field>
+        <field name="model_id" ref="model_certificado_send_email"/>
+        <field name="state">code</field>
+        <field name="code">model.send_email_certificado</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active" eval="True"/>
+        <field name="doall" eval="False"/>
+    </record>
+
 
 </odoo>

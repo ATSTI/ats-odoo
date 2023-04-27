@@ -1,31 +1,21 @@
-# -*- coding: utf-8 -*-
-##############################################################################
-#
-#    OpenERP, Open Source Management Solution
-#    Copyright (C) 2010-Today OpenERP S.A. (<http://www.openerp.com>).
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as
-#    published by the Free Software Foundation, either version 3 of the
-#    License, or (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU Affero General Public License for more details.
-#
-#    You should have received a copy of the GNU Affero General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-##############################################################################
+#© 2023 Carlos R. Silveira, Mauricio Silveira, ATSti Solucoes
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 {
     'name': 'Envia Email',
     'version': '1.0',
     'category': 'Others',
     'sequence': 2,
-    'summary': 'enviar email certificados',
+    'summary': 'Enviar email vencimento do certificados',
     'description': """
+        Preencher em Ações agendadas a ação:
+        Envia email vencimento certificado
+
+        "model.send_email_certificado(2, 7, 30)"
+        
+            2 = id do user que vai receber email, 
+            7 = Dias antes de vencer, 
+            30 = Outro dia antes de vencer.
     """,
     'author': 'ATS Soluções',
     'website': '',

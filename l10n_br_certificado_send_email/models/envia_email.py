@@ -4,14 +4,16 @@
 from odoo import models, fields
 from datetime import datetime, timedelta
 
-    
+
 class CertificadoSendEmail(models.Model):
     _name = "certificado.send.email"
-    
+
     def send_email_certificado(self, user_id, date1, date2=None):
         company = self.env['res.company'].search([])
         hoje = fields.Date.context_today(self)+timedelta(days=date1)
         for cp in company:
+            if not cp.certificate_ecnpj_id and not cp.certificate_nfe_id:
+                continue
             if cp.certificate_nfe_id.date_expiration.date() == hoje:
                 self.enviar_email(user_id, cp)
             if date2:

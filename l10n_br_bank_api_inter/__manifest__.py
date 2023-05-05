@@ -13,12 +13,11 @@
     'development_status': 'Alpha',
     'depends': [
         'l10n_br_account_payment_order',
+        'l10n_br_account_payment_brcobranca',
     ],
     'data': [
-        'views/account_invoice.xml',
         'views/account_move_line.xml',
         'views/account_journal.xml',
-
         'data/cron.xml',
     ],
     'demo': [

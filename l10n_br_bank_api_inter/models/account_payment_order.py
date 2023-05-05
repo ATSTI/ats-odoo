@@ -107,7 +107,6 @@ class AccountPaymentOrder(models.Model):
         else:
             raise NotImplementedError
 
-    @api.multi
     def generate_payment_file(self):
         self.ensure_one()
         try:

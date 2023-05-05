@@ -37,8 +37,9 @@
                 <field name="write_off_choice" string="Write Off" />
                 <field name="bank_inter_state"
                        string="State"
-                       domain="[('payment_mode_id', '=', 'payment_mode_cobranca_inter_api')]"
+                       
                 />
+                <!-- domain="[('payment_mode_id', '=', 'payment_mode_cobranca_inter_api')]" -->
                 <field name="write_off_by_api" stromg="Write Off by API" />
             </field>
 

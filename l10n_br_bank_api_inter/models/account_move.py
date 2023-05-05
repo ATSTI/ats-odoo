@@ -9,15 +9,10 @@ from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
 
-class AccountInvoice(models.Model):
+class AccountMove(models.Model):
 
-    _inherit = 'account.invoice'
+    _inherit = 'account.move'
 
-    pdf_boletos_id = fields.Many2one(
-        comodel_name='ir.attachment',
-        string='PDF Boletos',
-        ondelete='cascade'
-    )
 
     def _merge_pdf_boletos(self):
         pdf_merger = PdfFileMerger()
@@ -41,7 +36,7 @@ class AccountInvoice(models.Model):
         temp_merged.seek(0)
         datas = b64encode(temp_merged.read())
 
-        self.pdf_boletos_id = self.env['ir.attachment'].create(
+        self.file_boleto_pdf_id = self.env['ir.attachment'].create(
             {
                 'name': (
                     "Boleto %s" % self.display_name.replace('/', '-')),
@@ -55,17 +50,17 @@ class AccountInvoice(models.Model):
         for file in temp_files:
             file.close()
 
-    def action_pdf_boleto(self):
+    def gera_boleto_pdf(self):
         """
         Generates and lists all the attachment ids for an Boleto PDF of the
         invoice
         :return: actions.act_window
         """
         try:
-            if not self.pdf_boletos_id:
+            if not self.file_boleto_pdf_id:
                 self._merge_pdf_boletos()
 
-            boleto_id = self.pdf_boletos_id
+            boleto_id = self.file_boleto_pdf_id
             base_url = self.env['ir.config_parameter'].get_param(
                 'web.base.url')
             download_url = '/web/content/%s/%s?download=True' % (
@@ -80,7 +75,6 @@ class AccountInvoice(models.Model):
             raise UserError(error)
             # raise error
 
-    @api.multi
     def action_invoice_cancel(self):
         try:
             financial_move_line_ids = self.financial_move_line_ids

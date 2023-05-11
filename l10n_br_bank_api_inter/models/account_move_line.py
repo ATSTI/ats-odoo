@@ -73,16 +73,20 @@ class AccountMoveLine(models.Model):
             return
         import pudb;pu.db
         order_id = self.payment_line_ids[0].order_id
+
+        # criar o boleto aqui
+        order_id.generate_payment_file()
+
         with ArquivoCertificado(order_id.journal_id, 'w') as (key, cert):
             partner_bank_id = self.journal_id.bank_account_id
-            self.api = ApiInter(
+            api_inter = ApiInter(
                 cert=(cert, key),
                 conta_corrente=(
                         order_id.company_partner_bank_id.acc_number +
                         order_id.company_partner_bank_id.acc_number_dig
                 )
             )
-            datas = self.api.boleto_pdf(self.own_number)
+            datas = api_inter.boleto_pdf(self.own_number)
             self.pdf_boleto_id = self.env['ir.attachment'].create(
                 {
                     'name': (
@@ -142,14 +146,14 @@ class AccountMoveLine(models.Model):
             parser = InterFileParser(self.journal_payment_mode_id)
             for order in self.payment_line_ids:
                 with ArquivoCertificado(order.order_id.journal_id, 'w') as (key, cert):
-                    self.api = ApiInter(
+                    api_inter = ApiInter(
                         cert=(cert, key),
                         conta_corrente=(
                                 order.order_id.company_partner_bank_id.acc_number +
                                 order.order_id.company_partner_bank_id.acc_number_dig
                         )
                     )
-                    resposta = self.api.boleto_consulta(nosso_numero=self.own_number)
+                    resposta = api_inter.boleto_consulta(nosso_numero=self.own_number)
 
                     parser.parse(resposta)
 

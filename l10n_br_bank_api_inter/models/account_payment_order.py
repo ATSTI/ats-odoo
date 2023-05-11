@@ -82,14 +82,18 @@ class AccountPaymentOrder(models.Model):
 
     def _generate_bank_inter_boleto(self):
         with ArquivoCertificado(self.journal_id, 'w') as (key, cert):
-            self.api = ApiInter(
+            api_inter = ApiInter(
                 cert=(cert, key),
                 conta_corrente=(self.company_partner_bank_id.acc_number +
                                 self.company_partner_bank_id.acc_number_dig)
             )
             data = self._generate_bank_inter_boleto_data()
+            
+            import pudb;pu.db
+            # PAREI AQUI O DATA esta vindo vazio
+
             for item in data:
-                resposta = self.api.boleto_inclui(item._emissao_data())
+                resposta = api_inter.boleto_inclui(item._emissao_data())
                 payment_line_id = self.payment_line_ids.filtered(
                     lambda line: line.bank_line_id.name == item._identifier)
                 if payment_line_id:
@@ -110,8 +114,7 @@ class AccountPaymentOrder(models.Model):
     def generate_payment_file(self):
         self.ensure_one()
         try:
-            if (self.company_partner_bank_id.bank_id ==
-                    self.env.ref('l10n_br_base.res_bank_077') and
+            if (self.company_partner_bank_id.bank_id.code_bc == '077' and
                     self.payment_method_id.code == 'electronic'):
                 return self._gererate_bank_inter_api()
             else:

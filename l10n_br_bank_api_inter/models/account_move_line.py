@@ -71,7 +71,6 @@ class AccountMoveLine(models.Model):
         """
         if self.own_number and self.pdf_boleto_id:
             return
-        import pudb;pu.db
         order_id = self.payment_line_ids[0].order_id
 
         # criar o boleto aqui

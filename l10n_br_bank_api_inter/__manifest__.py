@@ -18,6 +18,7 @@
     'data': [
         'views/account_move_line.xml',
         'views/account_journal.xml',
+        'views/account_move_view.xml',
         'data/cron.xml',
     ],
     'demo': [

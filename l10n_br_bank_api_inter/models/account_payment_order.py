@@ -114,6 +114,10 @@ class AccountPaymentOrder(models.Model):
             # import pudb;pu.db
             if (self.company_partner_bank_id.bank_id.code_bc == '077' and
                     self.payment_method_id.code == '240'):
+                # date esta sem valor
+                for pay in self.payment_line_ids:
+                    if not pay.date:
+                        pay.write({'date': fields.Date.today()})
                 #cria o bank.payment.line
                 bank = self.env['bank.payment.line']
                 bank_line = bank.create({

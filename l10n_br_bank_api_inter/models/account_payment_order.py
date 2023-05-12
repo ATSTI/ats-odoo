@@ -4,7 +4,7 @@
 import logging
 from .arquivo_certificado import ArquivoCertificado
 
-from odoo import api, models, _
+from odoo import api, models, _, fields
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -119,7 +119,8 @@ class AccountPaymentOrder(models.Model):
                 bank_line = bank.create({
                     'name': self.name,
                     'order_id': self.id,
-                    'communication': self.name
+                    'communication': self.name,
+                    'date': fields.Date.today(),
                 })
                 bank_values = bank_line.prepare_bank_payment_line(self.company_partner_bank_id.bank_id)
                 bank_line.write({bank_values})

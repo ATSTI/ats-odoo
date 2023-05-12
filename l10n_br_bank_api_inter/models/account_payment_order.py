@@ -89,9 +89,6 @@ class AccountPaymentOrder(models.Model):
             )
             data = self._generate_bank_inter_boleto_data()
             
-            import pudb;pu.db
-            # PAREI AQUI O DATA esta vindo vazio
-
             for item in data:
                 resposta = api_inter.boleto_inclui(item._emissao_data())
                 payment_line_id = self.payment_line_ids.filtered(
@@ -114,8 +111,18 @@ class AccountPaymentOrder(models.Model):
     def generate_payment_file(self):
         self.ensure_one()
         try:
+            # import pudb;pu.db
             if (self.company_partner_bank_id.bank_id.code_bc == '077' and
-                    self.payment_method_id.code == 'electronic'):
+                    self.payment_method_id.code == '240'):
+                #cria o bank.payment.line
+                bank = self.env['bank.payment.line']
+                bank_line = bank.create({
+                    'name': self.name,
+                    'order_id': self.id,
+                    'communication': self.name
+                })
+                bank_values = bank_line.prepare_bank_payment_line(self.company_partner_bank_id.bank_id)
+                bank_line.write({bank_values})
                 return self._gererate_bank_inter_api()
             else:
                 return super().generate_payment_file()

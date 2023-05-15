@@ -88,3 +88,18 @@ class AccountMove(models.Model):
                 )
         except Exception as error:
             raise UserError(_(error))
+
+    # def create_account_payment_line(self):
+    #     res = super().create_account_payment_line()
+    #     import pudb;pu.db
+    #     if (self.partner_bank_id.bank_id.code_bc == '077' and
+    #         self.payment_mode_id.payment_method_id.code == '240'):
+    #         self.payment_order_id.draft2open()
+    #     return res    
+    
+    # def action_post(self):
+    #     result = super().action_post()
+    #     import pudb;pu.db
+    #     self.load_cnab_info()
+    #     self.payment_order_id.draft2open()
+    #     return result

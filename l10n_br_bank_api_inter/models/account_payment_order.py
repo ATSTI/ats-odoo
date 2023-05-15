@@ -114,20 +114,24 @@ class AccountPaymentOrder(models.Model):
             # import pudb;pu.db
             if (self.company_partner_bank_id.bank_id.code_bc == '077' and
                     self.payment_method_id.code == '240'):
-                # date esta sem valor
-                for pay in self.payment_line_ids:
-                    if not pay.date:
-                        pay.write({'date': fields.Date.today()})
                 #cria o bank.payment.line
-                bank = self.env['bank.payment.line']
-                bank_line = bank.create({
-                    'name': self.name,
-                    'order_id': self.id,
-                    'communication': self.name,
-                    'date': fields.Date.today(),
-                })
-                bank_values = bank_line.prepare_bank_payment_line(self.company_partner_bank_id.bank_id)
-                bank_line.write({bank_values})
+                # bank = self.env['bank.payment.line']
+                # bank_line = bank.create({
+                #     'name': self.name,
+                #     'order_id': self.id,
+                #     'communication': self.name,
+                # })
+                # date esta sem valor
+                # for pay in self.payment_line_ids:
+                #     line_id = pay.move_line_id.id
+                #     vals = []
+                #     vals['bank_line_id'] = bank_line.id
+                #     if not pay.date:
+                #         vals['date'] = fields.Date.today()
+                #     pay.write(vals)
+                # bank_values = bank_line.prepare_bank_payment_line(self.company_partner_bank_id.bank_id)
+                # bank_line.write({bank_values})
+                # self.draft2open()
                 return self._gererate_bank_inter_api()
             else:
                 return super().generate_payment_file()

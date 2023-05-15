@@ -42,7 +42,7 @@ class AccountPaymentOrder(models.Model):
                 bankName=self.company_partner_bank_id.bank_id.name,
             ),
         )
-        for line in self.bank_line_ids:
+        for line in self.payment_line_ids:
             payer = User(
                 name=line.partner_id.legal_name,
                 identifier=misc.punctuation_rm(
@@ -68,7 +68,7 @@ class AccountPaymentOrder(models.Model):
                 amount=line.amount_currency,
                 payer=payer,
                 issue_date=line.create_date,
-                due_date=line.date,
+                due_date=line.move_line_id.date_maturity,
                 identifier=line.name,
                 instructions=[
                     'TESTE 1',

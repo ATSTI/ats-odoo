@@ -99,7 +99,7 @@ class AccountMove(models.Model):
     
     # def action_post(self):
     #     result = super().action_post()
-    #     import pudb;pu.db
-    #     self.load_cnab_info()
+    #     # import pudb;pu.db
+    #     # self.load_cnab_info()
     #     self.payment_order_id.draft2open()
     #     return result

@@ -1,6 +1,8 @@
 # Copyright 2020 KMEE
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import re
+from datetime import timedelta
 import logging
 from .arquivo_certificado import ArquivoCertificado
 
@@ -16,11 +18,6 @@ except ImportError:
     _logger.error("Biblioteca erpbrasil.bank.inter não instalada")
 
 try:
-    from febraban.cnab240.user import User, UserAddress, UserBank
-except ImportError:
-    _logger.error("Biblioteca febraban não instalada")
-
-try:
     from erpbrasil.base import misc
 except ImportError:
     _logger.error("Biblioteca erpbrasil.base não instalada")
@@ -30,75 +27,135 @@ class AccountPaymentOrder(models.Model):
     _inherit = 'account.payment.order'
 
     def _generate_bank_inter_boleto_data(self):
+        import pudb;pu.db
         dados = []
-        myself = User(
-            name=self.company_id.legal_name,
-            identifier=misc.punctuation_rm(self.company_id.cnpj_cpf),
-            bank=UserBank(
-                bankId=self.company_partner_bank_id.bank_id.code_bc,
-                branchCode=self.company_partner_bank_id.bra_number,
-                accountNumber=self.company_partner_bank_id.acc_number,
-                accountVerifier=self.company_partner_bank_id.acc_number_dig,
-                bankName=self.company_partner_bank_id.bank_id.name,
-            ),
-        )
+        instrucao = self.payment_mode_id.instructions or ''
+        instrucao1 = ''
+        if instrucao and len(instrucao) > 80:
+            instrucao = instrucao[:80]
+            instrucao1 = instrucao[80:]
+
+        precision = self.env["decimal.precision"]
+        precision_account = precision.precision_get("Account")
         for line in self.payment_line_ids:
-            payer = User(
-                name=line.partner_id.legal_name,
-                identifier=misc.punctuation_rm(
-                    line.partner_id.cnpj_cpf
-                ),
-                email=line.partner_id.email or '',
-                personType=(
-                    "FISICA" if line.partner_id.company_type == 'person'
-                    else 'JURIDICA'),
-                phone=misc.punctuation_rm(
-                    line.partner_id.phone).replace(" ", ""),
-                address=UserAddress(
-                    streetLine1=line.partner_id.street or '',
-                    district=line.partner_id.district or '',
-                    city=line.partner_id.city_id.name or '',
-                    stateCode=line.partner_id.state_id.code or '',
-                    zipCode=misc.punctuation_rm(line.partner_id.zip),
-                    streetNumber=line.partner_id.street_number,
+            move_line = line.move_line_id
+            # Instrução de Juros
+            tipo_mora = "ISENTO"
+            data_mora = ''
+            valor_juro = 0
+            taxa_mora = 0
+            if self.payment_mode_id.boleto_interest_perc > 0.0:
+                tipo_mora = "TAXAMENSAL"
+                data_mora = (move_line.date_maturity + timedelta(days=1)).isoformat()
+                taxa_mora = move_line.payment_mode_id.boleto_interest_perc
+                valor_juro = round(
+                    move_line.debit
+                        * ((move_line.payment_mode_id.boleto_interest_perc / 100) / 30),
+                        precision_account,
+                    )
+            # Instrução Multa
+            tipo_multa = "NAOTEMMULTA"
+            data_multa = ''
+            taxa_multa = 0
+            valor_multa = 0
+            if move_line.payment_mode_id.boleto_fee_perc > 0.0:
+                tipo_multa = "PERCENTUAL"  # Percentual
+                data_multa = (move_line.date_maturity + timedelta(days=1)).isoformat()
+                taxa_multa = move_line.payment_mode_id.boleto_fee_perc
+                valor_multa = round(
+                    move_line.debit * (move_line.payment_mode_id.boleto_fee_perc / 100),
+                    precision_account,
                 )
-            )
-            slip = BoletoInter(
-                sender=myself,
-                amount=line.amount_currency,
-                payer=payer,
-                issue_date=line.create_date,
-                due_date=line.move_line_id.date_maturity,
-                identifier=line.name,
-                instructions=[
-                    'TESTE 1',
-                    'TESTE 2',
-                    'TESTE 3',
-                    'TESTE 4',
-                ]
-            )
-            dados.append(slip)
+            # Instrução Desconto
+            if move_line.boleto_discount_perc > 0.0:
+                valor_desconto = round(
+                    move_line.debit * (move_line.boleto_discount_perc / 100),
+                    precision_account,
+                )
+            email = move_line.partner_id.email or ""
+            email = email[:email.find(';')]
+            vals = {
+                "seuNumero": move_line.document_number,
+                "dataVencimento": move_line.date_maturity.isoformat(),
+                "valorNominal": move_line.debit,
+                "numDiasAgenda": 60,
+                "pagador":{
+                    "cpfCnpj": re.sub("[^0-9]", "",move_line.partner_id.cnpj_cpf),
+                    "nome": move_line.partner_id.legal_name,
+                    "email": email,
+                    "telefone":"",
+                    "ddd":"",
+                    "cep": re.sub("[^0-9]", "", move_line.partner_id.zip),
+                    "numero": move_line.partner_id.street_number or "",
+                    "complemento": move_line.partner_id.street2 or "",
+                    "bairro": move_line.partner_id.district or "",
+                    "cidade": move_line.partner_id.city_id.name or "",
+                    "uf": move_line.partner_id.state_id.code or "",
+                    "endereco": move_line.partner_id.street_name or "",
+                    "tipoPessoa": "JURIDICA" if move_line.partner_id.is_company else "FISICA"
+                },
+                "mensagem": {
+                    "linha1": instrucao,
+                    "linha2": instrucao1,
+                    "linha3": "",
+                    "linha4": "",
+                    "linha5": "",
+                },
+                "desconto1":{
+                    "codigoDesconto": "NAOTEMDESCONTO",
+                    "taxa": 0,
+                    "valor": 0,
+                    "data": ""
+                },
+                "desconto2": {
+                    "codigoDesconto": "NAOTEMDESCONTO",
+                    "taxa": 0,
+                    "valor": 0,
+                    "data": ""
+                },
+                "desconto3":{
+                    "codigoDesconto": "NAOTEMDESCONTO",
+                    "taxa": 0,
+                    "valor": 0,
+                    "data": ""
+                },
+                "multa": {
+                    "codigoMulta": tipo_multa,
+                    "data": data_multa,
+                    "taxa": taxa_multa,
+                    "valor": valor_multa,
+                },
+                "mora": {
+                    "codigoMora": tipo_mora,
+                    "data": data_mora,
+                    "taxa": taxa_mora,
+                    "valor": valor_juro,
+                },
+            }
+            dados.append(vals)
         return dados
 
     def _generate_bank_inter_boleto(self):
+        import pudb;pu.db
         with ArquivoCertificado(self.journal_id, 'w') as (key, cert):
             api_inter = ApiInter(
                 cert=(cert, key),
                 conta_corrente=(self.company_partner_bank_id.acc_number +
-                                self.company_partner_bank_id.acc_number_dig)
+                                self.company_partner_bank_id.acc_number_dig),
+                clientId=self.journal_id.bank_inter_id,
+                clientSecret=self.journal_id.bank_inter_secret
             )
             data = self._generate_bank_inter_boleto_data()
-            
             for item in data:
-                resposta = api_inter.boleto_inclui(item._emissao_data())
-                payment_line_id = self.payment_line_ids.filtered(
-                    lambda line: line.bank_line_id.name == item._identifier)
-                if payment_line_id:
-                    payment_line_id.move_line_id.own_number = \
-                        resposta['nossoNumero']
-                # bank_line_id.seu_numero = resposta['seuNumero']
-                # bank_line_id.linha_digitavel = resposta['linhaDigitavel']
-                # bank_line_id.barcode = resposta['codigoBarras']
+                resposta, result = api_inter.boleto_inclui(item)
+                if resposta.status_code == 200:
+                    payment_line_id = self.payment_line_ids.filtered(
+                        lambda line: line.document_number == item["nossoNumero"])
+                    payment_line_id.move_line_id.write({
+                        'nosso_numero': result["nossoNumero"],
+                        'codigo_barra': result["codigoBarras"],
+                        'linha_digitavel': result["linhaDigitavel"]
+                    })
         return False, False
 
     def _gererate_bank_inter_api(self):
@@ -111,27 +168,8 @@ class AccountPaymentOrder(models.Model):
     def generate_payment_file(self):
         self.ensure_one()
         try:
-            # import pudb;pu.db
             if (self.company_partner_bank_id.bank_id.code_bc == '077' and
                     self.payment_method_id.code == '240'):
-                #cria o bank.payment.line
-                # bank = self.env['bank.payment.line']
-                # bank_line = bank.create({
-                #     'name': self.name,
-                #     'order_id': self.id,
-                #     'communication': self.name,
-                # })
-                # date esta sem valor
-                # for pay in self.payment_line_ids:
-                #     line_id = pay.move_line_id.id
-                #     vals = []
-                #     vals['bank_line_id'] = bank_line.id
-                #     if not pay.date:
-                #         vals['date'] = fields.Date.today()
-                #     pay.write(vals)
-                # bank_values = bank_line.prepare_bank_payment_line(self.company_partner_bank_id.bank_id)
-                # bank_line.write({bank_values})
-                # self.draft2open()
                 return self._gererate_bank_inter_api()
             else:
                 return super().generate_payment_file()

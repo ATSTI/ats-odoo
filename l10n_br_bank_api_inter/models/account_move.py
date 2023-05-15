@@ -58,6 +58,16 @@ class AccountMove(models.Model):
         """
         try:
             if not self.file_boleto_pdf_id:
+                receivable_ids = self.mapped("financial_move_line_ids")
+                boletos = receivable_ids.send_payment()
+                if not boletos:
+                    raise UserError(
+                        _(
+                            "It is not possible generated boletos\n"
+                            "Make sure the Invoice are in Confirm state and "
+                            "Payment Mode method are CNAB."
+                        )
+                    )
                 self._merge_pdf_boletos()
 
             boleto_id = self.file_boleto_pdf_id
@@ -97,9 +107,13 @@ class AccountMove(models.Model):
     #         self.payment_order_id.draft2open()
     #     return res    
     
-    # def action_post(self):
-    #     result = super().action_post()
-    #     # import pudb;pu.db
-    #     # self.load_cnab_info()
-    #     self.payment_order_id.draft2open()
-    #     return result
+    def action_post(self):
+        result = super().action_post()
+        if (self.partner_bank_id.bank_id.code_bc == '077' and
+            self.payment_mode_id.payment_method_id.code == '240'):
+            self.gera_boleto_pdf()
+    
+        # import pudb;pu.db
+        # self.load_cnab_info()
+        # self.payment_order_id.draft2open()
+        return result

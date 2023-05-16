@@ -101,14 +101,10 @@ class AccountMove(models.Model):
         result = super().action_post()
         if (self.partner_bank_id.bank_id.code_bc == '077' and
             self.payment_mode_id.payment_method_id.code == '240'):
-            if (not self.journal_id.bank_inter_id or 
-                not self.journal_id.bank_inter_secret):
+            if (not self.partner_bank_id.journal_id.bank_inter_id or 
+                not self.partner_bank_id.journal_id.bank_inter_secret):
                 raise UserError(
                     _("Informe o Id é chave do banco Inter.")
                 )
             self.gera_boleto_pdf()
-    
-        # import pudb;pu.db
-        # self.load_cnab_info()
-        # self.payment_order_id.draft2open()
         return result

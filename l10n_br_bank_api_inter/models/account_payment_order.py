@@ -27,7 +27,6 @@ class AccountPaymentOrder(models.Model):
     _inherit = 'account.payment.order'
 
     def _generate_bank_inter_boleto_data(self):
-        import pudb;pu.db
         dados = []
         instrucao = self.payment_mode_id.instructions or ''
         instrucao1 = ''
@@ -136,7 +135,7 @@ class AccountPaymentOrder(models.Model):
         return dados
 
     def _generate_bank_inter_boleto(self):
-        import pudb;pu.db
+        # import pudb;pu.db
         with ArquivoCertificado(self.journal_id, 'w') as (key, cert):
             api_inter = ApiInter(
                 cert=(cert, key),

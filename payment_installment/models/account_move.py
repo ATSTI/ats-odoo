@@ -3,6 +3,7 @@
 
 from odoo import api, fields, models, _
 from datetime import date, datetime
+from odoo.exceptions import UserError
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
@@ -17,9 +18,18 @@ class AccountMove(models.Model):
     payment_mode_id = fields.Many2one(
        'account.payment.mode', string=u"Modo de pagamento")
     
+    def action_post(self):
+        different = False
+        for prc in self.parcela_ids:
+            fin = self.financial_move_line_ids.filtered(lambda l: l.date_maturity == prc.data_vencimento)
+            if fin.debit != prc.valor:
+                different = True
+                break
+        if different:
+            raise UserError(_(f"Parcela não foi confirmada, favor confirmar na aba PARCELAS."))       
+        return super().action_post()
+
     def action_confirma_parcela(self): 
-        import wdb
-        wdb.set_trace()
         if self.num_parcela > 0:
             parcela = 0
             for fin in self.financial_move_line_ids:

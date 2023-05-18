@@ -18,6 +18,8 @@ class AccountMove(models.Model):
     payment_mode_id = fields.Many2one(
        'account.payment.mode', string=u"Modo de pagamento")
     
+    # TODO saindo o mesmo nome para todas as parcelas
+
     def action_post(self):
         different = False
         for prc in self.parcela_ids:
@@ -26,27 +28,18 @@ class AccountMove(models.Model):
                 different = True
                 break
         if different:
-            raise UserError(_(f"Parcela não foi confirmada, favor confirmar na aba PARCELAS."))       
-        return super().action_post()
+            raise UserError(_(f"Parcela não foi confirmada, favor confirmar na aba PARCELAS.")) 
+        res = super().action_post()      
+        return res
 
     def action_confirma_parcela(self): 
         if self.num_parcela > 0:
-            parcela = 0
-            for fin in self.financial_move_line_ids:
-                parc = self.parcela_ids[parcela]
-                fin.with_context(check_move_validity=False).update({
-                        'date_maturity': parc.data_vencimento,
-                        'amount_currency': parc.valor,
-                        'debit': parc.valor,
-                        'balance': parc.valor,
-                        'credit': 0.0,
-                    })
-                parcela += 1
-                account = fin.account_id
-            for prc in self.parcela_ids[parcela:]:
+            account = self.financial_move_line_ids[0].account_id
+            self.financial_move_line_ids.with_context(check_move_validity=False).unlink()
+            for prc in self.parcela_ids:
                 create_method = self.env['account.move.line'].with_context(check_move_validity=False).create
-                candidate = create_method({
-                        'name': self.payment_reference or '',
+                create_method({
+                        'name': f"{self.payment_reference}-{prc.numero_fatura}",
                         'debit': prc.valor,
                         'balance': prc.valor,
                         'credit': 0.0,
@@ -58,8 +51,33 @@ class AccountMove(models.Model):
                         'account_id': account.id,
                         'partner_id': self.commercial_partner_id.id,
                         'exclude_from_invoice_tab': True,
-                    })
+                })
 
+    # def _recompute_payment_terms_lines(self):
+    #     """Compute the dynamic payment term lines of the journal entry.
+    #     overwritten this method to change aml's field name.
+    #     """
+
+    #     # TODO - esse método é executado em um onchange, na emissão de um novo
+    #     # documento fiscal o numero do documento pode estar em branco
+    #     # atualizar esse dado ao validar a fatura, ou atribuir o número da NFe
+    #     # antes de salva-la.
+    #     result = super()._recompute_payment_terms_lines()
+    #     if self.document_number:
+    #         terms_lines = self.line_ids.filtered(
+    #             lambda l: l.account_id.user_type_id.type in ("receivable", "payable")
+    #             and l.move_id.document_type_id
+    #         )
+    #         terms_lines.sorted(lambda line: line.date_maturity)
+    #         for idx, terms_line in enumerate(terms_lines):
+    #             # TODO TODO pegar o método do self.fiscal_document_id.with_context(
+    #             # fiscal_document_no_company=True
+    #             # )._compute_document_name()
+    #             terms_line.name = "{}/{}-{}".format(
+    #                 self.document_number, idx + 1, len(terms_lines)
+    #             )
+    #     return result
+    
     def calcular_vencimento(self, dia_preferencia, parcela):
         if self.invoice_date:
             hj = self.invoice_date

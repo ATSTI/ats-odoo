@@ -48,7 +48,6 @@ class RepairStage(models.Model):
         'res.company', string='Empresa'
     )
 
-    @api
     def get_color_information(self):
         # get stage ids
         stage_ids = self.search([])

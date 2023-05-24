@@ -113,7 +113,6 @@ class Repair(models.Model):
         res = super().write(vals)
         return res
 
-    @api.multi
     def action_view_sale_order(self):
         quotations = self.mapped('sale_ids')
         action = self.env.ref('sale.action_orders').read()[0]
@@ -130,7 +129,6 @@ class Repair(models.Model):
             action = {'type': 'ir.actions.act_window_close'}
         return action
 
-    @api.multi
     def action_create_sale_order(self):
         quotations = self.mapped('sale_ids')
         sale_name = f"{self.name}-1"

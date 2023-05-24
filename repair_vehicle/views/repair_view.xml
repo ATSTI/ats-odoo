@@ -69,6 +69,10 @@
                 <label for="name" position="replace">
                     <label for="name" string="N. OS"/>
                 </label>
+                <field name="name" position="after">
+                    <field name="origin"/>
+                    <field name="lot_id"/>
+                </field>
                 <field name="invoice_method" position="replace">
                     <field name="invoice_method" invisible="1"/>
                 </field>

@@ -54,6 +54,15 @@ class Repair(models.Model):
         copy=False
     )
 
+    origin = fields.Char(
+        string="Origem",
+    )    
+    
+    lot_id = fields.Many2one(
+        "stock.production.lot",
+        string="lote",
+    )
+
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
         search_domain = [('stage_type', '=', 'order')]

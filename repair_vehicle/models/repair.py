@@ -38,6 +38,8 @@ class Repair(models.Model):
     )
 
     contas_pendentes = fields.Monetary('Faturas')
+    payment_term_id = fields.Many2one('account.payment.term', string='Forma de pagamento')
+    date_vencimento = fields.Date(string='Data vencimento')
 
     currency_id = fields.Many2one(
         comodel_name="res.currency",
@@ -113,7 +115,6 @@ class Repair(models.Model):
         res = super().write(vals)
         return res
 
-    @api.multi
     def action_view_sale_order(self):
         quotations = self.mapped('sale_ids')
         action = self.env.ref('sale.action_orders').read()[0]
@@ -130,7 +131,6 @@ class Repair(models.Model):
             action = {'type': 'ir.actions.act_window_close'}
         return action
 
-    @api.multi
     def action_create_sale_order(self):
         quotations = self.mapped('sale_ids')
         sale_name = f"{self.name}-1"

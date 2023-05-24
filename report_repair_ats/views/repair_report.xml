@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>    
+    <record id="account_repair_budget" model="ir.actions.report">
+        <field name="name">Orçamento</field>
+        <field name="model">repair.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">report_repair_ats.report_repair_document</field>
+        <field name="report_file">report_repair_ats.report_repair_document</field>
+        <field name="binding_model_id" ref="repair.model_repair_order"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

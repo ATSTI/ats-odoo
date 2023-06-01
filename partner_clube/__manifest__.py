@@ -34,6 +34,7 @@
     ],
     'data': [
         'views/partner_view.xml',
+        'security/ir.model.access.csv',
     ],
     'demo': [],
     'installable': True,

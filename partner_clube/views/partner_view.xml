@@ -39,6 +39,7 @@
                 <field name="vat" string="N. Título" />
                 <field name="data_admissao" />
                 <field name="data_desligamento" />
+                <field name="category" />
                 <field name="categoria" />             
             </field>  
             <field name="phone" position="after">
@@ -47,31 +48,35 @@
             <notebook position="inside">
                 <page string="Informações Pessoais">
                     <group>
-                        <field name="data_nascimento" />
-	                <field
-                            name="age"
-                            attrs="{'invisible': [('data_nascimento', '=', False)]}"
-                        />
-                        <field name="sexo" />
-                        <field name="estado_civil" />
-                        <field name="parentesco" />
-                    </group>
-                    <group>
-                        <field name="chave_acesso" />
-                        <field name="pagante" />
-                        <field name="dependente" />
-                        <field name="inadimplente" />
-                        <field name="conselheiro" />
-                        <field name="funcionario" />
-                        <field name="diretor" />
-                    </group>
-                    <group>
-                        <field name="empresa" />
-                        <field name="profissao" />
-                        <field name="pai" />
-                        <field name="mae" />
-                        <field name="naturalidade" />
-                        <field name="nacionalidade" />
+                        <group>
+                            <field name="data_nascimento" />
+                        <field
+                                name="age"
+                                attrs="{'invisible': [('data_nascimento', '=', False)]}"
+                            />
+                            <field name="sexo" />
+                            <field name="estado_civil" />
+                            <field name="parentesco" />
+                            <field name="chave_acesso" />
+                        </group>
+                        <group>
+                            <field name="empresa" />
+                            <field name="profissao" />
+                            <field name="pai" />
+                            <field name="mae" />
+                            <field name="naturalidade" />
+                            <field name="nacionalidade" />
+                        </group>
+                        <group>
+                            <field name="pagante" />
+                            <field name="dependente" />
+                            <field name="inadimplente" />
+                        </group>
+                        <group>
+                            <field name="conselheiro" />
+                            <field name="funcionario" />
+                            <field name="diretor" />
+                        </group>
                     </group>
                 </page>
             </notebook>
@@ -84,9 +89,28 @@
         <field name="inherit_id" ref="base.view_partner_tree" />
         <field name="arch" type="xml">
             <field name="cnpj_cpf" position="before">
-			    <field name="cartao" string="Cartão" /> 
+			    <field name="parent_id" string="Titular" />
+                <field name="cartao" string="Cartão" /> 
                 <field name="age" />
             </field>
+            <field name="legal_name" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="inscr_est" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="user_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>  
+            <field name="city" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>  
+            <field name="country_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>  
+            <field name="company_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>              
         </field>
     </record>
     <!--

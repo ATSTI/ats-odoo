@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+  <record id="vencimento_certificado_send_email" model="mail.template">
+    <field name="name"> vencimento_certificado</field>
+    <field name="model_id" ref="l10n_br_certificado_send_email.model_certificado_send_email" />
+    <field name="email_from">${ctx.get('email_from')}</field>
+    <field name="subject">Certificado está vencendo.</field>
+    <field name="auto_delete" eval="False" />
+    <field name="email_to">${ctx.get('email_to')}</field>
+    <field name="body_html"><![CDATA[<html>
+                <head></head>
+                <body style="margin: 0; padding: 0;">
+                  <p>Olá ${ctx.get('user_name')}</p>
+                  <p>O seu certificado digital vencerá no dia <b>${ctx.get('date_expire')}</b></p>
+                </body>
+                </html>
+            ]]>    
+      </field>
+  </record>
+
+  	<record id="email_certificado_cron" model="ir.cron">
+        <field name="name">Envia emial vencimento certificado.</field>
+        <field name="model_id" ref="model_certificado_send_email"/>
+        <field name="state">code</field>
+        <field name="code">model.send_email_certificado</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active" eval="True"/>
+        <field name="doall" eval="False"/>
+    </record>
+
+
+</odoo>

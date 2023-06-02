@@ -12,7 +12,7 @@
    """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': [],
+    'depends': ["partner_manual_rank"],
     'data': [
         'security/ir.model.access.csv',
         'wizard/importar_view.xml',

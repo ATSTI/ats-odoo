@@ -59,7 +59,6 @@ class AccountMoveLine(models.Model):
                 handle_price_include=True, # FIXME
                 fiscal_taxes=self.env.context.get("fiscal_tax_ids"),
                 operation_line=operation_line,
-                cfop=cfop,
                 ncm=self.env.context.get("ncm_id"),
                 nbs=self.env.context.get("nbs_id"),
                 nbm=self.env.context.get("nbm_id"),

@@ -9,7 +9,7 @@ class NFeLine(spec_models.StackedModel):
     _schema_name = "nfe"
     _schema_version = "4.0.0"
     _odoo_module = "l10n_br_nfe"
-    _spec_module = "odoo.addons.l10n_br_nfe_spec.models.v4_00.leiauteNFe"
+    _spec_module = "odoo.addons.l10n_br_nfe_spec.models.v4_0.leiaute_nfe_v4_00"
     _spec_tab_name = "NFe"
     _stack_skip = "nfe40_det_infNFe_id"
     _stacking_points = {}
@@ -17,11 +17,12 @@ class NFeLine(spec_models.StackedModel):
 
     def _export_fields(self, xsd_fields, class_obj, export_dict):
         if class_obj._name == "nfe.40.prod":
+            # import pudb;pu.db
             for aml in self.account_line_ids:
                 if aml.move_id.move_type == "in_invoice":
                     for di in aml.di_ids:
                         vals_di_di = {
-                            "nfe40_DI_prod_id": di.aml_id.product_id.id,
+                            "nfe40_DI_prod_id": di.id,
                             "nfe40_nDI" : di.name,
                             "nfe40_dDI" : di.date_registration,
                             "nfe40_xLocDesemb" : di.location,

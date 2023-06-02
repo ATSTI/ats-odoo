@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2020 ACSONE SA/NV
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record model="ir.ui.view" id="create_detexp_form_view">
+        <field name="name">wizard_detexp_form_view</field>
+        <field name="model">wizard.create.detexp</field>
+        <field name="arch" type="xml">
+            <form string="Detalhe da exportação">
+                <group>
+                    <group>
+                        <field name="nfe40_nDraw" />
+                        <field name="nfe40_nRE" />
+                        <field name="nfe40_chNFe" />
+                        <field name="nfe40_qExport" />
+                    </group>
+                    <group>
+                        <field name="am_id" invisible="1" />
+                        <field 
+                            name="aml_id"
+                            domain="[('move_id', '=', am_id), ('product_id', '!=', False)]"
+                            options="{'no_create': True, 'no_create_edit':True}"
+                        />
+                    </group>
+                </group>
+                <footer>
+                    <button
+                        name="action_create_expind"
+                        string="SALVAR"
+                        class="btn-success"
+                        type="object"
+                    />
+                    <button string="DESCARTAR" class="btn-default" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_create_detexp" model="ir.actions.act_window">
+        <field name="name">Criar Di</field>
+        <field name="res_model">wizard.create.detexp</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="create_detexp_form_view"/>
+        <field name="target">new</field>
+    </record>
+
+    <!-- <record model="ir.ui.view" id="create_expind_tree_view">
+        <field name="name">create_expind_tree_view</field>
+        <field name="model">exp.ind</field>
+        <field name="arch" type="xml">
+            <tree string="Exportação indireta">
+                <field name="nfe40_nRE" />
+                <field name="nfe40_chNFe" />
+                <field name="nfe40_qExport" />
+            </tree>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="create_expind_form_view">
+        <field name="name">create_expind_form_view</field>
+        <field name="model">exp.ind</field>
+        <field name="arch" type="xml">
+            <form string="Exportação indireta">
+                <group>
+                    <group>
+                        <field name="nfe40_nRE" />
+                        <field name="nfe40_chNFe" />
+                        <field name="nfe40_qExport" />
+                    </group>
+                </group>
+            </form>
+        </field>
+    </record> -->
+</odoo>

@@ -5,13 +5,15 @@
     "version": "14.0.1.1.0",
     "category": "maintenance",
     "description" : "Cria retorno para o estoque quando a OM e concluida. \
-        IMPORTANTE: necessario criar um tipo de operação \
-            no inventário: Manutenção \
-            com local origem Manutenção e destino Stock",
+        IMPORTANTE: \
+            - Necessario criar um tipo de operação \
+              no inventário: Manutenção \
+              com local origem Manutenção e destino Stock. \
+            - O estágio de Concluído precisa estar marcado como 'Chamdo atendido'",
     "author": "Mauricio, ATSTi Soluções",
     "website": "",
     "license": "LGPL-3",
-    "depends": ["maintenance"],
+    "depends": ["maintenance", "maintenance_request_stage_transition"],
     "data": [
         "views/maintenance_picking_views.xml",
     ],

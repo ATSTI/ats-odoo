@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<odoo>
+    <!--  Partners inherited form -->
+    <record id="partner_birthdate_form_view" model="ir.ui.view">
+        <field name="name">partner_birthdate_form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <field name="parent_id" position="replace">
+                <field name="parent_id"
+                    widget="res_partner_many2one"
+                    options="{'no_create_edit': True, 'no_create': True}"
+                    attrs="{'invisible': ['|', '&amp;', ('is_company','=', True),('parent_id', '=', False),('company_name', '!=', False),('company_name', '!=', '')]}"/>
+		</field>
+		<xpath expr='//kanban' position="inside">
+			<field name="data_nascimento" />
+		</xpath>
+                <xpath expr='//div[@class="oe_kanban_details"]' position="inside">
+                    <div>
+			    <field name="data_nascimento" />
+			    <field
+                                 name="age"
+                                 attrs="{'invisible': [('data_nascimento', '=', False)]}"
+                            />
+	            </div>
+		</xpath>
+                <xpath expr='//div[@name="div_address"]' position="inside">
+                    <field name="data_nascimento" />
+	            <field
+                         name="age"
+                         attrs="{'invisible': [('data_nascimento', '=', False)]}"
+                    />
+                    <field name="sexo" />
+                    <field name="estado_civil" />
+                    <field name="parentesco" />
+                </xpath>
+            <field name="vat" position="replace">
+                <field name="cartao" />
+                <field name="vat" string="N. Título" />
+                <field name="data_admissao" />
+                <field name="data_desligamento" />
+                <field name="category" options="{'no_create': True, 'no_edit': True}" />            
+            </field>  
+            <field name="phone" position="after">
+                <field name="fone_comercial" />
+            </field>
+            <notebook position="inside">
+                <page string="Informações Pessoais">
+                    <group>
+                        <group>
+                            <field name="data_nascimento" />
+                        <field
+                                name="age"
+                                attrs="{'invisible': [('data_nascimento', '=', False)]}"
+                            />
+                            <field name="sexo" />
+                            <field name="estado_civil" />
+                            <field name="parentesco" />
+                            <field name="chave_acesso" />
+                        </group>
+                        <group>
+                            <field name="empresa" />
+                            <field name="profissao" />
+                            <field name="pai" />
+                            <field name="mae" />
+                            <field name="naturalidade" />
+                            <field name="nacionalidade" />
+                        </group>
+                        <group>
+                            <field name="pagante" />
+                            <field name="dependente" />
+                            <field name="inadimplente" />
+                        </group>
+                        <group>
+                            <field name="conselheiro" />
+                            <field name="funcionario" />
+                            <field name="diretor" />
+                        </group>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+    <record id="view_br_base_partner_tree_clube" model="ir.ui.view">
+        <field name="name">br_base.partner.tree.clube</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree" />
+        <field name="arch" type="xml">
+            <field name="cnpj_cpf" position="before">
+			    <field name="parent_id" string="Titular" />
+                <field name="cartao" string="Cartão" /> 
+                <field name="age" />
+            </field>
+            <field name="legal_name" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="inscr_est" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="user_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>  
+            <field name="city" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>  
+            <field name="country_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>  
+            <field name="company_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="activity_ids" position="before">
+			    <field name="category" string="Categoria" />
+            </field>              
+        </field>
+    </record>
+    <!--
+    <record model="ir.cron" id="clube_integra_cron_cliente">
+        <field name="name">Integracao Clube - Clientes</field>
+        <field name="interval_number">2</field>
+        <field name="interval_type">hours</field>
+        <field name="numbercall">-1</field>
+        <field name="model" eval="'res.partner'"/>
+        <field name="function" eval="'cron_integra_clientes'"/>
+        <field name="args" eval="'()'"/>
+    </record> -->
+</odoo>

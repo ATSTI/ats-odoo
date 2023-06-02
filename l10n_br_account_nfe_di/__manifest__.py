@@ -18,6 +18,7 @@
         "security/ir.model.access.csv",
         "views/account_invoice_view.xml",
         "wizard/create_di_view.xml",
+        "wizard/create_detexp_view.xml",
     ],
     "demo": [
     ],

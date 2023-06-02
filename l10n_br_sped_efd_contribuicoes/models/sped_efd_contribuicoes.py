@@ -183,7 +183,8 @@ class SpedEfdContribuicoes(models.Model):
         reg110.COD_INC_TRIB = self.cod_inc_trib #  Cód. ind. da incidência tributária
         reg110.IND_APRO_CRED = self.ind_apro_cred # Cód. ind. de método de apropriação de créditos comuns
         reg110.COD_TIPO_CONT = self.cod_tipo_cont # Cód. ind. do Tipo de Contribuição Apurada
-        reg110.IND_REG_CUM = self.ind_reg_cum # Cód. ind. do critério de escrituração e apuração adotado
+        if self.cod_inc_trib == '2':
+            reg110.IND_REG_CUM = self.ind_reg_cum # Cód. ind. do critério de escrituração e apuração adotado
         arq._blocos['0'].add(reg110)
         
         reg0140 = Registro0140()
@@ -226,8 +227,52 @@ class SpedEfdContribuicoes(models.Model):
             
         for item_lista in self.query_registro0400(periodo):
             arq.read_registro(self.junta_pipe(item_lista))
-           
+
+        query = """
+                    select distinct
+                        ie.id, ie.state_edoc, ie.issuer
+                    from
+                        l10n_br_fiscal_document as ie
+                    where
+                        %s
+                        and (ie.document_type in ('55','01'))
+                        and (ie.state_edoc in ('autorizada', 'cancelada'))
+                """ % (periodo)
+        self._cr.execute(query)
+        query_resposta = self._cr.fetchall()
+
+        # Registro 500
+        list_cod_cta = set()
         for conta in self.contas_entrada_saida:
+            list_cod_cta.add(conta.id)
+   
+        for id in query_resposta:
+            if id[2] == 'partner' and id[1] == 'cancelada':
+                continue
+            
+            for item_lista in self.query_registroC100(id[0]):
+                if id[1] == 'autorizada':
+                    nfe_line = self.env['l10n_br_fiscal.document.line'].search([
+                        ('document_id','=', id[0]),
+                        ], order='nfe40_nItem, id')
+                    
+                    # TODO - qdo nota de SAIDA mostrar conta de SAIDA
+                    for line in nfe_line:
+                        conta = 0
+                        if line.product_id.categ_id and (
+                           line.product_id.categ_id.property_stock_account_input_categ_id
+                        ):
+                            conta = line.product_id.categ_id.property_stock_account_input_categ_id.id
+                        elif line.product_id.categ_id and (
+                            line.product_id.categ_id.parent_id and
+                            line.product_id.categ_id.parent_id.property_stock_account_input_categ_id
+                        ):
+                            conta = line.product_id.categ_id.parent_id.property_stock_account_input_categ_id.id
+                        if conta not in list_cod_cta:
+                            list_cod_cta.add(conta)
+
+        conta_ids = self.env['account.account'].search([('id', 'in', list(list_cod_cta))])
+        for conta in conta_ids:
             reg500 = Registro0500()
             reg500.DT_ALT = conta.write_date
             # Conta de resultado
@@ -249,18 +294,6 @@ class SpedEfdContribuicoes(models.Model):
             reg500.NOME_CTA = conta.name
             arq._blocos['0'].add(reg500)
 
-        query = """
-                    select distinct
-                        ie.id, ie.state_edoc, ie.issuer
-                    from
-                        l10n_br_fiscal_document as ie
-                    where
-                        %s
-                        and (ie.document_type in ('55','01'))
-                        and (ie.state_edoc in ('autorizada', 'cancelada'))
-                """ % (periodo)
-        self._cr.execute(query)
-        query_resposta = self._cr.fetchall()
         lista = []
         cont = 1
         regA001 = RegistroA001()
@@ -287,8 +320,9 @@ class SpedEfdContribuicoes(models.Model):
             # TODO C110 - Inf. Adiciontal
             
             # TODO C170 - Itens Nota Fiscal de Compras = Fazendo
-            for item_lista in self.query_registroC170(id[0]):
-                arq.read_registro(self.junta_pipe(item_lista))
+            if id[1] == 'autorizada':
+                for item_lista in self.query_registroC170(id[0]):
+                    arq.read_registro(self.junta_pipe(item_lista))
                                         
         # TODO BLOCO D - prestações ou contratações de serviços 
         # de comunicação, transporte interestadual e intermunicipa
@@ -454,16 +488,11 @@ class SpedEfdContribuicoes(models.Model):
         un = ''
         for id in query_resposta:
             registro_0190 = registros.Registro0190()
-            unidade = ''
-            if id[0].find('-') != -1:
-                unidade = id[0][:id[0].find('-')]
-            else:
-                unidade = id[0]
-            unidade = unidade[:6]
+            unidade = id[0][:6]
             if un == unidade:
                 continue 
             lista_un.append(unidade)
-            registro_0190.UNID = unidade
+            registro_0190.UNID = unidade.strip()
             desc = id[1]
             if not desc:
                 msg_err = 'Unidade de medida sem descricao - Un %s.' %(unidade)
@@ -481,7 +510,7 @@ class SpedEfdContribuicoes(models.Model):
                 l10n_br_fiscal_document as ie
             inner join
                 l10n_br_fiscal_document_line as aml
-                on ie.id = aml.document_id                 
+                on ie.id = aml.document_id
             where
                 %s
                 and (ie.document_type in ('55','01'))
@@ -511,14 +540,7 @@ class SpedEfdContribuicoes(models.Model):
             registro_0200.DESCR_ITEM = desc_item
             if resposta_produto.barcode != resposta_produto.default_code:
                 registro_0200.COD_BARRA = resposta_produto.barcode
-            if resposta_produto.uom_id.name.find('-') != -1:
-                unidade = resposta_produto.uom_id.name[:resposta_produto.uom_id.name.find('-')]
-            else:
-                unidade = resposta_produto.uom_id.name
-            unidade = unidade.strip()
-            unidade = unidade.upper()
-            unidade = unidade[:6]
-            registro_0200.UNID_INV = unidade[:6]
+            registro_0200.UNID_INV = resposta_produto.uom_id.code.strip()[:6]
             registro_0200.TIPO_ITEM = resposta_produto.fiscal_type
             registro_0200.COD_NCM = self.limpa_formatacao(resposta_produto.ncm_id.code)
             lista.append(registro_0200)                        
@@ -527,14 +549,16 @@ class SpedEfdContribuicoes(models.Model):
     def query_registro0400(self, periodo):
         query = """
                 select distinct
-                    ie.fiscal_operation_id
+                    aml.fiscal_operation_id
                 from
                     l10n_br_fiscal_document as ie
+                inner join
+                    l10n_br_fiscal_document_line as aml
+                    on aml.document_id = ie.id
                 where
                     %s
                     and (ie.document_type in ('55','01'))
-                    and (ie.state_edoc in ('autorizada', 'cancelada')) 
-                    and (ie.issuer = 'partner') 
+                    and (ie.state_edoc in ('autorizada', 'cancelada'))
                 """ % (periodo)
         self._cr.execute(query)
         query_resposta = self._cr.fetchall()
@@ -644,11 +668,7 @@ class SpedEfdContribuicoes(models.Model):
             registro_c170.COD_ITEM = item.product_id.default_code
             registro_c170.DESCR_COMPL = self.limpa_caracteres(item.name.strip())
             registro_c170.QTD = self.transforma_valor(item.fiscal_quantity)
-            if item.uom_id.code.find('-') != -1:
-                unidade = item.uom_id.code[:item.uom_id.code.find('-')]
-            else:
-                unidade = item.uom_id.code
-            registro_c170.UNID = unidade.strip()
+            registro_c170.UNID = item.uom_id.code.strip()
             registro_c170.VL_DESC = item.discount_value
             registro_c170.VL_ITEM = item.fiscal_price * item.fiscal_quantity
             if item.cfop_id.stock_move:
@@ -682,6 +702,16 @@ class SpedEfdContribuicoes(models.Model):
             registro_c170.VL_BC_COFINS = item.cofins_base
             registro_c170.ALIQ_COFINS = item.cofins_percent
             registro_c170.VL_COFINS = item.cofins_value
+            if item.product_id.categ_id and (
+                item.product_id.categ_id.property_stock_account_input_categ_id
+            ):
+                registro_c170.COD_CTA = item.product_id.categ_id.property_stock_account_input_categ_id.code
+            elif item.product_id.categ_id and (
+                item.product_id.categ_id.parent_id and
+                item.product_id.categ_id.parent_id.property_stock_account_input_categ_id
+            ):
+                registro_c170.COD_CTA = item.product_id.categ_id.parent_id.property_stock_account_input_categ_id.code
+
             n_item += 1
             lista.append(registro_c170)
         return lista

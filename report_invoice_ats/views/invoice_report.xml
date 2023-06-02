@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>    
+    <record id="account_invoices_budget" model="ir.actions.report">
+        <field name="name">Orçamento</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">report_invoice_ats.report_invoice_document</field>
+        <field name="report_file">report_invoice_ats.report_invoice_document</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

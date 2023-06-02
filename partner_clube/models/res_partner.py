@@ -45,16 +45,6 @@ class ResPartner(models.Model):
     naturalidade = fields.Char(string='Naturalidade', size=80)
     nacionalidade = fields.Char(string='Nacionalidade', size=30)
     category = fields.Many2one('partner.category', 'Categoria' )
-    categoria = fields.Selection([
-        ('1', 'Socio'),
-        ('2', 'Individual'),
-        ('3', 'Estudante'),
-        ('4', 'Benemérito'), 
-        ('5', 'Atleta Militante'),
-        ('6', 'Baba'),
-        ('7', 'Professor'),
-        ('9', 'Visitante'),
-        ], 'Categoria', required=True)
     estado_civil = fields.Selection([
         ('S', 'Solteiro'),
         ('C', 'Casado'),
@@ -471,8 +461,8 @@ class ResPartner(models.Model):
         #for cli in cli_fb:
         cod = partner_id.chave_acesso
         categ = '1'
-        if partner_id.categoria:
-            categ = partner_id.categoria
+        if partner_id.category:
+            categ = partner_id.category
         sql =  'INSERT INTO Users ('
         sql += 'id,name \
             ,pis,idType,idArea,contingency, deleted,admin\

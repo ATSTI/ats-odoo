@@ -17,25 +17,26 @@
 ##############################################################################
 
 {
-    'name': 'Partner',
-    'description': """
-        Campos necessario Soma
+    "name": "Associações e Clubes",
+    "description": """
+        Campos adicionais para Associações e Clubes
     """,
-    'version': '1.0',
-    'category': 'Localisation',
-    'author': 'ATS Solucoes',
-    'website': 'http://www.atsti.com.br',
-    'license': 'AGPL-3',
-    'contributors': [
-        'Carlos Silveira<carlos@atsti.com.br>',
+    "version": "14.0.2.1.1",
+    "category": "Localisation",
+    "author": "ATS Solucoes",
+    "website": "http://www.atsti.com.br",
+    "license": "AGPL-3",
+    "contributors": [
+        "Carlos Silveira<carlos@atsti.com.br>",
     ],
-    'depends': [
-        'mail', 'l10n_br_base',
+    "depends": [
+        "l10n_br_base", "contacts",
     ],
-    'data': [
-        'views/partner_view.xml',
-        'security/ir.model.access.csv',
+    "data": [
+        "views/partner_view.xml",
+        "security/ir.model.access.csv",
+        "views/partner_categoria_view.xml",
     ],
-    'demo': [],
-    'installable': True,
+    "demo": [],
+    "installable": True,
 }

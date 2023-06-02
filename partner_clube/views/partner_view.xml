@@ -39,8 +39,7 @@
                 <field name="vat" string="N. Título" />
                 <field name="data_admissao" />
                 <field name="data_desligamento" />
-                <field name="category" />
-                <field name="categoria" />             
+                <field name="category" options="{'no_create': True, 'no_edit': True}" />            
             </field>  
             <field name="phone" position="after">
                 <field name="fone_comercial" />
@@ -110,6 +109,9 @@
             </field>  
             <field name="company_id" position="attributes">
                 <attribute name="invisible">1</attribute>
+            </field>
+            <field name="activity_ids" position="before">
+			    <field name="category" string="Categoria" />
             </field>              
         </field>
     </record>

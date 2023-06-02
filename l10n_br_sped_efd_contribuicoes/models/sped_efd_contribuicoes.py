@@ -711,7 +711,7 @@ class SpedEfdContribuicoes(models.Model):
                 item.product_id.categ_id.parent_id.property_stock_account_input_categ_id
             ):
                 registro_c170.COD_CTA = item.product_id.categ_id.parent_id.property_stock_account_input_categ_id.code
-            
+
             n_item += 1
             lista.append(registro_c170)
         return lista

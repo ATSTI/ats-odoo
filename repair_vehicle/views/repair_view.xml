@@ -9,6 +9,7 @@
                 <field name="state" position="replace">
                     <field name="stage_id"/>
                     <field name="state" invisible="1"/>
+                    <field name="company_id" groups="base.group_multi_company" readonly="1" optional="show"/>
                     <field name="activity_ids" widget="kanban_activity"/>
                 </field>
             </field>
@@ -48,13 +49,15 @@
                     <group>
                         <field name="invoice_state" invisible="1"/>
                         <field name="tracking" invisible="1" attrs="{'readonly': 1}"/>
-                        <field name="product_id"/>
+                        <field name="product_id" invisible="1" />
                         <field name="product_uom_category_id" invisible="1"/>
                         <field name="product_qty" invisible="1" />
                         <field name="product_uom" invisible="1"/>
                         <field name="lot_id" invisible="1" />
                         <field name="partner_id" widget="res_partner_many2one" attrs="{'required':[('invoice_method','!=','none')]}" context="{'show_vat': True}"/>
                         <field name="address_id" groups="sale.group_delivery_invoice_address"/>
+                        <field name="payment_term_id" />
+                        <field name="date_vencimento" invisible='1'/>
                     </group>  
                 </xpath>
                 <field name="guarantee_limit" position="after">
@@ -78,6 +81,7 @@
                 </field>
                 <field name="location_id" position="replace">
                     <field name="location_id" invisible="1"/>
+                    <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                 </field>
                 <field name="partner_id" position="after">
                     <field name="vehicle_id" domain="[('partner_id', '=', partner_id)]" context="{'default_partner_id': partner_id}" />
@@ -97,8 +101,10 @@
                                     <page string="Itens">
                                         <group>
                                             <group>
+                                                <field name="company_id" invisible="1" force_save="1"/>
                                                 <field name="type" invisible="1" />
                                                 <field name="product_id"/>
+                                                <field name="product_uom_category_id" invisible="1"/>
                                                 <field name="name"/>
                                                 <field name="product_uom_category_id" invisible="1"/>
                                                 <label for="product_uom_qty"/>
@@ -113,7 +119,8 @@
                                             </group>
                                             <group groups="stock.group_stock_multi_locations" invisible="1">
                                                 <field name="location_id" />
-                                                <field name="company_id"/>
+                                                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                                                <field name="location_dest_id"/>
                                             </group>
                                         </group>
                                     </page>
@@ -133,8 +140,10 @@
                                 <field name="product_uom_category_id" invisible="1"/>
                                 <field name="lot_id" domain="[('product_id', '=', product_id)]" context="{'default_product_id': product_id}" groups="stock.group_production_lot" invisible="1"/>
                                 <field name="location_id" groups="stock.group_stock_multi_locations" invisible="1"/>
+                                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                                 <field name="location_dest_id" groups="stock.group_stock_multi_locations" invisible="1"/>
                                 <field name="product_uom_qty" string="Quantidade"/>
+                                <field name="product_uom_category_id" invisible="1"/>
                                 <field name="product_uom" string="Unidade" groups="uom.group_uom"/>
                                 <field name="price_unit"/>
                                 <field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale')]" invisible="1"/>
@@ -267,10 +276,10 @@
             </field>
         </record>
         
-        <menuitem action="action_repair_order_vehicle_tree" id="menu_repair_order" groups="stock.group_stock_user" name="Ordem serviço" sequence="36"
-            web_icon="repair,static/description/icon.png"/>
-        <menuitem action="action_repair_vehicle" id="menu_dados_principais" groups="stock.group_stock_user" name="Dados Principais" sequence="37" parent="repair_vehicle.menu_repair_order"/>
-        <menuitem action="action_repair_vehicle" id="menu_configuracoes" groups="stock.group_stock_user" name="Configurações" sequence="39" parent="repair_vehicle.menu_repair_order"/>
+        <!-- <menuitem action="action_repair_order_vehicle_tree" id="menu_repair_order" groups="stock.group_stock_user" name="Ordem serviço" sequence="36"
+            web_icon="repair,static/description/icon.png"/> -->
+        <menuitem action="action_repair_vehicle" id="menu_dados_principais" groups="stock.group_stock_user" name="Dados Principais" sequence="37" parent="repair.menu_repair_order"/>
+        <menuitem action="action_repair_vehicle" id="menu_configuracoes" groups="stock.group_stock_user" name="Configurações" sequence="39" parent="repair.menu_repair_order"/>
         <!-- <menuitem action="action_repair_vehicle" id="menu_relatorios" groups="stock.group_stock_user" name="Relatorios" sequence="38" parent="repair_vehicle.menu_repair_order"/> -->
         <menuitem action="action_repair_order_vehicle_tree" id="menu_order_service" groups="stock.group_stock_user" name="Ordem serviço" sequence="36" parent="repair_vehicle.menu_dados_principais" />
         <menuitem action="action_repair_vehicle" id="menu_repair_vehicle" groups="stock.group_stock_user" name="Veículos" sequence="1" parent="repair_vehicle.menu_dados_principais"/>

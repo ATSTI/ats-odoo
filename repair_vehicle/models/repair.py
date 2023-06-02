@@ -38,6 +38,8 @@ class Repair(models.Model):
     )
 
     contas_pendentes = fields.Monetary('Faturas')
+    payment_term_id = fields.Many2one('account.payment.term', string='Forma de pagamento')
+    date_vencimento = fields.Date(string='Data vencimento')
 
     currency_id = fields.Many2one(
         comodel_name="res.currency",

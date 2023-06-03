@@ -16,7 +16,7 @@ class AccountMove(models.Model):
 
     def _merge_pdf_boletos(self):
         pdf_merger = PdfFileMerger()
-
+        import pudb;pu.db
         temp_files = []
         for move_line in self.financial_move_line_ids:
             move_line.generate_pdf_boleto()
@@ -59,7 +59,7 @@ class AccountMove(models.Model):
         try:
             if not self.file_boleto_pdf_id:
                 self._merge_pdf_boletos()
-
+            import pudb;pu.db
             boleto_id = self.file_boleto_pdf_id
             base_url = self.env['ir.config_parameter'].get_param(
                 'web.base.url')
@@ -88,3 +88,23 @@ class AccountMove(models.Model):
                 )
         except Exception as error:
             raise UserError(_(error))
+
+    # def create_account_payment_line(self):
+    #     res = super().create_account_payment_line()
+    #     import pudb;pu.db
+    #     if (self.partner_bank_id.bank_id.code_bc == '077' and
+    #         self.payment_mode_id.payment_method_id.code == '240'):
+    #         self.payment_order_id.draft2open()
+    #     return res    
+    
+    def action_post(self):
+        result = super().action_post()
+        if (self.partner_bank_id.bank_id.code_bc == '077' and
+            self.payment_mode_id.payment_method_id.code == '240'):
+            if (not self.partner_bank_id.journal_id.bank_inter_id or 
+                not self.partner_bank_id.journal_id.bank_inter_secret):
+                raise UserError(
+                    _("Informe o Id é chave do banco Inter.")
+                )
+            self.gera_boleto_pdf()
+        return result

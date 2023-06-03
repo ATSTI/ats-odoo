@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import logging
+import base64
 from datetime import datetime, date
 
 from .arquivo_certificado import ArquivoCertificado
@@ -69,12 +70,13 @@ class AccountMoveLine(models.Model):
         """
         Creates a new attachment with the Boleto PDF
         """
+        import pudb;pu.db
         if self.own_number and self.pdf_boleto_id:
             return
         order_id = self.payment_line_ids[0].order_id
 
         # criar o boleto aqui
-        order_id.generate_payment_file()
+        # order_id.generate_payment_file()
 
         with ArquivoCertificado(order_id.journal_id, 'w') as (key, cert):
             partner_bank_id = self.journal_id.bank_account_id
@@ -84,15 +86,17 @@ class AccountMoveLine(models.Model):
                         order_id.company_partner_bank_id.acc_number +
                         order_id.company_partner_bank_id.acc_number_dig
                 ),
-                clientId=self.journal_id.bank_inter_id,
-                clientSecret=self.journal_id.bank_inter_secret
+                clientId=self.move_id.partner_bank_id.journal_id.bank_inter_id,
+                clientSecret=self.move_id.partner_bank_id.journal_id.bank_inter_secret
             )
+            import pudb;pu.db
             datas = api_inter.boleto_pdf(self.own_number)
+            #pdf_file = BytesIO(base64.b64decode(json_p['pdf']))
             self.pdf_boleto_id = self.env['ir.attachment'].create(
                 {
                     'name': (
                             "Boleto %s" % self.bank_payment_line_id.display_name),
-                    'datas': datas,
+                    'datas': base64.b64encode(datas),
                     'datas_fname': ("boleto_%s.pdf" %
                                     self.bank_payment_line_id.display_name),
                     'type': 'binary'
@@ -136,8 +140,8 @@ class AccountMoveLine(models.Model):
                                     order_id.company_partner_bank_id.acc_number +
                                     order_id.company_partner_bank_id.acc_number_dig
                             ),
-                            clientId=order_id.journal_id.bank_inter_id,
-                            clientSecret=order_id.journal_id.bank_inter_secret
+                            clientId=self.move_id.partner_bank_id.journal_id.bank_inter_id,
+                            clientSecret=self.move_id.partner_bank_id.journal_id.bank_inter_secret
                         )
                         self.api.boleto_baixa(self.own_number, codigo_baixa)
                 self.bank_inter_state = "baixado"
@@ -155,8 +159,8 @@ class AccountMoveLine(models.Model):
                                 order.order_id.company_partner_bank_id.acc_number +
                                 order.order_id.company_partner_bank_id.acc_number_dig
                         ),
-                        clientId=order.order_id.journal_id.bank_inter_id,
-                        clientSecret=order.order_id.journal_id.bank_inter_secret
+                        clientId=self.move_id.partner_bank_id.journal_id.bank_inter_id,
+                        clientSecret=self.move_id.partner_bank_id.journal_id.bank_inter_secret
                     )
                     resposta = api_inter.boleto_consulta(nosso_numero=self.own_number)
 

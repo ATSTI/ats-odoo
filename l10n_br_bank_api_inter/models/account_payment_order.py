@@ -135,7 +135,7 @@ class AccountPaymentOrder(models.Model):
         return dados
 
     def _generate_bank_inter_boleto(self):
-        # import pudb;pu.db
+        nosso_numero = False
         with ArquivoCertificado(self.journal_id, 'w') as (key, cert):
             api_inter = ApiInter(
                 cert=(cert, key),
@@ -146,21 +146,31 @@ class AccountPaymentOrder(models.Model):
             )
             data = self._generate_bank_inter_boleto_data()
             for item in data:
-                resposta, result = api_inter.boleto_inclui(item)
-                if resposta.status_code == 200:
+                # DESCOMENTAR a LINHA ABAIXO E COMENTAR A PROXIMA
+                # result = api_inter.boleto_inclui(item)
+                result = {'seuNumero': '0002/01', 'nossoNumero': '01000227264', 'codigoBarras': '07793937700000003500001112052616101000227264', 'linhaDigitavel': '07790001161205261610410002272648393770000000350'}
+                if 'nossoNumero' in result:
                     payment_line_id = self.payment_line_ids.filtered(
-                        lambda line: line.document_number == item["nossoNumero"])
-                    payment_line_id.move_line_id.write({
-                        'nosso_numero': result["nossoNumero"],
-                        'codigo_barra': result["codigoBarras"],
-                        'linha_digitavel': result["linhaDigitavel"]
+                        lambda line: line.document_number == item["seuNumero"])
+                    payment_line_id.write({
+                        'own_number': result["nossoNumero"],
+                        'barcode': result["codigoBarras"],
+                        'digitable_line': result["linhaDigitavel"]
                     })
-        return False, False
+                    payment_line_id.move_line_id.write({
+                        'own_number': result["nossoNumero"],
+                        'cnab_state': 'accepted'
+                    })
+                    nosso_numero = result["nossoNumero"]
+        return nosso_numero
 
     def _gererate_bank_inter_api(self):
         """ Realiza a conexão com o a API do banco inter"""
         if self.payment_type == 'inbound':
-            return self._generate_bank_inter_boleto()
+            boleto = self._generate_bank_inter_boleto()
+            # if boleto:
+            # busca PDF
+            return True
         else:
             raise NotImplementedError
 

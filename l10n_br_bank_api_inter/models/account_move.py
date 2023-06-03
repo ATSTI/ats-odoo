@@ -16,7 +16,7 @@ class AccountMove(models.Model):
 
     def _merge_pdf_boletos(self):
         pdf_merger = PdfFileMerger()
-
+        import pudb;pu.db
         temp_files = []
         for move_line in self.financial_move_line_ids:
             move_line.generate_pdf_boleto()
@@ -59,7 +59,7 @@ class AccountMove(models.Model):
         try:
             if not self.file_boleto_pdf_id:
                 self._merge_pdf_boletos()
-
+            import pudb;pu.db
             boleto_id = self.file_boleto_pdf_id
             base_url = self.env['ir.config_parameter'].get_param(
                 'web.base.url')

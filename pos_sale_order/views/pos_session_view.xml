@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="_close_view_pos_session_form" model="ir.ui.view">
+        <field name="name">close.pos.session.form.view</field>
+        <field name="model">pos.session</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_session_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="replace">
+                <div class="oe_button_box" name="button_box">
+                <button class="oe_stat_button" name="%(point_of_sale.action_pos_box_in)d"
+                    type="action" icon="fa-level-down"
+                    attrs="{'invisible': ['|', ('cash_control', '=', False), ('state', 'not in', ['opened', 'closing_control'])]}">
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_text">Colocar</span>
+                        <span class="o_stat_text">Dinheiro</span>
+                    </div>
+                </button>
+                <button class="oe_stat_button" name="%(point_of_sale.action_pos_box_out)d"
+                    type="action" icon="fa-level-up"
+                    attrs="{'invisible': ['|', ('cash_control', '=', False), ('state', 'not in', ['opened', 'closing_control'])]}">
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_text">Tirar</span>
+                        <span class="o_stat_text">Dinheiro</span>
+                    </div>
+                </button>
+                <button name="%(account.action_view_account_bnk_stmt_cashbox)d"
+                    class="oe_stat_button"
+                    attrs="{'invisible':['|', ('cash_control', '=', False), ('state', '!=', 'opening_control')]}"
+                    icon="fa-money"
+                    type="action" context="{'balance': 'start', 'bank_statement_id': cash_register_id, 'default_pos_id': config_id}">
+                    <span class="o_stat_text">Saldo Abertura</span>
+                </button>
+                <button name="%(account.action_view_account_bnk_stmt_cashbox)d"
+                    class="oe_stat_button"
+                    attrs="{'invisible':['|', '|', ('cash_control', '=', False), ('state', '=', 'opening_control'), ('state', '=', 'closed')]}"
+                    icon="fa-money"
+                    type="action" context="{'balance': 'end', 'bank_statement_id': cash_register_id, 'default_pos_id': config_id}">
+                    <span class="o_stat_text">Saldo Final</span>
+                </button>
+                <button class="oe_stat_button" name="point_of_sale.action_stock_picking" type="object" icon="fa-arrows-v" attrs="{'invisible':[('picking_count', '=', 0)]}">
+                    <field name="picking_count" widget="statinfo" string="Picking Errors"/>
+                </button>
+                
+                <button class="oe_stat_button" name="action_integra_caixas"
+                     type="object" icon="fa-list-alt">
+                     <div class="o_form_field o_stat_info">
+                         <span class="o_stat_text">Atualizar </span>
+                         <span class="o_stat_text">CAIXA</span>
+                      </div>
+                </button>
+                <button class="oe_stat_button" name="action_integra_produtos"
+                     type="object" icon="fa-archive">
+                     <div class="o_form_field o_stat_info">
+                         <span class="o_stat_text">Atualizar </span>
+                         <span class="o_stat_text">PRODUTO</span>
+                      </div>
+                </button>
+                <button class="oe_stat_button" name="action_integra_clientes"
+                     type="object" icon="fa-arrows">
+                     <div class="o_form_field o_stat_info">
+                         <span class="o_stat_text">Atualizar </span>
+                         <span class="o_stat_text">CLIENTE</span>
+                      </div>
+                </button>
+                <button class="oe_stat_button" name="action_integra_vendas"
+                    type="object" icon="fa-anchor">
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_text">Atualizar </span>
+                        <span class="o_stat_text">VENDAS</span>
+                    </div>
+                </button>
+                <button class="oe_stat_button" name="action_integra_recebidos"
+                    type="object" icon="fa-anchor">
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_text">Atualizar </span>
+                        <span class="o_stat_text">RECEBIMENTO</span>
+                    </div>
+                </button>
+                <div>
+                        <field name="msg_integracao" widget="html" readonly="1"/>
+                </div>
+                </div>
+            </xpath>
+	        <field name="start_at" position="after">
+	            <field name="venda_finalizada" readonly="1"/>
+                <field name="periodo_integracao"/>
+	        </field>
+        </field>
+        </record>
+
+        <record id="view_pos_config_pdv_form" model="ir.ui.view">
+        <field name="name">pos.config.pdv.form.view</field>
+        <field name="model">pos.config</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_config_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/group" position="after">
+              <group>
+                <field name="ip_terminal" />
+                <field name="database" />
+                <button name="action_testar_acesso_terminal" type="object" class="oe_stat_button" string="Testar Conexao"/>
+              </group>    
+	        </xpath>
+        </field>
+    </record>
+
+    <record model="ir.cron" id="pos_session_integra_cron_venda">
+        <field name="name">Integracao PDV - Vendas</field>
+        <field name="interval_number">10</field>
+        <field name="interval_type">minutes</field>
+        <field name="numbercall">-1</field>
+        <field name="model" eval="'pos.session'"/>
+        <field name="function" eval="'cron_integra_vendas'"/>
+        <field name="args" eval="'()'"/>
+    </record>
+    <record model="ir.cron" id="pos_session_integra_cron_cliente">
+        <field name="name">Integracao PDV - Clientes</field>
+        <field name="interval_number">2</field>
+        <field name="interval_type">hours</field>
+        <field name="numbercall">-1</field>
+        <field name="model" eval="'pos.session'"/>
+        <field name="function" eval="'cron_integra_clientes'"/>
+        <field name="args" eval="'()'"/>
+    </record>    
+    <record model="ir.cron" id="pos_session_integra_cron_produto">
+        <field name="name">Integracao PDV - Produtos</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="numbercall">-1</field>
+        <field name="model" eval="'pos.session'"/>
+        <field name="function" eval="'cron_integra_produtos'"/>
+        <field name="args" eval="'()'"/>
+    </record>    
+    <record model="ir.cron" id="pos_session_integra_cron_receber">
+        <field name="name">Integracao PDV - Contas Receber</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="numbercall">-1</field>
+        <field name="model" eval="'pos.session'"/>
+        <field name="function" eval="'cron_integra_recebidos'"/>
+        <field name="args" eval="'()'"/>
+    </record>    
+</odoo>

@@ -11,14 +11,13 @@ Create sale order via POS.
     'author': 'otaviosilmunhoz@hotmail.com',
     'website': 'atsti.com.br',
     'version': '1.0.1',
-    'depends': ['br_sale', 'point_of_sale'],
+    'depends': ['point_of_sale'],
     'images': [],
     "data": [
         # 'static/src/xml/pos_sale_order.xml',
-        'views/pos_session_view.xml'
+        #'views/pos_session_view.xml'
     ],
     'installable': True,
     'auto_install': False,
 }
 
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

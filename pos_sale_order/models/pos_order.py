@@ -2,14 +2,12 @@
 
 from odoo import models, fields, api, tools, _
 # from odoo.addons.point_of_sale.wizard.pos_box import PosBox
-from odoo.exceptions import UserError
-from datetime import datetime
-from datetime import date
-from datetime import timedelta
-from unidecode import unidecode
+# from odoo.exceptions import UserError
+from datetime import datetime, date, timedelta
+# from unidecode import unidecode
 import logging
-import psycopg2
-import re
+# import psycopg2
+# import re
 # from . import atscon as con
 
 

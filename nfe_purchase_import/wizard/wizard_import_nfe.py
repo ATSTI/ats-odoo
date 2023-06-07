@@ -222,6 +222,7 @@ class WizardImportNfe(models.TransientModel):
             'order_id':order_id,'partner_id':partner_id, 'product_qty_xml':float(quantidade), 'product_uom_xml':uom_xml.id,
             'num_item_xml':nitem
         })
+        order_line._onchange_fiscal_operation_id()
         return order_line
 
     def get_items_purchase(self, nfe, order_id):
@@ -300,19 +301,19 @@ class WizardImportNfe(models.TransientModel):
         nfe_string = base64.b64decode(self.nfe_xml)
         nfe = objectify.fromstring(nfe_string)
         date_nfe = self.retorna_data(nfe)
-        self.nfe_num = nfe.NFe.infNFe.ide.nNF
-        self.nfe_serie = nfe.NFe.infNFe.ide.serie
-        self.nfe_modelo = nfe.NFe.infNFe.ide.mod
-        self.nfe_chave = nfe.protNFe.infProt.chNFe
-        self.nfe_emissao = date_nfe
+        self.purchase_id.document_number = nfe.NFe.infNFe.ide.nNF
+        self.purchase_id.document_serie = nfe.NFe.infNFe.ide.serie
+        self.purchase_id.document_type = nfe.NFe.infNFe.ide.mod
+        self.purchase_id.document_key = nfe.protNFe.infProt.chNFe
+        self.purchase_id.date_in_out = date_nfe
 
         for det in nfe.NFe.infNFe.det:
             vals = {}
             vals['name'] = det.prod.xProd
             #vals['purchase'] = self.purchase_id
-            vals['num_item_xml'] = int(det.get('nItem'))
-            vals['product_uom_xml'] = det.prod.uCom
-            vals['product_qty_xml'] = det.prod.qCom
+            vals['partner_order_line'] = int(det.get('nItem'))
+            vals['uot_id'] = det.prod.uCom
+            vals['fiscal_quantity'] = det.prod.qCom
             vals['purchase_id'] = self.purchase_id.id
             
             nfe_prod.append(self.env['found.products'].create(vals).id)

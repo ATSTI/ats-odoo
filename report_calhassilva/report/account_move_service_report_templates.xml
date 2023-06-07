@@ -223,30 +223,36 @@
                         <t t-set="category" t-value="vazio"/>
                         <t t-set="uom" t-value=""/>
                         <t t-set="qty" t-value="0"/>
-                        <t t-esc="'%.2f' % (price)"/>
+                        <t t-set="price" t-value="0.0"/>
                         <t t-foreach="doc.invoice_line_ids" t-as="line">
-                            <t t-set="qty" t-value="qty+line.quantity"/>
-                            <t t-set="price" t-value="price+line.price_subtotal"/>
                             <p t-if="category != vazio">
                             <p t-if="category != line.product_id.categ_id.name">
                                 <tr id="items">
-                                    <td><span t-esc="oum"/></td>
-                                    <td><span t-esc="qty"/></td>
+                                    <td><span t-esc="uom"/></td>
+                                    <td><span t-esc="'%.1f' % (qty)"/></td>
                                     <td><span t-esc="category"/></td>
-                                    <td><span t-esc="price/qty"/></td>
-                                    <td><span t-esc="price"/></td>
+                                    <td><span t-esc="price/qty" t-options='{"widget": "float", "precision": 2}'/></td>
+                                    <td><span t-esc="price" t-options='{"widget": "float", "precision": 2}' /></td>
                                 </tr>
+                                <!-- imprimiu , entao Zera -->
+                                <t t-set="uom" t-value=""/>
+                                <t t-set="qty" t-value="0"/>
+                                <t t-set="price" t-value="0.0"/>
                             </p>
                             </p>
+                            <t t-set="qty" t-value="qty+line.quantity"/>
+                            <t t-set="price" t-value="price+line.price_subtotal"/>
                             <t t-set="category" t-value="line.product_id.categ_id.name"/>
                             <t t-set="uom" t-value="line.product_uom_id.name"/>
                         </t>
                         <tr id="items">
                                     <td><span t-esc="uom"/></td>
-                                    <td><span t-esc="qty"/></td>
+                                    <td><span t-esc="'%.1f' % (qty)"/></td>
                                     <td><span t-esc="category"/></td>
-                                    <td><span t-esc="price/qty"/></td>
-                                    <td><span t-esc="price"/></td>
+                                    <p t-if="qty">
+                                       <td><span t-esc="price/qty" t-options='{"widget": "float", "precision": 2}'/></td>
+                                    </p>
+                                    <td><span t-esc="price" t-options='{"widget": "float", "precision": 2}' /></td>
                         </tr>
                          
                         <tr style="border-bottom: thin solid black;">

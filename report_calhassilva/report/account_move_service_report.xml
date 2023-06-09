@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report 
+            id="action_report_invoice_calhassilva"
+            string="Orçamento por Categoria"
+            model="account.move" 
+            report_type="qweb-pdf"
+            file="report_calhassilva.report_calhassilva_template" 
+            name="report_calhassilva.report_calhassilva_template" 
+        />
+    </data>
+</odoo>

@@ -74,6 +74,13 @@ class Repair(models.Model):
             ] + search_domain
         return stages.search(search_domain, order=order)
 
+    @api.onchange('state')
+    def onchange_state(self):
+        if self.state:
+            stage_id = self.env['repair.stage'].\
+                search([('stage_type', '=', self.state),], limit=1)
+            self.stage_id = stage_id.id
+
     @api.onchange('vehicle_id')
     def onchange_vehicle_id(self):
         prod_id = self.env["product.product"].search([('type', 'in', ['product', 'consu'])], limit=1)

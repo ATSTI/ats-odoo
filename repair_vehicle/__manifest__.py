@@ -18,11 +18,13 @@
         'base', 'repair', 'stock', 'sale'
     ],
     'data': [
+        'security/ir.model.access.csv'
+        'views/repair_stage_data.xml'
         'views/repair_stage.xml',
         'views/repair_vehicle.xml',
         'views/repair_view.xml',
         'views/res_partner_view.xml',
-        'security/ir.model.access.csv'
+        
     ],
     'demo': [],
     'installable': True,

@@ -26,8 +26,7 @@
                     <attribute name="readonly">True</attribute>
                 </field>
                 <button name="action_send_mail" position="before">
-                    <field name="stage_id" widget="statusbar" options="{'fold_field': 'fold'}" domain="[('stage_type', '=', 'order')]"/>
-                    <field name="state" invisible="1"/>
+                    <field name="stage_id" widget="statusbar" options="{'fold_field': 'fold'}" />
                 </button>
                 <label for="name" position="replace">
                     <label for="name" string="N. OS"/>

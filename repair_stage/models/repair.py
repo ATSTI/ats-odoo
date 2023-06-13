@@ -19,9 +19,9 @@ class Repair(models.Model):
                    order='sequence asc', limit=1)
         if stage_ids:
             return stage_ids[0]
-        else:
-            raise ValidationError(_(
-                "You must create an FSM order stage first."))
+        # else:
+        #     raise ValidationError(_(
+        #         "You must create an FSM order stage first."))
 
     date_repair = fields.Date(string='Data ordem serviço',
         index=True, readonly=True, default=fields.Date.context_today)

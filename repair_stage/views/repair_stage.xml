@@ -65,8 +65,6 @@
         <field name="arch" type="xml">
             <search string="Search repair Workers">
                 <field name="name"/>
-                <filter name="group_stage_type" string="Type" domain="[]"
-                        context="{'group_by':'stage_type'}"/>
             </search>
         </field>
     </record>

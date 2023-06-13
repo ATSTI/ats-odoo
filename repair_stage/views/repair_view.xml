@@ -19,20 +19,15 @@
             <field name="model">repair.order</field>
             <field name="inherit_id" ref="repair.view_repair_order_form" />
             <field name="arch" type="xml">
-                <field name="state" position="attributes">
-                    <attribute name="invisible">True</attribute>
-                </field>
                 <field name="name" position="attributes">
                     <attribute name="readonly">True</attribute>
                 </field>
-                <button name="action_send_mail" position="before">
-                    <field name="stage_id" widget="statusbar" options="{'fold_field': 'fold'}" />
-                </button>
                 <label for="name" position="replace">
                     <label for="name" string="N. OS"/>
                 </label>
                 <field name="guarantee_limit" position="replace"> 
                     <field name="guarantee_limit" string="Termino certificação" />
+                    <field name="stage_id" invisible="1" />
                 </field>
             </field>
         </record>
@@ -119,10 +114,9 @@
               </p>
             </field>
         </record>
-        <menuitem action="repair.action_repair_order_tree" id="repair.menu_repair_order" groups="stock.group_stock_user" name="Serviço" sequence="36"
+        <menuitem action="action_repair_order_stage_tree" id="repair.menu_repair_order" groups="stock.group_stock_user" name="Serviço" sequence="36"
             web_icon="repair,static/description/icon.png"/>
-        <menuitem action="action_repair_stage" id="menu_configuracoes" groups="stock.group_stock_user" name="Configurações" sequence="39" parent="repair.menu_repair_order"/>
-        <menuitem action="action_repair_stage" id="menu_repair_stage" groups="stock.group_stock_user" name="Estagio" sequence="1" parent="repair_stage.menu_configuracoes"/>
+        <menuitem action="action_repair_stage" id="menu_repair_stage" groups="stock.group_stock_user" name="Estagio" sequence="1" parent="repair.repair_menu_config"/>
 
     </data>
 </odoo>

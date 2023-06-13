@@ -22,7 +22,7 @@ class Repair(models.Model):
         else:
             raise ValidationError(_(
                 "You must create an FSM order stage first."))
-    
+
     date_repair = fields.Date(string='Data ordem serviço',
         index=True, readonly=True, default=fields.Date.context_today)
     date_repair_closed = fields.Date(string='Data fechamento',

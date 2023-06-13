@@ -12,7 +12,7 @@ class StockPicking(models.Model):
         for item in self.move_line_nosuggest_ids:
             if item.picking_id.picking_type_id.sequence_code == "IN":
                 vals = {}
-                vals["name"] = f"{self.name} - {item.lot_id.id} "
+                #vals["name"] = f"{self.name} - {item.lot_id.id} "
                 vals["company_id"] = self.company_id.id
                 vals["origin"] = self.origin
                 vals["lot_id"] = item.lot_id.id

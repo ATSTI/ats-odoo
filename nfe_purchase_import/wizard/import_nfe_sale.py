@@ -50,7 +50,6 @@ class WizardImportNfeSale(models.TransientModel):
         return partner_doc
 
     def get_main_sale(self, nfe):
-        #import pudb;pu.db
         ide = nfe.NFe.infNFe.ide
         num_nfe = nfe.NFe.infNFe.ide.nNF
         chave = nfe.protNFe.infProt.chNFe
@@ -88,7 +87,6 @@ class WizardImportNfeSale(models.TransientModel):
     def create_order_line(self, item, nfe, order_id):
         emit = nfe.NFe.infNFe.dest
         partner_doc = emit.CNPJ if hasattr(emit, 'CNPJ') else emit.CPF
-        import pudb;pu.db
         partner_id = self.env['res.partner'].search([('cnpj_cpf', '=', self.arruma_cpf_cnpj(str(partner_doc)))]).id
         uom_id = self.env['product.uom'].search([
             ('name', '=', str(item.prod.uCom))], limit=1).id

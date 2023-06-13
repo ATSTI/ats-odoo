@@ -117,7 +117,7 @@
               </p>
             </field>
         </record>
-        <menuitem action="action_repair_order_tree" id="menu_repair_order" groups="stock.group_stock_user" name="Serviço" sequence="36"
+        <menuitem action="repair.action_repair_order_tree" id="menu_repair_order" groups="stock.group_stock_user" name="Serviço" sequence="36"
             web_icon="repair,static/description/icon.png"/>
         <menuitem action="action_repair_vehicle" id="menu_dados_principais" groups="stock.group_stock_user" name="Dados Principais" sequence="37" parent="repair.menu_repair_order"/>
         <menuitem action="action_repair_vehicle" id="menu_configuracoes" groups="stock.group_stock_user" name="Configurações" sequence="39" parent="repair.menu_repair_order"/>

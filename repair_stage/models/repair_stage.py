@@ -39,10 +39,14 @@ class RepairStage(models.Model):
     custom_color = fields.Char("Cor do Codígo", default="#FFFFFF",
                                help="Use Hex Code only Ex:-#FFFFFF")
     description = fields.Text(translate=True)
-    stage_type = fields.Selection([('order', 'Order'),
-                                   ('equipment', 'Equipamento'),
-                                   ('location', 'Lugar'),
-                                   ('worker', 'Trabalho')], 'Type',
+    stage_type = fields.Selection([('draft', 'Novo'),
+                                   ('confirmed', 'Confirmado'),
+                                   ('under_repair', 'A Reparar'),
+                                   ('ready', 'Pronto para reparo'),
+                                   ('2binvoiced', 'A Faturar'),
+                                   ('invoice_except', 'Erro faturamento'),
+                                   ('done', 'Concluído'),
+                                   ('cancel', 'Cancelado')], 'Status',
                                   required=True)
     company_id = fields.Many2one(
         'res.company', string='Empresa'

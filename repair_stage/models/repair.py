@@ -12,7 +12,7 @@ class Repair(models.Model):
 
     def _default_stage_id(self):
         stage_ids = self.env['repair.stage'].\
-            search([('stage_type', '=', 'order'),
+            search([('stage_type', '=', 'draft'),
                     ('is_default', '=', True),
                     ('company_id', 'in', (self.env.user.company_id.id,
                                           False))],
@@ -22,7 +22,7 @@ class Repair(models.Model):
         else:
             raise ValidationError(_(
                 "You must create an FSM order stage first."))
-    
+
     date_repair = fields.Date(string='Data ordem serviço',
         index=True, readonly=True, default=fields.Date.context_today)
     date_repair_closed = fields.Date(string='Data fechamento',
@@ -38,6 +38,8 @@ class Repair(models.Model):
     )
 
     contas_pendentes = fields.Monetary('Faturas')
+    payment_term_id = fields.Many2one('account.payment.term', string='Forma de pagamento')
+    date_vencimento = fields.Date(string='Data vencimento')
 
     currency_id = fields.Many2one(
         comodel_name="res.currency",
@@ -65,12 +67,19 @@ class Repair(models.Model):
 
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
-        search_domain = [('stage_type', '=', 'order')]
+        search_domain = [('stage_type', '=', 'draft')]
         if self.env.context.get('default_team_id'):
             search_domain = [
                 '&', ('team_ids', 'in', self.env.context['default_team_id'])
             ] + search_domain
         return stages.search(search_domain, order=order)
+
+    # @api.onchange('state')
+    # def onchange_state(self):
+    #     if self.state:
+    #         stage_id = self.env['repair.stage'].\
+    #             search([('stage_type', '=', self.state),], limit=1)
+    #         self.stage_id = stage_id.id
 
     @api.onchange('vehicle_id')
     def onchange_vehicle_id(self):
@@ -115,10 +124,13 @@ class Repair(models.Model):
         }
 
     def write(self, vals):
-        if 'stage_id' in vals:
-            stage = self.env['repair.stage'].browse(vals['stage_id']).is_closed
-            if stage:
-                vals['date_repair_closed'] = fields.Date.context_today(self)
+        if 'state' in vals:
+            stage_id = self.env['repair.stage'].\
+                search([('stage_type', '=', vals['state']),], limit=1)
+            if stage_id:
+                vals['stage_id'] = stage_id.id
+                if stage_id.is_closed:
+                    vals['date_repair_closed'] = fields.Date.context_today(self)
         res = super().write(vals)
         return res
 

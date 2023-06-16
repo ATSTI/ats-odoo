@@ -207,9 +207,6 @@
                                 <td>
                                     <span t-field="doc.amount_total"/>
                                 </td>
-                                <td>
-                                    <span t-field="doc.payment_term_id.name"/>
-                                </td>
                                 <!-- <td>
                                     <span t-field="doc.date_vencimento"/>
                                 </td> -->

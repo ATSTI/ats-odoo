@@ -9,8 +9,6 @@
                 <field name="state" position="replace">
                     <field name="stage_id"/>
                     <field name="state" invisible="1"/>
-                    <field name="company_id" groups="base.group_multi_company" readonly="1" optional="show"/>
-                    <field name="activity_ids" widget="kanban_activity"/>
                 </field>
             </field>
         </record>

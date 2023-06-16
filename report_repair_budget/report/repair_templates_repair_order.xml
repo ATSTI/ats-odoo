@@ -5,7 +5,41 @@
         <xpath expr="//t[@t-call='web.external_layout']" position="replace">
             <t t-call="web.external_layout">
                 <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)" />
+                <t t-foreach="docs" t-as="doc">
+                    <style>
+                        .shipping{
+                            width: 29,5%;
+                            border: thin solid black;
+                            padding: 10px;
+                        }
+                        .shipping &gt; span{
+                            font-size: 11px;
+                        }
+                    </style>    
+                </t>
                 <div class="page">
+                    <table>
+                        <td class="shipping">
+                            <span>
+                                <h3>ORÇAMENTO Nº: <span t-field="doc.id"/>
+                                </h3>
+                            </span>
+                            <br/>
+                            <h6>
+                                <span>CNPJ: <span t-field="doc.company_id.cnpj_cpf"/>
+                                </span>
+                            </h6>
+                            <h6>
+                                <span>Insc. Estadual: <span t-field="doc.company_id.inscr_est"/>
+                                </span>
+                            </h6>
+                            <br/>
+                            <span>
+                                <h4>DATA DE EMISSÃO : <span t-field="doc.date_repair"/>
+                                </h4>
+                            </span>
+                        </td>
+                    </table>
                     <div class="oe_structure"/>
                     <h2>
                         <span t-if="o.state != 'draft'">Repair Order #:</span>
@@ -37,8 +71,8 @@
                     <table class="table table-sm o_main_table">
                         <thead>
                             <tr>
-                                <th>Descirção</th>
-                                <th class="text-right">Quatidade</th>
+                                <th>Descrição</th>
+                                <th class="text-right">Quantidade</th>
                                 <t t-if="o.invoice_method != 'none'">
                                     <th class="text-right">Preço Unitário</th>
                                     <th class="text-center">Taxa</th>
@@ -48,8 +82,10 @@
                         </thead>
                         <tbody>
                             <t t-if="o.operations">
-                                <tr class="bg-200 o_line_section"><td colspan="5"><strong>Partes</strong></td></tr>
+                                <tr class="bg-200 o_line_section"><td colspan="5"><strong>Peças de reposição</strong></td></tr>
+                                <t t-set="tot_pecas" t-value="0.0" />
                                 <tr t-foreach="o.operations" t-as="line">
+                                    <t t-set="tot_pecas" t-value="tot_pecas + line.price_subtotal" />
                                     <td>
                                         <p t-if="line.type == 'add'"><i>(Add)</i> <span t-field="line.name" /></p>
                                         <p t-if="line.type == 'remove'">(<i>Remove</i>) <span t-field="line.name"/></p>
@@ -71,9 +107,27 @@
                                     </t>
                                 </tr>
                             </t>
+                        </tbody>
+                    </table>
+
+                    <table class="table table-sm o_main_table">
+                        <thead>
+                            <tr>
+                                <th>Descrição</th>
+                                <th class="text-right">Quantidade</th>
+                                <t t-if="o.invoice_method != 'none'">
+                                    <th class="text-right">Preço Unitário</th>
+                                    <th class="text-center">Taxa</th>
+                                    <th class="text-right">Preço</th>
+                                </t>
+                            </tr>
+                        </thead>
+                        <tbody>
                             <t t-if="o.fees_lines">
-                                <tr class="bg-200 o_line_section"><td colspan="5"><strong>Operações</strong></td></tr>
+                                <tr class="bg-200 o_line_section"><td colspan="5"><strong>Serviços</strong></td></tr>
+                                <t t-set="tot_servicos" t-value="0.0" />
                                 <tr t-foreach="o.fees_lines" t-as="fees">
+                                    <t t-set="tot_servicos" t-value="tot_servicos + fees.price_subtotal" />
                                     <td>
                                         <span t-field="fees.name"/>
                                     </td>
@@ -101,29 +155,27 @@
                     <div id="total" class="row justify-content-end">
                         <div class="col-4">
                             <table class="table table-sm">
-                                <t t-if="o.invoice_method !='none'">
                                     <tr class="border-black o_subtotal">
-                                        <td><strong>Total Without Taxes</strong></td>
+                                        <td><strong>subTotal Peças</strong></td>
                                         <td class="text-right">
-                                            <span t-field="o.amount_untaxed"
+                                            <span t-esc="tot_pecas"
                                                 t-options='{"widget": "monetary", "display_currency": o.pricelist_id.currency_id}'/>
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td>Taxes</td>
-                                        <td class="text-right o_price_total">
-                                            <span t-field="o.amount_tax"
+                                    <tr class="border-black o_subtotal">
+                                        <td><strong>subTotal Serviços</strong></td>
+                                        <td class="text-right">
+                                            <span t-esc="tot_servicos"
                                                 t-options='{"widget": "monetary", "display_currency": o.pricelist_id.currency_id}'/>
                                         </td>
                                     </tr>
                                     <tr class="border-black o_total">
                                         <td><strong>Total</strong></td>
                                         <td class="text-right o_price_total">
-                                            <span t-field="o.amount_total"
+                                            <span t-esc="tot_pecas + tot_servicos"
                                                 t-options='{"widget": "monetary", "display_currency": o.pricelist_id.currency_id}'/>
                                         </td>
                                     </tr>
-                                </t>
                             </table>
                         </div>
                     </div>

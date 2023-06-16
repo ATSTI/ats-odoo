@@ -3,6 +3,7 @@
 
 import logging
 import base64
+import json
 from datetime import datetime, date
 
 from .arquivo_certificado import ArquivoCertificado
@@ -70,38 +71,35 @@ class AccountMoveLine(models.Model):
         """
         Creates a new attachment with the Boleto PDF
         """
-        import pudb;pu.db
         if self.own_number and self.pdf_boleto_id:
             return
         order_id = self.payment_line_ids[0].order_id
 
-        # criar o boleto aqui
-        # order_id.generate_payment_file()
-
         with ArquivoCertificado(order_id.journal_id, 'w') as (key, cert):
-            partner_bank_id = self.journal_id.bank_account_id
             api_inter = ApiInter(
                 cert=(cert, key),
                 conta_corrente=(
-                        order_id.company_partner_bank_id.acc_number +
-                        order_id.company_partner_bank_id.acc_number_dig
+                        self.move_id.partner_bank_id.acc_number +
+                        self.move_id.partner_bank_id.acc_number_dig
                 ),
                 clientId=self.move_id.partner_bank_id.journal_id.bank_inter_id,
                 clientSecret=self.move_id.partner_bank_id.journal_id.bank_inter_secret
             )
-            import pudb;pu.db
             datas = api_inter.boleto_pdf(self.own_number)
-            #pdf_file = BytesIO(base64.b64decode(json_p['pdf']))
-            self.pdf_boleto_id = self.env['ir.attachment'].create(
+            datas = json.loads(datas)
+            pdf_file = datas['pdf']
+            self.pdf_boleto_id = self.env["ir.attachment"].create(
                 {
-                    'name': (
-                            "Boleto %s" % self.bank_payment_line_id.display_name),
-                    'datas': base64.b64encode(datas),
-                    'datas_fname': ("boleto_%s.pdf" %
-                                    self.bank_payment_line_id.display_name),
-                    'type': 'binary'
+                    "name": (
+                            "boleto_%s.pdf" % self.name),
+                    "res_model": self.move_id._name, 
+                    "res_id": self.move_id.id,
+                    "datas": pdf_file,
+                    "mimetype": "application/pdf",
+                    "type": "binary"
                 }
             )
+            self.move_id.file_boleto_pdf_id = self.pdf_boleto_id
 
     def print_pdf_boleto(self):
         """

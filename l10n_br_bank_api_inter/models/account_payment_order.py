@@ -37,6 +37,8 @@ class AccountPaymentOrder(models.Model):
         precision = self.env["decimal.precision"]
         precision_account = precision.precision_get("Account")
         for line in self.payment_line_ids:
+            if line.date:
+                continue
             move_line = line.move_line_id
             # Instrução de Juros
             tipo_mora = "ISENTO"
@@ -136,6 +138,7 @@ class AccountPaymentOrder(models.Model):
 
     def _generate_bank_inter_boleto(self):
         nosso_numero = False
+        import pudb;pu.db
         with ArquivoCertificado(self.journal_id, 'w') as (key, cert):
             api_inter = ApiInter(
                 cert=(cert, key),
@@ -147,8 +150,9 @@ class AccountPaymentOrder(models.Model):
             data = self._generate_bank_inter_boleto_data()
             for item in data:
                 # DESCOMENTAR a LINHA ABAIXO E COMENTAR A PROXIMA
-                # result = api_inter.boleto_inclui(item)
-                result = {'seuNumero': '0002/01', 'nossoNumero': '01000227264', 'codigoBarras': '07793937700000003500001112052616101000227264', 'linhaDigitavel': '07790001161205261610410002272648393770000000350'}
+                result = api_inter.boleto_inclui(item)
+                # print(result)
+                #result = {'seuNumero': '0002/01', 'nossoNumero': '01000227264', 'codigoBarras': '07793937700000003500001112052616101000227264', 'linhaDigitavel': '07790001161205261610410002272648393770000000350'}
                 if 'nossoNumero' in result:
                     payment_line_id = self.payment_line_ids.filtered(
                         lambda line: line.document_number == item["seuNumero"])

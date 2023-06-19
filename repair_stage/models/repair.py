@@ -28,6 +28,10 @@ class Repair(models.Model):
             index=True, copy=False,
             group_expand='_read_group_stage_ids',
             default=lambda self: self._default_stage_id())
+    
+    origin = fields.Char(
+        string="Origem",
+    )
 
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):

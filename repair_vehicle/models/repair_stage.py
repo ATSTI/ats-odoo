@@ -38,9 +38,6 @@ class RepairStage(models.Model):
                                 help='Used a default stage')
     custom_color = fields.Char("Cor do Codígo", default="#FFFFFF",
                                help="Use Hex Code only Ex:-#FFFFFF")
-    origin = fields.Char(
-        string="Origem",
-    )
     description = fields.Text(translate=True)
     stage_type = fields.Selection([('order', 'Order'),
                                    ('equipment', 'Equipamento'),

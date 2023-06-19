@@ -8,6 +8,7 @@
             <field name="arch" type="xml">
                 <field name="state" position="replace">
                     <field name="stage_id"/>
+                    <field name="origin" />
                     <field name="state" invisible="1"/>
                 </field>
             </field>
@@ -26,6 +27,7 @@
                 <field name="guarantee_limit" position="replace"> 
                     <field name="guarantee_limit" string="Termino certificação" />
                     <field name="stage_id" invisible="1" />
+                    <field name="origin" />
                 </field>
             </field>
         </record>

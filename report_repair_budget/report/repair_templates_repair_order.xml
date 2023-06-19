@@ -7,6 +7,12 @@
                 <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)" />
                 <t t-foreach="docs" t-as="doc">
                     <style>
+                        *{
+                            margin: 0;
+                            padding: 0;
+                            box-sizing: border-box;
+                            text-transform: uppercase;
+                        }
                         .shipping{
                             width: 29,5%;
                             border: thin solid black;
@@ -14,6 +20,15 @@
                         }
                         .shipping &gt; span{
                             font-size: 11px;
+                        }
+                        .address{
+                            width: 49,5%;
+                            border: thin solid black;
+                            padding: 10px;
+                            vertical-align: middle;
+                        }
+                        .address span{
+                            font-size: 12px;
                         }
                     </style>    
                 </t>
@@ -38,6 +53,17 @@
                                 <h4>DATA DE EMISSÃO : <span t-field="doc.date_repair"/>
                                 </h4>
                             </span>
+                        </td>
+                        <td style="width: 0,5%"/>
+                        <td class="address">
+                                <h4 t-field="doc.company_id.name"/>
+                                <br/>
+                                <span t-field="doc.company_id.street_name"/>, <span t-field="doc.company_id.street_number"/> - <span t-field="doc.company_id.district"/><br/>
+                                
+                                <span>CEP: <span t-field="doc.company_id.zip"/> - <span t-field="doc.company_id.city_id"/> - <span t-field="doc.company_id.state_id.code"/></span><br/>
+                                <br/>
+                                <span>FONES: <span t-field="doc.company_id.phone"/></span><br/>
+                                <br/>
                         </td>
                     </table>
                     <div class="oe_structure"/>
@@ -67,7 +93,8 @@
                             <p t-esc="datetime.datetime.now().strftime('%Y-%m-%d')" t-options="{'widget': 'date'}" class="m-0"/>
                         </div>
                     </div>
-
+                    <t t-set="tot_pecas" t-value="0.0" />
+                    <t t-set="tot_servicos" t-value="0.0" />
                     <table class="table table-sm o_main_table">
                         <thead>
                             <tr>
@@ -83,7 +110,7 @@
                         <tbody>
                             <t t-if="o.operations">
                                 <tr class="bg-200 o_line_section"><td colspan="5"><strong>Peças de reposição</strong></td></tr>
-                                <t t-set="tot_pecas" t-value="0.0" />
+                                
                                 <tr t-foreach="o.operations" t-as="line">
                                     <t t-set="tot_pecas" t-value="tot_pecas + line.price_subtotal" />
                                     <td>
@@ -125,7 +152,6 @@
                         <tbody>
                             <t t-if="o.fees_lines">
                                 <tr class="bg-200 o_line_section"><td colspan="5"><strong>Serviços</strong></td></tr>
-                                <t t-set="tot_servicos" t-value="0.0" />
                                 <tr t-foreach="o.fees_lines" t-as="fees">
                                     <t t-set="tot_servicos" t-value="tot_servicos + fees.price_subtotal" />
                                     <td>

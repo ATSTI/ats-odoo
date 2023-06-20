@@ -66,20 +66,21 @@
                     </div>
                     <t t-set="tot_pecas" t-value="0.0" />
                     <t t-set="tot_servicos" t-value="0.0" />
-                    <t t-if="o.operations">
-                        <table class="table table-sm o_main_table">
-                            <thead>
-                                <tr>
-                                    <th>Descrição</th>
-                                    <th class="text-right">Quantidade</th>
-                                    <t t-if="o.invoice_method != 'none'">
-                                        <th class="text-right">Preço Unitário</th>
-                                        <th class="text-center">Taxa</th>
-                                        <th class="text-right">Preço</th>
-                                    </t>
-                                </tr>
-                            </thead>
-                            <tbody>
+
+                    <table class="table table-sm o_main_table">
+                        <thead>
+                            <tr>
+                                <th>Descrição</th>
+                                <th class="text-right">Quantidade</th>
+                                <t t-if="o.invoice_method != 'none'">
+                                    <th class="text-right">Preço Unitário</th>
+                                    <th class="text-center">Taxa</th>
+                                    <th class="text-right">Preço</th>
+                                </t>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-if="o.operations">
                                 <tr class="bg-200 o_line_section">
                                     <td colspan="5">
                                         <strong>Peças de reposição</strong>
@@ -106,24 +107,8 @@
                                         </td>
                                     </t>
                                 </tr>
-
-                            </tbody>
-                        </table>
-                    </t>
-                    <t t-if="o.fees_lines">
-                        <table class="table table-sm o_main_table">
-                            <thead>
-                                <tr>
-                                    <th>Descrição</th>
-                                    <th class="text-right">Quantidade</th>
-                                    <t t-if="o.invoice_method != 'none'">
-                                        <th class="text-right">Preço Unitário</th>
-                                        <th class="text-center">Taxa</th>
-                                        <th class="text-right">Preço</th>
-                                    </t>
-                                </tr>
-                            </thead>
-                            <tbody>
+                            </t>
+                            <t t-if="o.fees_lines">
                                 <tr class="bg-200 o_line_section">
                                     <td colspan="5">
                                         <strong>Serviços</strong>
@@ -151,16 +136,15 @@
                                     </t>
                                 </tr>
 
-                            </tbody>
-                        </table>
-                    </t>
-
+                            </t>
+                        </tbody>
+                    </table>
                     <div id="total" class="row justify-content-end">
                         <div class="col-4">
                             <table class="table table-sm">
                                 <tr class="border-black o_subtotal">
                                     <td>
-                                        <strong>subTotal Peças</strong>
+                                        <strong>Subtotal Peças</strong>
                                     </td>
                                     <td class="text-right">
                                         <span t-esc="tot_pecas" t-options='{"widget": "monetary", "display_currency": o.pricelist_id.currency_id}'/>
@@ -168,7 +152,7 @@
                                 </tr>
                                 <tr class="border-black o_subtotal">
                                     <td>
-                                        <strong>subTotal Serviços</strong>
+                                        <strong>Subtotal Serviços</strong>
                                     </td>
                                     <td class="text-right">
                                         <span t-esc="tot_servicos" t-options='{"widget": "monetary", "display_currency": o.pricelist_id.currency_id}'/>

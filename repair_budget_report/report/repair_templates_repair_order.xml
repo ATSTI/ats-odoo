@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-<template id="report_repairorder_budget" inherit_id="repair.report_repairorder">
+<template id="repair_budget_report" inherit_id="repair.report_repairorder">
         <t t-set="o" t-value="doc"/>
         <xpath expr="//t[@t-call='web.external_layout']" position="replace">
             <t t-call="web.external_layout">
@@ -69,7 +69,7 @@
                     <div class="oe_structure"/>
                     <h2>
                         <span t-if="o.state != 'draft'">Repair Order #:</span>
-                        <span t-if="o.state == 'draft'">Repair Quotation #:</span>
+                        <span t-if="o.state == 'draft'">Orçamento de Serviços #:</span>
                         <span t-field="o.name"/>
                     </h2>
 
@@ -84,14 +84,19 @@
                                 <span t-field="o.lot_id.name"/>
                             </t>
                         </div>
-                        <div t-if="o.guarantee_limit" class="col-3 bm-2">
-                            <strong>Warranty:</strong>
-                            <p t-field="o.guarantee_limit" class="m-0"/>
+                        <div t-if="o.date_repair" class="col-3 bm-2">
+                            <strong>Emissao:</strong>
+                            <p t-field="o.date_repair" class="m-0"/>
                         </div>
                         <div class="col-3 bm-2">
-                            <strong>Printing Date:</strong>
-                            <p t-esc="datetime.datetime.now().strftime('%Y-%m-%d')" t-options="{'widget': 'date'}" class="m-0"/>
+                            <strong>Validade:</strong>
+                            <p t-field="o.data_validacao" class="m-0"/>
                         </div>
+                        <div class="col-3 bm-2">
+                            <strong>Observações:</strong>
+                            <p t-field="o.quotation_notes" class="m-0"/>
+                        </div>
+
                     </div>
                     <t t-set="tot_pecas" t-value="0.0" />
                     <t t-set="tot_servicos" t-value="0.0" />
@@ -114,8 +119,7 @@
                                 <tr t-foreach="o.operations" t-as="line">
                                     <t t-set="tot_pecas" t-value="tot_pecas + line.price_subtotal" />
                                     <td>
-                                        <p t-if="line.type == 'add'"><i>(Add)</i> <span t-field="line.name" /></p>
-                                        <p t-if="line.type == 'remove'">(<i>Remove</i>) <span t-field="line.name"/></p>
+                                        <span t-field="line.name" />
                                     </td>
                                     <td class="text-right">
                                         <span t-field="line.product_uom_qty"/>

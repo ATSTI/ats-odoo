@@ -29,7 +29,7 @@
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['repair'],
+    'depends': ['repair_date'],
     'data': [
         'report/repair_templates_repair_order.xml',
 

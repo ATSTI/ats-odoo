@@ -14,7 +14,7 @@
         'Carlos Silveira<carlos@atsti.com.br>',
     ],
     'depends': [
-        'base', 'repair', 'stock', 'sale'
+        'repair', 'stock'
     ],
     'data': [
     ],

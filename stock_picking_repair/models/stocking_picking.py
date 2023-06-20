@@ -14,7 +14,7 @@ class StockPicking(models.Model):
                 vals = {}
                 #vals["name"] = f"{self.name} - {item.lot_id.id} "
                 vals["company_id"] = self.company_id.id
-                vals["origin"] = self.origin
+                vals["origin"] = self.group_id.name
                 vals["lot_id"] = item.lot_id.id
                 #["invoice_method"] = self.invoice_method.id
                 vals["location_id"] = self.location_dest_id.id

@@ -7,8 +7,8 @@ from datetime import datetime
 from odoo.exceptions import UserError, ValidationError
 
 
-class Repair(models.Model):
-    _inherit = 'repair.order'
+class RepairOrder(models.Model):
+    _inherit = "repair.order"
 
     # def action_repair_confirm(self):
     #     super(Repair, self).action_repair_confirm(vals)

@@ -8,8 +8,6 @@ class StockPicking(models.Model):
 
     def _action_done(self):
         result = super(StockPicking, self)._action_done()
-        import wdb
-        wdb.set_trace()
         # TODO criar somente qdo for um tipo especifico de Picking
         for item in self.move_line_nosuggest_ids:
             if item.picking_id.picking_type_id.sequence_code == "IN":

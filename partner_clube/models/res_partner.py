@@ -74,8 +74,7 @@ class ResPartner(models.Model):
         ('M', 'Masculino')], 'Sexo')
     chave_acesso = fields.Char(string="Carteirinha")
     cartao = fields.Char(string='Cartão acesso', size=10)
-     
-    # 17/12/2020
+
     @api.depends("data_nascimento")
     def _compute_age(self):
         for record in self:
@@ -84,11 +83,14 @@ class ResPartner(models.Model):
                 age = relativedelta(fields.Date.today(), record.data_nascimento).years
             record.age = age
 
-    #30/09/20 
-    
+    @api.model
+    def create(self, vals):
+        if not "dependente" in vals:
+            if "parent_id" in vals:
+                vals["dependente"] = True
+        return super(ResPartner, self).create(vals)
+
     def write(self, vals):
-        #partner_id = self
-        # atualiza BD
         res = super(ResPartner, self).write(vals)  
         return res
                        

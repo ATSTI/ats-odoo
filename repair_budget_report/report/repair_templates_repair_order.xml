@@ -69,7 +69,6 @@
                                 <th class="text-right">Quantidade</th>
                                 <t t-if="o.invoice_method != 'none'">
                                     <th class="text-right">Preço Unitário</th>
-                                    <th class="text-center">Taxa</th>
                                     <th class="text-right">Preço</th>
                                 </t>
                             </tr>
@@ -90,17 +89,17 @@
                                         <span t-field="line.product_uom_qty"/>
                                         <span groups="uom.group_uom" t-field="line.product_uom.name"/>
                                     </td>
-                                    <t t-if="(line.repair_id.invoice_method != 'none')">
+                                    <!-- <t t-if="(line.repair_id.invoice_method != 'none')"> -->
                                         <td class="text-right">
                                             <span t-field="line.price_unit"/>
                                         </td>
-                                        <td class="text-center">
+                                        <!-- <td class="text-center">
                                             <span t-esc="','.join(map( lambda x: x.name, line.tax_id))"/>
-                                        </td>
+                                        </td> -->
                                         <td class="text-right o_price_total">
                                             <span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": o.pricelist_id.currency_id}'/>
                                         </td>
-                                    </t>
+                                    <!-- </t> -->
                                 </tr>
                             </t>
                             <t t-if="o.fees_lines">
@@ -118,17 +117,17 @@
                                         <span t-field="fees.product_uom_qty"/>
                                         <span groups="uom.group_uom" t-field="fees.product_uom.name"/>
                                     </td>
-                                    <t t-if="(fees.repair_id.invoice_method != 'none')">
+                                    <!-- <t t-if="(fees.repair_id.invoice_method != 'none')"> -->
                                         <td class="text-right">
                                             <span t-field="fees.price_unit"/>
                                         </td>
-                                        <td class="text-center">
+                                        <!-- <td class="text-center">
                                             <span t-esc="','.join(map( lambda x: x.name, fees.tax_id))"/>
-                                        </td>
+                                        </td> -->
                                         <td class="text-right o_price_total">
                                             <span t-field="fees.price_subtotal" t-options='{"widget": "monetary", "display_currency": o.pricelist_id.currency_id}'/>
                                         </td>
-                                    </t>
+                                    <!-- </t> -->
                                 </tr>
 
                             </t>

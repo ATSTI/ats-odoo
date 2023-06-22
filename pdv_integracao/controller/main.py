@@ -566,6 +566,10 @@ class IntegracaoPdv(http.Controller):
                 ('name','like', jrn),
                 ('company_id', '=', user_id.company_id.id)
             ])[0]
+            forma_pg = http.request.env['pos.payment.method'].sudo().search([
+                ('name','like', jrn),
+                ('company_id', '=', user_id.company_id.id)
+            ])[0]
             session_id = http.request.env['pos.session'].sudo().browse([session])
             if not session_id:
                 return 0,0,0,0
@@ -581,9 +585,10 @@ class IntegracaoPdv(http.Controller):
             pag['journal'] = jrn_id.id
             pag['partner_id'] = cliente
             pag['name'] = ord_name
-            # pag['discount'] = desconto
+            pag['forma_pag'] = forma_pg.id            # pag['discount'] = desconto
+            pag['forma'] = jrn
             if controle_troca == 0:
-                pag_line.append((0, 0,pag))
+                pag_line = pag
         return pag_line, desconto, troca, total_g
                 
     @http.route('/pedidoinsere', type='json', auth="user", csrf=False)
@@ -652,7 +657,17 @@ class IntegracaoPdv(http.Controller):
             pedido['amount_paid'] = total
             # pedido['statement_ids'] = pagamento
             pos = http.request.env['pos.order']
-            ord_ids = pos.sudo().create(pedido)
+            order = pos.sudo().create(pedido)
+            order.add_payment({
+                'pos_order_id': order.id,
+                'amount': pagamento['amount'],
+                'name': pagamento['name'],
+                'payment_method_id': pagamento['forma_pag'],
+            })
+            if pagamento['forma'] == "4-":
+                order.action_pos_order_invoice()
+            else:
+                order.action_pos_order_paid()
         return 'Sucesso'
 
     @http.route('/devolucao', type='json', auth="user", csrf=False)

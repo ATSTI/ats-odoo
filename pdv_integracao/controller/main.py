@@ -344,6 +344,8 @@ class IntegracaoPdv(http.Controller):
 
     @http.route('/pedidoconsulta', type='json', auth="user", csrf=True)
     def website_pedidoconsulta(self, **kwargs):
+        #import wdb
+        #wdb.set_trace()
         data = request.jsonrequest
         # TODO testar aqui se e a empresa mesmo
         user_id = http.request.env['res.users'].browse([request.uid])
@@ -372,8 +374,8 @@ class IntegracaoPdv(http.Controller):
             if not p_id.pos_reference:
                 continue
             ped = p_id.pos_reference[p_id.pos_reference.find('-')+1:]
-        #     if ultimo != '':
-        #         ultimo += ','
+            if ultimo != '':
+                ultimo += ','
             ultimo += ped
         #     if int(ped) < menor or menor == 0:
         #         menor = int(ped)
@@ -515,8 +517,11 @@ class IntegracaoPdv(http.Controller):
                 #TODO Felicita usa o campo CORTESIA como TIPO , colocar no exporta do PDV
                 #if md['CORTESIA']:
                 #    prd['tipo_venda'] = md['CORTESIA']
-                
-                prd['product_id'] = md['CODPRODUTO']
+                prod_ids = http.request.env['product.product'].search([('product_tmpl_id', '=', md['CODPRODUTO'])])
+                if prod_ids:
+                    prd['product_id'] = prod_ids.id
+                else:
+                    prd['product_id'] = 29690 #coloca aqui o ID de um produto GENERICO
                 prd['discount'] = desconto * 100
                 prd['qty'] = qtd
                 prd['price_unit'] = pco
@@ -583,7 +588,8 @@ class IntegracaoPdv(http.Controller):
                 
     @http.route('/pedidoinsere', type='json', auth="user", csrf=False)
     def website_pedidoinsere(self, **kwargs):
-        import pudb;pu.db
+        #import wdb
+        #wdb.set_trace()
         data = request.jsonrequest
         hj = datetime.now()
         hj = datetime.strftime(hj,'%m-%d-%Y')

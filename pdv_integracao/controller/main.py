@@ -180,22 +180,23 @@ class IntegracaoPdv(http.Controller):
             ('company_id', '=', user_id.company_id.id),
         ])
         cj = http.request.env['account.journal'].search([
-            ('name', 'ilike', 'Cliente'),
+            '|',('name', 'ilike', 'Cliente'),
+            ('name', 'ilike', 'Caixas'),
             ('company_id', '=', user_id.company_id.id),
-        ])        
+        ])  
         conta_obj = http.request.env['account.move.line']
         conta_ids = conta_obj.sudo().search([('partner_id', '=',int(cod_cliente)), 
             ('full_reconcile_id', '=', False), ('balance','!=', 0),
             ('company_id', '=', user_id.company_id.id),
             ('account_id.reconcile','=',True),
             ('account_id', '=', cc.id),
-            ('journal_id', '=', cj.id),
+            ('journal_id', 'in', cj.ids),
         ], order='date_maturity')
         vlr = float(valor_pago)
         juros = float(juro)
         vlr = vlr - juros
         vlr_baixado = '0.00'
-        if vlr:
+        if vlr > 0.01:
             # tem valor , entao baixa
             diario = data['diario'][:2]
             diario_obj = http.request.env['account.journal']    
@@ -221,7 +222,7 @@ class IntegracaoPdv(http.Controller):
 
                 # aqui colocar pra baixar
                 if conta.id == int(aml_id):
-                    arp = http.request.env['account.abstract.payment']
+                    arp = http.request.env['account.payment.register']
                     # passo duas vezes o cod_forma, na segunda vai como cod_venda
                     arp.baixa_pagamentos(conta, diario_id, caixa, vlr, cod_forma, juros)
                     vlr = 0.0
@@ -230,7 +231,7 @@ class IntegracaoPdv(http.Controller):
                 ('company_id', '=', user_id.company_id.id),
                 ('account_id.reconcile','=',True),
                 ('account_id', '=', cc.id),
-                ('journal_id', '=', cj.id),
+                ('journal_id', 'in', cj.ids),
             ], order='date_maturity')        
         lista = []
         for conta in conta_ids:
@@ -249,7 +250,8 @@ class IntegracaoPdv(http.Controller):
             contas['fatura'] = conta.move_id.ref
             contas['codigo'] = conta.id
             # contas['cod_cliente'] = 1           
-            lista.append(contas)
+            if conta.amount_residual > 0.01 and 'POS' not in  conta.move_id.ref:
+                lista.append(contas)
         return json.dumps(lista)
 
     @http.route('/usuarioconsulta', type='json', auth="user", csrf=False)

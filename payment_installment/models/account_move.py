@@ -24,9 +24,14 @@ class AccountMove(models.Model):
         different = False
         for prc in self.parcela_ids:
             fin = self.financial_move_line_ids.filtered(lambda l: l.date_maturity == prc.data_vencimento)
-            if fin.debit != prc.valor:
-                different = True
-                break
+            if self.move_type == "in_invoice":
+                if fin.credit != prc.valor:
+                    different = True
+                    break
+            if self.move_type == "out_invoice":
+                if fin.debit != prc.valor:
+                    different = True
+                    break
         if different:
             raise UserError(_(f"Parcela não foi confirmada, favor confirmar na aba PARCELAS.")) 
         res = super().action_post()      
@@ -38,11 +43,17 @@ class AccountMove(models.Model):
             self.financial_move_line_ids.with_context(check_move_validity=False).unlink()
             for prc in self.parcela_ids:
                 create_method = self.env['account.move.line'].with_context(check_move_validity=False).create
+                valor_cre = 0
+                valor_deb = 0
+                if self.move_type == "in_invoice":
+                    valor_cre = prc.valor
+                if self.move_type == "out_invoice":
+                    valor_deb = prc.valor
                 create_method({
                         'name': f"{self.payment_reference}-{prc.numero_fatura}",
-                        'debit': prc.valor,
+                        'debit': valor_deb,
                         'balance': prc.valor,
-                        'credit': 0.0,
+                        'credit': valor_cre,
                         'quantity': 1.0,
                         'amount_currency': prc.valor,
                         'date_maturity': prc.data_vencimento,

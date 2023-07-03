@@ -32,11 +32,12 @@
                 <field name="parentesco" />
             </xpath>
             <field name="ref" position="replace"/>
+            <field name="website" position="replace"/>
             <xpath expr="/form/sheet/group" position="inside">
                 <group>
+                    <field name="ref" string="N. Título" />
                     <field name="chave_acesso" />
                     <field name="cartao" />
-                    <field name="ref" string="N. Título" />
                 </group>
                 <group>
                     <field name="data_admissao" />
@@ -49,6 +50,20 @@
             </field>
             <notebook position="inside">
                 <page string="Informações Pessoais">
+                    <div>
+                        <label for="pagante" />
+                        <field name="pagante" />
+                        <label for="dependente" />
+                        <field name="dependente" />
+                        <label for="inadimplente" />
+                        <field name="inadimplente" />
+                        <label for="conselheiro" />
+                        <field name="conselheiro" />
+                        <label for="funcionario" />
+                        <field name="funcionario" />
+                        <label for="diretor" />
+                        <field name="diretor" />
+                    </div>
                     <group>
                         <group>
                             <field name="data_nascimento" />
@@ -56,7 +71,6 @@
                             <field name="sexo" />
                             <field name="estado_civil" />
                             <field name="parentesco" />
-                            <field name="chave_acesso" />
                         </group>
                         <group>
                             <field name="empresa" />
@@ -66,19 +80,28 @@
                             <field name="naturalidade" />
                             <field name="nacionalidade" />
                         </group>
-                        <group>
-                            <field name="pagante" />
-                            <field name="dependente" />
-                            <field name="inadimplente" />
-                        </group>
-                        <group>
-                            <field name="conselheiro" />
-                            <field name="funcionario" />
-                            <field name="diretor" />
-                        </group>
+
                     </group>
                 </page>
             </notebook>
+            <xpath expr='//page[@name="sales_purchases"]' position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr='//page[@name="fiscal"]' position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='child_ids']/form/sheet/group" position="inside">
+                <group colspan="5">
+                    <field name="data_nascimento" attrs="{'invisible' : [('type', '!=', 'contact')]}"/>
+                    <field name="age" attrs="{'invisible': [('type', '!=', 'contact')]}"/>
+                    <field name="chave_acesso" attrs="{'invisible' : [('type', '!=', 'contact')]}"/>
+                </group>
+                <group colspan="5">
+                    <field name="sexo" attrs="{'invisible' : [('type', '!=', 'contact')]}"/>
+                    <field name="estado_civil" attrs="{'invisible' : [('type', '!=', 'contact')]}"/>
+                    <field name="parentesco" attrs="{'invisible' : [('type', '!=', 'contact')]}"/>
+                </group>
+            </xpath>
         </field>
     </record>
 
@@ -131,14 +154,4 @@
             </field>
         </field>
     </record>
-    <!--
-    <record model="ir.cron" id="clube_integra_cron_cliente">
-        <field name="name">Integracao Clube - Clientes</field>
-        <field name="interval_number">2</field>
-        <field name="interval_type">hours</field>
-        <field name="numbercall">-1</field>
-        <field name="model" eval="'res.partner'"/>
-        <field name="function" eval="'cron_integra_clientes'"/>
-        <field name="args" eval="'()'"/>
-    </record> -->
 </odoo>

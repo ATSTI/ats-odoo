@@ -344,6 +344,8 @@ class IntegracaoPdv(http.Controller):
 
     @http.route('/pedidoconsulta', type='json', auth="user", csrf=True)
     def website_pedidoconsulta(self, **kwargs):
+        #import wdb
+        #wdb.set_trace()
         data = request.jsonrequest
         # TODO testar aqui se e a empresa mesmo
         user_id = http.request.env['res.users'].browse([request.uid])
@@ -372,8 +374,8 @@ class IntegracaoPdv(http.Controller):
             if not p_id.pos_reference:
                 continue
             ped = p_id.pos_reference[p_id.pos_reference.find('-')+1:]
-        #     if ultimo != '':
-        #         ultimo += ','
+            if ultimo != '':
+                ultimo += ','
             ultimo += ped
         #     if int(ped) < menor or menor == 0:
         #         menor = int(ped)
@@ -449,6 +451,9 @@ class IntegracaoPdv(http.Controller):
             data_pedido = datetime.strptime(data_sistema,'%m/%d/%Y %H:%M')
             data_pedido = data_pedido + timedelta(hours=+3)
             user_id = http.request.env['res.users'].browse([request.uid])
+            vendedor_id = http.request.env['res.users'].browse([codvendedor])
+            if not vendedor_id:
+                vendedor_id = user_id.id
             if 1 == 1:
                 vals['name'] = ord_name
                 vals['nb_print'] = 0
@@ -460,24 +465,9 @@ class IntegracaoPdv(http.Controller):
                 vals['date_order'] = data_pedido
                 vals['sequence_number'] = codmov
                 vals['partner_id'] = int(codcliente)
-                vals['user_id'] = int(codvendedor)
+                vals['user_id'] = int(vendedor_id)
                 vals['amount_tax'] = 0.0
                 vals['company_id'] = user_id.company_id.id
-            """
-                if cli != 1:
-                    if cli == 1609:
-                        cli = 1944
-                    vals['partner_id'] = cli
-                else:
-                    vals['partner_id'] = self.env['res.partner'].search([
-                        ('name','ilike','consumidor')],limit=1)[0].id
-                userid = mvs[5]
-                userid = self.env['res.users'].search([('id','=',userid)])
-                if userid:
-                    vals['user_id'] = userid.id
-                if not userid:
-                    vals['user_id'] = 1
-                vals['fiscal_position_id'] = session.config_id.default_fiscal_position_id.id"""
             return vals
 
     def _monta_pedidodetalhe(self,dados_json, desconto_financeiro, total_geral):
@@ -515,8 +505,11 @@ class IntegracaoPdv(http.Controller):
                 #TODO Felicita usa o campo CORTESIA como TIPO , colocar no exporta do PDV
                 #if md['CORTESIA']:
                 #    prd['tipo_venda'] = md['CORTESIA']
-                
-                prd['product_id'] = md['CODPRODUTO']
+                prod_ids = http.request.env['product.product'].search([('product_tmpl_id', '=', md['CODPRODUTO'])])
+                if prod_ids:
+                    prd['product_id'] = prod_ids.id
+                else:
+                    prd['product_id'] = 29690 #coloca aqui o ID de um produto GENERICO
                 prd['discount'] = desconto * 100
                 prd['qty'] = qtd
                 prd['price_unit'] = pco
@@ -583,7 +576,8 @@ class IntegracaoPdv(http.Controller):
                 
     @http.route('/pedidoinsere', type='json', auth="user", csrf=False)
     def website_pedidoinsere(self, **kwargs):
-        import pudb;pu.db
+        #import wdb
+        #wdb.set_trace()
         data = request.jsonrequest
         hj = datetime.now()
         hj = datetime.strftime(hj,'%m-%d-%Y')

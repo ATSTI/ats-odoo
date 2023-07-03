@@ -41,6 +41,7 @@ class AccountMove(models.Model):
         if self.num_parcela > 0:
             account = self.financial_move_line_ids[0].account_id
             self.financial_move_line_ids.with_context(check_move_validity=False).unlink()
+            date_due = False
             for prc in self.parcela_ids:
                 create_method = self.env['account.move.line'].with_context(check_move_validity=False).create
                 valor_cre = 0
@@ -63,32 +64,10 @@ class AccountMove(models.Model):
                         'partner_id': self.commercial_partner_id.id,
                         'exclude_from_invoice_tab': True,
                 })
-
-    # def _recompute_payment_terms_lines(self):
-    #     """Compute the dynamic payment term lines of the journal entry.
-    #     overwritten this method to change aml's field name.
-    #     """
-
-    #     # TODO - esse método é executado em um onchange, na emissão de um novo
-    #     # documento fiscal o numero do documento pode estar em branco
-    #     # atualizar esse dado ao validar a fatura, ou atribuir o número da NFe
-    #     # antes de salva-la.
-    #     result = super()._recompute_payment_terms_lines()
-    #     if self.document_number:
-    #         terms_lines = self.line_ids.filtered(
-    #             lambda l: l.account_id.user_type_id.type in ("receivable", "payable")
-    #             and l.move_id.document_type_id
-    #         )
-    #         terms_lines.sorted(lambda line: line.date_maturity)
-    #         for idx, terms_line in enumerate(terms_lines):
-    #             # TODO TODO pegar o método do self.fiscal_document_id.with_context(
-    #             # fiscal_document_no_company=True
-    #             # )._compute_document_name()
-    #             terms_line.name = "{}/{}-{}".format(
-    #                 self.document_number, idx + 1, len(terms_lines)
-    #             )
-    #     return result
-    
+                date_due = prc.data_vencimento
+            if date_due:
+                self.invoice_date_due = date_due
+   
     def calcular_vencimento(self, dia_preferencia, parcela):
         if self.invoice_date:
             hj = self.invoice_date

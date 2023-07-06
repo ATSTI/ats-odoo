@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <odoo>
     <!--  Partners inherited form -->
-    <record id="partner_birthdate_form_view" model="ir.ui.view">
-        <field name="name">partner_birthdate_form</field>
+    <record id="partner_clube_form_view" model="ir.ui.view">
+        <field name="name">partner_clube_form</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="l10n_br_base.l10n_br_base_partner_form"/>
         <field name="arch" type="xml">
@@ -12,19 +12,25 @@
             <xpath expr='//kanban' position="inside">
                 <field name="data_nascimento" />
             </xpath>
-            <!-- <xpath expr='//div[@class="oe_kanban_details"]' position="inside">
+            <xpath expr='//div[@class="oe_kanban_details"]' position="inside">
                 <div>
                     <field name="data_nascimento" />
                     <field name="age" attrs="{'invisible': [('data_nascimento', '=', False)]}" />
                 </div>
-            </xpath> -->
-            <!-- <xpath expr='//div[@name="div_address"]' position="inside">
+            </xpath>
+            <xpath expr='//page[@name="sales_purchases"]' position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr='//page[@name="fiscal"]' position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr='//div[@name="div_address"]' position="inside">
                 <field name="data_nascimento" />
                 <field name="age" attrs="{'invisible': [('data_nascimento', '=', False)]}" />
                 <field name="sexo" />
                 <field name="estado_civil" />
                 <field name="parentesco" />
-            </xpath> -->
+            </xpath>
             <field name="ref" position="replace"/>
             <field name="website" position="replace"/>
             <xpath expr="/form/sheet/group" position="inside">
@@ -96,6 +102,22 @@
                     <field name="parentesco" attrs="{'invisible' : [('type', '!=', 'contact')]}"/>
                 </group>
             </xpath>
+        </field>
+    </record>
+
+    <record id="view_partner_simple_form_clube" model="ir.ui.view">
+        <field name="name">partner_simple_form_clube</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_simple_form" />
+        <field name="arch" type="xml">
+            <field name="mobile" position="after" >
+                <field name="data_nascimento" />
+                <field name="age" attrs="{'invisible': [('data_nascimento', '=', False)]}" />
+                <field name="sexo" />
+                <field name="estado_civil" />
+                <field name="parentesco" />
+                <field name="chave_acesso" />
+            </field>
         </field>
     </record>
 

@@ -30,7 +30,7 @@
         "Carlos Silveira<carlos@atsti.com.br>",
     ],
     "depends": [
-        "l10n_br_base", "contacts",
+        "base", "l10n_br_base", "contacts",
     ],
     "data": [
         "views/partner_view.xml",

@@ -470,6 +470,9 @@ class IntegracaoPdv(http.Controller):
             data_pedido = datetime.strptime(data_sistema,'%m/%d/%Y %H:%M')
             data_pedido = data_pedido + timedelta(hours=+3)
             user_id = http.request.env['res.users'].browse([request.uid])
+            vendedor_id = http.request.env['res.users'].browse([codvendedor])
+            if not vendedor_id:
+                vendedor_id = user_id.id
             if 1 == 1:
                 vals['name'] = ord_name
                 vals['nb_print'] = 0
@@ -484,21 +487,6 @@ class IntegracaoPdv(http.Controller):
                 vals['user_id'] = ven_id.id # int(codvendedor)
                 vals['amount_tax'] = 0.0
                 vals['company_id'] = user_id.company_id.id
-            """
-                if cli != 1:
-                    if cli == 1609:
-                        cli = 1944
-                    vals['partner_id'] = cli
-                else:
-                    vals['partner_id'] = self.env['res.partner'].search([
-                        ('name','ilike','consumidor')],limit=1)[0].id
-                userid = mvs[5]
-                userid = self.env['res.users'].search([('id','=',userid)])
-                if userid:
-                    vals['user_id'] = userid.id
-                if not userid:
-                    vals['user_id'] = 1
-                vals['fiscal_position_id'] = session.config_id.default_fiscal_position_id.id"""
             return vals
 
     def _monta_pedidodetalhe(self,dados_json, desconto_financeiro, total_geral):

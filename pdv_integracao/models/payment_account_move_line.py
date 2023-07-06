@@ -9,6 +9,8 @@ class AccountPaymentRegister(models.TransientModel):
 
     def lanca_sangria_reforco(self, journal_id, caixa, valor, cod_forma, cod_venda, partner_id, motivo=''):
         # Inseri no PDV a Entrada no CAIXA
+        #import wdb
+        #wdb.set_trace()  
         lancamento = 'Recebimento-%s-%s' %(caixa, journal_id.name)
         if cod_venda == 0:
             lancamento = motivo
@@ -17,9 +19,9 @@ class AccountPaymentRegister(models.TransientModel):
             valor = valor * (-1)
         hj = datetime.now()
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
-        session = self.env['pos.session'].search([
-            ('id', '=', caixa)])
-        for ses in session: 
+        session = f"/{caixa}"
+        session_id = self.env['pos.session'].sudo().search([('name', 'ilike', session)])
+        for ses in session_id: 
             vals = {
                 'date': hj,
                 'amount': valor,
@@ -38,18 +40,19 @@ class AccountPaymentRegister(models.TransientModel):
                     jrn = cx.journal_id
                     vals['statement_id'] = cx.id
                     vals['journal_id'] = jrn.id
-                    vals['account_id'] = jrn.company_id.transfer_account_id.id,
-                    cx.write({'line_ids': [(0, False, vals)]})    
-
+                    vals['payment_ref'] = motivo # corrigi 06/07/23
+                    #vals['account_id'] = jrn.company_id.transfer_account_id.id,
+                    #cx.write({'line_ids': [(0, False, vals)]})    
+                    self.env['account.bank.statement.line'].sudo().create(vals)
 
     def baixa_pagamentos(self, move_line_id, journal_id, caixa, valor, cod_forma, juros):
-        invoices = move_line_id.invoice_id
+        invoices = move_line_id.move_id
         # amount = self._compute_payment_amount(invoices=invoices) if self.multi else self.amount
-        if move_line_id.amount_residual > valor or ((move_line_id.amount_residual - valor) > 0.01):
+        if move_line_id.amount_residual > valor and ((move_line_id.amount_residual - valor) > 0.01):
             baixar_tudo = 'open'
         else:
             baixar_tudo = 'reconcile'
-        bank_account = invoices[0].partner_bank_id or self.partner_bank_account_id
+        #bank_account = invoices[0].partner_bank_id or self.partner_bank_account_id
         # pmt_communication = self._prepare_communication(invoices)
 
         payment_type = 'inbound'# if move_line_id.debit else 'outbound'
@@ -70,23 +73,49 @@ class AccountPaymentRegister(models.TransientModel):
         vals = {
             'journal_id': journal_id.id,
             'payment_method_id': payment_method_id.id,
-            'payment_date': datetime.now(),
-            'communication': invoices.name,
-            'invoice_ids': [(6, 0, invoices.ids)],
+            #'payment_date': datetime.now(),
+            'payment_reference': invoices.name,
+            'move_id': invoices.id,
             'payment_type': payment_type,
             'amount': valor+juros,
             'currency_id': journal_id.company_id.currency_id.id,
             'partner_id': move_line_id.partner_id.id,
             'partner_type': 'customer',
-            'partner_bank_account_id': bank_account.id,
-            'multi': False,
-            'payment_difference_handling': baixar_tudo,
-            'writeoff_account_id': conta_juros,
-            'writeoff_label': juros_desc
+            # 'payment_difference_handling': baixar_tudo,
+            # 'writeoff_account_id': conta_juros,
+            # 'writeoff_label': juros_desc
         }
-        Payment = self.env['account.payment']        
-        pay = Payment.create(vals)
-        pay.post()
+        #to_process = []
+        #to_process.append({
+        #    'create_vals': vals,
+        #import pudb;pu.db
+        arp = self.env['account.payment.register']    
+        pag = arp.with_context(active_model='account.move')
+        ctx = {'active_model': 'account.invoice', 'active_ids': [invoices.id]}
+        register_payments = pag.with_context(ctx).create({
+            'payment_date': datetime.now(),
+            'journal_id': journal_id.id,
+            'amount': valor+juros,
+            'payment_method_id': self.env.ref('account.account_payment_method_manual_in').id,
+        })
+        #import pudb;pu.db
+        rg = arp.browse(register_payments)
+        rg.create_payments()
+
+
+
+        # payment = self.env['account.payment']
+        # pay = payment.create(vals)
+        # pay.post()
+        # payment.create_payments(payment_register_id.id)
+        #ctx = dict(
+        #    active_ids=invoices.ids, # Use ids and not id (it has to be a list)
+        #    active_model='account.move',
+        #)
+        #wizard = self.env['account.payment.register'].with_context(ctx).create(vals)
+        #wizard._create_payments()
+
+
         # coloco o valor no PDV como uma entrada
         # pra nao dar diferenca no caixa
         self.lanca_sangria_reforco(journal_id, caixa, valor+juros, cod_forma, cod_forma, move_line_id.partner_id, invoices.name)

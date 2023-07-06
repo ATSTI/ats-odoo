@@ -9,6 +9,8 @@ class AccountPaymentRegister(models.TransientModel):
 
     def lanca_sangria_reforco(self, journal_id, caixa, valor, cod_forma, cod_venda, partner_id, motivo=''):
         # Inseri no PDV a Entrada no CAIXA
+        #import wdb
+        #wdb.set_trace()  
         lancamento = 'Recebimento-%s-%s' %(caixa, journal_id.name)
         if cod_venda == 0:
             lancamento = motivo
@@ -17,9 +19,9 @@ class AccountPaymentRegister(models.TransientModel):
             valor = valor * (-1)
         hj = datetime.now()
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
-        session = self.env['pos.session'].search([
-            ('id', '=', caixa)])
-        for ses in session: 
+        session = f"/{caixa}"
+        session_id = self.env['pos.session'].sudo().search([('name', 'ilike', session)])
+        for ses in session_id: 
             vals = {
                 'date': hj,
                 'amount': valor,
@@ -38,9 +40,10 @@ class AccountPaymentRegister(models.TransientModel):
                     jrn = cx.journal_id
                     vals['statement_id'] = cx.id
                     vals['journal_id'] = jrn.id
-                    vals['account_id'] = jrn.company_id.transfer_account_id.id,
-                    cx.write({'line_ids': [(0, False, vals)]})    
-
+                    vals['payment_ref'] = motivo # corrigi 06/07/23
+                    #vals['account_id'] = jrn.company_id.transfer_account_id.id,
+                    #cx.write({'line_ids': [(0, False, vals)]})    
+                    self.env['account.bank.statement.line'].sudo().create(vals)
 
     def baixa_pagamentos(self, move_line_id, journal_id, caixa, valor, cod_forma, juros):
         invoices = move_line_id.move_id

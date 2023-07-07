@@ -167,8 +167,6 @@ class IntegracaoPdv(http.Controller):
 
     @http.route('/contasconsulta', type='json', auth="user", csrf=False)
     def website_contasconsulta(self, **kwargs):
-        #import wdb
-        #wdb.set_trace() 
         user_id = http.request.env['res.users'].browse([request.uid])
         data = request.jsonrequest
         cod_cliente = data['cod_cliente']
@@ -182,21 +180,23 @@ class IntegracaoPdv(http.Controller):
             valor_pago = data['valor_pago']
             juro = data['juro']
         # TODO testar aqui se e a empresa mesmo
+        diarios_usados = http.request.env["ir.config_parameter"].sudo().get_param("pos.diario_contas")
+        diarios_usados = json.loads(diarios_usados)
         cc = http.request.env['account.account'].search([
             ('name', 'ilike', 'Cliente Padrao'),
             ('company_id', '=', user_id.company_id.id),
         ])
-        cj = http.request.env['account.journal'].search([
-            ('name', 'ilike', 'Cliente'),
-            ('company_id', '=', user_id.company_id.id),
-        ])        
+        # cj = http.request.env['account.journal'].search([
+        #     ('name', 'ilike', 'Cliente'),
+        #     ('company_id', '=', user_id.company_id.id),
+        # ])        
         conta_obj = http.request.env['account.move.line']
         conta_ids = conta_obj.sudo().search([('partner_id', '=',int(cod_cliente)), 
             ('full_reconcile_id', '=', False), ('balance','!=', 0),
             ('company_id', '=', user_id.company_id.id),
             ('account_id.reconcile','=',True),
             ('account_id', '=', cc.id),
-            ('journal_id', '=', cj.id),
+            ('journal_id', 'in', diarios_usados),
         ], order='date_maturity')
         vlr = float(valor_pago)
         juros = float(juro)

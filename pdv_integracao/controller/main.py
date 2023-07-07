@@ -238,7 +238,7 @@ class IntegracaoPdv(http.Controller):
                 ('company_id', '=', user_id.company_id.id),
                 ('account_id.reconcile','=',True),
                 ('account_id', '=', cc.id),
-                ('journal_id', 'in', cj.ids),
+                ('journal_id', 'in', diarios_usados),
             ], order='date_maturity')        
         lista = []
         for conta in conta_ids:

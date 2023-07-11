@@ -4,9 +4,8 @@
 from odoo import models, _, fields
 from odoo.exceptions import UserError
 import re
-from datetime import timedelta
+from datetime import datetime, timedelta
 import time
-import datetime
 import base64
 import tempfile
 import requests
@@ -81,7 +80,7 @@ class PaymentOrderLine(models.Model):
             arq_temp.write(key.decode())
             arq_temp.close()
 
-            agora = datetime.datetime.now()
+            agora = datetime.now()
             tempo_token = diario.write_date
             #    request_body = "client_id=" + id_inter + "&client_secret=" + secret + "&scope=boleto-cobranca.read boleto-cobranca.write extrato.read&grant_type=client_credentials"
             if (agora - tempo_token).total_seconds() > 3500:
@@ -289,9 +288,52 @@ class PaymentOrderLine(models.Model):
                 moveline.write({'codigo_barra': 'Houve erro na API'})
                 #raise UserError('Houve um erro com a API do Banco Inter:\n%s' % response.text)
 
-    def search_information_to_banco_inter(self, diario):
-        # import pudb;pu.db
+    def baixa_faturas(self, move_line_id, valor, journal_id, juros):
+        invoices = move_line_id.invoice_id
+        if move_line_id.amount_residual > valor or ((move_line_id.amount_residual - valor) > 0.01):
+            baixar_tudo = 'open'
+        else:
+            baixar_tudo = 'reconcile'
+        bank_account = invoices[0].partner_bank_id or self.partner_bank_account_id
 
+        payment_type = 'inbound'# if move_line_id.debit else 'outbound'
+        payment_methods = \
+            payment_type == 'inbound' and \
+            journal_id.inbound_payment_method_ids or \
+            journal_id.outbound_payment_method_ids
+        payment_method_id = payment_methods and payment_methods[0] or False
+        conta_juros = ''
+        juros_desc = ''
+        if juros:
+            cc = self.env['account.account'].search([
+                    ('name', 'ilike', 'Juros Recebidos'),
+                    ('company_id', '=', journal_id.company_id.id),
+            ])
+            conta_juros = cc.id
+            juros_desc = 'Juros recebido %s - %s' %(move_line_id.partner_id.name, move_line_id.name or '')
+            
+        vals = {
+            'journal_id': journal_id.id,
+            'payment_method_id': payment_method_id.id,
+            'payment_date': datetime.now(),
+            'communication': invoices.name,
+            'invoice_ids': [(6, 0, invoices.ids)],
+            'payment_type': payment_type,
+            'amount': valor+juros,
+            'currency_id': journal_id.company_id.currency_id.id,
+            'partner_id': move_line_id.partner_id.id,
+            'partner_type': 'customer',
+            'partner_bank_account_id': bank_account.id,
+            'multi': False,
+            'payment_difference_handling': baixar_tudo,
+            'writeoff_account_id': conta_juros,
+            'writeoff_label': juros_desc
+        }
+        Payment = self.env['account.payment']        
+        pay = Payment.create(vals)
+        pay.post()
+
+    def search_information_to_banco_inter(self, diario):
         # teste pegar PDF
         # moveline = self.env['account.move.line'].browse([40787])
         # nosso_numero = '00841740287'
@@ -314,7 +356,7 @@ class PaymentOrderLine(models.Model):
         opFiltros = {
             'dataInicial': data_ini,
             'dataFinal': data_fim,
-            'situacao': 'EMABERTO',
+            'situacao': 'PAGO',
             'tipoOrdenacao': 'ASC', 
             'itensPorPagina': 10,
             'paginaAtual': 0
@@ -338,6 +380,9 @@ class PaymentOrderLine(models.Model):
                 line = self.env['account.move.line'].search([
                     ('nosso_numero', '=', boleto['nossoNumero']),
                 ])
+                valor = boleto["valorTotalRecebimento"]
+                valor_nominal = boleto["valorNominal"]
+                juros = valor - valor_nominal
                 if not line:
                     rotulo = boleto['seuNumero'][-2:]
                     fatura = boleto['seuNumero']
@@ -352,7 +397,6 @@ class PaymentOrderLine(models.Model):
                         ])
                     if line and not line.nosso_numero:
                         line.write({'nosso_numero': boleto['nossoNumero']})
-                        
                 if not line:
                     continue
                 move = self.env['payment.order.line'].search(
@@ -361,7 +405,9 @@ class PaymentOrderLine(models.Model):
                     ('move_line_id', '=', line.id),
                     ('state', 'in', ('draft', 'processed'))])
                 if move:
-                    move.write({'state':'paid'})
+                    if line.invoice_id.state == 'open':
+                        move.write({'state':'paid'})
+                        self.baixa_faturas(line, valor, diario, juros)
         #elif response.status_code == 401:
         #    raise UserError("Erro de autorização ao consultar a API do Banco Inter")
         #else:

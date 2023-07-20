@@ -284,7 +284,8 @@ class IntegracaoPdv(http.Controller):
         return json.dumps(lista)
 
     @http.route('/enviasangria', type='json', auth="user", csrf=False)
-    def website_enviasangria(self, **kwargs): 
+    def website_enviasangria(self, **kwargs):
+        # import pudb;pu.db
         #{"params": {"login": "ats@atsti.com.br", "password": "123456", "db": "21_vitton"}, "todos": [{9992, "Sangria", 1, "200,00"}, {9993, "Sangria", 1, "25,00"}]}
         user_id = http.request.env['res.users'].browse([request.uid])
         # receber todas as sangrias e reforco do caixa
@@ -329,29 +330,68 @@ class IntegracaoPdv(http.Controller):
         #import wdb
         #wdb.set_trace() 
         data = request.jsonrequest
-        session = http.request.env['pos.session']
-        ses_ids = session.sudo().search([('state', '=', 'opened')],limit=4)
+        session_obj = http.request.env['pos.session']
+        user_id = http.request.env['res.users'].browse([request.uid])
+        # import pudb;pu.db
         lista = []
-        for ses in ses_ids:
-            if 'caixa' in data:
-                dados_json = json.loads(data['caixa'])
-                for d in dados_json:
-                    session = f"/{d['CODCAIXA']}"
-                    if 'SITUACAO' in d and d['SITUACAO'] == 'F' and session in ses.name:
-                        # TODO ver se esta dando certo , aqui
-                        ses.sudo().write({'venda_finalizada': True})
-            caixa = {}
+        if 'caixa' in data:
+            dados_json = json.loads(data['caixa'])
             hj = datetime.now()
             dta_abre = datetime.strftime(hj,'%m-%d-%Y')
-            caixa['idcaixacontrole'] = ses.id
-            caixa['codcaixa'] = ses.id
-            caixa['codusuario'] = ses.user_id.id
-            caixa['situacao'] = 'o'
-            caixa['datafechamento'] = '01-01-2020'
-            caixa['nomecaixa'] = ses.name
-            caixa['dataabertura'] = dta_abre
-            caixa['valorabre'] = ses.cash_register_balance_start
-            lista.append(caixa)
+            session_insert = False
+            for d in dados_json:
+                if session_insert:
+                    continue
+                session = f"/{d['CODCAIXA']}"
+                ses_ids = session_obj.sudo().search([
+                    ('name', 'like', session),
+                ],limit=4)
+                if not len(ses_ids):
+                    # nao existe este caixa no odoo inserir
+                    vals = {}
+                    vals['user_id'] = user_id.id
+                    # vals['cash_register_balance_start'] = d['valorabre']
+                    # vals['start_at'] = d['dataabertura']
+                    pos_obj = http.request.env['pos.config']
+                    pos = pos_obj.search([('name', 'ilike', user_id.name)])
+                    # preciso verificar se ja existe uma sessao aberta pra este pos_obj
+                    # nao e permitido 2 sessoes
+                    ses_open = session_obj.sudo().search([
+                        ('state', '=', 'opened'),
+                        ('config_id', '=', pos.id)])
+                    if len(ses_open):
+                        continue
+                    vals['config_id'] = pos.id
+                    vals['state'] = 'opening_control'
+                    print(f"Incluindo sessao :{session}")
+                    session_id = session_obj.create(vals)
+                    if session_id:
+                        session_id.action_pos_session_open()
+                    session_id.write({
+                        'name': f"{session_id.name}{session}",
+                        'state': 'opened'})
+                    session_insert = True
+                ses_ids = session_obj.search([
+                    ('state', '=', 'opened'),
+                ],limit=4)
+                for ses in ses_ids:     
+                    if 'SITUACAO' in d and d['SITUACAO'] == 'F' and session in ses.name:
+                        # TODO ver se esta dando certo , aqui
+                        ses.write({'venda_finalizada': True})
+                        ses.action_pos_session_close()
+                        caixa = {}
+                        caixa['situacao'] = f"{ses.name}: Caixa Fechado com sucesso."
+                        lista.append(caixa)
+                    # caixa = {}
+                    # caixa['idcaixacontrole'] = ses.id
+                    # caixa['codcaixa'] = ses.id
+                    # caixa['codusuario'] = ses.user_id.id
+                    # caixa['situacao'] = 'o'
+                    # caixa['datafechamento'] = '01-01-2020'
+                    # caixa['nomecaixa'] = ses.name
+                    # caixa['dataabertura'] = dta_abre
+                    # caixa['valorabre'] = ses.cash_register_balance_start
+                    # lista.append(caixa)
         return json.dumps(lista)
 
     @http.route('/pedidoconsulta', type='json', auth="user", csrf=True)

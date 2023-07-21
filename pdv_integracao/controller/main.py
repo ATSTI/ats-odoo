@@ -285,8 +285,6 @@ class IntegracaoPdv(http.Controller):
 
     @http.route('/enviasangria', type='json', auth="user", csrf=False)
     def website_enviasangria(self, **kwargs):
-        # import pudb;pu.db
-        #{"params": {"login": "ats@atsti.com.br", "password": "123456", "db": "21_vitton"}, "todos": [{9992, "Sangria", 1, "200,00"}, {9993, "Sangria", 1, "25,00"}]}
         user_id = http.request.env['res.users'].browse([request.uid])
         # receber todas as sangrias e reforco do caixa
         # verificar no odoo se existe       
@@ -327,12 +325,9 @@ class IntegracaoPdv(http.Controller):
 
     @http.route('/caixaconsulta', type='json', auth="user", csrf=False)
     def website_caixaconsulta(self, **kwargs):
-        #import wdb
-        #wdb.set_trace() 
         data = request.jsonrequest
         session_obj = http.request.env['pos.session']
         user_id = http.request.env['res.users'].browse([request.uid])
-        # import pudb;pu.db
         lista = []
         if 'caixa' in data:
             dados_json = json.loads(data['caixa'])
@@ -371,13 +366,17 @@ class IntegracaoPdv(http.Controller):
                         'name': f"{session_id.name}{session}",
                         'state': 'opened'})
                     session_insert = True
+                    caixa = {}
+                    caixa['situacao'] = f"{session_id.name}: Caixa criado com sucesso."
+                    lista.append(caixa)
+
                 ses_ids = session_obj.search([
                     ('state', '=', 'opened'),
                 ],limit=4)
                 for ses in ses_ids:     
                     if 'SITUACAO' in d and d['SITUACAO'] == 'F' and session in ses.name:
                         # TODO ver se esta dando certo , aqui
-                        ses.write({'venda_finalizada': True})
+                        ses.write({'venda_finalizada': True, 'stop_at': hj})
                         ses.action_pos_session_close()
                         caixa = {}
                         caixa['situacao'] = f"{ses.name}: Caixa Fechado com sucesso."

@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="report_sale_balance_wizard" model="ir.ui.view">
+        <field name="name">report.sale.balance.wizard</field>
+        <field name="model">report.sale.balance.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Balanço de vendas">
+                <group>
+                    <group>
+                        <field name="date_start" />
+                        <field name="date_end" />
+                    </group>
+                    <footer>
+                        <button
+                            name="action_report_balance"
+                            string="PDF"
+                            class="btn-primary"
+                            type="object"
+                        />                                        
+                        <button string="Cancel" class="btn-default" special="cancel" />
+                    </footer>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_report_sale_balance_view" model="ir.actions.act_window">
+        <field name="name">Balanço de vendas</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">report.sale.balance.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="report_sale_balance_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem
+        id="menu_report_sale_balance_wizard"
+        name="Balanço de vendas"
+        action="report_sale_balance.action_report_sale_balance_view"
+        parent="sale.menu_sale_report"
+        sequence="99"/>
+
+</odoo>

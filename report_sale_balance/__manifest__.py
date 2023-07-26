@@ -31,6 +31,7 @@
     'website': '',
     'depends': ['sale'],
     'data': [
+        'security/ir.model.access.csv',
         'report/report_sale_balance.xml',
         'report/sale_balance.xml',
         'wizard/report_sale_balance_view.xml',

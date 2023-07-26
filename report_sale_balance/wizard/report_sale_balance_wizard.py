@@ -1,15 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import fields, models, _, api
-from datetime import datetime, date
-from odoo.exceptions import ValidationError
-import base64
-import tempfile
-import time
-import xlrd
-import re
-import os.path
-from erpbrasil.base.fiscal import cnpj_cpf, ie
+from odoo import api, fields, models
 
 
 class ReportSaleBalanceWizard(models.TransientModel):
@@ -32,11 +23,23 @@ class ReportSaleBalanceWizard(models.TransientModel):
 
     def action_report_balance(self):
         docs = self.env['sale.order'].search([("date_order", ">=", self.date_start),("date_order", ">=", self.date_end)])
-        return {
-            'type': 'ir.actions.act_window',
-            'view_mode': 'form',
-            'res_model': 'sale.order',
-            'docs': docs,
-            'views': [(False, 'form')],
-            'view_id': False,
+        # return {
+        #     'type': 'ir.actions.act_window',
+        #     'view_mode': 'form',
+        #     'res_model': 'sale.order',
+        #     'docs': docs,
+        #     'views': [(False, 'form')],
+        #     'context': '',
+        #     'view_id': False,
+        # }
+        data = 'x'
+        docargs = {
+           'doc_ids': docs,
+           'doc_model': 'report.sale.balance.wizard',
+           'data': data,
         }
+        data = {
+            'x': 1,
+            'y': 2,
+        }
+        return self.env.ref['report_sale_balance.action_report_sale_balance'].report_action(None, data=data)

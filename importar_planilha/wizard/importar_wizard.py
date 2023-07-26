@@ -407,8 +407,8 @@ class ImportarWizard(models.TransientModel):
                         mensagem += f"{vals['name']}<br>"                        
                         continue
                     # if cod and cod == '0000518':
-                    if rowValues[c_name]:
-                        vals['name'] = rowValues[c_name]
+                    if rowValues[c_name] or rowValues[c_razao]:
+                        vals['name'] = rowValues[c_name] or rowValues[c_razao]
                     c_id = cli_obj.search([('ref', '=', vals['ref'])])
                     if c_id:
                         continue

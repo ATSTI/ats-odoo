@@ -5,7 +5,7 @@
         <p>Balanço de Vendas</p>
         <t t-call="web.external_layout">
             <t t-foreach="docs" t-as="o">
-                <p>This object's name is <span t-field="o.name"/></p>
+                <p>This object's name is <span t-esc="o['name']"/> -> <span t-esc="o['venda']"/></p>
             </t>
         </t>
     </t>

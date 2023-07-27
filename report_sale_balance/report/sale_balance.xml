@@ -14,10 +14,10 @@
         </record> -->
         <record id="action_report_sale_balance" model="ir.actions.report">
             <field name="name">Balanço de vendas</field>
-            <field name="model">sale.order</field>
+            <field name="model">sale.balance</field>
             <field name="report_type">qweb-pdf</field>
-            <field name="report_name">report_sale_balance.report_sale_balance_id</field>
-            <field name="report_file">report_sale_balance.report_sale_balance_id</field>
+            <field name="report_name">report_sale_balance.balance_report</field>
+            <field name="report_file">report_sale_balance.balance_report</field>
         </record>
     </data>
 </odoo>

@@ -25,6 +25,7 @@ class AccountAnalyticAccount(models.Model):
             ("draft", "Transmitida"),
             ("confirm", "Emitida"),
             ("cancel", "Vencida"),
+            ("loss", "Perdida"),
         ],
         string="Situação",
         readonly=True,
@@ -44,6 +45,9 @@ class AccountAnalyticAccount(models.Model):
 
     def action_confirm(self):
         self.write({"state": "confirm"})
+
+    def action_loss(self):
+        self.write({"state": "loss"})
 
     def action_cancel(self):
         self.write({"state": "cancel"})

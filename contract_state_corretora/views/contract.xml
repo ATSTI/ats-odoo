@@ -19,6 +19,12 @@
                     states="draft"
                 />
                 <button
+                    name="action_loss"
+                    type="object"
+                    string="Apólice perdida"
+                    states="draft"
+                />
+                <button
                     name="action_cancel"
                     type="object"
                     string="Apólice Vencida"

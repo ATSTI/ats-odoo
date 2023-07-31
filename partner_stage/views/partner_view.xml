@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_partner_order_tree_view" model="ir.ui.view">
+            <field name="name">partner.order.tree</field>
+            <field name="model">partner.order</field>
+            <field name="inherit_id" ref="partner.view_partner_order_tree" />
+            <field name="arch" type="xml">
+                <field name="state" position="replace">
+                    <field name="stage_id"/>
+                    <field name="origin" />
+                    <field name="state" invisible="1"/>
+                </field>
+            </field>
+        </record>
+        <record id="view_partner_order_form" model="ir.ui.view">
+            <field name="name">partner.order.form</field>
+            <field name="model">partner.order</field>
+            <field name="inherit_id" ref="partner.view_partner_order_form" />
+            <field name="arch" type="xml">
+                <field name="name" position="attributes">
+                    <attribute name="readonly">True</attribute>
+                </field>
+                <label for="name" position="replace">
+                    <label for="name" string="N. OS"/>
+                </label>
+                <field name="guarantee_limit" position="replace"> 
+                    <field name="guarantee_limit" string="Termino certificação" />
+                    <field name="stage_id" invisible="1" />
+                    <field name="origin" />
+                </field>
+            </field>
+        </record>
+
+        <!-- Dashboard -->
+        <record id="view_partner_order_kanban" model="ir.ui.view">
+            <field name="name">partner.order.kanban</field>
+            <field name="model">partner.order</field>
+            <field name="inherit_id" ref="partner.view_partner_kanban" />
+            <field name="arch" type="xml">
+                <field name="name" position='after'>
+                    <field name="stage_id" />
+                    <field name="origin" />
+                </field>
+                <field name="name" position='after'>
+                    <field name="user_id" />
+                    <progressbar field="activity_state" colors="{&quot;planned&quot;: &quot;success&quot;, &quot;today&quot;: &quot;warning&quot;, &quot;overdue&quot;: &quot;danger&quot;}"/>
+                </field>
+                <xpath expr="//kanban" position="attributes">
+                    <attribute name="default_group_by">stage_id</attribute>
+                </xpath>
+                <xpath expr="//kanban/templates/t/div/div[2]" position="replace">
+                </xpath>
+                <xpath expr="//kanban/templates/t/div/div" position="replace">
+                    <div class="o_kanban_record_top mb16">
+                        <div class="o_kanban_record_headings mt4">
+                            <strong><span><t t-esc="record.name.value"/></span></strong>
+                            <strong><span><t t-esc="record.origin.value"/></span></strong>
+                        </div>
+                    </div>
+                    <div class="row" >
+                        <div class="col-12">
+                            <strong><span><t t-esc="record.partner_id.value"/></span></strong>
+                        </div>
+                    </div>
+                    <div class="o_kanban_record_bottom">
+                        <div class="oe_kanban_bottom_left">
+                            <field name="activity_ids" widget="kanban_activity" related="activity_state"/>
+                            <field name="activity_state" invisible="1"/>
+                            <img t-att-src="kanban_image('res.users', 'image_small', record.user_id.raw_value)" t-att-title="record.user_id.value" width="24" height="24" class="oe_kanban_avatar" alt="Usuário responsável"/>
+                        </div>
+                    </div>
+                </xpath>
+
+            </field>
+        </record>
+
+         <record id="view_partner_stage_graph" model="ir.ui.view">
+            <field name="name">partner.stage.graph</field>
+            <field name="model">partner.order</field>
+            <field name="arch" type="xml">
+                <graph string="Ordem serviço">
+                    <field name="partner_id" type="row"/>
+                    <field name="amount_total" type="measure"/>
+                </graph>
+            </field>
+        </record>
+        <record id="view_partner_stage_pivot" model="ir.ui.view">
+            <field name="name">partner.stage.pivot</field>
+            <field name="model">partner.order</field>
+            <field name="arch" type="xml">
+                <pivot string="Ordem Serviço" >
+                    <field name="partner_id" type="row"/>
+                    <field name="amount_total" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <record id="action_partner_order_stage_tree" model="ir.actions.act_window">
+            <field name="name">Ordem Servico</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">partner.order</field>
+            <field name="view_mode">kanban,tree,form,pivot,graph</field>
+            <field name="search_view_id" ref="partner.view_partner_order_form_filter"/>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Create a new reparation order
+              </p><p>
+                In a partner order, you can detail the components you remove,
+                add or replace and record the time you spent on the different
+                operations.
+              </p><p>
+                The partner order uses the warranty date on the Serial Number in
+                order to know if whether the partner should be invoiced to the
+                customer or not.
+              </p>
+            </field>
+        </record>
+        <menuitem action="action_partner_order_stage_tree" id="partner.menu_partner_order" groups="stock.group_stock_user" name="Serviço" sequence="36"
+            web_icon="partner,static/description/icon.png"/>
+        <menuitem action="action_partner_stage" id="menu_partner_stage" groups="stock.group_stock_user" name="Estagio" sequence="1" parent="partner.partner_menu_config"/>
+
+    </data>
+</odoo>

@@ -4,9 +4,72 @@
     <t t-call="web.html_container">
         <p>Balanço de Vendas</p>
         <t t-call="web.external_layout">
-            <t t-foreach="docs" t-as="o">
-                <p>This object's name is <span t-esc="o['name']"/> -> <span t-esc="o['venda']"/></p>
-            </t>
+            <style>
+                table, th, td{
+                    border: 2px solid #e6e6e6 ;
+                    text-align: center;
+                    border-collapse: collapse;
+                }
+                .cabecalho {
+                    width: 100%;
+                    text-align: left;
+                    font-size: 20px;
+                }
+                .nome {
+                    width: 40%;
+                    text-align: center;
+                }
+                .qtd {
+                    width: 12%;
+                    text-align: center;
+                }
+                .saldo {
+                    width: 10%;
+                    text-align: center;
+                }
+                .price {
+                    width: 10%;
+                    text-align: center;
+                }
+                .name {
+                    font-size: 12px;
+                    text-align: left;
+                }
+                .qtde {
+                    font-size: 12px;
+                    text-align: right;
+                }
+                .preco {
+                    font-size: 12px;
+                    text-align: right;
+                }
+                .sld {
+                    font-size: 12px;
+                    text-align: right;
+                }
+
+            </style>
+            <table class="cabecalho">
+                <th>Relatório Vendas x Compras - Período de <span t-esc="docs[0]['date_start']" /> a <span t-esc="docs[0]['date_end']" /> </th>
+            </table>
+            <table>
+                <tr>
+                    <th class="nome">Nome do Produto </th>
+                    <th class="qtd">Qtde Comprada </th>
+                    <th class="qtd">Qtde Vendida </th>
+                    <th class="price">Preço Unit </th>
+                    <th class="saldo">Saldo </th>
+                </tr>     
+                <t t-foreach="docs" t-as="o">
+                    <tr>      
+                        <td class="name"><span t-esc="o['name']"/></td>
+                        <td class="qtde"><span t-esc="o['compra']" t-options='{"widget": "float", "precision": 1}'/></td>
+                        <td class="qtde"><span t-esc="o['venda']" t-options='{"widget": "float", "precision": 1}'/></td>
+                        <td class="preco">R$<span t-esc="o['preco']" t-options='{"widget": "float", "precision": 2}'/></td>
+                        <td class="sld"><span t-esc="o['saldo']" t-options='{"widget": "float", "precision": 1}'/></td>
+                    </tr>
+                </t>
+            </table>
         </t>
     </t>
     </template>

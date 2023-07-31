@@ -29,13 +29,19 @@ class BalanceReport(models.AbstractModel):
                     lambda x: x.product_id.id in [pr.id]
                )
             )
+            d = data['data']['date_start']
+            date_in = f"{d[8:10]}/{d[5:7]}/{d[:4]}"
+            d = data['data']['date_end']
+            date_end =  f"{d[8:10]}/{d[5:7]}/{d[:4]}"
             vals['product_id'] = pr.id
-            vals['name'] = pr.name
+            vals['name'] = f"[{pr.default_code}]{pr.name}"
             vals['preco'] = pr.lst_price
             vals['unidade'] = pr.uom_id.code
             vals['venda'] = p_out
             vals['compra'] = p_in
-            vals['saldo'] = p_out - p_in
+            vals['saldo'] = p_in - p_out
+            vals['date_start'] = date_in
+            vals['date_end'] = date_end
             itens.append(vals)
 
         return {

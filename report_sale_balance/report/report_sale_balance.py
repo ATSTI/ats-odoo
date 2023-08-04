@@ -13,8 +13,8 @@ class BalanceReport(models.AbstractModel):
             ("commitment_date", ">=", data['data']['date_start']),
             ("commitment_date", "<=", data['data']['date_end'])])
         t_in = self.env['purchase.order'].search([
-            ("commitment_date", ">=", data['data']['date_start']),
-            ("commitment_date", "<=", data['data']['date_end'])])
+            ("date_planned", ">=", data['data']['date_start']),
+            ("date_planned", "<=", data['data']['date_end'])])
         prod_ids = t_out.order_line.mapped("product_id")
         itens = []
         for pr in prod_ids:

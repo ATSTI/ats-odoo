@@ -10,11 +10,11 @@ class BalanceReport(models.AbstractModel):
 
     def _get_report_values(self, docids, data=None):
         t_out = self.env['sale.order'].search([
-            ("date_order", ">=", data['data']['date_start']),
-            ("date_order", "<=", data['data']['date_end'])])
+            ("commitment_date", ">=", data['data']['date_start']),
+            ("commitment_date", "<=", data['data']['date_end'])])
         t_in = self.env['purchase.order'].search([
-            ("date_order", ">=", data['data']['date_start']),
-            ("date_order", "<=", data['data']['date_end'])])
+            ("commitment_date", ">=", data['data']['date_start']),
+            ("commitment_date", "<=", data['data']['date_end'])])
         prod_ids = t_out.order_line.mapped("product_id")
         itens = []
         for pr in prod_ids:

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="action_button.css"?>
+<templates id="template" xml:space="preserve">
+    <t t-inherit="point_of_sale.PaymentScreen" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('payment-controls')]" position="inside">
+            <div>
+                <script type="text/javascript" src="/pos_parcelas_button/static/src/js/models.js"/>
+                    <style>
+                        .popup{
+                            position: fixed;
+                            top: 0; bottom: 0;
+                            left: 0; right: 0;
+                            margin: auto;
+                            width: 350px;
+                            height: 300px;
+                            padding: 15px;
+                            border: solid 2px #7e5c74;
+                            background: #e2e2e2;
+                            display: none;
+                        }
+                        .popupCheck  {
+                            position: fixed;
+                            top: 0; bottom: 0;
+                            left: 0; right: 0;
+                            margin: auto;
+                            width: 200px;
+                            height: 90px;
+                            padding: 15px;
+                            border: solid 2px #7e5c74;
+                            background: #e2e2e2;
+                            display: none;
+                        }
+                        .popupError  {
+                            position: fixed;
+                            top: 0; bottom: 0;
+                            left: 0; right: 0;
+                            margin: auto;
+                            width: 200px;
+                            height: 90px;
+                            padding: 15px;
+                            border: solid 4px #d80000;
+                            background: #e2e2e2;
+                            display: none;
+                        }
+                        .botaoA  {
+                            position:absolute;
+                            bottom:73px;
+                            right:16px;
+                            margin:0x;
+                            padding:0px;
+                            height: 75px;
+                            width: 273px;
+                            background: #e2e2e2;
+                            border: solid 1px #c9c9c9;
+                            font-size: 16px !important;
+                            color: #e6fff6 !important;
+                        }
+                        .botaoF  {
+                            position:absolute;
+                            bottom:20px;
+                            left:120px;
+                            margin:0x;
+                            padding:0px;
+                            height: 25px;
+                            width: 100px;
+                            border: solid 1px #000000 ;    
+                        }
+                        .input {
+                            position:absolute;
+                            bottom: 230px;
+                            left: 9px;
+                            margin:0x;
+                            padding:2px;
+                            height: 20px;
+                            width: 230px;
+                            background: #bdbdbd;
+                            text-align: center;
+                        }
+                        .checkS {
+                            position:absolute;
+                            bottom: 40px;
+                            left: 80px;
+                            margin:0x;
+                            padding:2px;
+                            height: 20px;
+                            width: 20px;
+                            background: #bdbdbd;
+                            text-align: right;
+                        }
+                        .labelS {
+                            position:absolute;
+                            bottom: 40px;
+                            left: 45px;
+                        }
+                        .checkN {
+                            position:absolute;
+                            bottom: 40px;
+                            left: 160px;
+                            margin:0x;
+                            padding:2px;
+                            height: 20px;
+                            width: 20px;
+                            background: #bdbdbd;
+                        }
+                        .labelN {
+                            position:absolute;
+                            bottom: 40px;
+                            left: 123px;
+
+                        }
+                        .caixa2  {
+                            position:absolute;
+                            bottom:78px;
+                            right: 0px;
+                            margin:0x;
+                            padding:2px;
+                            height: 40px;
+                            width: 227px;
+                            background: #7e5c74;
+                            text-align: center;
+                        }
+                        .botaoC  {
+                            position:absolute;
+                            bottom:20px;
+                            left:10px;
+                            margin:0x;
+                            padding:0px;
+                            height: 25px;
+                            width: 100px;
+                            border: solid 1px #79a490 !important;
+                            background: #73ca9f !important;
+                        }
+                        .caixa  {
+                            position:absolute;
+                            bottom:292px;
+                            right: 0px;
+                            margin:0x;
+                            padding:2px;
+                            height: 35px;
+                            width: 376px;
+                            background: #7e5c74;
+                            text-align: center;
+                            text-align: center
+                        }
+                    </style>
+                    <div id="popupcheck" class="popupCheck">
+                        <font size="3" class="caixa2" color="#FFFFFF"> Metodo de pagamento é CREDITO ou A PRAZO?</font>
+                            <form action="form_action.asp" name="selecao">
+                                <font size="3" class="labelS"> Sim:</font>
+                                <font size="3" class="labelN"> Não:</font>
+                                <input type="checkbox" onclick="abrir()" class="checkS"></input>
+                                <input type="checkbox" onclick="fecharCheck()" class="checkN"></input>
+                            </form>
+                    </div>
+                    <div id="popup" class="popup">
+                        <font size="3" class="caixa" color="#FFFFFF"> Escolha o número de parcelas para pagamento</font>
+                            <form>
+                                <input value="1" type="number" class="input" id="inlinesOptions"></input>
+                            </form>
+                            <button class="botaoF" onclick="fechar()" >Fechar </button>
+                            <button class="botaoC" onclick="confirmar()"  >Confirmar</button>
+                    </div>
+                    <div id="popuperror" class="popupError">
+                        <font size="4" color="#810b0b"> Informe o número de parcelas </font>
+                            <button class="botaoF" onclick="fecharerror()" >Voltar </button>
+                    </div>
+                    <button
+                        id="test"
+                        class="botaoA"
+                        onclick="abrircheck()" >
+                        <font size="3" face="Arial" color="#4b4b4b" > Parcelas</font>
+                    </button>
+            </div>
+        </xpath>
+    </t>
+</templates>

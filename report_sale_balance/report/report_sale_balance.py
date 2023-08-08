@@ -35,6 +35,7 @@ class BalanceReport(models.AbstractModel):
             date_end =  f"{d[8:10]}/{d[5:7]}/{d[:4]}"
             vals['product_id'] = pr.id
             vals['name'] = f"[{pr.default_code}]{pr.name}"
+            vals['prod'] = pr.name
             vals['preco'] = pr.lst_price
             vals['unidade'] = pr.uom_id.code
             vals['venda'] = p_out
@@ -43,7 +44,7 @@ class BalanceReport(models.AbstractModel):
             vals['date_start'] = date_in
             vals['date_end'] = date_end
             itens.append(vals)
-
+        itens_ordem = sorted(itens,key=lambda k: k['prod'])
         return {
-            'docs': itens,
+            'docs': itens_ordem,
         }

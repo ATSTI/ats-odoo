@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<template id="report_contas_a_receber">
+    <t t-call="web.basic_layout">        
+         <div class="page">
+             <h2 align="center">Resumo de Contas a Receber</h2>              
+             <t t-set="tot_fat" t-value="0.0"/> 
+             <t t-set="tot" t-value="0.0"/> 
+                  <table class="table table-condensed" width="98%" style="border:1px solid lightgray">
+                    <thead style="font-size:10px;" >
+                      <tr>
+                          <th><strong>Cliente</strong></th>
+                          <th><strong>Titulo</strong></th>
+                          <th><strong>Vencimento</strong></th>
+                          <th class="text-right"><strong>Valor Titulo</strong></th>                        
+                      </tr>
+                    </thead>
+                    <tbody>                        
+                       <t t-foreach="docs" t-as="o">                           
+                        <tr style="border:1px solid lightgray">
+                          <td style="font-size:10px;" width="60%"><span t-field="o.partner_id"/></td>
+                          <td style="font-size:10px;" width="18%"><span t-field="o.move_id"/></td>
+                          <td style="font-size:10px;" width="7%"><span t-field="o.date_maturity"/></td>
+                          <td style="font-size:10px;" width="15%" class="text-right"><span t-esc="o.debit" t-options='{"widget": "float", "precision": 2}'/></td>
+                        </tr>
+                          <t t-set="tot" t-value="tot + o.amount_residual"/>
+                          <t t-set="tot_fat" t-value="tot_fat + o.debit"/>
+                       </t>
+                       <tr>
+                        <td></td>
+                        <td></td>
+                        <td>Total </td>
+                        <td  class="text-right">
+                            <span t-esc="tot_fat" t-options='{"widget": "float", "precision": 2}'/>
+                        </td>
+                    </tr>  
+                    </tbody>
+                 </table>   
+         </div>
+    </t>
+</template>
+<template id="report_contas_recebidas">
+    <t t-call="web.basic_layout">        
+         <div class="page">
+             <h2 align="center">Resumo de Contas Recebidas</h2>              
+             <t t-set="tot_fat" t-value="0.0"/> 
+             <t t-set="tot" t-value="0.0"/> 
+                  <table class="table table-condensed" width="98%" style="border:1px solid lightgray">
+                    <thead style="font-size:10px;" >
+                      <tr>
+                          <th><strong>Cliente</strong></th>
+                          <th><strong>Titulo</strong></th>
+                          <th><strong>Vencimento</strong></th>
+                          <th class="text-right"><strong>Valor Titulo</strong></th>                        
+                      </tr>
+                    </thead>
+                    <tbody>                        
+                       <t t-foreach="docs" t-as="o">                           
+                        <tr style="border:1px solid lightgray">
+                          <td style="font-size:10px;" width="60%"><span t-field="o.partner_id"/></td>
+                          <td style="font-size:10px;" width="18%"><span t-field="o.move_id"/></td>
+                          <td style="font-size:10px;" width="7%"><span t-field="o.date_maturity"/></td>
+                          <td style="font-size:10px;" width="15%" class="text-right"><span t-esc="o.credit" t-options='{"widget": "float", "precision": 2}'/></td>
+                        </tr>
+                          <t t-set="tot" t-value="tot + o.amount_residual"/>
+                          <t t-set="tot_fat" t-value="tot_fat + o.credit"/>
+                       </t>
+                       <tr>
+                        <td></td>
+                        <td></td>
+                        <td>Total </td>
+                        <td  class="text-right">
+                            <span t-esc="tot_fat" t-options='{"widget": "float", "precision": 2}'/>
+                        </td>
+                    </tr>  
+                    </tbody>
+                 </table>   
+         </div>
+    </t>
+</template>
+
+</odoo>

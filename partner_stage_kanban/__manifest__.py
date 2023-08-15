@@ -16,9 +16,6 @@
         'partner_stage'
     ],
     'data': [
-        #'security/ir.model.access.csv',
-        #'views/partner_stage_data.xml',
-        #'views/partner_stage.xml',
         'views/partner_view.xml',
     ],
     'demo': [],

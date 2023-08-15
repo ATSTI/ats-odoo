@@ -12,8 +12,6 @@
     "depends": ["crm", "product"],
     "data": [
         "views/crm_lead_views.xml",
-        # "views/crm_lead_line_views.xml",
-        # "report/crm_product_report_views.xml",
     ],
     "installable": True,
     "auto_install": False,

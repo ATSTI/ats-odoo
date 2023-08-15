@@ -21,14 +21,14 @@ class DocumentSerie(models.Model):
     def next_seq_number(self):
         self.ensure_one()
         query = """
-            SELECT CAST(document_number AS INTEGER) AS nf
+            SELECT REGEXP_REPLACE(document_number, '[^0-9]', '', 'g')::int AS num_nf
             FROM l10n_br_fiscal_document
             WHERE document_serie_id = %s
             AND document_type_id = %s
             AND company_id = %s
             AND issuer = '%s'
             AND document_number IS NOT NULL
-            ORDER BY CAST(document_number AS INTEGER) DESC
+            ORDER BY 1 DESC
             LIMIT 1
         """ % (
                 self.id,
@@ -36,8 +36,11 @@ class DocumentSerie(models.Model):
                 self.company_id.id,
                 DOCUMENT_ISSUER_COMPANY
             )
-        self._cr.execute(query)
-        sql_num = self._cr.fetchall()
+        try:
+            self._cr.execute(query)
+            sql_num = self._cr.fetchall()
+        except:
+            sql_num = 0
         if sql_num:
             for num in sql_num:
                 document_number = int(num[0]) + 1

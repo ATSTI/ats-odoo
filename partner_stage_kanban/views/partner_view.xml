@@ -1,36 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- <record id="view_partner_kanban_tree_view" model="ir.ui.view">
-            <field name="name">partner.order.tree</field>
-            <field name="model">partner.order</field>
-            <field name="inherit_id" ref="base.view_partner_tree" />
-            <field name="arch" type="xml">
-                <field name="state" position="replace">
-                    <field name="stage_id"/>
-                    <field name="origin" />
-                    <field name="state" invisible="1"/>
-                </field>
-            </field>
-        </record>
-        <record id="view_partner_kanban_form" model="ir.ui.view">
-            <field name="name">partner.order.form</field>
-            <field name="model">partner.order</field>
-            <field name="inherit_id" ref="base.view_partner_form" />
-            <field name="arch" type="xml">
-                <field name="name" position="attributes">
-                    <attribute name="readonly">True</attribute>
-                </field>
-                <label for="name" position="replace">
-                    <label for="name" string="N. OS"/>
-                </label>
-                    <field name="stage_id" invisible="1" />
-                    <field name="origin" />
-                </field>
-            </field>
-        </record> -->
-
-        <!-- Dashboard -->
         <record id="view_partner_stage_kanban" model="ir.ui.view">
             <field name="name">partner.stage.kanban</field>
             <field name="model">res.partner</field>
@@ -45,16 +15,6 @@
                 <xpath expr="//kanban" position="attributes">
                     <attribute name="default_group_by">stage_id</attribute>
                 </xpath>
-                <!-- <xpath expr="//kanban/templates/t/div/div" position="replace">
-                    <div class="o_kanban_record_bottom">
-                        <div class="oe_kanban_bottom_left">
-                            <field name="activity_ids" widget="kanban_activity" related="activity_state"/>
-                            <field name="activity_state" invisible="1"/>
-                            <img t-att-src="kanban_image('res.users', 'image_small', record.user_id.raw_value)" t-att-title="record.user_id.value" width="24" height="24" class="oe_kanban_avatar" alt="Usuário responsável"/>
-                        </div>
-                    </div>
-                </xpath> -->
-
             </field>
         </record>
     </data>

@@ -1,7 +1,10 @@
 /* License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).*/
-odoo.define("pos_pacelas_button.models", function (require) {
+odoo.define("pos_parcelas_button.models", function (require) {
     "use strict";
 
+    function abrir() {
+        document.getElementById('popup').style.display = 'block';
+    }
     var models = require("point_of_sale.models");
     // const order_super = models.PaymentLine.prototype;
     // var pay_super = models.PaymentLine.prototype;
@@ -32,6 +35,10 @@ odoo.define("pos_pacelas_button.models", function (require) {
                 console.log(" executou RRRR : ", parcela.value)
                 this.ticket = parcela.value;
             }
+            if (this.payment_method.id === 2){
+                abrir();
+                console.log('2',this.payment_method.name)
+            }
         },
         init_from_JSON: function (json) {
             _paymentlineproto.init_from_JSON.apply(this, arguments);
@@ -55,6 +62,13 @@ odoo.define("pos_pacelas_button.models", function (require) {
             }
             console.log(" PARCELA: ", vals.ticket)
             return vals;
+        },
+        set_selected: function(selected){
+            _paymentlineproto.set_selected.apply(this, arguments);
+            if(this.selected !== selected){
+                this.selected = selected;
+                this.trigger('change',this);
+            }
         },
     });
 

@@ -18,18 +18,6 @@
                             background: #e2e2e2;
                             display: none;
                         }
-                        .popupCheck  {
-                            position: fixed;
-                            top: 0; bottom: 0;
-                            left: 0; right: 0;
-                            margin: auto;
-                            width: 200px;
-                            height: 90px;
-                            padding: 15px;
-                            border: solid 2px #7e5c74;
-                            background: #e2e2e2;
-                            display: none;
-                        }
                         .popupError  {
                             position: fixed;
                             top: 0; bottom: 0;
@@ -76,49 +64,6 @@
                             background: #bdbdbd;
                             text-align: center;
                         }
-                        .checkS {
-                            position:absolute;
-                            bottom: 40px;
-                            left: 80px;
-                            margin:0x;
-                            padding:2px;
-                            height: 20px;
-                            width: 20px;
-                            background: #bdbdbd;
-                            text-align: right;
-                        }
-                        .labelS {
-                            position:absolute;
-                            bottom: 40px;
-                            left: 45px;
-                        }
-                        .checkN {
-                            position:absolute;
-                            bottom: 40px;
-                            left: 160px;
-                            margin:0x;
-                            padding:2px;
-                            height: 20px;
-                            width: 20px;
-                            background: #bdbdbd;
-                        }
-                        .labelN {
-                            position:absolute;
-                            bottom: 40px;
-                            left: 123px;
-
-                        }
-                        .caixa2  {
-                            position:absolute;
-                            bottom:78px;
-                            right: 0px;
-                            margin:0x;
-                            padding:2px;
-                            height: 40px;
-                            width: 227px;
-                            background: #7e5c74;
-                            text-align: center;
-                        }
                         .botaoC  {
                             position:absolute;
                             bottom:20px;
@@ -143,15 +88,7 @@
                             text-align: center
                         }
                     </style>
-                    <div id="popupcheck" class="popupCheck">
-                        <font size="3" class="caixa2" color="#FFFFFF"> Metodo de pagamento é CREDITO ou A PRAZO?</font>
-                            <form action="form_action.asp" name="selecao">
-                                <font size="3" class="labelS"> Sim:</font>
-                                <font size="3" class="labelN"> Não:</font>
-                                <input type="checkbox" onclick="abrir()" class="checkS"></input>
-                                <input type="checkbox" onclick="fecharCheck()" class="checkN"></input>
-                            </form>
-                    </div>
+
                     <div id="popup" class="popup">
                         <font size="3" class="caixa" color="#FFFFFF"> Escolha o número de parcelas para pagamento</font>
                             <form>
@@ -167,7 +104,7 @@
                     <button
                         id="test"
                         class="botaoA"
-                        onclick="abrircheck()" >
+                        onclick="abrir()" >
                         <font size="3" face="Arial" color="#4b4b4b" > Parcelas</font>
                     </button>
             </div>

@@ -1,19 +1,6 @@
-  function abrircheck() {
-      document.getElementById('popupcheck').style.display = 'block';
-    }
-  function abrir() {
-      document.getElementById('popup').style.display = 'block';
-//      document.getElementById('popupcheck').style.display = 'none';
-    //   for (i = 0; i < document.forms.selecao.elements.length; i++)
-    //   if (document.forms.selecao.elements[i].type == "checkbox")
-    //     document.forms.selecao.elements[i].checked = false;
-  }
-  function fecharCheck() {
-      document.getElementById('popupcheck').style.display = 'none';
-      for (i = 0; i < document.forms.selecao.elements.length; i++)
-      if (document.forms.selecao.elements[i].type == "checkbox")
-        document.forms.selecao.elements[i].checked = false;
-    }
+  // function abrir() {
+  //     document.getElementById('popup').style.display = 'block';
+  // }
   function fechar() {
       document.getElementById('popup').style.display = 'none';
     }
@@ -26,6 +13,9 @@
       document.getElementById('popup').style.display = 'none';
       var selectedOption = document.getElementById('inlinesOptions').value;
       if (selectedOption === '') {
+        document.getElementById('popuperror').style.display = 'block';
+      }
+      if (selectedOption === '0') {
         document.getElementById('popuperror').style.display = 'block';
       }
       else {

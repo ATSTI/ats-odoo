@@ -15,7 +15,7 @@
                         <field name="nfe40_tpIntermedio" />
                         <field name="partner_acquirer_id" />
                         <field name="nfe40_CNPJ" readonly="1" />
-                        <field name="nfe40_UFTerceiro" readonly="1" options="{'no_create': True, 'no_create_edit':True}" />
+                        <field name="nfe40_UFTerceiro" />
                         <field name="nfe40_cExportador" />
                         <field name="nfe40_vAFRMM" />
                         <field name="am_id" invisible="1" />

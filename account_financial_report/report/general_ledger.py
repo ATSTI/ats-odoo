@@ -1124,10 +1124,10 @@ SELECT
     a.code AS account,
     (select COALESCE(rp.code_reduced, aa.code_reduced, aa.code) from account_move_line am, account_account aa, res_partner rp
 	  where aa.id = am.account_id and rp.id = aml.partner_id
-       and am.move_id = aml.move_id and am.debit > 0  limit 1) as contabil_debito,
+       and am.move_id = ml.move_id and am.debit > 0  limit 1) as contabil_debito,
 	(select COALESCE(rp.code_reduced, aa.code_reduced, aa.code) from account_move_line am, account_account aa, res_partner rp
 	  where aa.id = am.account_id and rp.id = aml.partner_id
-        and am.move_id = aml.move_id and am.credit > 0 limit 1) as contabil_credito,
+        and am.move_id = ml.move_id and am.credit > 0 limit 1) as contabil_credito,
     CASE
         WHEN
             ml.tax_line_id is not null

@@ -563,7 +563,7 @@ class IntegracaoPdv(http.Controller):
                 #TODO Felicita usa o campo CORTESIA como TIPO , colocar no exporta do PDV
                 #if md['CORTESIA']:
                 #    prd['tipo_venda'] = md['CORTESIA']
-                prod_ids = http.request.env['product.product'].search([('product_tmpl_id', '=', md['CODPRODUTO'])])
+                prod_ids = http.request.env['product.product'].search([('product_tmpl_id', '=', int(md['CODPRODUTO']))])
                 if prod_ids:
                     prd['product_id'] = prod_ids.id
                 else:

@@ -719,6 +719,7 @@ class IntegracaoPdv(http.Controller):
                     order.action_pos_order_invoice()
                 else:
                     order.action_pos_order_paid()
+            order._create_order_picking()
         return 'Sucesso'
 
     @http.route('/devolucao', type='json', auth="user", csrf=False)

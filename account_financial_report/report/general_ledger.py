@@ -1122,12 +1122,21 @@ SELECT
     m.name AS entry,
     j.code AS journal,
     a.code AS account,
-    (select COALESCE(rp.code_reduced, aa.code_reduced, aa.code) from account_move_line am, account_account aa, res_partner rp
-	  where aa.id = am.account_id and rp.id = am.partner_id
-       and am.move_id = ml.move_id and am.debit > 0  limit 1) as contabil_debito,
-	(select COALESCE(rp.code_reduced, aa.code_reduced, aa.code) from account_move_line am, account_account aa, res_partner rp
-	  where aa.id = am.account_id and rp.id = am.partner_id
-        and am.move_id = ml.move_id and am.credit > 0 limit 1) as contabil_credito,
+    COALESCE((SELECT CASE WHEN aj.default_debit_account_id = am.account_id THEN aa.code_reduced
+			  ELSE COALESCE(rp.code_reduced, aa.code_reduced, aa.code) END
+	          FROM account_move_line am
+			  INNER JOIN account_account aa ON aa.id = am.account_id
+              INNER JOIN account_journal aj ON aj.id = am.journal_id 
+              LEFT JOIN res_partner rp ON rp.id = am.partner_id
+	          WHERE am.move_id = m.id AND am.debit > 0 
+			  LIMIT 1), a.code_reduced, a.code) AS contabil_debito,
+	COALESCE((select CASE WHEN aj.default_credit_account_id = am.account_id THEN aa.code_reduced
+			  ELSE COALESCE(rp.code_reduced, aa.code_reduced, aa.code) END
+	          FROM account_move_line am			  INNER JOIN account_account aa ON aa.id = am.account_id
+              INNER JOIN account_journal aj ON aj.id = am.journal_id 
+              LEFT JOIN res_partner rp ON rp.id = am.partner_id
+	          WHERE am.move_id = m.id AND am.credit > 0
+			  LIMIT 1), a.code_reduced, a.code) as contabil_credito,
     CASE
         WHEN
             ml.tax_line_id is not null

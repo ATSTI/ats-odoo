@@ -13,6 +13,12 @@ Configuração ODOO:
        Diários de Contas a Receber :
        Name:  pos.diario_contas
        Value: [1,2]  (exemplo: diario 1 e 2)
+/// update property_stock_inventory para poder alterar Quantidade em Mãos
+prd = env['product.template'].search([('type','=','product'),('property_stock_inventory','=',False), ('id', '>',1), ('id', '<',150) ], order = "id")
+x = []
+for p in prd:
+  x.append(p.id)
+prd.write({'property_stock_inventory': 20})
 
 
 Authors

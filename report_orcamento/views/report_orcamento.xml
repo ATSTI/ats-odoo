@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>    
+    <record id="report_saleorder_orcamentoa" model="ir.actions.report">
+        <field name="name">Orçamento A teste </field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">report_locefaca.report_saleorder_locefaca</field>
+        <field name="report_file">report_locefaca.report_saleorder_locefaca</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

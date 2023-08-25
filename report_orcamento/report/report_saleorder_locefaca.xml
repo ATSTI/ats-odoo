@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <template id="report_saleorder_locefaca"
+<?xml version="1.0" encoding="utf-8"?>	 
+<odoo>	 
+    <template id="sales_report_locefaca" 
         inherit_id="sale.report_saleorder_document">
         <xpath expr="//div[hasclass('page')]" position="inside"> 
             <!-- //here we can add the changes  -->

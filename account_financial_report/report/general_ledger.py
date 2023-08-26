@@ -1122,21 +1122,40 @@ SELECT
     m.name AS entry,
     j.code AS journal,
     a.code AS account,
-    COALESCE((SELECT CASE WHEN aj.default_debit_account_id = am.account_id THEN aa.code_reduced
-			  ELSE COALESCE(rp.code_reduced, aa.code_reduced, aa.code) END
+	COALESCE((SELECT 
+			  COALESCE(amc.code_reduced, amc.code, 
+			      CASE WHEN aj.default_debit_account_id = am.account_id THEN aa.code_reduced
+			      ELSE 
+   		            COALESCE(rp.code_reduced, aa.code_reduced, aa.code)
+			      END)
 	          FROM account_move_line am
-			  INNER JOIN account_account aa ON aa.id = am.account_id
-              INNER JOIN account_journal aj ON aj.id = am.journal_id 
-              LEFT JOIN res_partner rp ON rp.id = am.partner_id
-	          WHERE am.move_id = m.id AND am.debit > 0 
-			  LIMIT 1), a.code_reduced, a.code) AS contabil_debito,
-	COALESCE((select CASE WHEN aj.default_credit_account_id = am.account_id THEN aa.code_reduced
-			  ELSE COALESCE(rp.code_reduced, aa.code_reduced, aa.code) END
-	          FROM account_move_line am			  INNER JOIN account_account aa ON aa.id = am.account_id
-              INNER JOIN account_journal aj ON aj.id = am.journal_id 
-              LEFT JOIN res_partner rp ON rp.id = am.partner_id
-	          WHERE am.move_id = m.id AND am.credit > 0
-			  LIMIT 1), a.code_reduced, a.code) as contabil_credito,
+			    INNER JOIN account_account aa ON aa.id = am.account_id
+                INNER JOIN account_journal aj ON aj.id = am.journal_id 
+                LEFT JOIN res_partner rp ON rp.id = am.partner_id
+			  	LEFT JOIN account_move_line aml ON aml.full_reconcile_id = am.full_reconcile_id 
+				  AND aml.journal_id != am.journal_id AND aa.internal_type not in ('receivable', 'payable')
+				LEFT JOIN account_journal amj ON amj.id = aml.journal_id
+				LEFT JOIN account_account amc on amc.id = amj.default_debit_account_id
+	          WHERE am.move_id = m.id AND am.debit > 0 AND aa.user_type_id not in (14,16) 
+			    LIMIT 1), a.code_reduced, a.code) 
+	          AS contabil_debito,    
+	COALESCE((SELECT 
+			  COALESCE(amc.code_reduced, amc.code,
+			    CASE WHEN aj.default_credit_account_id = am.account_id THEN aa.code_reduced
+			    ELSE 
+ 		          COALESCE(rp.code_reduced, aa.code_reduced, aa.code)
+			    END)
+	          FROM account_move_line am
+			    INNER JOIN account_account aa ON aa.id = am.account_id
+                INNER JOIN account_journal aj ON aj.id = am.journal_id 
+                LEFT JOIN res_partner rp ON rp.id = am.partner_id
+			  	LEFT JOIN account_move_line aml ON aml.full_reconcile_id = am.full_reconcile_id 
+				  AND aml.journal_id != am.journal_id AND aa.internal_type not in ('receivable', 'payable')
+				LEFT JOIN account_journal amj ON amj.id = aml.journal_id
+				LEFT JOIN account_account amc on amc.id = amj.default_debit_account_id
+	          WHERE am.move_id = m.id AND am.credit > 0 AND aa.user_type_id not in (14, 16) 
+			    LIMIT 1), a.code_reduced, a.code)
+	          AS contabil_credito,
     CASE
         WHEN
             ml.tax_line_id is not null
@@ -1368,6 +1387,8 @@ ORDER BY
             query_inject_move_line_params += (tuple(
                 self.filter_journal_ids.ids,
             ),)
+        # print (query_inject_move_line)
+        # print (query_inject_move_line_params)
         self.env.cr.execute(
             query_inject_move_line,
             query_inject_move_line_params

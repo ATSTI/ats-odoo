@@ -29,9 +29,10 @@
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['account', 'sale', 'report_locefaca'],
+    'depends': ['account', 'sale', 'mrp'],
     'data': [
-        'report/report_saleorder_locefaca.xml',
+        'report/report_entregadevolucao_locefaca.xml',
+        'report/report_servico_locefaca.xml',
         'views/report_orcamento.xml',
     ],
     'installable': True,

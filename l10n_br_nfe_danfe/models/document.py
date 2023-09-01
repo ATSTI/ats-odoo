@@ -69,10 +69,10 @@ class NFe(spec_models.StackedModel):
 
         if self.authorization_file_id:
             arquivo = self.authorization_file_id
-            xml_string = base64.b64decode(arquivo.datas).decode()
+            xml_string = base64.b64decode(arquivo.datas)
         else:
             arquivo = self.send_file_id
-            xml_string = base64.b64decode(arquivo.datas).decode()
+            xml_string = base64.b64decode(arquivo.datas)
             xml_string = self.temp_xml_autorizacao(xml_string)
 
         # Teste Usando impressao via ReportLab Pytrustnfe

@@ -13,24 +13,7 @@
                             font-size: 12px;
                             }
                         </style>
-                        <table style="border: 0px solid">
-                            <tr>
-                                <td width="25%" style="border: 0px solid">
-                                    <div style="width: 100%;float: left;">
-                                        <img t-attf-src="data:image/*;base64,{{o.company_id.logo}}"
-                                            t-att-alt="o.company_id.name" style="width:100%"/>
-                                    </div>
-                                </td>
-                                <td width="75%" style="text-align: rigth; font-size:24px; border: 0px solid" >
-                                    <strong t-field="o.company_id.name"/>
-                                    <br/><span style="font-size:16px" t-field="o.company_id.street_name"/>, <strong style="font-size:16px" t-field="o.company_id.street_number"/>
-                                    <br/><span style="font-size:16px" t-field="o.company_id.street2"/>
-                                    <br/><span style="font-size:16px" t-field="o.company_id.district"/> 
-                                    <br/><span style="font-size:16px" t-field="o.company_id.zip"/> - <strong style="font-size:16px" t-field="o.company_id.city_id.name"/> - <strong style="font-size:16px" t-field="o.company_id.state_id.code"/>
-                                    <br/><span style="font-size:16px" t-field="o.company_id.country_id.name"/>
-                                </td>
-                            </tr>
-                        </table>
+                        <t t-call="report_cabecalho.report_cabecalho_id" />
                         <table style="width:100%">
                             <th colspan="3" style="text-align: center; font-size:18px; border: 0px solid">
                                 TERMO DE ENTREGA
@@ -153,24 +136,7 @@
                         <p/>
                         <p/>
                         <p/>
-                    <table style="border: 0px solid">
-                            <tr>
-                                <td width="25%" style="border: 0px solid">
-                                    <div style="width: 100%;float: left;">
-                                        <img t-attf-src="data:image/*;base64,{{o.company_id.logo}}"
-                                            t-att-alt="o.company_id.name" style="width:100%"/>
-                                    </div>
-                                </td>
-                                <td width="75%" style="text-align: rigth; font-size:24px; border: 0px solid" >
-                                    <strong t-field="o.company_id.name"/>
-                                    <br/><span style="font-size:16px" t-field="o.company_id.street_name"/>, <strong style="font-size:16px" t-field="o.company_id.street_number"/>
-                                    <br/><span style="font-size:16px" t-field="o.company_id.street2"/>
-                                    <br/><span style="font-size:16px" t-field="o.company_id.district"/> 
-                                    <br/><span style="font-size:16px" t-field="o.company_id.zip"/> - <strong style="font-size:16px" t-field="o.company_id.city_id.name"/> - <strong style="font-size:16px" t-field="o.company_id.state_id.code"/>
-                                    <br/><span style="font-size:16px" t-field="o.company_id.country_id.name"/>
-                                </td>
-                            </tr>
-                        </table>
+                    <t t-call="report_cabecalho.report_cabecalho_id" />
                     <table style="width:100%">
                         <th colspan="3" style="text-align: center; font-size:18px; border: 0px solid">
                             TERMO DE DEVOLUÇÃO

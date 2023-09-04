@@ -20,7 +20,7 @@
 ##############################################################################
 
 {
-    'name': 'Relatorios Orcamento',
+    'name': 'Cabeçalho de Relatorio',
     'version': '1.0',
     'category': 'Others',
     'sequence': 2,
@@ -29,12 +29,9 @@
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['account', 'sale', 'mrp', 'report_cabecalho'],
+    'depends': ['account', 'sale', 'mrp'],
     'data': [
-        'report/report_entregadevolucao_locefaca.xml',
-        'report/report_servico_locefaca.xml',
-        'report/report_locacao_locefaca.xml',
-        'views/report_orcamento.xml',
+        'report/report_header.xml',
     ],
     'installable': True,
     'application': False,

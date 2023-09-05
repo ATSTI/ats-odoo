@@ -9,7 +9,7 @@
         <field name="binding_model_id" ref="sale.model_sale_order"/>
     </record>
     <record id="report_saleorder_orcamentob" model="ir.actions.report">
-        <field name="name">Serviços</field>
+        <field name="name">Proposta de Serviços</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">report_orcamento.report_servico_locefaca</field>
@@ -17,11 +17,19 @@
         <field name="binding_model_id" ref="sale.model_sale_order"/>
     </record>
     <record id="report_saleorder_orcamentoc" model="ir.actions.report">
-        <field name="name">Locação</field>
+        <field name="name">Proposta de Locação</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">report_orcamento.report_locacao_locefaca</field>
         <field name="report_file">report_orcamento.report_locacao_locefaca</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+    </record>
+    <record id="report_saleorder_orcamentod" model="ir.actions.report">
+        <field name="name">Instalação de montagem</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">report_orcamento.report_instalacao_locefaca</field>
+        <field name="report_file">report_orcamento.report_instalacao_locefaca</field>
         <field name="binding_model_id" ref="sale.model_sale_order"/>
     </record>
 </odoo>

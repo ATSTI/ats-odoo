@@ -31,7 +31,7 @@
                                 <b>A/C:</b>
                             </td>
                             <td style="width:100%">
-                                <span t-field="o.partner_id.cnpj_cpf"/>
+                                <span t-field="o.partner_id.child_ids.name"/>
                             </td>
                         </tr>
                         <tr>
@@ -57,6 +57,7 @@
                                     <b>Nº Da Prop.:</b>
                                 </td>
                                 <td style="border: 1px solid black; width:50%; font-size: 12px">
+                                    <span t-field="o.name"/>
                                 </td>
                             </tr>
                             <tr>

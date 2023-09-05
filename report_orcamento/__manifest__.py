@@ -29,11 +29,12 @@
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['account', 'sale', 'mrp', 'report_cabecalho'],
+    'depends': ['account', 'sale', 'mrp', 'report_cabecalho', 'sale_order_tag'],
     'data': [
         'report/report_entregadevolucao_locefaca.xml',
         'report/report_servico_locefaca.xml',
         'report/report_locacao_locefaca.xml',
+        'report/report_venda_locefaca.xml',
         'views/report_orcamento.xml',
     ],
     'installable': True,

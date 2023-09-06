@@ -20,20 +20,18 @@
 ##############################################################################
 
 {
-    'name': 'Relatorios LoceFaca',
+    'name': 'Cabeçalho de Relatorio',
     'version': '1.0',
     'category': 'Others',
     'sequence': 2,
-    'summary': 'relatorios personalizadps',
+    'summary': 'relatorios personalizados',
     'description': """
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['account', 'l10n_br_sale'],
+    'depends': ['account', 'sale', 'mrp'],
     'data': [
-        'report/report_saleorder_document.xml',
-        'report/report_delivery_document_locefaca.xml',
-        'report/report_layout_background.xml',
+        'report/report_header.xml',
     ],
     'installable': True,
     'application': False,

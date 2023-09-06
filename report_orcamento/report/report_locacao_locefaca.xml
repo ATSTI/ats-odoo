@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_locacao_locefaca">
+        <t t-call="web.html_container">
+            <t t-set="docs" t-value="docs.with_context({'lang':docs.partner_id.lang})"/>
+            <t t-foreach="docs" t-as="o">
+                <div class="page">
+                    <t t-call="report_cabecalho.report_cabecalho_id" />
+                    <p style="text-align: center; font-size:18px"><b>Proposta de Locação</b></p>
+                    <p>Para:</p>
+                    <tbody style="width: 100%">
+                        <table style="border: 1px solid black; width: 50%; float: left;">
+                        <tr>
+                            <td style="font-size: 12px">
+                                <b>CLIENTE:</b>
+                            </td>
+                            <td style="width:100%">
+                                <span t-field="o.partner_id.name"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px">
+                                <b>CNPJ:</b>
+                            </td>
+                            <td style="width:100%">
+                                <span t-field="o.partner_id.cnpj_cpf"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px">
+                                <b>A/C:</b>
+                            </td>
+                            <td style="width:100%">
+                                <span t-field="o.partner_id.child_ids.name"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px">
+                                <b>TELEFONE:</b>
+                            </td>
+                            <td style="width:100%">
+                                <span t-field="o.partner_id.phone"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 13px">
+                                <b>EMAIL:</b>
+                            </td>
+                            <td style="width:100%">
+                                <span t-field="o.partner_id.email"/>
+                            </td>
+                        </tr>
+                        </table>
+                        <table style="border: 1px solid black; border-collapse: collapse; height: 80px; width: 37%; float: right;">
+                            <tr>
+                                <td style="border: 1px solid black; width:50%; text-align: right; font-size: 12px">
+                                    <b>Nº Da Prop.:</b>
+                                </td>
+                                <td style="border: 1px solid black; width:50%; font-size: 12px">
+                                    <span t-field="o.name"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid black; width:50%; text-align: right; font-size: 12px">
+                                    <b>Data:</b>
+                                </td>
+                                <td style="border: 1px solid black; width:50%; text-align: center; font-size: 12px">
+                                    <span t-field="o.date_order"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid black; width:50%; text-align: right; font-size: 12px">
+                                    <b>Vendedora:</b>
+                                </td>
+                                <td style="border: 1px solid black; width:50%; font-size: 12px">
+                                    <span t-field="o.user_id"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <p style="font-size:12px;">Ref.: Proposta para Locação de Equipamentos para Trabalho em Espaço Confinado e Segurança.</p>
+                        <br/>
+                        <table style="border: 1px solid black; border-collapse: collapse; width:100%">
+                            <tr style="height:25px">
+                                <td style="border: 1px solid black; border-collapse: collapse; width:8% ; text-align:center">
+                                    <b>Item</b>
+                                </td >
+                                <td style="border: 1px solid black; border-collapse: collapse; width:20% ; text-align:center">
+                                    <b>Produto</b>
+                                </td>
+                                <td style="border: 1px solid black; border-collapse: collapse; width:20% ; text-align:center">
+                                    <b>Descrição</b>
+                                </td>
+                                <td style="border: 1px solid black; border-collapse: collapse; width:10% ; text-align:center">
+                                    <b>SKU</b>
+                                </td>
+                                <td style="border: 1px solid black; border-collapse: collapse; width:10% ; text-align:center">
+                                    <b>Período</b>
+                                </td>
+                                <td style="border: 1px solid black; border-collapse: collapse; width:8% ; text-align:center">
+                                    <b>Qtd.</b>
+                                </td>
+                                <td style="border: 1px solid black; border-collapse: collapse; width:10% ; text-align:center">
+                                    <b>Preço Un.</b>
+                                </td>
+                                <td style="border: 1px solid black; border-collapse: collapse; width:14% ; text-align:center">
+                                    <b>Total</b>
+                                </td>
+                            </tr>
+                            <t t-set="linhas" t-value="0" />
+                            <t t-foreach="o.order_line" t-as="line">
+                                <t t-set="linhas" t-value="linhas + 1" />
+                                <tr style="height:20px">
+                                    <td style="border: 1px solid black; font-size:12px; text-align:center"><t t-esc="linhas" /></td> 
+                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:center"><span t-field="line.product_id.name" /></td>
+                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:center"><span t-field="line.name" /></td>
+                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:center"><span t-field="line.product_id.default_code" /></td>
+                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:center"><span t-field="o.pricelist_id" /></td>
+                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:center"><span t-field="line.product_uom_qty" /></td>
+                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:right"><span t-field="line.price_unit" /></td>
+                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:right"><span t-field="line.amount_total" /></td>
+                                </tr>
+                            </t>
+                        </table>
+                        <br/>
+                        <table align='center' style="border: 1px solid black; border-collapse: collapse; width:80%">
+                            <tr style="height:25px">
+                                <td style="border: 1px solid black; border-collapse: collapse; width:30% ; text-align:center">
+                                    <b>Frete</b>
+                                </td >
+                                <td style="border: 1px solid black; border-collapse: collapse; width:20% ; text-align:center">
+                                    <b>Valor do frete</b>
+                                </td>
+                                <td style="border: 1px solid black; border-collapse: collapse; width:20% ; text-align:center">
+                                    <b>Impostos</b>
+                                </td>
+                                <td style="border: 1px solid black; border-collapse: collapse; width:30% ; background-color: #D9D9D9; text-align:center">
+                                    <b>Valor total da proposta</b>
+                                </td>
+                            </tr>
+                            <tr style="height:20px">
+                                <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:center">-</td> 
+                                <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:center"><span t-field="o.amount_freight_value" /></td>
+                                <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:center"><span t-field="o.order_line.fiscal_tax_ids" /></td>
+                                <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:right"><span t-field="o.amount_total" /></td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <table style="border: 1px solid black; height: 220px">
+                            <tr>
+                                <td>
+                                    <p style="text-indent: 30px; font-size:14px">O valor devido em virtude da locação será apurado através da multiplicação do número de períodos em que o equipamento esteve locado.
+                                    <b>Será cobrado o valor da locação dos equipamentos durante todo o prazo em que estes permanecerem fora do depósito da Locadora,independentemente de sua utilização pela Locatária</b> por culpa
+                                    exclusiva da Locadora não serão devidos pela Locatária Forma de Pagamento.
+                                    </p>
+                                    <p style="text-indent: 30px; font-size:14px">
+                                        Informamos que a atividade de locação de bens móveis, nos termos da LEI FEDERAL No 116 de 31/07/2003, e da pacífica jurisprudência do
+                                        STF, não constitui fato gerador de ISS, estando, portanto a empresa desobrigada da emissão de nota fiscal de prestação de serviços. Será
+                                        enviada a título de cobrança, apenas RECIBO DE LOCAÇAO onde a partir de sua emissão serão recolhidos todos os devidos impostos:
+                                        PIS/COFINS/CSLL/IR.
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <br/>
+                        <p style="text-align: center ; font-size: 15px;"><b> Condições Especiais</b></p>
+                        <table style="border: 1px solid black; height: 180px ; width: 100%">
+                            <tr>
+                                <td>
+                                    <p style="text-indent: 30px; font-size:15px;" t-field="o.note"></p>
+                                </td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <br/>
+                        <table style="border: 1px solid black;  border-collapse: collapse ; width:50%">
+                            <tr>
+                                <td style="border: 1px solid black; width:50%; text-align: center; font-size: 12px">
+                                    <b>Condições de Pagamento:</b>
+                                </td>
+                                <td style="border: 1px solid black; width:50%; text-align: center; font-size: 12px">
+                                    <span t-field="o.payment_term_id"/> 
+                                </td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <table style="border: 1px solid black;  border-collapse: collapse ; width:50%">
+                            <tr>
+                                <td style="border: 1px solid black; width:50%; text-align: center; font-size: 12px">
+                                    <b>Forma de Pagamento:</b>
+                                </td>
+                                <td style="border: 1px solid black; width:50%; text-align: center; font-size: 12px">
+                                    <span t-field="o.payment_mode_id"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <table style="border: 1px solid black;  border-collapse: collapse ; width:40%">
+                            <tr>
+                                <td style="border: 1px solid black; width:50%; text-align: center; font-size: 12px">
+                                    <b>Prazo de entrega:</b>
+                                </td>
+                                <td style="border: 1px solid black; width:30%; text-align: center; font-size: 12px">
+                                    <span t-field="o.commitment_date"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid black; width:50%; text-align: center; font-size: 12px">
+                                    <b>Validade da proposta:</b>
+                                </td>
+                                <td style="border: 1px solid black; width:30%; text-align: center; font-size: 12px">
+                                    <span t-field="o.validity_date"/>
+                                </td>
+                            </tr>
+                        </table>  
+                    </tbody>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

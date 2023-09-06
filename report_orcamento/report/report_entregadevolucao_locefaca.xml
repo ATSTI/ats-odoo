@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_locefaca_entregaedevolucao">
+        <t t-call="web.html_container">
+            <t t-set="docs" t-value="docs.with_context({'lang':docs.partner_id.lang})"/>
+            <t t-foreach="docs" t-as="o">
+                <div class="page">
+                    <div class="oe_structure"/>
+                        <style>
+                            table, td {
+                            border: 1px solid black;
+                            border-collapse: collapse;
+                            font-size: 12px;
+                            }
+                        </style>
+                        <t t-call="report_cabecalho.report_cabecalho_id" />
+                        <table style="width:100%">
+                            <th colspan="3" style="text-align: center; font-size:18px; border: 0px solid">
+                                TERMO DE ENTREGA
+                            </th>
+                            <tr>
+                                <td style="text-align: left" colspan="3">
+                                    Cliente: <strong t-field="o.partner_id.name"/>
+                                    <p/>
+                                </td>
+                            </tr>
+                            <tr style="height:35px">
+                                <td style="text-align: left">
+                                    CNPJ: <strong t-field="o.partner_id.cnpj_cpf"/>
+                                    <p/>
+                                </td>
+                                <td style="text-align: left">
+                                    Nº DO CONTRATO: <strong t-field="o.name"/>
+                                    <p/> 
+                                </td>
+                            </tr>
+                        </table>
+                        <table style="width:100%">
+                            <th colspan="3" style="text-align: center">
+                                DADOS DO RESPONSÁVEL PELA RETIRADA
+                            </th>
+                            <tr style="height:35px">
+                                <td colspan="3" style="text-align: left">
+                                    RECEBEDOR (NOME LEGÍVEL):
+                                    <p/>
+                                </td>
+                            </tr>
+                            <tr style="height:35px">
+                                <td style="text-align: left">
+                                    IDENTIDADE:
+                                    <p/>
+                                </td>
+                                <td style="text-align: left">
+                                    PLACA DO CARRO:
+                                    <p/>
+                                </td>
+                                <td style="text-align: left">
+                                    FUNÇÃO:
+                                    <p/>
+                                </td>
+                            </tr>
+                            <tr style="height:35px">
+                                <td style="text-align: left" colspan="3">
+                                    Entrega:
+                                    ▢ LALAMOVE  ▢ TRANSPORTADORA   ▢ RETIRADO PELO CLIENTE
+                                </td>
+                            </tr>
+                        </table>
+                        <table style="width:100%">
+                            <tr style="height:15px">
+                            </tr>
+                            <tr style="height:25px">
+                                <td style="width:40% ; text-align:center">
+                                    EQUIPAMENTO
+                                    <p/>
+                                </td >
+                                <td style="width:10% ; text-align:center">
+                                    QTD
+                                    <p/>
+                                </td>
+                                <td style="width:20% ; text-align:center">
+                                    Nº DE SÉRIE
+                                    <p/>
+                                </td>
+                                <td style="width:15% ; text-align:center">
+                                    SEPARADO?
+                                    <p/>
+                                </td>
+                                <td style="width:15% ; text-align:center">
+                                    ENTREGUE?
+                                    <p/>
+                                </td>
+                            </tr>
+                            <t t-set="linhas" t-value="12" />
+                            <t t-foreach="o.order_line" t-as="line">
+                                <t t-set="linhas" t-value="linhas - 1" />
+                                <tr style="height:20px">
+                                    <td><b t-field="line.name" /></td> 
+                                    <td style="text-align:right"><b t-field="line.product_uom_qty" /></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </t>
+                            <t t-foreach="range(linhas)" t-as="compl">
+                                <tr style="height:20px">
+                                    <td></td> 
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </t>
+                        </table>
+                        <table style="width:100%">
+                            <tr style="height:15px">
+                            </tr>
+                            <tr style="height:35px">
+                                <td style="text-align:center">
+                                    <b>RIO DE JANEIRO,_________________DE__________________________________2023 </b>
+                                </td>
+                            </tr>
+                        </table>
+                        <table style="width:100%">
+                            <tr style="height:35px">
+                                <td style="text-align: left">
+                                    ASSINATURA DO RECEBEDOR:
+                                    <p/>
+                                </td>
+                            </tr>
+                        </table>
+                        <p/>
+                        <p/>
+                        <p>________________________________________________________________________________________________________________________________________</p>
+                        <p/>
+                        <p/>
+                        <p/>
+                        <p/>
+                    <t t-call="report_cabecalho.report_cabecalho_id" />
+                    <table style="width:100%">
+                        <th colspan="3" style="text-align: center; font-size:18px; border: 0px solid">
+                            TERMO DE DEVOLUÇÃO
+                        </th>
+                        <tr>
+                            <td style="text-align: left" colspan="3">
+                                Cliente: <strong t-field="o.partner_id.name"/>
+                                <p/>
+                            </td>
+                        </tr>
+                        <tr style="height:35px">
+                            <td style="text-align: left">
+                                CNPJ:  <strong t-field="o.partner_id.cnpj_cpf"/>
+                                <p/>
+                            </td>
+                            <td style="text-align: left">
+                                Nº DO CONTRATO:  <strong t-field="o.name"/>
+                                <p/> 
+                            </td>
+                        </tr>
+                    </table>
+                    <table style="width:100%">
+                        <th colspan="3" style="text-align: center">
+                            DADOS DO RESPONSÁVEL PELA RETIRADA
+                        </th>
+                        <tr style="height:35px">
+                            <td colspan="3" style="text-align: left">
+                                ENTREGADOR (NOME LEGÍVEL):
+                                <p/>
+                            </td>
+                        </tr>
+                        <tr style="height:35px">
+                            <td style="text-align: left">
+                                IDENTIDADE:
+                                <p/>
+                            </td>
+                            <td style="text-align: left">
+                                PLACA DO CARRO:
+                                <p/>
+                            </td>
+                            <td style="text-align: left">
+                                FUNÇÃO:
+                                <p/>
+                            </td>
+                        </tr>
+                        <tr style="height:35px">
+                            <td style="text-align: left" colspan="3">
+                                RETIRADA:
+                                <p/>
+                            </td>
+                        </tr>
+                    </table>
+                    <table style="width:100%">
+                        <tr style="height:15px">
+                        </tr>
+                        <tr style="height:35px">
+                            <td style="width:40% ; text-align:center">
+                                EQUIPAMENTO
+                                <p/>
+                            </td >
+                            <td style="width:10% ; text-align:center">
+                                QTD
+                                <p/>
+                            </td>
+                            <td style="width:20% ; text-align:center">
+                                Nº DE SÉRIE
+                                <p/>
+                            </td>
+                            <td style="width:15% ; text-align:center">
+                                SIM
+                                <p/>
+                            </td>
+                            <td style="width:15% ; text-align:center">
+                                NÃO
+                                <p/>
+                            </td>
+                        </tr>
+                        <t t-set="linhas" t-value="12" />
+                        <t t-foreach="o.order_line" t-as="line">
+                            <t t-set="linhas" t-value="linhas - 1" />
+                            <tr style="height:20px">
+                                <td><b t-field="line.name" /></td> 
+                                <td style="text-align:right"><b t-field="line.product_uom_qty" /></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </t>
+                        <t t-foreach="range(linhas)" t-as="compl">
+                            <tr style="height:20px">
+                                <td></td> 
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </t>
+                    </table>
+                    <table style="width:100%">
+                        <tr style="height:15px">
+                        </tr>
+                        <tr style="height:35px">
+                            <td style="text-align:center">
+                                <b>RIO DE JANEIRO,_________________DE__________________________________2023 </b>
+                            </td>
+                        </tr>
+                    </table>
+                    <table style="width:100%">
+                        <tr style="height:35px">
+                            <td style="text-align: left">
+                                ASSINATURA DO RESPONSÁVEL PELA DEVOLUÇÃO:
+                                <p/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

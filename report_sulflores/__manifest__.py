@@ -20,7 +20,7 @@
 ##############################################################################
 
 {
-    'name': 'Relatorios LoceFaca',
+    'name': 'Relatorios SulFlores',
     'version': '1.0',
     'category': 'Others',
     'sequence': 2,
@@ -29,11 +29,9 @@
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['account', 'l10n_br_sale'],
+    'depends': ['account'],
     'data': [
-        'report/report_saleorder_document.xml',
-        'report/report_delivery_document_locefaca.xml',
-        'report/report_layout_background.xml',
+        'report/report_delivery_document_sulflores.xml',
     ],
     'installable': True,
     'application': False,

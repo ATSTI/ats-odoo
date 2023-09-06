@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_servico_locefaca">
+        <t t-call="web.html_container">
+            <t t-set="docs" t-value="docs.with_context({'lang':docs.partner_id.lang})"/>
+            <t t-foreach="docs" t-as="o">
+                <div class="page">
+                    <t t-call="report_cabecalho.report_cabecalho_id" />
+                    <p style="text-align: center; font-size:18px"><b>Proposta de Serviço</b></p>
+                    <p>Para:</p>
+                    <tbody style="width: 100%">
+                        <table style="border: 1px solid black; width: 50%; float: left;">
+                        <tr>
+                            <td style="font-size: 12px">
+                                <b>CLIENTE:</b>
+                            </td>
+                            <td style="width:100%">
+                                <span t-field="o.partner_id.name"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px">
+                                <b>CNPJ:</b>
+                            </td>
+                            <td style="width:100%">
+                                <span t-field="o.partner_id.cnpj_cpf"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px">
+                                <b>A/C:</b>
+                            </td>
+                            <td style="width:100%">
+                                <span t-field="o.partner_id.child_ids.name"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px">
+                                <b>TELEFONE:</b>
+                            </td>
+                            <td style="width:100%">
+                                <span t-field="o.partner_id.phone"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 13px">
+                                <b>EMAIL:</b>
+                            </td>
+                            <td style="width:100%">
+                                <span t-field="o.partner_id.email"/>
+                            </td>
+                        </tr>
+                        </table>
+                        <table style="border: 1px solid black; border-collapse: collapse; height: 80px; width: 37%; float: right;">
+                            <tr>
+                                <td style="border: 1px solid black; width:50%; text-align: right; font-size: 12px">
+                                    <b>Nº Da Prop.:</b>
+                                </td>
+                                <td style="border: 1px solid black; width:50%; font-size: 12px">
+                                    <span t-field="o.name"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid black; width:50%; text-align: right; font-size: 12px">
+                                    <b>Data:</b>
+                                </td>
+                                <td style="border: 1px solid black; width:50%; text-align: center; font-size: 12px">
+                                    <span t-field="o.date_order"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid black; width:50%; text-align: right; font-size: 12px">
+                                    <b>Vendedora:</b>
+                                </td>
+                                <td style="border: 1px solid black; width:50%; font-size: 12px">
+                                    <span t-field="o.user_id"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <p style="font-size:12px;">Conforme vossa solicitação segue nossa Proposta Comercial.</p>
+                        <br/>
+                        <b style="font-size:13px;">Escopo</b>
+                        <p style="font-size:12px;">1. O escopo do serviço consiste em:</p>
+                        <p style="text-indent: 30px; font-size:15px;" t-field="o.manual_customer_additional_data"></p>
+                        <p style="font-size:12px;">2. O serviço será realizado no seguinte local:</p>
+                        <p style="text-indent: 30px; font-size:15px;" t-field="o.note"></p>
+                        <p style="font-size:12px;">3. Fornecimento dos seguintes entregáveis: </p>
+                        <p style="text-indent: 30px; font-size:15px;" t-field="o.so_tag_ids"></p>
+                        <p style="font-size:12px;">4. A MAQTRUCK fornecerá equipe composta por :</p>
+                        <p style="text-indent: 30px; font-size:15px;" t-field="o.tag_ids"></p>
+                        <p style="font-size:12px;">5. Prazos :</p>
+                        <p style="text-indent: 30px; font-size:15px;" t-field="o.commitment_date"></p>
+                        <br/>
+                        <br/>
+                        <table style="border: 1px solid black; border-collapse: collapse; height: 30px; width: 100%; float: right;">
+                            <tr>
+                                <td style="border: 1px solid black; width:20%; text-align: center; font-size: 14px">
+                                    <b>Item</b>
+                                </td>
+                                <td style="border: 1px solid black; width:50%; text-align: center; font-size: 14px">
+                                    <b>Descrição</b>
+                                </td>
+                                <td style="border: 1px solid black; width:30%; text-align: center; font-size: 14px">
+                                    <b>Valor Total</b>
+                                </td>
+                            </tr>
+                            <t t-set="linhas" t-value="0" />
+                            <t t-foreach="o.order_line" t-as="line">
+                                <t t-set="linhas" t-value="linhas + 1" />
+                                <tr style="height:20px">
+                                    <td style="border: 1px solid black; font-size:12px; text-align:center"><t t-esc="linhas" /></td>  
+                                    <td style="border: 1px solid black; text-align:left"><span t-field="line.name" /></td>
+                                    <td style="border: 1px solid black; text-align:right"><span t-field="line.amount_total" /></td>
+                                </tr>
+                            </t>
+                        </table>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <b style="background-color: #efefef; font-size: 14px">CONDIÇÕES DE FORNECIMENTO</b>
+                        <br/> 
+                        <br/>
+                        <br/>
+                        <b style="text-indent: 30px;font-size:12px"> Responsabilidade da Contratada</b>
+                        <p style="text-indent: 30px;font-size:12px">I. Portar todos os equipamentos de proteção individual necessários para a atividade</p>
+                        <p style="text-indent: 30px;font-size:12px">II. Realizar todos os serviços de acordo com seus procedimentos de execução e de acordo com as normas aplicáveis; </p>
+                        <p style="text-indent: 30px;font-size:12px">III. Cumprir todas as normas e procedimentos de conduta da CONTRATANTE;</p>
+                        <p style="text-indent: 30px;font-size:12px">IV. Comunicar imediatamente qualquer anormalidade nas dependências da CONTRATANTE e/ou potenciais interferências com a 
+                        operação rotineira da mesma;</p>
+                        <p style="text-indent: 30px;font-size:12px">V. Agendar as datas para a realização dos serviços com uma antecedência mínima de 15 dias;</p>
+                        <p style="text-indent: 30px;font-size:12px">VI. Disponibilizar pessoal para acompanhamento da contratada.</p>
+                        <br/>
+                        <b style="background-color: #efefef; font-size: 14px">CONDIÇÕES DO SERVIÇO</b>
+                        <p style="text-indent: 30px;font-size:12px">1. Quando houver necessidade de testes de carga, para a realização dos mesmos é necessário que exista um ponto de ancoragem
+                            próximo à linha de vida/ancoragem a ser testada;</p>
+                        <p style="text-indent: 30px;font-size:12px">2. Caso não haja ponto de ancoragem, quando necessário o teste de carga, o teste pode ser realizado utilizando um objeto,
+                            disponibilizado pela CONTRATANTE, pesando pelo menos 1,5 Ton como: tonel de líquidos e contêineres ou veículos como
+                            empilhadeira, trator ou guindaste;</p>
+                        <p style="text-indent: 30px;font-size:12px">3. Caso nenhuma das opções acima seja possível, será cobrado o valor da instalação de pontos de ancoragem próximos às linhas de
+                            vida/ancoragem a serem testadas, que poderão ser utilizados para testes futuros.</p>
+                        <p style="text-indent: 30px;font-size:12px">4. Quando necessário, a MAQTRUCK realiza os testes de forma progressiva a fim de avaliar a conformidade da ancoragem sem
+                            causar qualquer efeito destrutivo a estrutura, no entanto a mesma não se responsabiliza por deformações ou quaisquer a danos
+                            causados às estruturas durante os testes de carga;</p>
+                        <p style="text-indent: 30px;font-size:12px">5. Na eventualidade de indecência de atraso na entrega do serviço devido a causas de responsabilidade da CONTRATANTE, será
+                            cobrado como fora de escopo o proporcional ao atraso incidente, equivalente ao custo por dia (diárias de mão de obra, locomoção e
+                            hospedagem), mais o valor da locação extra de qualquer equipamento de apoio que seja necessário.</p>
+                        <p style="text-indent: 30px;font-size:12px"> 
+                            6. Caso seja observado, no momento da execução do serviço, circunstâncias não previamente informadas que inviabilizem a
+                            execução do escopo acordado, seja por obstáculos físicos ou condição insegura para a integridade física dos colaboradores envolvidos:
+                            o serviço não será realizado e será cobrado o valor da mobilização da equipe e de qualquer equipamento ou ferramenta extra
+                            moblizada;
+                        </p>
+                        <br/>
+                        <b style="font-size:12px">
+                            A realização de teste de carga quando necessário, está condicionado à avaliação técnica da equipe de inspeção, caso a mesma
+                            avalie que o ponto ou estrutura de ancoragem não será capaz de suportar o teste, o mesmo não será realizado a fim de evitar
+                            danos patrimoniais ao cliente.
+                        </b>
+                        <br/>
+                        <br/>
+                        <b style="font-size:14px">II. Validade da Proposta:</b><span t-field="o.validity_date"/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <b style="background-color: #efefef; font-size: 13px">Pagamento</b>
+                        <br/>
+                        <br/>
+                        <table style="border: 1px solid black">
+                            <tr>
+                            <td>
+                                <b style="font-size:13px">TERMOS E CONDIÇÕES</b>
+                                <p style="font-size:11px">1. Limite de crédito: o valor do limite de crédito será estipulado com base nos documentos apresentados para análise</p>
+                                <p style="font-size:11px">2. Produtos sujeitos a cobrança de substituição tributária, variando de acordo com aplicação/estado do cliente</p>
+                                <p style="font-size:11px">3. Atrasos de pagamento: A MAQTRUCK reserva-se ao direito de suspender novos fornecimentos a clientes inadimplentes</p>
+                                <p style="font-size:11px">4. Sugestões/Reclamações: Entrar em contato através do e-mail: comercial@maqtruck.com.</p>
+                            </td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <table style="border: 1px solid black;  border-collapse: collapse ; width:50%">
+                            <tr>
+                            <td style="border: 1px solid black; width:50%; text-align: center; font-size: 12px">
+                                Condições de Pagamento:
+                            </td>
+                            <td style="border: 1px solid black; width:50%; text-align: center; font-size: 12px">
+                                <span t-field="o.payment_term_id"/> 
+                            </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid black; width:50%; text-align: center; font-size: 12px">
+                                    Forma de Pagamento:
+                                </td>
+                                <td style="border: 1px solid black; width:50%; text-align: center; font-size: 12px">
+                                    <span t-field="o.payment_mode_id"/>
+                                </td>
+                            </tr>
+                        </table> 
+                    </tbody>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

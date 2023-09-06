@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_cabecalho_id">
+        <t t-call="web.html_container">
+            <t t-set="docs" t-value="docs.with_context({'lang':docs.partner_id.lang})"/>
+            <t t-foreach="docs" t-as="o">
+                <div class="page">
+                    <div class="oe_structure"/>
+                    <table style="border: 0px solid">
+                        <tr>
+                            <td width="25%" style="border: 0px solid">
+                                <div style="width: 100%;float: left;">
+                                    <img t-attf-src="data:image/*;base64,{{o.company_id.logo}}"
+                                        t-att-alt="o.company_id.name" style="width:100%"/>
+                                </div>
+                            </td>
+                            <td width="75%" style="text-align: rigth; font-size:24px; border: 0px solid" >
+                                <strong t-field="o.company_id.name"/>
+                                <br/><span style="font-size:16px" t-field="o.company_id.street_name"/>, <strong style="font-size:16px" t-field="o.company_id.street_number"/>
+                                <br/><span style="font-size:16px" t-field="o.company_id.street2"/>
+                                <br/><span style="font-size:16px" t-field="o.company_id.district"/> 
+                                <br/><span style="font-size:16px" t-field="o.company_id.zip"/> - <strong style="font-size:16px" t-field="o.company_id.city_id.name"/> - <strong style="font-size:16px" t-field="o.company_id.state_id.code"/>
+                                <br/><span style="font-size:16px" t-field="o.company_id.country_id.name"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

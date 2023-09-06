@@ -20,20 +20,24 @@
 ##############################################################################
 
 {
-    'name': 'Relatorios LoceFaca',
+    'name': 'Relatorios Orcamento',
     'version': '1.0',
     'category': 'Others',
     'sequence': 2,
-    'summary': 'relatorios personalizadps',
+    'summary': 'relatorios personalizados',
     'description': """
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['account', 'l10n_br_sale'],
+    'depends': ['account', 'sale', 'mrp', 'report_cabecalho'],
     'data': [
-        'report/report_saleorder_document.xml',
-        'report/report_delivery_document_locefaca.xml',
-        'report/report_layout_background.xml',
+        'report/report_entregadevolucao_locefaca.xml',
+        'report/report_servico_locefaca.xml',
+        'report/report_locacao_locefaca.xml',
+        'report/report_instalacao_locefaca.xml',
+        'report/report_venda_locefaca.xml',
+        'views/report_orcamento.xml',
+        'views/sale_order_view.xml',
     ],
     'installable': True,
     'application': False,

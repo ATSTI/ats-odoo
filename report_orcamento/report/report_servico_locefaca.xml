@@ -31,7 +31,7 @@
                                 <b>A/C:</b>
                             </td>
                             <td style="width:100%">
-                                <span t-field="o.partner_id.child_ids.name"/>
+                                <span t-field="o.contact_id.name"/>
                             </td>
                         </tr>
                         <tr>
@@ -56,7 +56,7 @@
                                 <td style="border: 1px solid black; width:50%; text-align: right; font-size: 12px">
                                     <b>Nº Da Prop.:</b>
                                 </td>
-                                <td style="border: 1px solid black; width:50%; font-size: 12px">
+                                <td style="border: 1px solid black; width:50%;text-align: center; font-size: 12px">
                                     <span t-field="o.name"/>
                                 </td>
                             </tr>
@@ -72,7 +72,7 @@
                                 <td style="border: 1px solid black; width:50%; text-align: right; font-size: 12px">
                                     <b>Vendedora:</b>
                                 </td>
-                                <td style="border: 1px solid black; width:50%; font-size: 12px">
+                                <td style="border: 1px solid black; width:50%;text-align: center; font-size: 12px">
                                     <span t-field="o.user_id"/>
                                 </td>
                             </tr>

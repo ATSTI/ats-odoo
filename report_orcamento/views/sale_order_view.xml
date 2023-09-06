@@ -4,7 +4,10 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale_order_tag.sale_order_tag_view_form" />
         <field name="arch" type="xml">
-            <field name="so_tag_ids" position="replace">
+            <field name="so_tag_ids" position="replace"/>
+            <field name="commitment_date" position="replace"/>
+            <field name="tag_ids" position="replace"/>
+            <field name="partner_id" position="after">
                 <field name="so_tag_ids" 
                     string="Entregáveis"
                     placeholder="Materiais..."
@@ -12,13 +15,7 @@
                     options="{'color_field': 'color', 'no_create': True, 'no_create_edit': True}"
                     domain="['|',('team_ids', 'in', team_id), ('team_ids', '=', False)]" 
                 />
-            </field>
-            <field name="commitment_date" position="replace"/>
-            <field name="tag_ids" position="replace"/>
-            <field name="validity_date" position="after">
                 <field name="commitment_date" />
-            </field>
-            <field name="so_tag_ids" position="after">
                 <field name="tag_ids" 
                     string="Equipe" 
                     placeholder="colaboradores..."

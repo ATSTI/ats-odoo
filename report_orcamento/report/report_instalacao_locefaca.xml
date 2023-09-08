@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="report_servico_locefaca">
+    <template id="report_instalacao_locefaca">
         <t t-call="web.html_container">
             <t t-set="docs" t-value="docs.with_context({'lang':docs.partner_id.lang})"/>
             <t t-foreach="docs" t-as="o">
@@ -94,7 +94,7 @@
                         <p style="text-indent: 30px; font-size:15px;" t-field="o.note"></p>
                         <p style="font-size:12px;">3. Fornecimento dos seguintes entregáveis: </p>
                         <p style="text-indent: 30px; font-size:15px;" t-field="o.so_tag_ids"></p>
-                        <p style="font-size:12px;">4. A MAQTRUCK fornecerá equipe composta por :</p>
+                        <p style="font-size:12px;">4. Mão de obra :</p>
                         <p style="text-indent: 30px; font-size:15px;" t-field="o.tag_ids"></p>
                         <p style="font-size:12px;">5. Prazos :</p>
                         <p style="text-indent: 30px; font-size:15px;" t-field="o.commitment_date"></p>
@@ -128,52 +128,76 @@
                         <br/>
                         <br/>
                         <br/>
-                        <b style="background-color: #D9D9D9; font-size: 14px">CONDIÇÕES DE FORNECIMENTO</b>
+                        <b style="background-color: #efefef; font-size: 14px">CONDIÇÕES DE FORNECIMENTO</b>
                         <br/> 
                         <br/>
                         <br/>
                         <b style="font-size:12px"> Responsabilidade da Contratada</b>
-                        <p style="font-size:12px">I. Portar todos os equipamentos de proteção individual necessários para a atividade</p>
-                        <p style="font-size:12px">II. Realizar todos os serviços de acordo com seus procedimentos de execução e de acordo com as normas aplicáveis; </p>
-                        <p style="font-size:12px">III. Cumprir todas as normas e procedimentos de conduta da CONTRATANTE;</p>
-                        <p style="font-size:12px">IV. Comunicar imediatamente qualquer anormalidade nas dependências da CONTRATANTE e/ou potenciais interferências com a 
-                        operação rotineira da mesma;</p>
-                        <p style="font-size:12px">V. Agendar as datas para a realização dos serviços com uma antecedência mínima de 15 dias;</p>
-                        <p style="font-size:12px">VI. Disponibilizar pessoal para acompanhamento da contratada.</p>
-                        <br/>
-                        <b style="background-color: #D9D9D9; font-size: 14px">CONDIÇÕES DO SERVIÇO</b>
-                        <p style="font-size:12px">1. Quando houver necessidade de testes de carga, para a realização dos mesmos é necessário que exista um ponto de ancoragem
-                            próximo à linha de vida/ancoragem a ser testada;</p>
-                        <p style="font-size:12px">2. Caso não haja ponto de ancoragem, quando necessário o teste de carga, o teste pode ser realizado utilizando um objeto,
-                            disponibilizado pela CONTRATANTE, pesando pelo menos 1,5 Ton como: tonel de líquidos e contêineres ou veículos como
-                            empilhadeira, trator ou guindaste;</p>
-                        <p style="font-size:12px">3. Caso nenhuma das opções acima seja possível, será cobrado o valor da instalação de pontos de ancoragem próximos às linhas de
-                            vida/ancoragem a serem testadas, que poderão ser utilizados para testes futuros.</p>
-                        <p style="font-size:12px">4. Quando necessário, a MAQTRUCK realiza os testes de forma progressiva a fim de avaliar a conformidade da ancoragem sem
-                            causar qualquer efeito destrutivo a estrutura, no entanto a mesma não se responsabiliza por deformações ou quaisquer a danos
-                            causados às estruturas durante os testes de carga;</p>
-                        <p style="font-size:12px">5. Na eventualidade de indecência de atraso na entrega do serviço devido a causas de responsabilidade da CONTRATANTE, será
-                            cobrado como fora de escopo o proporcional ao atraso incidente, equivalente ao custo por dia (diárias de mão de obra, locomoção e
-                            hospedagem), mais o valor da locação extra de qualquer equipamento de apoio que seja necessário.</p>
-                        <p style="font-size:12px"> 
-                            6. Caso seja observado, no momento da execução do serviço, circunstâncias não previamente informadas que inviabilizem a
-                            execução do escopo acordado, seja por obstáculos físicos ou condição insegura para a integridade física dos colaboradores envolvidos:
-                            o serviço não será realizado e será cobrado o valor da mobilização da equipe e de qualquer equipamento ou ferramenta extra
-                            moblizada;
+                        <p style="text-indent: 30px;font-size:12px">
+                        I. Portar todos os equipamentos de proteção individual necessários para a atividade
+                        </p>
+                        <p style="text-indent: 30px;font-size:12px">
+                        II. Realizar todos os serviços de acordo com seus procedimentos de execução e de acordo com as normas aplicáveis; 
+                        </p>
+                        <p style="text-indent: 30px;font-size:12px">
+                        III. Cumprir todas as normas e procedimentos de conduta da CONTRATANTE;
+                        </p>
+                        <p style="text-indent: 30px;font-size:12px">
+                        IV. Comunicar imediatamente qualquer anormalidade nas dependências da CONTRATANTE e/ou potenciais interferências com a 
+                        operação rotineira da mesma;
+                        </p>
+                        <p style="text-indent: 30px;font-size:12px">
+                        V. Agendar as datas para a realização dos serviços com uma antecedência mínima de 15 dias;
+                        </p>
+                        <p style="text-indent: 30px;font-size:12px">
+                        VI. Disponibilizar pessoal para acompanhamento da contratada.
                         </p>
                         <br/>
-                        <b style="font-size:12px">
-                            A realização de teste de carga quando necessário, está condicionado à avaliação técnica da equipe de inspeção, caso a mesma
-                            avalie que o ponto ou estrutura de ancoragem não será capaz de suportar o teste, o mesmo não será realizado a fim de evitar
-                            danos patrimoniais ao cliente.
-                        </b>
+                        <b style="background-color: #efefef; font-size: 14px">Responsabilidade da Contratante</b>
+                        <p style="text-indent: 30px;font-size:12px">
+                        I. Equipamento para alcance e trabalho nos locais onde devem ser vistoriados os olhais de ancoragem, seja escada, andaime ou
+                        plataforma elevatória
+                        </p>
+                        <p style="text-indent: 30px;font-size:12px">
+                        II. Disponibilizar equipamento para elevação de carga e pessoas para instalação em altura, caso necessário;
+                        </p>
+                        <p style="text-indent: 30px;font-size:12px">
+                        III. Manter livre e/ou isolar a área para realização da análise e inspeção;
+                        </p>
+                        <p style="text-indent: 30px;font-size:12px">
+                        IV. Disponibilizar a área e os recursos para a execução dos serviços nas datas previamente agendadas;
+                        </p>
+                        <p style="text-indent: 30px;font-size:12px">
+                        V. Agendar as datas para a realização dos serviços com uma antecedência mínima de 15 dias;
+                        </p>
+                        <p style="text-indent: 30px;font-size:12px"> 
+                        VI. Disponibilizar pessoal para acompanhamento da contratada.
+                        </p>
+                        <br/>
+                        <b style="background-color: #efefef; font-size: 14px">CONDIÇÕES DO SERVIÇO</b>
+                        <p style="text-indent: 30px;font-size:12px">
+                        1. Na eventualidade de indecência de atraso na entrega do serviço devido a causas de responsabilidade da CONTRATANTE, será
+                        cobrado como fora de escopo o proporcional ao atraso incidente, equivalente ao custo por dia (diárias de mão de obra, locomoção e
+                        hospedagem), mais o valor da locação extra de qualquer equipamento de apoio que seja necessário.
+                        </p>
+                        <p style="text-indent: 30px;font-size:12px">
+                        2. Caso seja observado, no momento da execução do serviço, circunstâncias não previamente informadas que inviabilizem a
+                        execução do escopo acordado, seja por obstáculos físicos ou condição insegura para a integridade física dos colaboradores envolvidos:
+                        o serviço não será realizado e será cobrado o valor da mobilização da equipe e de qualquer equipamento ou ferramenta extra
+                        moblizada;
+                        </p>
+                        <p style="text-indent: 30px;font-size:12px">
+                        3. O transporte ou frete do equipamento para o local de instalação externamente ou internamento é de responsabilidade exclusiva da
+                        contratante.
+                        </p>
                         <br/>
                         <br/>
-                        <b style="font-size:14px">II. Validade da Proposta:</b><span t-field="o.validity_date"/>
+                        <br/>
+                        <b style="font-size:14px">II. Validade da Proposta:</b><span/><span t-field="o.validity_date"/>
                         <br/>
                         <br/>
                         <br/>
-                        <b style="background-color: #D9D9D9; font-size: 13px">Pagamento</b>
+                        <b style="background-color: #efefef; font-size: 13px">Pagamento</b>
                         <br/>
                         <br/>
                         <table style="border: 1px solid black">

@@ -29,8 +29,9 @@
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['account', 'sale', 'mrp', 'report_cabecalho', 'sale_order_tag'],
+    'depends': ['account', 'sale_order_tag', 'mrp', 'report_cabecalho'],
     'data': [
+        'views/sale_order_view.xml',
         'report/report_entregadevolucao_locefaca.xml',
         'report/report_servico_locefaca.xml',
         'report/report_locacao_locefaca.xml',
@@ -38,7 +39,6 @@
         'report/report_instalacao_locefaca.xml',
         'report/report_venda_locefaca.xml',
         'views/report_orcamento.xml',
-        'views/sale_order_view.xml',
     ],
     'installable': True,
     'application': False,

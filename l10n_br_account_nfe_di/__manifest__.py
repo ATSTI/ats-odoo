@@ -5,10 +5,10 @@
     "summary": "Adicionado campos para Detalhes Importação/Exportação",
     "category": "Localisation",
     "license": "AGPL-3",
-    "author": "Engenere," "Akretion," "Odoo Community Association (OCA)",
+    "author": "Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/l10n-brazil",
     "version": "14.0.1.0.0",
-    "development_status": "Alpha",
+    "development_status": "Beta",
     "depends": [
         "l10n_br_fiscal",
         "l10n_br_nfe",

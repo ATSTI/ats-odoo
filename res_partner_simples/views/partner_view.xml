@@ -11,6 +11,13 @@
             <xpath expr="//page[@name='internal_notes']" position="attributes">
                 <attribute name="attrs">{'invisible': True}</attribute>
             </xpath>
+            <page position="replace" name="fiscal"/>
+            <page position="before" name="contact_addresses">
+                <page string="Fiscal" name="fiscal" />
+            </page>
+            <page position="after" name="contact_addresses">
+                <page string="Outras Informações" name="other_info" />
+            </page>      
         </field>
     </record>
 </odoo>

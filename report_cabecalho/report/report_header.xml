@@ -6,21 +6,20 @@
             <t t-foreach="docs" t-as="o">
                 <div class="page">
                     <div class="oe_structure"/>
-                    <table style="border: 0px solid">
+                    <br/>
+                    <table style="border: 0px solid; width:100%">
                         <tr>
-                            <td width="25%" style="border: 0px solid">
+                            <td style="border: 0px solid; width:40% ; height:35px">
                                 <div style="width: 100%;float: left;">
                                     <img t-attf-src="data:image/*;base64,{{o.company_id.logo}}"
-                                        t-att-alt="o.company_id.name" style="width:100%"/>
+                                        t-att-alt="o.company_id.name" style="width:100%; height:70px"/>
                                 </div>
                             </td>
-                            <td width="75%" style="text-align: rigth; font-size:24px; border: 0px solid" >
-                                <strong t-field="o.company_id.name"/>
-                                <br/><span style="font-size:16px" t-field="o.company_id.street_name"/>, <strong style="font-size:16px" t-field="o.company_id.street_number"/>
-                                <br/><span style="font-size:16px" t-field="o.company_id.street2"/>
-                                <br/><span style="font-size:16px" t-field="o.company_id.district"/> 
-                                <br/><span style="font-size:16px" t-field="o.company_id.zip"/> - <strong style="font-size:16px" t-field="o.company_id.city_id.name"/> - <strong style="font-size:16px" t-field="o.company_id.state_id.code"/>
-                                <br/><span style="font-size:16px" t-field="o.company_id.country_id.name"/>
+                            <td style="text-align: right; border: 0px solid; width:60%" >
+                                <span style="font-size:12px" t-field="o.company_id.name"/>                                
+                                <br/><span style="font-size:12px">CNPJ/CPF: </span><span style="font-size:12px" t-field="o.company_id.cnpj_cpf"/>
+                                <br/><span style="font-size:12px" t-field="o.company_id.street_name"/><span style="font-size:12px"> , </span><span style="font-size:12px" t-field="o.company_id.street_number"/> <span style="font-size:12px"> - </span><span style="font-size:12px" t-field="o.company_id.district"/><span style="font-size:12px"> , CEP: </span><span style="font-size:12px" t-field="o.company_id.zip"/><span style="font-size:12px"> - </span><span style="font-size:12px" t-field="o.company_id.state_id.code"/> 
+                                <br/><span style="font-size:12px" t-field="o.company_id.phone"/> <span style="font-size:12px"> | </span><span style="font-size:12px" t-field="o.company_id.email"/>
                             </td>
                         </tr>
                     </table>

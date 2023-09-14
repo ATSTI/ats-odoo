@@ -10,7 +10,7 @@
                             table, td {
                             border: 1px solid black;
                             border-collapse: collapse;
-                            font-size: 12px;
+                            font-size: 15px;
                             }
                         </style>
                         <t t-call="report_cabecalho.report_cabecalho_id" />
@@ -36,7 +36,7 @@
                             </tr>
                         </table>
                         <table style="width:100%">
-                            <th colspan="3" style="text-align: center">
+                            <th colspan="3" style="text-align: center; height: 30px">
                                 DADOS DO RESPONSÁVEL PELA RETIRADA
                             </th>
                             <tr style="height:35px">
@@ -67,34 +67,34 @@
                             </tr>
                         </table>
                         <table style="width:100%">
-                            <tr style="height:15px">
+                            <tr style="height:25px">
                             </tr>
                             <tr style="height:25px">
                                 <td style="width:40% ; text-align:center">
                                     EQUIPAMENTO
                                     <p/>
                                 </td >
-                                <td style="width:10% ; text-align:center">
+                                <td style="width:5% ; text-align:center">
                                     QTD
                                     <p/>
                                 </td>
-                                <td style="width:20% ; text-align:center">
+                                <td style="width:35% ; text-align:center">
                                     Nº DE SÉRIE
                                     <p/>
                                 </td>
-                                <td style="width:15% ; text-align:center">
+                                <td style="width:10% ; text-align:center">
                                     SEPARADO?
                                     <p/>
                                 </td>
-                                <td style="width:15% ; text-align:center">
+                                <td style="width:10% ; text-align:center">
                                     ENTREGUE?
                                     <p/>
                                 </td>
                             </tr>
-                            <t t-set="linhas" t-value="12" />
+                            <t t-set="linhas" t-value="8" />
                             <t t-foreach="o.order_line" t-as="line">
                                 <t t-set="linhas" t-value="linhas - 1" />
-                                <tr style="height:20px">
+                                <tr style="height:30px">
                                     <td><b t-field="line.name" /></td> 
                                     <td style="text-align:right"><b t-field="line.product_uom_qty" /></td>
                                     <td></td>
@@ -103,7 +103,7 @@
                                 </tr>
                             </t>
                             <t t-foreach="range(linhas)" t-as="compl">
-                                <tr style="height:20px">
+                                <tr style="height:30px">
                                     <td></td> 
                                     <td></td>
                                     <td></td>
@@ -113,9 +113,9 @@
                             </t>
                         </table>
                         <table style="width:100%">
-                            <tr style="height:15px">
+                            <tr style="height:25px">
                             </tr>
-                            <tr style="height:35px">
+                            <tr style="height:45px">
                                 <td style="text-align:center">
                                     <b>RIO DE JANEIRO,_________________DE__________________________________2023 </b>
                                 </td>
@@ -159,7 +159,7 @@
                         </tr>
                     </table>
                     <table style="width:100%">
-                        <th colspan="3" style="text-align: center">
+                        <th colspan="3" style="text-align: center ; height: 30px">
                             DADOS DO RESPONSÁVEL PELA RETIRADA
                         </th>
                         <tr style="height:35px">
@@ -190,34 +190,34 @@
                         </tr>
                     </table>
                     <table style="width:100%">
-                        <tr style="height:15px">
+                        <tr style="height:25px">
                         </tr>
                         <tr style="height:35px">
                             <td style="width:40% ; text-align:center">
                                 EQUIPAMENTO
                                 <p/>
                             </td >
-                            <td style="width:10% ; text-align:center">
+                            <td style="width:5% ; text-align:center">
                                 QTD
                                 <p/>
                             </td>
-                            <td style="width:20% ; text-align:center">
+                            <td style="width:35% ; text-align:center">
                                 Nº DE SÉRIE
                                 <p/>
                             </td>
-                            <td style="width:15% ; text-align:center">
+                            <td style="width:10% ; text-align:center">
                                 SIM
                                 <p/>
                             </td>
-                            <td style="width:15% ; text-align:center">
+                            <td style="width:10% ; text-align:center">
                                 NÃO
                                 <p/>
                             </td>
                         </tr>
-                        <t t-set="linhas" t-value="12" />
+                        <t t-set="linhas" t-value="8" />
                         <t t-foreach="o.order_line" t-as="line">
                             <t t-set="linhas" t-value="linhas - 1" />
-                            <tr style="height:20px">
+                            <tr style="height:30px">
                                 <td><b t-field="line.name" /></td> 
                                 <td style="text-align:right"><b t-field="line.product_uom_qty" /></td>
                                 <td></td>
@@ -226,7 +226,7 @@
                             </tr>
                         </t>
                         <t t-foreach="range(linhas)" t-as="compl">
-                            <tr style="height:20px">
+                            <tr style="height:30px">
                                 <td></td> 
                                 <td></td>
                                 <td></td>
@@ -236,9 +236,12 @@
                         </t>
                     </table>
                     <table style="width:100%">
-                        <tr style="height:15px">
+                        <tr style="height:75px">
+                            <td>
+                                <b>OBSERVAÇÃO:</b>
+                            </td>
                         </tr>
-                        <tr style="height:35px">
+                        <tr style="height:45px">
                             <td style="text-align:center">
                                 <b>RIO DE JANEIRO,_________________DE__________________________________2023 </b>
                             </td>

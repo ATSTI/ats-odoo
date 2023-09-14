@@ -35,6 +35,7 @@
         'report/report_entregadevolucao_locefaca.xml',
         'report/report_servico_locefaca.xml',
         'report/report_locacao_locefaca.xml',
+        'report/report_venda_locefaca.xml',
         'report/report_instalacao_locefaca.xml',
         'report/report_venda_locefaca.xml',
         'views/report_orcamento.xml',

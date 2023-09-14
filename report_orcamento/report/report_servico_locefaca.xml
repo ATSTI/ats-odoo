@@ -132,24 +132,24 @@
                         <p style="text-indent: 30px;font-size:12px">III. Cumprir todas as normas e procedimentos de conduta da CONTRATANTE;</p>
                         <p style="text-indent: 30px;font-size:12px">IV. Comunicar imediatamente qualquer anormalidade nas dependências da CONTRATANTE e/ou potenciais interferências com a 
                         operação rotineira da mesma;</p>
-                        <p style="text-indent: 30px;font-size:12px">V. Agendar as datas para a realização dos serviços com uma antecedência mínima de 15 dias;</p>
-                        <p style="text-indent: 30px;font-size:12px">VI. Disponibilizar pessoal para acompanhamento da contratada.</p>
+                        <p style="font-size:12px">V. Agendar as datas para a realização dos serviços com uma antecedência mínima de 15 dias;</p>
+                        <p style="font-size:12px">VI. Disponibilizar pessoal para acompanhamento da contratada.</p>
                         <br/>
-                        <b style="background-color: #efefef; font-size: 14px">CONDIÇÕES DO SERVIÇO</b>
-                        <p style="text-indent: 30px;font-size:12px">1. Quando houver necessidade de testes de carga, para a realização dos mesmos é necessário que exista um ponto de ancoragem
+                        <b style="background-color: #D9D9D9; font-size: 14px">CONDIÇÕES DO SERVIÇO</b>
+                        <p style="font-size:12px">1. Quando houver necessidade de testes de carga, para a realização dos mesmos é necessário que exista um ponto de ancoragem
                             próximo à linha de vida/ancoragem a ser testada;</p>
-                        <p style="text-indent: 30px;font-size:12px">2. Caso não haja ponto de ancoragem, quando necessário o teste de carga, o teste pode ser realizado utilizando um objeto,
+                        <p style="font-size:12px">2. Caso não haja ponto de ancoragem, quando necessário o teste de carga, o teste pode ser realizado utilizando um objeto,
                             disponibilizado pela CONTRATANTE, pesando pelo menos 1,5 Ton como: tonel de líquidos e contêineres ou veículos como
                             empilhadeira, trator ou guindaste;</p>
-                        <p style="text-indent: 30px;font-size:12px">3. Caso nenhuma das opções acima seja possível, será cobrado o valor da instalação de pontos de ancoragem próximos às linhas de
+                        <p style="font-size:12px">3. Caso nenhuma das opções acima seja possível, será cobrado o valor da instalação de pontos de ancoragem próximos às linhas de
                             vida/ancoragem a serem testadas, que poderão ser utilizados para testes futuros.</p>
-                        <p style="text-indent: 30px;font-size:12px">4. Quando necessário, a MAQTRUCK realiza os testes de forma progressiva a fim de avaliar a conformidade da ancoragem sem
+                        <p style="font-size:12px">4. Quando necessário, a MAQTRUCK realiza os testes de forma progressiva a fim de avaliar a conformidade da ancoragem sem
                             causar qualquer efeito destrutivo a estrutura, no entanto a mesma não se responsabiliza por deformações ou quaisquer a danos
                             causados às estruturas durante os testes de carga;</p>
-                        <p style="text-indent: 30px;font-size:12px">5. Na eventualidade de indecência de atraso na entrega do serviço devido a causas de responsabilidade da CONTRATANTE, será
+                        <p style="font-size:12px">5. Na eventualidade de indecência de atraso na entrega do serviço devido a causas de responsabilidade da CONTRATANTE, será
                             cobrado como fora de escopo o proporcional ao atraso incidente, equivalente ao custo por dia (diárias de mão de obra, locomoção e
                             hospedagem), mais o valor da locação extra de qualquer equipamento de apoio que seja necessário.</p>
-                        <p style="text-indent: 30px;font-size:12px"> 
+                        <p style="font-size:12px"> 
                             6. Caso seja observado, no momento da execução do serviço, circunstâncias não previamente informadas que inviabilizem a
                             execução do escopo acordado, seja por obstáculos físicos ou condição insegura para a integridade física dos colaboradores envolvidos:
                             o serviço não será realizado e será cobrado o valor da mobilização da equipe e de qualquer equipamento ou ferramenta extra
@@ -167,7 +167,7 @@
                         <br/>
                         <br/>
                         <br/>
-                        <b style="background-color: #efefef; font-size: 13px">Pagamento</b>
+                        <b style="background-color: #D9D9D9; font-size: 13px">Pagamento</b>
                         <br/>
                         <br/>
                         <table style="border: 1px solid black; height: 100px ; width: 100%">

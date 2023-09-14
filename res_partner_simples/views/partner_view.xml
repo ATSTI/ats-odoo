@@ -13,11 +13,21 @@
             </xpath>
             <page position="replace" name="fiscal"/>
             <page position="before" name="contact_addresses">
-                <page string="Fiscal" name="fiscal" />
+                <page string="Fiscal" name="fiscal">
+                    <group name="fiscal_numbers" position="replace">
+                        <group string="Fiscal Profile" name="fiscal_profile">
+                            <field name="fiscal_profile_id" force_save="1" groups="l10n_br_fiscal.group_user" />
+                            <field name="ind_ie_dest" force_save="1" attrs="{'readonly': [('fiscal_profile_id', '!=', False)]}" />
+                            <field name="tax_framework" force_save="1" attrs="{'readonly': [('fiscal_profile_id', '!=', False)]}" />
+                            <field name="cnae_main_id" options="{'no_create': True, 'no_create_edit': True}" />
+                            <field name="ind_final" />
+                        </group>
+                    </group>
+                </page>
             </page>
             <page position="after" name="contact_addresses">
                 <page string="Outras Informações" name="other_info" />
-            </page>      
+            </page>
         </field>
     </record>
 </odoo>

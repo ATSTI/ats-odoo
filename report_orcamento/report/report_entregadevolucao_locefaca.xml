@@ -91,13 +91,21 @@
                                     <p/>
                                 </td>
                             </tr>
-                            <t t-set="linhas" t-value="8" />
+                            <t t-set="linhas" t-value="6" />
+                            <t t-set="lot" t-value="" />
                             <t t-foreach="o.order_line" t-as="line">
+                            <t t-foreach="o.picking_ids" t-as="pick">
+                                <t t-foreach="pick.move_line_ids_without_package" t-as="lp">
+                                    <t t-if="line.product_id == lp.product_id and pick.picking_type_id.code == 'outgoing'" >
+                                        <t t-set="lot" t-value="lp.lot_id.name" />
+                                    </t>
+                                </t>
+                            </t>
                                 <t t-set="linhas" t-value="linhas - 1" />
                                 <tr style="height:30px">
                                     <td><b t-field="line.name" /></td> 
                                     <td style="text-align:right"><b t-field="line.product_uom_qty" /></td>
-                                    <td></td>
+                                    <td style="text-indent: 30px;text-align:left"><b t-esc="lot" /></td>
                                     <td></td>
                                     <td></td>
                                 </tr>
@@ -214,13 +222,21 @@
                                 <p/>
                             </td>
                         </tr>
-                        <t t-set="linhas" t-value="8" />
-                        <t t-foreach="o.order_line" t-as="line">
+                        <t t-set="linhas" t-value="6" />
+                            <t t-set="lot" t-value="" />
+                            <t t-foreach="o.order_line" t-as="line">
+                            <t t-foreach="o.picking_ids" t-as="pick">
+                                <t t-foreach="pick.move_line_ids_without_package" t-as="lp">
+                                    <t t-if="line.product_id == lp.product_id and pick.picking_type_id.code == 'outgoing'" >
+                                        <t t-set="lot" t-value="lp.lot_id.name" />
+                                    </t>
+                                </t>
+                            </t>
                             <t t-set="linhas" t-value="linhas - 1" />
                             <tr style="height:30px">
                                 <td><b t-field="line.name" /></td> 
                                 <td style="text-align:right"><b t-field="line.product_uom_qty" /></td>
-                                <td></td>
+                                <td style="text-indent: 30px;text-align:left"><b t-esc="lot" /></td>
                                 <td></td>
                                 <td></td>
                             </tr>

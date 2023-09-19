@@ -99,6 +99,8 @@ class NFe(spec_models.StackedModel):
                     etree.SubElement(infProt, "verAplic").text = processo.resposta.protNFe.infProt.verAplic
                     etree.SubElement(infProt, "dhRecbto").text = fields.Datetime.to_string(
                         processo.resposta.protNFe.infProt.dhRecbto)
+                    protocol_date=fields.Datetime.to_string(
+                        processo.resposta.protNFe.infProt.dhRecbto)
                     etree.SubElement(infProt, "nProt").text = processo.resposta.protNFe.infProt.nProt
                     # etree.SubElement(infProt, "digVal").text = processo.resposta.protNFe.infProt.digVal
                     etree.SubElement(infProt, "cStat").text = processo.resposta.protNFe.infProt.cStat
@@ -107,18 +109,24 @@ class NFe(spec_models.StackedModel):
                     new_root.append(root)
                     new_root.append(protNFe_node)
                     file = etree.tostring(new_root)
-                    record.atualiza_status_nfe(processo)
-                    if processo.resposta.protNFe.infProt.cStat == "204":
-                        state = "autorizada"
+                    #record.atualiza_status_nfe(processo)
+                    self.authorization_event_id.set_done(
+                            status_code="100",
+                            response="Autorizada",
+                            protocol_date=protocol_date,
+                            protocol_number=processo.resposta.protNFe.infProt.nProt,
+                            file_response_xml=file.decode("utf-8"),
+                        )
+                    state = "autorizada"
 
-                        record._change_state(state)
+                    record._change_state(state)
 
-                        record.write(
+                    record.write(
                             {
                                 "status_code": "100",
                                 "status_name": "Autorizada",
                             }
-                        )
+                    )
 
             elif not record.status_code and processo.resposta.cStat == "225":
                 state = SITUACAO_EDOC_REJEITADA

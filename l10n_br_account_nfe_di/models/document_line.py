@@ -53,21 +53,22 @@ class NFeLine(spec_models.StackedModel):
 
             if self.account_line_ids.move_id.move_type == "out_invoice":
                 vals_detexp = []
-                for det in self.exp_ids:
-                    vals_det_exp = {
-                        "nfe40_detExport_prod_id": det.id,
-                        "nfe40_nDraw": det.name
-                    }
-                    vals_detexp = {
-                        "nfe40_nRE": det.registro_exp,
-                        "nfe40_chNFe": det.chava_nfe,
-                        "nfe40_qExport": "{:.2f}".format(det.q_export) if det.q_export != 0.0 else False,
-                    }
-                # TODO estou gravando so uma linha , se tiver mais vai dar erro
-                if len(vals_detexp):
-                    export_id = self.env["nfe.40.exportind"].create(vals_detexp)
-                    vals_det_exp["nfe40_exportInd"] = export_id.id                       
-                    obj_di = self.env["nfe.40.detexport"].create(vals_det_exp).id
-                    self.nfe40_detExport = [(6, 0, [obj_di])]
+                if hasattr(self, "exp_ids"):
+                    for det in self.exp_ids:
+                        vals_det_exp = {
+                            "nfe40_detExport_prod_id": det.id,
+                            "nfe40_nDraw": det.name
+                        }
+                        vals_detexp = {
+                            "nfe40_nRE": det.registro_exp,
+                            "nfe40_chNFe": det.chava_nfe,
+                            "nfe40_qExport": "{:.2f}".format(det.q_export) if det.q_export != 0.0 else False,
+                        }
+                    # TODO estou gravando so uma linha , se tiver mais vai dar erro
+                    if len(vals_detexp):
+                        export_id = self.env["nfe.40.exportind"].create(vals_detexp)
+                        vals_det_exp["nfe40_exportInd"] = export_id.id                       
+                        obj_di = self.env["nfe.40.detexport"].create(vals_det_exp).id
+                        self.nfe40_detExport = [(6, 0, [obj_di])]
 
         return super()._export_fields(xsd_fields, class_obj, export_dict)

@@ -45,9 +45,14 @@ class StockPicking(models.Model):
                 try:
                     if item.product_id.item_id:
                         estoque = 0
-                        if item.product_id.qty_available > 0:
-                            estoque = item.product_id.qty_available
-                        self.atualiza_estoque(item.product_id, estoque)
+                        stock = self.env['stock.quant'].sudo().search([
+                        ('company_id','!=', False),
+                        ('product_id','=', item.product_id.id),
+                        ])
+                        for st in stock:
+                            estoque += st.quantity
+                        if estoque:
+                            self.atualiza_estoque(item.product_id, estoque)
                 except:
                     return False
         return result
@@ -98,9 +103,14 @@ class Inventory(models.Model):
                 try:
                     if item.product_id.item_id:
                         estoque = 0
-                        if item.product_id.qty_available > 0:
-                            estoque = item.product_id.qty_available
-                        self.atualiza_estoque(item.product_id, estoque)
-                except:
+                        stock = self.env['stock.quant'].sudo().search([
+                        ('company_id','!=', False),
+                        ('product_id','=', item.product_id.id),
+                        ])
+                        for st in stock:
+                            estoque += st.quantity
+                        if estoque:
+                            self.atualiza_estoque(item.product_id, estoque)
+                except: 
                     return False
         return result

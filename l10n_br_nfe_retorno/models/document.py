@@ -82,15 +82,14 @@ class NFe(spec_models.StackedModel):
 
             if processo.resposta.cStat in LOTE_PROCESSADO + ["100"]:
                 if (hasattr(processo, 'protocolo')):
-                    record.atualiza_status_nfe(
-                        processo.protocolo.infProt, processo.processo_xml.decode("utf-8")
-                    )
+                    record.atualiza_status_nfe(processo)
                 elif processo.resposta.cStat == "100" and not self.authorization_file_id:
                     # qdo a nota ja foi enviada, o primeiro retorno retConsSitNFe
                     # sera cStat = 100
                     arquivo = self.send_file_id
                     xml_string = base64.b64decode(arquivo.datas).decode()
-                    root = etree.fromstring(xml_string)
+                    parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
+                    root = etree.fromstring(xml_string, parser=parser)
                     ns = {None: "http://www.portalfiscal.inf.br/nfe"}
                     new_root = etree.Element("nfeProc", nsmap=ns)
 
@@ -108,9 +107,19 @@ class NFe(spec_models.StackedModel):
                     new_root.append(root)
                     new_root.append(protNFe_node)
                     file = etree.tostring(new_root)
-                    record.atualiza_status_nfe(
-                        processo.resposta.protNFe.infProt, file.decode("utf-8")
-                    )
+                    record.atualiza_status_nfe(processo)
+                    if processo.resposta.protNFe.infProt.cStat == "204":
+                        state = "autorizada"
+
+                        record._change_state(state)
+
+                        record.write(
+                            {
+                                "status_code": "100",
+                                "status_name": "Autorizada",
+                            }
+                        )
+
             elif not record.status_code and processo.resposta.cStat == "225":
                 state = SITUACAO_EDOC_REJEITADA
 

@@ -11,22 +11,46 @@
             <xpath expr="//page[@name='internal_notes']" position="attributes">
                 <attribute name="attrs">{'invisible': True}</attribute>
             </xpath>
+            <xpath expr="//page[@name='accounting']" position="attributes">
+                <attribute name="attrs">{'invisible': True}</attribute>
+            </xpath>
             <page position="replace" name="fiscal"/>
             <page position="before" name="contact_addresses">
-                <page string="Fiscal" name="fiscal">
+                <page string="Fiscal" name="fiscal" autofocus="autofocus">
                     <group name="fiscal_numbers" position="replace">
                         <group string="Fiscal Profile" name="fiscal_profile">
                             <field name="fiscal_profile_id" force_save="1" groups="l10n_br_fiscal.group_user" />
                             <field name="ind_ie_dest" force_save="1" attrs="{'readonly': [('fiscal_profile_id', '!=', False)]}" />
                             <field name="tax_framework" force_save="1" attrs="{'readonly': [('fiscal_profile_id', '!=', False)]}" />
-                            <field name="cnae_main_id" options="{'no_create': True, 'no_create_edit': True}" />
                             <field name="ind_final" />
                         </group>
                     </group>
                 </page>
             </page>
             <page position="after" name="contact_addresses">
-                <page string="Outras Informações" name="other_info" />
+                <page string="Outras Informações" name="other_info">
+                    <group name="container_row_2">
+                        <group string="Vendas" name="sale" priority="1">
+                            <field name="user_id" domain="[('share', '=', False)]"/>
+                            <field string="Condições de Pagamento" name="property_payment_term_id" widget="selection" groups="account.group_account_invoice,account.group_account_readonly"/>
+                            <field string="Modo de Pagamento do Cliente" name="customer_payment_mode_id" widget="selection" groups="account.group_account_invoice,account.group_account_readonly"/>
+                        </group>
+                    </group>
+                    <group name="misc" string="Diversos">
+                        <field name="ref" string="Referência"/>
+                    </group>
+                    <group string="Lançamentos Contábeis" name="accounting_entries" groups="account.group_account_readonly">
+                        <field name="property_account_receivable_id"/>
+                        <field name="property_account_payable_id"/>
+                    </group>
+                    <group string="Compras" name="purchase" priority="2">
+                        <field string="Condições de pagamento" name="property_supplier_payment_term_id" widget="selection" groups="account.group_account_invoice,account.group_account_readonly"/>
+                        <field string="Modo de Pagamento do Fornecedor" name="supplier_payment_mode_id" widget="selection" groups="account.group_account_invoice,account.group_account_readonly"/>
+                    </group>
+                    <group name="internal_notes" string="Anotações Internas">
+                        <field name="comment" placeholder="Internal note..."/>
+                    </group>
+                </page>
             </page>
         </field>
     </record>

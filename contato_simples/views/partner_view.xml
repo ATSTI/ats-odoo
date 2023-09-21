@@ -12,9 +12,12 @@
             <xpath expr="//page[@name='contact_addresses']" position="attributes">
                 <attribute name="attrs">{'invisible': True}</attribute>
             </xpath>
-                <field name="legal_name" position="attributes">
-                    <attribute name="attrs">{'invisible': True}</attribute>
-                </field>
+            <field name="legal_name" position="attributes">
+                <attribute name="attrs">{'invisible': True}</attribute>
+            </field>
+            <label for="legal_name" position="replace">
+                <label string="" for="legal_name"/>
+            </label>
         </field>
     </record>
 </odoo>

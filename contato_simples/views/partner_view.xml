@@ -6,6 +6,12 @@
         <field name="priority">9999</field>
         <field name="inherit_id" ref="l10n_br_base.l10n_br_base_partner_form" />
         <field name="arch" type="xml">
+            <xpath expr="//page[@name='sales_purchases']" position="attributes">
+                <attribute name="attrs">{'invisible': True}</attribute>
+            </xpath>
+            <xpath expr="//page[@name='accounting']" position="attributes">
+                <attribute name="attrs">{'invisible': True}</attribute>
+            </xpath>
             <xpath expr="//page[@name='fiscal']" position="attributes">
                 <attribute name="attrs">{'invisible': True}</attribute>
             </xpath>
@@ -13,6 +19,12 @@
                 <attribute name="attrs">{'invisible': True}</attribute>
             </xpath>
             <field name="legal_name" position="attributes">
+                <attribute name="attrs">{'invisible': True}</attribute>
+            </field>
+            <field name="title" position="attributes">
+                <attribute name="attrs">{'invisible': True}</attribute>
+            </field>
+            <field name="website" position="attributes">
                 <attribute name="attrs">{'invisible': True}</attribute>
             </field>
             <label for="legal_name" position="replace">

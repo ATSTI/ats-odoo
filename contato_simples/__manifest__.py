@@ -29,7 +29,7 @@
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['l10n_br_base'],
+    'depends': ['l10n_br_base', 'l10n_br_account'],
     'data': [
         'views/partner_view.xml',
     ],

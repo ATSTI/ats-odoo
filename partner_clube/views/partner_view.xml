@@ -32,7 +32,7 @@
                 <field name="parentesco" />
             </xpath>
             <field name="ref" position="replace"/>
-            <field name="website" position="replace"/>
+            <!-- <field name="website" position="replace"/> -->
             <xpath expr="/form/sheet/group" position="inside">
                 <group>
                     <field name="ref" string="N. Título" />

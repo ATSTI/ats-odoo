@@ -7,7 +7,7 @@
     "version": "14.0.1.0.0",
     "author": "ATSti",
     "website": "",
-    "depends": ["contract"],
+    "depends": ["contract", "l10n_br_fiscal"],
     "category": "Contract Management",
     "license": "AGPL-3",
     "data": ["views/contract_view.xml"],

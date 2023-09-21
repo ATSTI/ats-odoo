@@ -1,6 +1,4 @@
 
-from copy import deepcopy
-from lxml import etree
 from odoo import models, _, api, fields
 
 class AccountMove(models.Model):

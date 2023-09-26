@@ -12,5 +12,5 @@
     "license": "AGPL-3",
     "data": ["views/contract_view.xml"],
     "installable": True,
-    "auto_install": True,
+    "auto_install": False,
 }

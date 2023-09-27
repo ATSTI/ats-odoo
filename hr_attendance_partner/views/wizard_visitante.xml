@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="visitante_create_wizard_view" model="ir.ui.view">
+        <field name="name">visitante.create.wizard.view</field>
+        <field name="model">visitante.attendance</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="name" />
+                </sheet>
+                <footer>
+                    <button class="btn-primary" string="Cadastrar"  name="action_create_attendance" type="object"/>
+                    <button string="Sair" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    
+    <record id="visitante_attendance_wizard_action" model="ir.actions.act_window">
+        <field name="name">Cadastrar visita</field>
+        <field name="res_model">visitante.attendance</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="visitante_create_wizard_view"/>
+        <field name="binding_model_id" ref="hr.model_hr_employee_public"/>
+        <field name="target">new</field>       
+    </record>
+
+    <record id="visitante_attendance_create_action" model="ir.actions.server">
+        <field name="name">Cadastrar</field>
+        <field name="model_id" ref="hr.model_hr_employee_public" />
+        <field name="binding_model_id" ref="hr.model_hr_employee_public" />
+        <field name="state">code</field>
+        <field name="code">
+            action = model.action_visitante_cadastra()
+        </field>
+    
+    </record>
+    <!-- <menuitem id="visitante_menu_cadastro" parent="” action="your_wizard_action" sequence="15" /> -->
+
+    <record id="kanban_visitante" model="ir.ui.view">
+               <field name="name">kanban.visitante</field>
+               <field name="model">hr.employee.public</field>
+               <field name="inherit_id" ref="hr.hr_employees_view_kanban"/>
+               <field name="arch" type="xml">
+                   <xpath expr="//kanban" position="attributes">
+                       <attribute name="js_class">button_in_kanban</attribute>
+                   </xpath>
+               </field>
+    </record>
+      
+
+
+
+</odoo>

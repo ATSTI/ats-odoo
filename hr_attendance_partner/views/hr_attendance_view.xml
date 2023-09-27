@@ -1,28 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <record id="hr_attendance_view_form" model="ir.ui.view">
-        <field name="name">hr.attendance.form</field>
-        <field name="model">hr.attendance</field>
-        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form" />
-        <field name="priority">400</field>
+    <record id="hr_employees_partner_view_kanban" model="ir.ui.view">
+        <field name="name">hr.employee.partner.kanban</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr_attendance.hr_employees_view_kanban" />
         <field name="arch" type="xml">
-            <field name="check_out" position="after">
-                <field name="open_worked_hours" widget="float_time" />
-            </field>
-        </field>
-    </record>
-    <record id="view_attendance_tree" model="ir.ui.view">
-        <field name="name">hr.attendance.tree</field>
-        <field name="model">hr.attendance</field>
-        <field name="inherit_id" ref="hr_attendance.view_attendance_tree" />
-        <field name="priority">400</field>
-        <field name="arch" type="xml">
-            <field name="check_out" position="after">
-                <field name="open_worked_hours" widget="float_time" />
-            </field>
-            <field name="worked_hours" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </field>
+            <xpath expr="//div[hasclass('oe_kanban_details')]" position="inside">
+                <field
+                    name="attendance_reason_ids"
+                />
+            </xpath>
         </field>
     </record>
 </odoo>

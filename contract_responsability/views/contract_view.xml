@@ -6,7 +6,7 @@
         <field name="model">contract.contract</field>
         <field
             name="inherit_id"
-            ref="contract_payment_mode.contract_contract_form_view"
+            ref="contract.contract_contract_form_view"
         />
         <field name="arch" type="xml">
             <field name="partner_id" position="after">

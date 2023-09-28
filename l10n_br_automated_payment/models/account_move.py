@@ -36,6 +36,7 @@ class AccountMove(models.Model):
 
     payment_journal_id = fields.Many2one(
         'account.journal', string='Forma de pagamento')
+    #payment_journal_id = fields.Many2one(related="payment_order_id.journal_id")
 
     def validate_data_iugu(self):
         errors = []

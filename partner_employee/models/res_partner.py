@@ -30,6 +30,15 @@ class ResPartner(models.Model):
         res = super(ResPartner, self).create(vals)
         self.env["hr.employee"].create({
             "name": vals.get("name"),
-            "address_id": res.id
+            "address_id": res.id,
+            "image_1920": vals.get("image_1920"),
         })
-        return res
+        return res    
+    
+    def write(self, vals):
+        result = super(ResPartner, self).write(vals)
+        if vals.get("image_1920"):
+            hr = self.env["hr.employee"].search([("address_id", "=", self.id)])
+            if hr:
+                hr.write({"image_1920": vals.get("image_1920")})
+        return result

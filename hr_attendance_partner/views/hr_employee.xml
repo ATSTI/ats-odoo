@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <record id="hr_employee_attendance_action_kanban" model="ir.actions.act_window">
-        <field name="name">Employees</field>
-        <field name="res_model">hr.employee.public</field>
-        <!-- <field name="inherit_id" ref="hr_attendance.hr_employee_attendance_action_kanban" /> -->
-        <field name="view_mode">kanban</field>
-        <field name="view_id" ref="hr_attendance.hr_employees_view_kanban"/>
-        <!-- <field name="target">fullscreen</field> -->
-        <field name="help" type="html">
-        <p class="o_view_nocontent_smiling_face"> Create a new employee XXXXXXX</p>
-        <p> Add a few employees to be able to select an employee here and perform his check in / check out. To create employees go to the Employees menu. </p>
-        
-        <button
-        name="action_partner_create"
-        string="Cadastrar novo"
-        type="object"
-        class="oe_highlight"
-        />
-    </field>
-        </record>
+    <record id="hr_employee_pub_partner_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.partner.view.form.inherit</field>
+        <field name="model">hr.employee.public</field>
+        <field name="inherit_id" ref="hr.hr_employee_public_view_form"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="cnpj_cpf" invisible="1" />
+                <field name="rg" invisible="1" />
+            </field>
+        </field>
+    </record>
+
+    <!-- <field name="name" string="Visitante" filter_domain="['|','|','|', ('work_email', 'ilike', self), ('name', 'ilike', self),('cnpj_cpf', '=', self), ('rg','=', self)]"/> -->
+
+    <record id="hr_employee_partner_view_search" model="ir.ui.view">
+        <field name="name">hr.employee.search</field>
+        <field name="model">hr.employee.public</field>
+        <field name="inherit_id" ref="hr.hr_employee_public_view_search"/>
+        <field name="arch" type="xml">
+                <field name="name" position="replace">
+                    <field name="name" string="Visitante" filter_domain="['|','|','|',('work_email','ilike',self),('name','ilike',self),('cnpj_cpf', 'like', self), ('rg','like', self)]"/>
+                </field>
+        </field>
+    </record>
+
 </odoo>

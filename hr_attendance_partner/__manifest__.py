@@ -11,6 +11,6 @@
     "installable": True,
     "depends": ["hr", "hr_attendance"],
     "data": [
-        # "views/hr_employee.xml",
+        "views/hr_employee.xml",
     ],
 }

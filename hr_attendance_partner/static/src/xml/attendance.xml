@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-extend="KanbanView.buttons" t-name="button_near_create.button">
+        <t t-jquery="button" t-operation="after">
+                <button t-if="widget.modelName == 'hr.employee.public'"
+                    class="btn btn-primary open_wizard_action_kanban oe_highlight"
+                    type="button">Open Wizard</button>
+        </t>
+    </t>
+ </templates>

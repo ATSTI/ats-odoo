@@ -258,7 +258,7 @@ class ImportarWizard(models.TransientModel):
                     
                     # Tipo Fiscal - esta colocando Produto Revenda
                     vals['fiscal_type'] = '00'
-                    vals['type'] = 'consu'
+                    vals['type'] = 'product'
                     if len(rowValues) > c_tipo-1 and rowValues[c_tipo]:
                         vals['type'] = rowValues[c_tipo]
                     
@@ -294,7 +294,7 @@ class ImportarWizard(models.TransientModel):
                     # Se utilizar Ponto de Venda
                     # vals['available_in_pos'] = True
 
-                    vals['purchase_method'] = 'purchase'
+                    # vals['purchase_method'] = 'purchase'
 
                     if len(rowValues) > c_codbarra-1 and rowValues[c_codbarra] and len(str(rowValues[c_codbarra])) > 7:
                         bcod = str(rowValues[c_codbarra])
@@ -311,6 +311,7 @@ class ImportarWizard(models.TransientModel):
 
                     try:
                         p_id =  prod_obj.create(vals)
+                        p_id._onchange_ncm_id()
                     except Exception as error:
                         if mensagem == "":
                             mensagem += "Erro cadastro : <br>"
@@ -364,7 +365,7 @@ class ImportarWizard(models.TransientModel):
                 c_city_id = int(linha[linha.find('=')+1:])
             if "c_phone" in linha:
                 c_phone = int(linha[linha.find('=')+1:])
-            if "c_mobile" in linha:
+            if "c_mobile" in linha and linha[:linha.find('=')] == "c_mobile":
                 c_mobile = int(linha[linha.find('=')+1:])
             if "c_mobile2" in linha:
                 c_mobile2 = int(linha[linha.find('=')+1:])
@@ -394,6 +395,8 @@ class ImportarWizard(models.TransientModel):
                     vals = {}
                     cod = 0
                     cnpj_cpf = ""
+                    if rowValues[c_name] or rowValues[c_razao]:
+                        vals['name'] = rowValues[c_name] or rowValues[c_razao]
                     if rowValues[c_ref]:
                         cod = rowValues[c_ref]
                         if type(cod) == float:
@@ -407,9 +410,10 @@ class ImportarWizard(models.TransientModel):
                         mensagem += f"{vals['name']}<br>"                        
                         continue
                     # if cod and cod == '0000518':
-                    if rowValues[c_name]:
-                        vals['name'] = rowValues[c_name]
                     c_id = cli_obj.search([('ref', '=', vals['ref'])])
+                    if c_id:
+                        continue
+                    c_id = cli_obj.search([('name', 'ilike', vals['name'])])
                     if c_id:
                         continue
                     if self.tipo == "cliente":
@@ -417,7 +421,7 @@ class ImportarWizard(models.TransientModel):
                     if self.tipo == "fornecedor":
                         vals['supplier_rank'] = 1
 
-                    if vals['name']:
+                    if 'name' in vals and vals['name']:
                         print ("Cliente/Fornecedor: {}".format(vals['name']))                        
                                                                     
                     if rowValues[c_razao]:
@@ -519,11 +523,27 @@ class ImportarWizard(models.TransientModel):
                     # else:
                     #     # Nao Contribuinte
                     #     vals['fiscal_profile_id'] = 8
+                    #import pudb;pu.db
                     try:
                         c_id =  cli_obj.create(vals)
                         vals_u = {}
                         if c_id and len(rowValues) > c_company_type-1 and rowValues[c_company_type]:
-                            vals_u['company_type'] = rowValues[c_company_type]
+                            if rowValues[c_company_type] == 'Pessoa Jurídica':
+                                vals_u['company_type'] = 'company'
+                                vals_u['ind_final'] = "0"
+                                vals_u['fiscal_profile_id'] = 4
+                                vals_u['ind_ie_dest'] = "1"
+                            if not rowValues[c_inscrest]:
+                                vals_u['ind_final'] = "1"
+                                vals_u['ind_ie_dest'] = "9"
+                                vals_u['fiscal_profile_id'] = 5
+                            if rowValues[c_company_type] == 'Pessoa Física':
+                                vals_u['company_type'] = 'person'
+                                # Consumidor Final
+                                vals_u['ind_final'] = "1"
+                                # Nao Contribuinte
+                                vals_u['fiscal_profile_id'] = 8
+                                vals_u['ind_ie_dest'] = "9"
                         else:
                             if 'cnpj_cpf' in vals and len(vals['cnpj_cpf']) > 14:
                                 vals_u['company_type'] = 'company'
@@ -547,9 +567,9 @@ class ImportarWizard(models.TransientModel):
                         else:
                             mensagem += str(error)  + "<br>"
 
-                    vals = {
-                        'category_id': [(6,0,[1])]
-                    }
+                    # vals = {
+                    #     'category_id': [(6,0,[1])]
+                    # }
                     vals['country_id'] = 31
                     if rowValues[c_state_id] and (not c_id.state_id or not c_id.city_id):
                         uf = self.env['res.country.state'].search([
@@ -582,10 +602,10 @@ class ImportarWizard(models.TransientModel):
                         if type(inscrest) == float:
                             inscrest = str(int(inscrest))
                             vl_ie['inscr_est'] = inscrest
-                            vl_ie['ind_ie_dest'] = '1'
+                            #vl_ie['ind_ie_dest'] = '1'
                         else:
                             vl_ie['inscr_est'] = inscrest
-                            vl_ie['ind_final'] = '1'
+                            #vl_ie['ind_final'] = '1'
                         if c_id.state_id:
                             if len(inscrest) > 13 and c_id.state_id.code == 'MG':
                                 inscrest = inscrest[1:len(inscrest)]
@@ -598,7 +618,6 @@ class ImportarWizard(models.TransientModel):
                                 if c_id.comment:
                                     inscrest = c_id.comment + 'IE: ' + inscrest
                                 c_id.write({'comment': inscrest})
-
                     # if c_id and c_id.zip:
                         # try:
                         #     # c_id.zip_search()

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>    
+<odoo>
     <record id="report_saleorder_orcamentoe" model="ir.actions.report">
         <field name="name">Termo de Entrega/Devolução</field>
         <field name="model">sale.order</field>
@@ -26,14 +26,15 @@
     </record>
     <record id="report_saleorder_orcamentob" model="ir.actions.report">
         <field name="name">Modelo de Locação</field>
+        <field name="name">Modelo de Venda</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">report_orcamento.report_locacao_locefaca</field>
-        <field name="report_file">report_orcamento.report_locacao_locefaca</field>
+        <field name="report_name">report_orcamento.report_venda_locefaca</field>
+        <field name="report_file">report_orcamento.report_venda_locefaca</field>
         <field name="binding_model_id" ref="sale.model_sale_order"/>
     </record>
     <record id="report_saleorder_orcamentoa" model="ir.actions.report">
-        <field name="name">Instalação de montagem</field>
+        <field name="name">Instalção de montagem</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">report_orcamento.report_instalacao_locefaca</field>

@@ -40,6 +40,7 @@
             <field name="arch" type="xml">
                 <field name="name" position='after'>
                     <field name="stage_id" />
+                    <field name="origin" />
                 </field>
                 <field name="name" position='after'>
                     <field name="user_id" />
@@ -54,6 +55,7 @@
                     <div class="o_kanban_record_top mb16">
                         <div class="o_kanban_record_headings mt4">
                             <strong><span><t t-esc="record.name.value"/></span></strong>
+                            <strong><span><t t-esc="record.origin.value"/></span></strong>
                         </div>
                     </div>
                     <div class="row" >

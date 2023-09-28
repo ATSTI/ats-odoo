@@ -160,6 +160,11 @@ class IntegracaoPdv(http.Controller):
         lista_j = json.dumps(lista)
         return lista_j
 
+    def busca_sessao(self, caixa):
+        session = f"/{caixa}"
+        session_id = http.request.env['pos.session'].sudo().search([('name', 'ilike', session)])
+        return session_id
+
     @http.route('/contasconsulta', type='json', auth="user", csrf=False)
     def website_contasconsulta(self, **kwargs):
         user_id = http.request.env['res.users'].browse([request.uid])
@@ -175,27 +180,29 @@ class IntegracaoPdv(http.Controller):
             valor_pago = data['valor_pago']
             juro = data['juro']
         # TODO testar aqui se e a empresa mesmo
+        diarios_usados = http.request.env["ir.config_parameter"].sudo().get_param("pos.diario_contas")
+        diarios_usados = json.loads(diarios_usados)
         cc = http.request.env['account.account'].search([
             ('name', 'ilike', 'Cliente Padrao'),
             ('company_id', '=', user_id.company_id.id),
         ])
-        cj = http.request.env['account.journal'].search([
-            ('name', 'ilike', 'Cliente'),
-            ('company_id', '=', user_id.company_id.id),
-        ])        
+        # cj = http.request.env['account.journal'].search([
+        #     ('name', 'ilike', 'Cliente'),
+        #     ('company_id', '=', user_id.company_id.id),
+        # ])        
         conta_obj = http.request.env['account.move.line']
         conta_ids = conta_obj.sudo().search([('partner_id', '=',int(cod_cliente)), 
             ('full_reconcile_id', '=', False), ('balance','!=', 0),
             ('company_id', '=', user_id.company_id.id),
             ('account_id.reconcile','=',True),
             ('account_id', '=', cc.id),
-            ('journal_id', '=', cj.id),
+            ('journal_id', 'in', diarios_usados),
         ], order='date_maturity')
         vlr = float(valor_pago)
         juros = float(juro)
         vlr = vlr - juros
         vlr_baixado = '0.00'
-        if vlr:
+        if vlr > 0.01:
             # tem valor , entao baixa
             diario = data['diario'][:2]
             diario_obj = http.request.env['account.journal']    
@@ -220,8 +227,9 @@ class IntegracaoPdv(http.Controller):
                 #     vlr -= conta.debit
 
                 # aqui colocar pra baixar
+
                 if conta.id == int(aml_id):
-                    arp = http.request.env['account.abstract.payment']
+                    arp = http.request.env['account.payment.register']
                     # passo duas vezes o cod_forma, na segunda vai como cod_venda
                     arp.baixa_pagamentos(conta, diario_id, caixa, vlr, cod_forma, juros)
                     vlr = 0.0
@@ -230,7 +238,7 @@ class IntegracaoPdv(http.Controller):
                 ('company_id', '=', user_id.company_id.id),
                 ('account_id.reconcile','=',True),
                 ('account_id', '=', cc.id),
-                ('journal_id', '=', cj.id),
+                ('journal_id', 'in', diarios_usados),
             ], order='date_maturity')        
         lista = []
         for conta in conta_ids:
@@ -249,7 +257,8 @@ class IntegracaoPdv(http.Controller):
             contas['fatura'] = conta.move_id.ref
             contas['codigo'] = conta.id
             # contas['cod_cliente'] = 1           
-            lista.append(contas)
+            if conta.amount_residual > 0.01 and 'POS' not in  conta.move_id.ref:
+                lista.append(contas)
         return json.dumps(lista)
 
     @http.route('/usuarioconsulta', type='json', auth="user", csrf=False)
@@ -276,7 +285,6 @@ class IntegracaoPdv(http.Controller):
 
     @http.route('/enviasangria', type='json', auth="user", csrf=False)
     def website_enviasangria(self, **kwargs):
-        #{"params": {"login": "ats@atsti.com.br", "password": "123456", "db": "21_vitton"}, "todos": [{9992, "Sangria", 1, "200,00"}, {9993, "Sangria", 1, "25,00"}]}
         user_id = http.request.env['res.users'].browse([request.uid])
         # receber todas as sangrias e reforco do caixa
         # verificar no odoo se existe       
@@ -285,10 +293,9 @@ class IntegracaoPdv(http.Controller):
         caixa = lista_pdv[0]['caixa']
         sg_obj = http.request.env['account.bank.statement.line']
         
-        # vejo os diarios usados no PDV do Caixa aberto
-        session = http.request.env['pos.session'].search([
-            ('id', '=', caixa)
-        ])
+        # vejo os diarios usados no PDV do Caixa aberto       
+        session = self.busca_sessao(caixa)
+        
         lista_st = []
         for lt_st in session.statement_ids:
             lista_st.append(lt_st.id)
@@ -313,37 +320,83 @@ class IntegracaoPdv(http.Controller):
                 ('statement_id', 'in', (lista_st)),
             ])
             if not line:
-                arp = http.request.env['account.abstract.payment']
+                arp = http.request.env['account.payment.register']
                 arp.lanca_sangria_reforco(diario_id, caixa, valor, cod_forma, cod_venda, user_id.partner_id, motivo)
 
     @http.route('/caixaconsulta', type='json', auth="user", csrf=False)
     def website_caixaconsulta(self, **kwargs):
         data = request.jsonrequest
-        session = http.request.env['pos.session']
-        ses_ids = session.sudo().search([('state', '=', 'opened')],limit=4)
+        session_obj = http.request.env['pos.session']
+        user_id = http.request.env['res.users'].browse([request.uid])
         lista = []
-        for ses in ses_ids:
-            if 'caixa' in data:
-                dados_json = json.loads(data['caixa'])
-                for d in dados_json:
-                    if 'SITUACAO' in d and d['SITUACAO'] == 'F' and d['CODCAIXA'] == ses.id:
-                        ses.sudo().write({'venda_finalizada': True})
-            caixa = {}
+        if 'caixa' in data:
+            dados_json = json.loads(data['caixa'])
             hj = datetime.now()
             dta_abre = datetime.strftime(hj,'%m-%d-%Y')
-            caixa['idcaixacontrole'] = ses.id
-            caixa['codcaixa'] = ses.id
-            caixa['codusuario'] = ses.user_id.id
-            caixa['situacao'] = 'o'
-            caixa['datafechamento'] = '01-01-2020'
-            caixa['nomecaixa'] = ses.name
-            caixa['dataabertura'] = dta_abre
-            caixa['valorabre'] = ses.cash_register_balance_start
-            lista.append(caixa)
+            session_insert = False
+            for d in dados_json:
+                if session_insert:
+                    continue
+                session = f"/{d['CODCAIXA']}"
+                ses_ids = session_obj.sudo().search([
+                    ('name', 'like', session),
+                ],limit=4)
+                if not len(ses_ids):
+                    # nao existe este caixa no odoo inserir
+                    vals = {}
+                    vals['user_id'] = user_id.id
+                    # vals['cash_register_balance_start'] = d['valorabre']
+                    # vals['start_at'] = d['dataabertura']
+                    pos_obj = http.request.env['pos.config']
+                    pos = pos_obj.search([('name', 'ilike', user_id.name)])
+                    # preciso verificar se ja existe uma sessao aberta pra este pos_obj
+                    # nao e permitido 2 sessoes
+                    ses_open = session_obj.sudo().search([
+                        ('state', '=', 'opened'),
+                        ('config_id', '=', pos.id)])
+                    if len(ses_open):
+                        continue
+                    vals['config_id'] = pos.id
+                    vals['state'] = 'opening_control'
+                    print(f"Incluindo sessao :{session}")
+                    session_id = session_obj.create(vals)
+                    if session_id:
+                        session_id.action_pos_session_open()
+                    session_id.write({
+                        'name': f"{session_id.name}{session}",
+                        'state': 'opened'})
+                    session_insert = True
+                    caixa = {}
+                    caixa['situacao'] = f"{session_id.name}: Caixa criado com sucesso."
+                    lista.append(caixa)
+
+                ses_ids = session_obj.search([
+                    ('state', '=', 'opened'),
+                ],limit=4)
+                for ses in ses_ids:     
+                    if 'SITUACAO' in d and d['SITUACAO'] == 'F' and session in ses.name:
+                        # TODO ver se esta dando certo , aqui
+                        ses.write({'venda_finalizada': True, 'stop_at': hj})
+                        ses.action_pos_session_close()
+                        caixa = {}
+                        caixa['situacao'] = f"{ses.name}: Caixa Fechado com sucesso."
+                        lista.append(caixa)
+                    # caixa = {}
+                    # caixa['idcaixacontrole'] = ses.id
+                    # caixa['codcaixa'] = ses.id
+                    # caixa['codusuario'] = ses.user_id.id
+                    # caixa['situacao'] = 'o'
+                    # caixa['datafechamento'] = '01-01-2020'
+                    # caixa['nomecaixa'] = ses.name
+                    # caixa['dataabertura'] = dta_abre
+                    # caixa['valorabre'] = ses.cash_register_balance_start
+                    # lista.append(caixa)
         return json.dumps(lista)
 
     @http.route('/pedidoconsulta', type='json', auth="user", csrf=True)
     def website_pedidoconsulta(self, **kwargs):
+        #import wdb 
+        #wdb.set_trace()
         data = request.jsonrequest
         # TODO testar aqui se e a empresa mesmo
         user_id = http.request.env['res.users'].browse([request.uid])
@@ -351,10 +404,13 @@ class IntegracaoPdv(http.Controller):
         hj = hj - timedelta(days=3)
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
         pedido = http.request.env['pos.order']
+
+        session_id = self.busca_sessao(data['caixa']).id
+        
         if 'caixa' in data:
             ped_ids = pedido.sudo().search([('write_date', '>=', hj),
                 ('company_id', '=', user_id.company_id.id),
-                ('session_id', '=', data['caixa']),
+                ('session_id', '=', session_id),
                 ], order="pos_reference desc", limit=10)
         else:
             ped_ids = pedido.sudo().search([('write_date', '>=', hj),
@@ -372,8 +428,8 @@ class IntegracaoPdv(http.Controller):
             if not p_id.pos_reference:
                 continue
             ped = p_id.pos_reference[p_id.pos_reference.find('-')+1:]
-        #     if ultimo != '':
-        #         ultimo += ','
+            if ultimo != '':
+                ultimo += ','
             ultimo += ped
         #     if int(ped) < menor or menor == 0:
         #         menor = int(ped)
@@ -394,10 +450,11 @@ class IntegracaoPdv(http.Controller):
         user_id = http.request.env['res.users'].browse([request.uid])
         pedido = http.request.env['pos.order']
         lista_pdv = json.loads(data['todos'])
+        session_id = self.busca_sessao(data['caixa']).id        
         if 'todos' in data:
             ped_ids = pedido.sudo().search([
                 ('company_id', '=', user_id.company_id.id),
-                ('session_id', '=', int(data['caixa'])),
+                ('session_id', '=', session_id),
                 ])            
             lista_odoo = []
             for p_id in ped_ids:
@@ -418,9 +475,11 @@ class IntegracaoPdv(http.Controller):
         return json.dumps(lista)
 
     def _monta_pedido(self,dados):
+        #import wdb
+        #wdb.set_trace()
         codmov = dados['CODMOVIMENTO']
         codcliente = dados['CODCLIENTE']
-        caixa = dados['CODALMOXARIFADO']
+        caixa = self.busca_sessao(dados['CODALMOXARIFADO']).id
         codvendedor = dados['CODVENDEDOR']
         data_sistema = dados['DATA_SISTEMA']
         coduser = dados['CODUSUARIO']
@@ -435,49 +494,38 @@ class IntegracaoPdv(http.Controller):
         if not ord_ids:
             # insere o pedido
             # prt = http.request.env['res.partner']
-            # usr = http.request.env['res.users']
+            usr = http.request.env['res.users']
             # prt_id = prt.sudo().search([
             #     ('id','=',codcliente),
             # ])
-            # ven_id = usr.sudo().search([
-            #     ('id','=',codvendedor),
-            # ])
-            # usr_id = usr.sudo().search([
-            #     ('id','=',coduser),
-            # ])
+            ven_id = usr.sudo().search([
+                 ('id','=',codvendedor),
+            ])
+            if not ven_id:
+                ven_id = usr.sudo().search([
+                    ('name','ilike', 'admin'),
+               ], limit=1)
             # if prt_id and ven_id and usr_id:
             data_pedido = datetime.strptime(data_sistema,'%m/%d/%Y %H:%M')
             data_pedido = data_pedido + timedelta(hours=+3)
             user_id = http.request.env['res.users'].browse([request.uid])
+            vendedor_id = http.request.env['res.users'].browse([codvendedor])
+            if not vendedor_id:
+                vendedor_id = user_id.id
             if 1 == 1:
                 vals['name'] = ord_name
                 vals['nb_print'] = 0
                 vals['pos_reference'] = ord_name
-                vals['session_id'] = int(str(caixa))
+                vals['session_id'] = caixa
                 # vals['pos_session_id'] = int(str(caixa))
                 # vals['pricelist_id'] = session.config_id.pricelist_id.id
                 vals['create_date'] = data_pedido #datetime.strftime(datetime.now(),'%Y-%m-%d %H:%M:%S')
                 vals['date_order'] = data_pedido
                 vals['sequence_number'] = codmov
                 vals['partner_id'] = int(codcliente)
-                vals['user_id'] = int(codvendedor)
+                vals['user_id'] = ven_id.id # int(codvendedor)
                 vals['amount_tax'] = 0.0
                 vals['company_id'] = user_id.company_id.id
-            """
-                if cli != 1:
-                    if cli == 1609:
-                        cli = 1944
-                    vals['partner_id'] = cli
-                else:
-                    vals['partner_id'] = self.env['res.partner'].search([
-                        ('name','ilike','consumidor')],limit=1)[0].id
-                userid = mvs[5]
-                userid = self.env['res.users'].search([('id','=',userid)])
-                if userid:
-                    vals['user_id'] = userid.id
-                if not userid:
-                    vals['user_id'] = 1
-                vals['fiscal_position_id'] = session.config_id.default_fiscal_position_id.id"""
             return vals
 
     def _monta_pedidodetalhe(self,dados_json, desconto_financeiro, total_geral):
@@ -515,8 +563,11 @@ class IntegracaoPdv(http.Controller):
                 #TODO Felicita usa o campo CORTESIA como TIPO , colocar no exporta do PDV
                 #if md['CORTESIA']:
                 #    prd['tipo_venda'] = md['CORTESIA']
-                
-                prd['product_id'] = md['CODPRODUTO']
+                prod_ids = http.request.env['product.product'].search([('product_tmpl_id', '=', int(md['CODPRODUTO']))])
+                if prod_ids:
+                    prd['product_id'] = prod_ids.id
+                else:
+                    prd['product_id'] = 29690 #coloca aqui o ID de um produto GENERICO
                 prd['discount'] = desconto * 100
                 prd['qty'] = qtd
                 prd['price_unit'] = pco
@@ -528,8 +579,9 @@ class IntegracaoPdv(http.Controller):
                 order_line.append((0, 0,prd))
         return order_line    
 
-    def _monta_pagamento(self, dados, cliente, session, ord_name, data_ord):        
-        # import pudb;pu.db
+    def _monta_pagamento(self, dados, cliente, session, ord_name, data_ord):
+        #import wdb
+        #wdb.set_trace()
         pag_line = []
         desconto_t = 0.0
         total_g = 0.0
@@ -561,8 +613,13 @@ class IntegracaoPdv(http.Controller):
                 ('name','like', jrn),
                 ('company_id', '=', user_id.company_id.id)
             ])[0]
-            session_id = http.request.env['pos.session'].sudo().browse([session])
-            if not session_id:
+            forma_pg = http.request.env['pos.payment.method'].sudo().search([
+                ('name','like', jrn),
+                ('company_id', '=', user_id.company_id.id)
+            ])[0]
+            #session_id = self.busca_sessao(session).id
+            #session_id = http.request.env['pos.session'].sudo().browse([session])
+            if not session:
                 return 0,0,0,0
             # for stt in session_id.payment_ids:
             #     if stt.journal_id.id == jrn_id.id:
@@ -576,14 +633,14 @@ class IntegracaoPdv(http.Controller):
             pag['journal'] = jrn_id.id
             pag['partner_id'] = cliente
             pag['name'] = ord_name
-            # pag['discount'] = desconto
+            pag['forma_pag'] = forma_pg.id            # pag['discount'] = desconto
+            pag['forma'] = jrn
             if controle_troca == 0:
-                pag_line.append((0, 0,pag))
+                pag_line = pag
         return pag_line, desconto, troca, total_g
                 
     @http.route('/pedidoinsere', type='json', auth="user", csrf=False)
     def website_pedidoinsere(self, **kwargs):
-        import pudb;pu.db
         data = request.jsonrequest
         hj = datetime.now()
         hj = datetime.strftime(hj,'%m-%d-%Y')
@@ -600,8 +657,10 @@ class IntegracaoPdv(http.Controller):
             desconto = 0
             total = 0
             troca = 0
+            tem_pagamento = False
             #if 'pag' in data:
             if 'pagamentos' in dados_json:
+                tem_pagamento = True
                 #dados_json = json.loads(data['pag'])
                 dados_j = dados_json['pagamentos']
                 pagamento, desconto, troca, total = self._monta_pagamento(dados_j, 
@@ -646,7 +705,21 @@ class IntegracaoPdv(http.Controller):
             pedido['amount_paid'] = total
             # pedido['statement_ids'] = pagamento
             pos = http.request.env['pos.order']
-            ord_ids = pos.sudo().create(pedido)
+            order = pos.sudo().create(pedido)
+            #import wdb
+            #wdb.set_trace()
+            if tem_pagamento:
+                order.add_payment({
+                    'pos_order_id': order.id,
+                    'amount': pagamento['amount'],
+                    'name': pagamento['name'],
+                    'payment_method_id': pagamento['forma_pag'],
+                })
+                if pagamento['forma'] == "4-":
+                    order.action_pos_order_invoice()
+                else:
+                    order.action_pos_order_paid()
+            order._create_order_picking()
         return 'Sucesso'
 
     @http.route('/devolucao', type='json', auth="user", csrf=False)

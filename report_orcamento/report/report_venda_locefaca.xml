@@ -5,51 +5,52 @@
             <t t-set="docs" t-value="docs.with_context({'lang':docs.partner_id.lang})"/>
             <t t-foreach="docs" t-as="o">
                 <div class="page">
+                    <br/>
                     <t t-call="report_cabecalho.report_cabecalho_id" />
                     <p style="text-align: center; font-size:18px"><b>Proposta de Venda</b></p>
-                    <p>Para:</p>
+                    <p style="font-size:14px"><b>Para:</b></p>
                     <tbody style="width: 100%">
                         <table style="border: 1px solid black; width: 50%; float: left;">
-                        <tr>
-                            <td style="font-size: 12px">
-                                <b>CLIENTE:</b>
-                            </td>
-                            <td style="width:100%">
-                                <span t-field="o.partner_id.name"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px">
-                                <b>CNPJ:</b>
-                            </td>
-                            <td style="width:100%">
-                                <span t-field="o.partner_id.cnpj_cpf"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px">
-                                <b>A/C:</b>
-                            </td>
-                            <td style="width:100%">
-                                <span t-field="o.contact_id.name"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px">
-                                <b>TELEFONE:</b>
-                            </td>
-                            <td style="width:100%">
-                                <span t-field="o.partner_id.phone"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 13px">
-                                <b>EMAIL:</b>
-                            </td>
-                            <td style="width:100%">
-                                <span t-field="o.partner_id.email"/>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td style="font-size: 12px; height: 25px">
+                                    <b>CLIENTE:</b>
+                                </td>
+                                <td style="width:100%; font-size: 12px">
+                                    <span t-field="o.partner_id.name"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="font-size: 12px; height: 25px">
+                                    <b>CNPJ:</b>
+                                </td>
+                                <td style="width:100%; font-size: 12px">
+                                    <span t-field="o.partner_id.cnpj_cpf"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="font-size: 12px; height: 25px">
+                                    <b>A/C:</b>
+                                </td>
+                                <td style="width:100%; font-size: 12px">
+                                    <span t-field="o.contact_id.name"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="font-size: 12px; height: 25px">
+                                    <b>TELEFONE:</b>
+                                </td>
+                                <td style="width:100%; font-size: 12px">
+                                    <span t-field="o.partner_id.phone"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="font-size: 12px; height: 25px">
+                                    <b>EMAIL:</b>
+                                </td>
+                                <td style="width:100%; font-size: 12px">
+                                    <span t-field="o.partner_id.email"/>
+                                </td>
+                            </tr>
                         </table>
                         <table style="border: 1px solid black; border-collapse: collapse; height: 80px; width: 37%; float: right;">
                             <tr>
@@ -87,45 +88,46 @@
                         <br/>
                         <p style="font-size:12px;">Ref.: Proposta para Venda de Equipamentos para Trabalho em Espaço Confinado, Trabalho em Altura e Segurança.</p>
                         <br/>
+                        <br/>
                         <table style="border: 1px solid black; border-collapse: collapse; width:100%">
                             <tr style="height:25px">
-                                <td style="border: 1px solid black; border-collapse: collapse; width:8% ; text-align:center">
+                                <td style="border: 1px solid black; border-collapse: collapse; width:6% ; text-align:center; font-size: 12px">
                                     <b>Item</b>
                                 </td >
-                                <td style="border: 1px solid black; border-collapse: collapse; width:20% ; text-align:center">
+                                <td style="border: 1px solid black; border-collapse: collapse; width:22% ; text-align:center; font-size: 12px">
                                     <b>Produto</b>
                                 </td>
-                                <td style="border: 1px solid black; border-collapse: collapse; width:20% ; text-align:center">
+                                <td style="border: 1px solid black; border-collapse: collapse; width:22% ; text-align:center; font-size: 12px">
                                     <b>Descrição</b>
                                 </td>
-                                <td style="border: 1px solid black; border-collapse: collapse; width:10% ; text-align:center">
+                                <td style="border: 1px solid black; border-collapse: collapse; width:10% ; text-align:center; font-size: 12px">
                                     <b>SKU</b>
                                 </td>
-                                <td style="border: 1px solid black; border-collapse: collapse; width:10% ; text-align:center">
+                                <td style="border: 1px solid black; border-collapse: collapse; width:10% ; text-align:center; font-size: 12px">
                                     <b>Período</b>
                                 </td>
-                                <td style="border: 1px solid black; border-collapse: collapse; width:8% ; text-align:center">
+                                <td style="border: 1px solid black; border-collapse: collapse; width:6% ; text-align:center; font-size: 12px">
                                     <b>Qtd.</b>
                                 </td>
-                                <td style="border: 1px solid black; border-collapse: collapse; width:10% ; text-align:center">
+                                <td style="border: 1px solid black; border-collapse: collapse; width:10% ; text-align:center; font-size: 12px">
                                     <b>Preço Un.</b>
                                 </td>
-                                <td style="border: 1px solid black; border-collapse: collapse; width:14% ; text-align:center">
+                                <td style="border: 1px solid black; border-collapse: collapse; width:14% ; text-align:center; font-size: 12px">
                                     <b>Total</b>
                                 </td>
                             </tr>
                             <t t-set="linhas" t-value="0" />
                             <t t-foreach="o.order_line" t-as="line">
                                 <t t-set="linhas" t-value="linhas + 1" />
-                                <tr style="height:20px">
-                                    <td style="border: 1px solid black; font-size:12px; text-align:center"><t t-esc="linhas" /></td> 
-                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:center"><span t-field="line.product_id.name" /></td>
-                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:center"><span t-field="line.name" /></td>
-                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:center"><span t-field="line.product_id.default_code" /></td>
-                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:center"><span t-field="o.pricelist_id" /></td>
-                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:center"><span t-field="line.product_uom_qty" /></td>
-                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:right"><span t-field="line.price_unit" /></td>
-                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:right"><span t-field="line.amount_total" /></td>
+                                <tr>
+                                    <td style="border: 1px solid black; font-size:12px; text-align:center; height:80px"><t t-esc="linhas" /></td> 
+                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:center; height:80px"><span t-field="line.product_id.name" /></td>
+                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:center; height:80px"><span t-field="line.name" /></td>
+                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:center; height:80px"><span t-field="line.product_id.default_code" /></td>
+                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:center; height:80px"><span t-field="o.pricelist_id" /></td>
+                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:center; height:80px"><span t-field="line.product_uom_qty" /></td>
+                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:center; height:80px"><span t-field="line.price_unit" /></td>
+                                    <td style="border: 1px solid black; border-collapse: collapse; font-size:12px; text-align:center; height:80px"><span t-field="line.amount_total" /></td>
                                 </tr>
                             </t>
                         </table>
@@ -164,40 +166,41 @@
                         </table>
                         <br/>
                         <br/>
-                        <table style="border: 1px solid black">
+                        <table style="border: 1px solid black; height: 100px ; width: 100%">
                             <tr>
-                            <td>
-                                <b style="font-size:13px">TERMOS E CONDIÇÕES</b>
-                                <p style="font-size:11px">1. Limite de crédito: o valor do limite de crédito será estipulado com base nos documentos apresentados para análise</p>
-                                <p style="font-size:11px">2. Produtos sujeitos a cobrança de substituição tributária, variando de acordo com aplicação/estado do cliente</p>
-                                <p style="font-size:11px">3. Atrasos de pagamento: A MAQTRUCK reserva-se ao direito de suspender novos fornecimentos a clientes inadimplentes</p>
-                                <p style="font-size:11px">4. Sugestões/Reclamações: Entrar em contato através do e-mail: comercial@maqtruck.com.</p>
-                            </td>
+                                <td>
+                                    <b style="font-size:13px">TERMOS E CONDIÇÕES</b>
+                                    <p/>
+                                    <p style="font-size:12px">1. Limite de crédito: o valor do limite de crédito será estipulado com base nos documentos apresentados para análise</p>
+                                    <p style="font-size:12px">2. Produtos sujeitos a cobrança de substituição tributária, variando de acordo com aplicação/estado do cliente</p>
+                                    <p style="font-size:12px">3. Atrasos de pagamento: A MAQTRUCK reserva-se ao direito de suspender novos fornecimentos a clientes inadimplentes</p>
+                                    <p style="font-size:12px">4. Sugestões/Reclamações: Entrar em contato através do e-mail: comercial@maqtruck.com.</p>
+                                </td>
                             </tr>
                         </table>
                         <br/>
-                        <table style="border: 1px solid black;  border-collapse: collapse ; width:50%">
+                        <table style="border: 1px solid black;  border-collapse: collapse ; width:60%; height:25px">
                             <tr>
-                                <td style="border: 1px solid black; width:50%; text-align: center; font-size: 12px">
+                                <td style="border: 1px solid black; width:45%; text-align: center; font-size: 14px">
                                     <b>Condições de Pagamento:</b>
                                 </td>
-                                <td style="border: 1px solid black; width:50%; text-align: center; font-size: 12px">
+                                <td style="border: 1px solid black; width:55%; text-align: center; font-size: 14px">
                                     <span t-field="o.payment_term_id"/> 
                                 </td>
                             </tr>
                         </table>
-                        <table style="border: 1px solid black;  border-collapse: collapse ; width:50%">
+                        <table style="border: 1px solid black;  border-collapse: collapse ; width:60%; height:25px">
                             <tr>
-                                <td style="border: 1px solid black; width:50%; text-align: center; font-size: 12px">
+                                <td style="border: 1px solid black; width:45%; text-align: center; font-size: 14px">
                                     <b>Forma de Pagamento:</b>
                                 </td>
-                                <td style="border: 1px solid black; width:50%; text-align: center; font-size: 12px">
+                                <td style="border: 1px solid black; width:55%; text-align: center; font-size: 14px">
                                     <span t-field="o.payment_mode_id"/>
                                 </td>
                             </tr>
                         </table>
                         <br/>
-                        <table style="border: 1px solid black;  border-collapse: collapse ; width:40%">
+                        <table style="border: 1px solid black;  border-collapse: collapse ; width:45% ; height:25px">
                             <tr>
                                 <td style="border: 1px solid black; width:50%; text-align: center; font-size: 12px">
                                     <b>Prazo de entrega:</b>

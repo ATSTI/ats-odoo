@@ -1,0 +1,74 @@
+<odoo>
+    <record id="res_config_settings_account_payment" model="ir.ui.view">
+        <field name="name">res_config_settings.account.payment</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='qr_code']/parent::div/parent::div" position="after">
+                <div class="col-xs-12 col-md-6 o_setting_box" title="Define accounts to use for fine and interest.">
+                    <div class="o_setting_right_pane">
+                        <span class="o_form_label">Sequência NFe para serviços</span>
+                        <label for="l10n_br_interest_account_id" />
+                        <div class="text-muted">
+                            Selecione a conta usada para registrar juros/multas recebidas
+                        </div>
+                        <div class="text-muted">
+                            <field name="l10n_br_interest_account_id" domain="[('company_id', '=', company_id)]"/>
+                        </div>
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="l10n_br_bankfee_account_id" />
+                        <div class="text-muted">
+                            Selecione a conta usada para registrar tarifas bancárias
+                        </div>
+                        <div class="text-muted">
+                            <field name="l10n_br_bankfee_account_id" domain="[('company_id', '=', company_id)]"/>
+                        </div>
+                    </div>
+                </div>
+                <div id="mail_template_bank_slip" class="col-12 col-lg-6 o_setting_box">
+                    <div class="o_setting_left_pane"/>
+                    <div class="o_setting_right_pane">
+                        <span class="o_form_label">Modelo de e-mail Boleto</span>
+                        <div class="text-muted">
+                             Modelo a ser utilizado no envio de boleto automatizado
+                        </div>
+                        <div class="text-muted">
+                            <field name="l10n_br_bank_slip_email_template"/>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='module_account_sepa']/parent::div/parent::div" position="after">
+                <div class="col-xs-12 col-md-6 o_setting_box" title="Define accounts to use for fine and interest.">
+                    <div class="o_setting_right_pane">
+                        <label for="l10n_br_payment_interest_account_id" />
+                        <div class="text-muted">
+                            Selecione a conta usada para registrar juros/multas pagos a fornecedores
+                        </div>
+                        <div class="content-group">
+                            <div class="row mt16">
+                                <label for="l10n_br_payment_interest_account_id" string="Conta" class="col-md-3 o_light_label" />
+                                <field name="l10n_br_payment_interest_account_id" domain="[('company_id', '=', company_id)]"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="l10n_br_payment_discount_account_id" />
+                        <div class="text-muted">
+                            Selecione a conta usada para registrar descontos recebidos
+                        </div>
+                        <div class="content-group">
+                            <div class="row mt16">
+                                <label for="l10n_br_payment_discount_account_id" string="Conta" class="col-md-3 o_light_label" />
+                                <field name="l10n_br_payment_discount_account_id" domain="[('company_id', '=', company_id)]"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+            <div id="account_vendor_bills" position="before" >
+            </div>
+        </field>
+    </record>
+</odoo>

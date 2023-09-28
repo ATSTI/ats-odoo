@@ -18,6 +18,8 @@
     ],
     'depends': [
         'account',
+        'payment',
+        'account_payment_order',
         'l10n_br_base_address',
     ],
     'external_dependencies': {

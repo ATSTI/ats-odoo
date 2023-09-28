@@ -34,9 +34,13 @@ class AccountMove(models.Model):
         'account.move.line', string='Payable Move Lines',
         compute='_compute_payables')
 
+    # payment_journal_id = fields.Many2one(
+    #     'account.journal', string='Forma de pagamento')
     payment_journal_id = fields.Many2one(
-        'account.journal', string='Forma de pagamento')
-    #payment_journal_id = fields.Many2one(related="payment_order_id.journal_id")
+        'account.journal',
+        string='Forma de pagamento',
+        related="payment_mode_id.fixed_journal_id"
+    )
 
     def validate_data_iugu(self):
         errors = []
@@ -66,15 +70,8 @@ class AccountMove(models.Model):
             raise ValidationError(msg)
 
     def send_information_to_iugu(self):
-        if self.payment_mode_id.fixed_journal_id:
-            pay_journal = self.payment_mode_id.fixed_journal_id
-        elif self.payment_journal_id:
-            pay_journal = self.payment_journal_id
-        #if not self.payment_journal_id.receive_by_iugu:
-        #    return
-        if not pay_journal.receive_by_iugu:
-            return
-
+        if not self.payment_journal_id.receive_by_iugu:
+           return
         base_url = (
             self.env["ir.config_parameter"].sudo().get_param("web.base.url")
         )
@@ -144,7 +141,11 @@ class AccountMove(models.Model):
     def action_post(self):
         self.validate_data_iugu()
         result = super(AccountMove, self).action_post()
-        self.generate_payment_transactions()
+        # TODO removi daqui a funcao abaixo pq pelo contrato
+        # gera a NFSe tbem ao confirmar e se da algum erro 
+        # o processo e cancelado, mas a funcao abaixo ja gerou
+        # o boleto
+        # self.generate_payment_transactions()
         return result
 
 

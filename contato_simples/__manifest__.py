@@ -20,16 +20,16 @@
 ##############################################################################
 
 {
-    'name': 'Cadastro de Cliente simplificado',
+    'name': 'Cadastro de Parceiros simplificado',
     'version': '1.0',
     'category': 'Others',
     'sequence': 2,
-    'summary': 'relatorios personalizados',
+    'summary': 'Cadastro de parceiros somente com campos necessario para pequena empresa',
     'description': """
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['l10n_br_base', 'l10n_br_account'],
+    'depends': ['l10n_br_base'],
     'data': [
         'views/partner_view.xml',
     ],

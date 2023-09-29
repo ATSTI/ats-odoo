@@ -83,8 +83,7 @@ class WizardCreateDi(models.TransientModel):
         string='CNPJ adquir./encomendante',
     )
 
-    nfe40_UFTerceiro = fields.Many2one(
-        'res.country.state', 
+    nfe40_UFTerceiro = fields.Char(
         string='UF adquir./encomendante',
     )
 
@@ -98,7 +97,7 @@ class WizardCreateDi(models.TransientModel):
     @api.onchange('partner_acquirer_id')
     def onchange_partner_acquirer_id(self):
         if self.partner_acquirer_id:
-            self.nfe40_UFTerceiro = self.partner_acquirer_id.state_id.id
+            self.nfe40_UFTerceiro = self.partner_acquirer_id.state_id.code
 
     @api.onchange('nfe40_nDI')
     def onchange_nfe40_nDI(self):
@@ -139,7 +138,7 @@ class WizardCreateDi(models.TransientModel):
                 'afrmm_value': self.nfe40_vAFRMM,
                 'tpIntermedio': self.nfe40_tpIntermedio,
                 'thirdparty_cnpj': self.nfe40_CNPJ,
-                'thirdparty_state_id': self.nfe40_UFTerceiro.id,
+                'thirdparty_state': self.nfe40_UFTerceiro,
                 'exporting_code': self.nfe40_cExportador,
                 'company_id': self.aml_id.company_id.id,
                 'adi_ids': adi_line,
@@ -164,7 +163,7 @@ class WizardCreateDi(models.TransientModel):
                     'afrmm_value': self.nfe40_vAFRMM,
                     'tpIntermedio': self.nfe40_tpIntermedio,
                     'thirdparty_cnpj': self.nfe40_CNPJ,
-                    'thirdparty_state_id': self.nfe40_UFTerceiro.id,
+                    'thirdparty_state': self.nfe40_UFTerceiro,
                     'exporting_code': self.nfe40_cExportador,
                     'company_id': self.aml_id.company_id.id,
                     'adi_ids': adi_line,

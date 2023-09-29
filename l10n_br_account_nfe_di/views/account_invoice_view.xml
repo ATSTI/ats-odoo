@@ -36,7 +36,7 @@
                         <field name="afrmm_value" />
                         <field name="tpIntermedio" />
                         <field name="thirdparty_cnpj" />
-                        <field name="thirdparty_state_id" />
+                        <field name="thirdparty_state" />
                         <field name="exporting_code" />
                         <field name="company_id" invisible="1" />
                         <field name="adi_ids">
@@ -153,7 +153,7 @@
                                         <field name="afrmm_value" force_save="1"/>
                                         <field name="tpIntermedio" force_save="1" />                            
                                         <field name="thirdparty_cnpj" force_save="1"/>
-                                        <field name="thirdparty_state_id" options="{'no_create': True, 'no_create_edit': True}" force_save="1"/>
+                                        <field name="thirdparty_state" />
                                         <field name="exporting_code" force_save="1" />
                                         <field name="company_id" invisible="1" />
                                     </group>

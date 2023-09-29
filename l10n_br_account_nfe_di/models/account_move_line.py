@@ -1,6 +1,4 @@
 
-from copy import deepcopy
-from lxml import etree
 from odoo import models, _, api, fields
 
 class AccountMove(models.Model):
@@ -80,7 +78,7 @@ class AccountMove(models.Model):
             di["type_transportation"] = record.type_transportation
             di["afrmm_value"] = record.afrmm_value
             di["tpIntermedio"] = record.tpIntermedio
-            di["thirdparty_state_id"] = record.thirdparty_state_id.id
+            di["thirdparty_state"] = record.thirdparty_state
             di["thirdparty_cnpj"] = record.thirdparty_cnpj
             di["exporting_code"] = record.exporting_code
             di["company_id"] = record.company_id.id
@@ -173,9 +171,7 @@ class DeclaracaoImportacao(models.Model):
         ('3', '3 - Importação por encomenda'),
     ], 'Forma Importação', default='1')
     thirdparty_cnpj = fields.Char('CNPJ adquir./encomendante', size=18)
-    thirdparty_state_id = fields.Many2one(
-        'res.country.state', 'UF adquir./encomendante',
-        domain="[('country_id.code', '=', 'BR')]")
+    thirdparty_state = fields.Char(string='UF adquir./encomendante')
     exporting_code = fields.Char('Código do Exportador', size=60)
     company_id = fields.Many2one(comodel_name='res.company', string='Company', store=True, readonly=True, default=lambda s: s.env.company)
     adi_ids = fields.One2many(
@@ -205,7 +201,7 @@ class DeclaracaoImportacao(models.Model):
             'default_nfe40_vAFRMM': self.afrmm_value,
             'default_nfe40_tpIntermedio': self.tpIntermedio,
             'default_nfe40_CNPJ': self.thirdparty_cnpj,
-            'default_nfe40_UFTerceiro': self.thirdparty_state_id.id,
+            'default_nfe40_UFTerceiro': self.thirdparty_state,
             'default_nfe40_cExportador': self.exporting_code,
             'default_company_id': self.company_id.id,
             'default_nfe40_dDesemb': self.date_release,

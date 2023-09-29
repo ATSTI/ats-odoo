@@ -64,10 +64,7 @@ class AccountMove(models.Model):
                 errors.append(u'Destinatário / Endereço - Município')
             if not partner.country_id:
                 errors.append(u'Destinatário / Endereço - País')
-        if len(errors) > 0:
-            msg = "\n".join(
-                ["Por favor corrija os erros antes de prosseguir"] + errors)
-            raise ValidationError(msg)
+        return errors
 
     def send_information_to_iugu(self):
         if not self.payment_journal_id.receive_by_iugu:
@@ -115,13 +112,16 @@ class AccountMove(models.Model):
             data = iugu_invoice_api.create(vals)
             if "errors" in data:
                 if isinstance(data['errors'], str):
-                    raise UserError('Erro na integração com IUGU:\n%s' % data['errors'])
+                    # raise UserError('Erro na integração com IUGU:\n%s' % data['errors'])
+                    msg = 'Erro na integração com IUGU:\n%s' % data['errors']
+                    return msg
 
                 msg = "\n".join(
                     ["A integração com IUGU retornou os seguintes erros"] +
                     ["Field: %s %s" % (x[0], x[1][0])
                         for x in data['errors'].items()])
-                raise UserError(msg)
+                # raise UserError(msg)
+                return msg
 
             transaction.write({
                 'acquirer_reference': data['id'],
@@ -133,13 +133,20 @@ class AccountMove(models.Model):
                 'iugu_digitable_line': data['bank_slip']['digitable_line'],
                 'iugu_barcode_url': data['bank_slip']['barcode'],
             })
+            return ""
 
     def generate_payment_transactions(self):
         for item in self:
-            item.send_information_to_iugu()
+            msg = item.send_information_to_iugu()
+            if len(msg):
+                raise UserError(msg)
 
     def action_post(self):
-        self.validate_data_iugu()
+        errors = self.validate_data_iugu()
+        if len(errors[0]) > 0:
+            msg = "\n".join(
+                ["Por favor corrija os erros antes de prosseguir"] + errors)
+            raise ValidationError(msg)
         result = super(AccountMove, self).action_post()
         # TODO removi daqui a funcao abaixo pq pelo contrato
         # gera a NFSe tbem ao confirmar e se da algum erro 

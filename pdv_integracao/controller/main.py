@@ -49,6 +49,14 @@ class IntegracaoPdv(http.Controller):
         for pr in audit:
             if len(pr.line_ids):
                 prd_ids.add(pr.res_id)
+    
+        audit = http.request.env['auditlog.log'].sudo().search([
+            ('create_date', '>=', hj),
+            ('model_id', '=', 'product.product'),
+        ])
+        for pr in audit:
+            if len(pr.line_ids):
+                prd_ids.add(pr.res_id)
 
         if len(prd_ids):
             prod_ids = http.request.env['product.product'].sudo().search([

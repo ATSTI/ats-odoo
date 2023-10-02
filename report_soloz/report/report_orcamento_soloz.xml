@@ -189,8 +189,12 @@
                         </tr>
                     </table>
                     <t t-set="foto_item" t-value="0" />
+                    <t t-set="foto" t-value="0" />
                     <t t-foreach="o.order_line" t-as="line">
-                        <t t-set="foto_item" t-value="line.product_id.image_1920" />
+                        <t t-if="foto == 0">
+                            <t t-set="foto_item" t-value="line.product_id.image_1920" />
+                        </t>
+                        <t t-set="foto" t-value="1" />
                     </t>
                     <table style="border: 1px solid #dcdcdc; border-collapse: collapse; width:100%">    
                         <tr>

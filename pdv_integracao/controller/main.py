@@ -32,13 +32,23 @@ class IntegracaoPdv(http.Controller):
         hj = datetime.now()
         hj = hj - timedelta(days=30)
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
-        prod_tmpl = http.request.env['product.template'].sudo().search([
-            ('write_date', '>=', hj),
-            ('sale_ok', '=', True)])
+        audit = http.request.env['auditlog.log'].sudo().search([
+            ('create_date', '>=', hj),
+            ('model_id', '=', 'product.template'),
+        ])
         prod_ids = []
         prd_ids = set()
-        for pr in prod_tmpl:
-            prd_ids.add(pr.id)
+        # TODO para quem não usa o AUDIT LOG vai ter problema
+        # if not audit:
+        #     prod_tmpl = http.request.env['product.template'].sudo().search([
+        #         ('write_date', '>=', hj),
+        #         ('sale_ok', '=', True)])
+        #     for pr in prod_tmpl:
+        #         prd_ids.add(pr.id)
+        # else:
+        for pr in audit:
+            if len(pr.line_ids):
+                prd_ids.add(pr.res_id)
 
         if len(prd_ids):
             prod_ids = http.request.env['product.product'].sudo().search([
@@ -395,8 +405,6 @@ class IntegracaoPdv(http.Controller):
 
     @http.route('/pedidoconsulta', type='json', auth="user", csrf=True)
     def website_pedidoconsulta(self, **kwargs):
-        #import wdb 
-        #wdb.set_trace()
         data = request.jsonrequest
         # TODO testar aqui se e a empresa mesmo
         user_id = http.request.env['res.users'].browse([request.uid])
@@ -475,8 +483,6 @@ class IntegracaoPdv(http.Controller):
         return json.dumps(lista)
 
     def _monta_pedido(self,dados):
-        #import wdb
-        #wdb.set_trace()
         codmov = dados['CODMOVIMENTO']
         codcliente = dados['CODCLIENTE']
         caixa = self.busca_sessao(dados['CODALMOXARIFADO']).id
@@ -580,8 +586,6 @@ class IntegracaoPdv(http.Controller):
         return order_line    
 
     def _monta_pagamento(self, dados, cliente, session, ord_name, data_ord):
-        #import wdb
-        #wdb.set_trace()
         pag_line = []
         desconto_t = 0.0
         total_g = 0.0
@@ -706,8 +710,6 @@ class IntegracaoPdv(http.Controller):
             # pedido['statement_ids'] = pagamento
             pos = http.request.env['pos.order']
             order = pos.sudo().create(pedido)
-            #import wdb
-            #wdb.set_trace()
             if tem_pagamento:
                 order.add_payment({
                     'pos_order_id': order.id,

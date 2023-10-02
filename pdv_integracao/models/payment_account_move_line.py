@@ -9,8 +9,6 @@ class AccountPaymentRegister(models.TransientModel):
 
     def lanca_sangria_reforco(self, journal_id, caixa, valor, cod_forma, cod_venda, partner_id, motivo=''):
         # Inseri no PDV a Entrada no CAIXA
-        #import wdb
-        #wdb.set_trace()  
         lancamento = 'Recebimento-%s-%s' %(caixa, journal_id.name)
         if cod_venda == 0:
             lancamento = motivo
@@ -25,14 +23,18 @@ class AccountPaymentRegister(models.TransientModel):
             vals = {
                 'date': hj,
                 'amount': valor,
-                'name': lancamento,
-                'ref': str(cod_forma),
+                #'name': lancamento,
+                'name': str(cod_forma)+session ,
+                #'ref': str(cod_forma),
+                'ref': lancamento,
             }
             if partner_id:
                 vals['partner_id'] = partner_id.id
             ja_importou = self.env['account.bank.statement.line'].search([
-                ('ref', '=', str(cod_forma))])
+                ('name', '=', str(cod_forma)+session)])
+            #print(cod_forma + session)
             if ja_importou:
+                #print(cod_forma +session + 'X')
                 continue
             for cx in ses.statement_ids:
                 if cx.journal_id.id == journal_id.id:

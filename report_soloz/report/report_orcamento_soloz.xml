@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_orcamento_solozz">
+        <t t-call="web.html_container">
+            <t t-set="docs" t-value="docs.with_context({'lang':docs.partner_id.lang})"/>
+            <t t-foreach="docs" t-as="o">
+                <div class="page">
+                    <t t-call="report_cabecalho.report_cabecalho_id" />
+                    <br/>
+                    <br/>
+                    <table style="border: 1px solid #dcdcdc; width: 100%; text-align: center; font-size:20px; background-color:#e7e7e7">
+                        <tr>
+                            <td style="text-align: right; width: 50%; height:40px">
+                                <b>Orçamento Nº <span t-field="o.name"/></b>
+                            </td>
+                            <td style="text-align: right; width: 50%; height:40px; font-size:16px;">
+                                <span t-field="o.date_order"/>
+                            </td>
+                        </tr>
+                    </table>
+                    <br/>
+                    <table style="border: 1px solid #dcdcdc; width: 100%; font-size:16px; background-color:#e7e7e7">
+                        <tr>
+                            <td style="text-align: left; width: 100%; height:32px">
+                                <b>Dados do cliente</b>
+                            </td>
+                        </tr>
+                    </table>
+                    <table style="border: 1px solid #dcdcdc; border-collapse: collapse; font-size:14px;width: 100%;">
+                        <tr>
+                            <td style="border: 1px solid #dcdcdc; height:30px;  border-collapse: collapse; font-size:12px;text-align: center; width: 15%">
+                                <b>Razão social:</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; font-size:12px;text-align: left; width: 50%">
+                                <span t-field="o.partner_id.legal_name"/>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; font-size:12px;text-align: center; width: 15%">
+                                <b>CNPJ/CPF:</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; font-size:12px;text-align: left; width: 20%">
+                                <span t-field="o.partner_id.cnpj_cpf"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; font-size:12px;text-align: center; width: 15%; height: 40px;">
+                                <b>Endereço:</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; font-size:12px;text-align: left; width: 50%; height: 40px;">
+                                <span t-field="o.partner_id.street_name"/><span> - </span><span t-field="o.partner_id.street_number"/><span> - </span><span t-field="o.partner_id.city_id.id"/><span> - </span><span t-fieldpa="o.partner_id.district"/><span> - </span><span t-field="o.partner_id.state_id.name"/>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; font-size:12px;text-align: center; width: 15%; height: 40px;">
+                                <b>Contato:</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; font-size:12px;text-align: left; width: 20%; height: 40px;">
+                                <span t-field="o.partner_id.child_ids.name"/>
+                            </td>
+                        </tr>
+                    </table>
+                    <br/>
+                    <table style="border: 1px solid #dcdcdc; width: 100%; font-size:16px; background-color:#e7e7e7">
+                        <tr>
+                            <td style="text-align: left; width: 100%; height:32px">
+                                <b>Dados do projeto</b>
+                            </td>
+                        </tr>
+                    </table>
+                    <table style="border: 1px solid #dcdcdc; width: 100%; font-size:14px">
+                        <tr>
+                            <td style="text-align: left; width: 100%; height:150px">
+                                <span t-field="o.note"/>
+                            </td>
+                        </tr>
+                    </table>
+                    <br/>
+                    <table style="border: 1px solid #dcdcdc; width: 100%; font-size:16px; background-color:#e7e7e7">
+                        <tr>
+                            <td style="text-align: left; width: 100%; height:32px">
+                                <b>Lista de materiais</b>
+                            </td>
+                        </tr>
+                    </table>
+                    <table style="border: 1px solid #dcdcdc; border-collapse: collapse; font-size:14px;width: 100%;">
+                        <tr>
+                            <td style="border: 1px solid #dcdcdc; height:27px;  border-collapse: collapse; font-size:12px;text-align: center; width: 5%">
+                                <b>Item</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 50%">
+                                <b>Descrição</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 5%">
+                                <b>Und.</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 8%">
+                                <b>Qtd.</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 15%">
+                                <b>Vlr Unit.</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 17%">
+                                <b>Subtotal</b>
+                            </td>
+                        </tr>
+                        <t t-set="linhas" t-value="13" />
+                        <t t-set="item" t-value="0" />
+                            <t t-foreach="o.order_line" t-as="line">
+                                <t t-set="item" t-value="item + 1" />
+                                <t t-set="linhas" t-value="linhas - 1" />
+                                <tr>
+                                    <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 5%;">
+                                        <t t-esc="item" ></t>
+                                    </td>
+                                    <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: left; width: 50%;">
+                                        <span t-field="line.name"/>
+                                    </td>
+                                    <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 5%;">
+                                        <span t-field="line.product_uom.name"/>
+                                    </td>
+                                    <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 8%;">
+                                        <span t-field="line.product_uom_qty"/>
+                                    </td>
+                                    <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: right; width: 15%">
+                                        <span t-field="line.price_unit"/>
+                                    </td>
+                                    <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: right; width: 17%">
+                                        <span t-field="line.price_subtotal"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        <t t-foreach="range(linhas)" t-as="compl">
+                            <tr style="height:17px">
+                                <td style="border: 1px solid #dcdcdc; height:20px; border-collapse: collapse;"></td> 
+                                <td style="border: 1px solid #dcdcdc; height:20px; border-collapse: collapse;"></td>
+                                <td style="border: 1px solid #dcdcdc; height:20px; border-collapse: collapse;"></td>
+                                <td style="border: 1px solid #dcdcdc; height:20px; border-collapse: collapse;"></td>
+                                <td style="border: 1px solid #dcdcdc; height:20px; border-collapse: collapse;"></td>
+                                <td style="border: 1px solid #dcdcdc; height:20px; border-collapse: collapse;"></td>
+                            </tr>
+                        </t>
+                    </table>
+                    <table style="border: 1px solid #dcdcdc; border-collapse: collapse; width: 100%; font-size:16px; background-color:#e7e7e7; height:150px">
+                        <tr>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse;text-align: left;font-size:16px; width: 55%">
+                                <b>Total:</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; text-align: left; width: 5%"></td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; text-align: left; width: 8%"></td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; text-align: left; width: 15%"></td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; text-align: right; width: 17%">
+                                <span t-field="o.amount_price_gross"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse;text-align: left;font-size:16px; width: 55%">
+                                <b>Frete Cajuru - SP:</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; text-align: left; width: 5%"></td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; text-align: left; width: 8%"></td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; text-align: left; width: 15%"></td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; text-align: right; width: 17%">
+                                <span t-field="o.amount_freight_value"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse;text-align: left;font-size:16px; width: 55%">
+                                <b>Total CIF:</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; text-align: left; width: 5%"></td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; text-align: left; width: 8%"></td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; text-align: left; width: 15%"></td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; text-align: right; width: 17%">
+                                <span t-field="o.amount_total"/>
+                            </td>
+                        </tr>
+                    </table>
+                    <br/>
+                    <div style="width: 100%;float: left;">
+                        <img t-attf-src="/report_soloz/static/src/img/fotter.png" style="width:100%; height:100px;"/>
+                    </div>
+                </div>
+                <div class="page">
+                    <t t-call="report_cabecalho.report_cabecalho_id" />
+                    <br/>
+                    <br/>
+                    <table style="border: 1px solid #dcdcdc; width: 100%; font-size:16px; background-color:#e7e7e7">
+                        <tr>
+                            <td style="text-align: left; width: 100%; height:35px">
+                                <b>ilustrações:</b>
+                            </td>
+                        </tr>
+                    </table>
+                    <t t-set="foto_item" t-value="0" />
+                    <t t-set="foto" t-value="0" />
+                    <t t-foreach="o.order_line" t-as="line">
+                        <t t-if="foto == 0">
+                            <t t-set="foto_item" t-value="line.product_id.image_1920" />
+                        </t>
+                        <t t-set="foto" t-value="1" />
+                    </t>
+                    <table style="border: 1px solid #dcdcdc; border-collapse: collapse; width:100%">    
+                        <tr>
+                            <td style="border: 1px solid #dcdcdc; height:30px;  border-collapse: collapse; font-size:12px;text-align: center; width: 5%">
+                                <div style="width: 100%;float: left;">
+                                    <img t-attf-src="data:image/*;base64,{{foto_item}}" style="width:35%; height:150px; float: center"/>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <table style="border: 1px solid #dcdcdc; width: 100%; font-size:16px; background-color:#e7e7e7">
+                        <tr>
+                            <td style="text-align: left; width: 100%; height:35px">
+                                <b>Condições de Fornecimento:</b>
+                            </td>
+                        </tr>
+                    </table>
+                    <table style="border: 1px solid #dcdcdc; border-collapse: collapse; font-size:14px;width: 100%;">
+                        <tr>
+                            <td style="border: 1px solid #dcdcdc; height:30px;  border-collapse: collapse; font-size:12px;text-align: center; width: 20%">
+                                <b>Prazo de entrega:</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; font-size:12px;text-align: center; width: 30%">
+                                <span t-field="o.commitment_date"/>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; font-size:12px;text-align: center; width: 20%">
+                                <b>Coleta / Entrega:</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; font-size:12px;text-align: center; width: 30%">
+                                <span t-field="o.partner_shipping_id.city_id.name"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #dcdcdc; height:30px;  border-collapse: collapse; font-size:12px;text-align: center; width: 20%">
+                                <b>Condição de Pagamento:</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; font-size:12px;text-align: center; width: 30%">
+                                <span t-field="o.payment_term_id"/>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; font-size:12px;text-align: center; width: 20%">
+                                <b>Frete:</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; font-size:12px;text-align: center; width: 30%">
+                                <span></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #dcdcdc; height:30px;  border-collapse: collapse; font-size:12px;text-align: center; width: 20%">
+                                <b>Garantia contra corrosão:</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; font-size:12px;text-align: center; width: 30%">
+                                <span></span>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; font-size:12px;text-align: center; width: 20%">
+                                <b>Peso (Kg):</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; font-size:12px;text-align: center; width: 30%">
+                                <span></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #dcdcdc; height:30px;  border-collapse: collapse; font-size:12px;text-align: center; width: 20%">
+                                <b>Impostos Inclusos:</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; font-size:12px;text-align: center; width: 30%">
+                                <span></span>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; font-size:12px;text-align: center; width: 20%">
+                                <b>Obs:</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:30px; border-collapse: collapse; font-size:12px;text-align: center; width: 30%">
+                                <span></span>
+                            </td>
+                        </tr>
+                    </table>
+                    <br/>
+                    <table style="border: 1px solid #dcdcdc; width: 100%; font-size:16px; background-color:#e7e7e7">
+                        <tr>
+                            <td style="text-align: left; width: 100%; height:35px">
+                                <b>Condições gerais:</b>
+                            </td>
+                        </tr>
+                    </table>
+                    <table style="border: 1px solid #dcdcdc;border-collapse: collapse; width: 100%; font-size:11px">
+                        <tr>
+                            <td style="border: 1px solid #dcdcdc;border-collapse: collapse;text-align: left; width: 100%; height:30px">
+                                <p>
+                                1.Executar a instalação e manutenção conforme o manual, instalar a estrutura no local definido no orçamento. O não cumprimento deste item implica em perda de garantia.
+                                </p>
+                                <p>
+                                2.A fundação padrão é definida para solos argilosos. Para solos arenosos, pantanosos, com turfas ou de aterro é necessário fundação especial. Se faz necessário ensaio SPT do local de instalação para que se possa assumir a responsabilidade do projeto da fundação.
+                                </p>
+                                <p>
+                                3.A garantia contra corrosão é função de características do ambiente do local. No caso do ambiente com poluentes artificiais, emitidos na proximidade e de forma recorrente, a vida útil e a garantia poderão ser revistas.
+                                </p>
+                                <p>
+                                4.Se frete CIF:
+                                    a A descarga é de responsabilidade do cliente;
+                                    b A conferência da mercadoria deve ser feita no ato da entrega.
+                                </p>
+                                <p>
+                                    5. Se frete FOB:
+                                    ato de retirada. A empresa transportadora é responsável pelo material durante o transporte e/ou descarga
+                                </p>
+                                <p>
+                                6.O orçamento pode sofrer alterações de acordo com o layout e o datasheet do módulo;
+                                </p>
+                                <p>
+                                7.A planta de locação deve ser aprovada pelo cliente.
+                                </p>
+                                <p>
+                                8.Orçamento com Validade de 07 dias.
+                                </p>
+                                <br/>
+                                <p>
+                                Dados Bancários:
+                                </p>
+                                <p>
+                                Soloz Industrial Ltda
+                                </p>
+                                <p>
+                                CNPJ: 41.397.343/0001-19
+                                </p>
+                                <p>
+                                Banco Bradesco
+                                </p>
+                                <p>
+                                Agência: 3441
+                                </p>
+                                <p>
+                                Conta: 3579-3
+                                </p>
+                                <p>
+                                PIX: CNPJ
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                    <table style="border: 1px solid #dcdcdc; width: 100%; font-size:16px; background-color:#e7e7e7">
+                        <tr>
+                            <td style="text-align: left; width: 100%; height:25px">
+                                <b>Aceite da proposta</b>
+                            </td>
+                        </tr>
+                    </table>
+                    <table style="border: 1px solid #dcdcdc;border-collapse: collapse; width: 100%; font-size:11px">
+                        <tr>
+                            <td style="border: 1px solid #dcdcdc;border-collapse: collapse;text-align: center; width: 100%; height:50px">
+                                <br/>
+                                <span>______________________________</span>
+                                <br/>
+                                <span style="text-align:center">Assinatura do cliente</span>
+                            </td>
+                        </tr>
+                    </table>
+                    <br/>
+                    <div style="width: 100%;float: left;">
+                        <img t-attf-src="/report_soloz/static/src/img/fotter.png" style="width:100%; height:100px;"/>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

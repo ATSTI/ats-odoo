@@ -138,14 +138,13 @@ class AccountPaymentOrder(models.Model):
 
     def _generate_bank_inter_boleto(self):
         nosso_numero = False
-        import pudb;pu.db
         with ArquivoCertificado(self.journal_id, 'w') as (key, cert):
             api_inter = ApiInter(
                 cert=(cert, key),
                 conta_corrente=(self.company_partner_bank_id.acc_number +
                                 self.company_partner_bank_id.acc_number_dig),
-                clientId=self.journal_id.bank_inter_id,
-                clientSecret=self.journal_id.bank_inter_secret
+                client_id=self.journal_id.bank_inter_id,
+                client_secret=self.journal_id.bank_inter_secret
             )
             data = self._generate_bank_inter_boleto_data()
             for item in data:

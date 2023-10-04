@@ -82,8 +82,8 @@ class AccountMoveLine(models.Model):
                         self.move_id.partner_bank_id.acc_number +
                         self.move_id.partner_bank_id.acc_number_dig
                 ),
-                clientId=self.move_id.partner_bank_id.journal_id.bank_inter_id,
-                clientSecret=self.move_id.partner_bank_id.journal_id.bank_inter_secret
+                client_id=self.move_id.partner_bank_id.journal_id.bank_inter_id,
+                client_secret=self.move_id.partner_bank_id.journal_id.bank_inter_secret
             )
             datas = api_inter.boleto_pdf(self.own_number)
             datas = json.loads(datas)
@@ -138,8 +138,8 @@ class AccountMoveLine(models.Model):
                                     order_id.company_partner_bank_id.acc_number +
                                     order_id.company_partner_bank_id.acc_number_dig
                             ),
-                            clientId=self.move_id.partner_bank_id.journal_id.bank_inter_id,
-                            clientSecret=self.move_id.partner_bank_id.journal_id.bank_inter_secret
+                            client_id=self.move_id.partner_bank_id.journal_id.bank_inter_id,
+                            client_secret=self.move_id.partner_bank_id.journal_id.bank_inter_secret
                         )
                         self.api.boleto_baixa(self.own_number, codigo_baixa)
                 self.bank_inter_state = "baixado"
@@ -157,8 +157,8 @@ class AccountMoveLine(models.Model):
                                 order.order_id.company_partner_bank_id.acc_number +
                                 order.order_id.company_partner_bank_id.acc_number_dig
                         ),
-                        clientId=self.move_id.partner_bank_id.journal_id.bank_inter_id,
-                        clientSecret=self.move_id.partner_bank_id.journal_id.bank_inter_secret
+                        client_id=self.move_id.partner_bank_id.journal_id.bank_inter_id,
+                        client_secret=self.move_id.partner_bank_id.journal_id.bank_inter_secret
                     )
                     resposta = api_inter.boleto_consulta(nosso_numero=self.own_number)
 

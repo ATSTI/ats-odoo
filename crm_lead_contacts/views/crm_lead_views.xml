@@ -1,5 +1,26 @@
 <?xml version="1.0" ?>
 <odoo>
+    <record id="crm_lead_view_form_quick" model="ir.ui.view">
+        <field name="name">crm.lead.form.lead</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.quick_create_opportunity_form" />
+        <field name="arch" type="xml">
+            <field name="partner_id" position="replace" >
+                <field name="partner_id" widget="res_partner_many2one"
+                    string='Organization / Contact'
+                    context="{
+                    'res_partner_search_mode': type == 'opportunity' and 'customer' or False,
+                    'default_name': contact_name or partner_name,
+                    'default_is_company': type == 'opportunity' and contact_name == False,
+                    'default_company_name': type == 'opportunity' and partner_name,
+                    'default_phone': phone,
+                    'default_email': email_from,
+                    'show_vat': True}"
+                    domain="[('parent_id', '=', False)]"
+                />
+            </field>
+        </field>
+    </record>
     <record id="crm_lead_view_form" model="ir.ui.view">
         <field name="name">crm.lead.form.lead</field>
         <field name="model">crm.lead</field>

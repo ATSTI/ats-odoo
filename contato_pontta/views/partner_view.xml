@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="partner_view_order_form" model="ir.ui.view">
+        <field name="name">res.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="priority">10001</field>
+        <field name="inherit_id" ref="l10n_br_base.l10n_br_base_partner_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='o_address_format']" position="replace">
+            <div class="o_address_format">
+                <field name="zip" placeholder="Zip code..." style="width: 70%" class="o_address_zip"/>
+                <button name="zip_search" type="object" attrs="{'invisible': [('country_id', '!=', %(base.br)d)]}" class="btn-sm btn-link mb4 fa fa-search oe_edit_only" aria-label="Pesquisar CEP" title="Pesquisar CEP"/>
+                <field name="street_name" placeholder="Street..." class="o_address_street"/>
+                <field name="street_number" placeholder="Street number..." class="o_address_street"/>
+                <field name="street2" placeholder="Complement..." class="o_address_street"/>
+                <field name="district" placeholder="District..." class="o_address_street"/>
+                <field name="state_id" domain="[('country_id', '=', country_id)]" placeholder="State..." style="width: 45%" class="o_address_state" options="{'no_open': True, 'no_create': True}"/>
+                <field name="city_id" placeholder="City..." style="width: 50%" class="o_address_city" options="{'no_open': True, 'no_create': True}" attrs="{'invisible': [('country_id', '!=', %(base.br)d)]}"/>
+                <field name="city" placeholder="City..." style="width: 50%" class="o_address_city" force_save="True" attrs="{'invisible': [('country_id', '=', %(base.br)d)]}"/>
+                <field name="country_id" placeholder="Country..." class="o_address_country" options="{'no_open': True, 'no_create': True}"/>
+            </div>
+        </xpath>
+        </field>
+    </record>
+</odoo>

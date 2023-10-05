@@ -143,7 +143,7 @@ class AccountMove(models.Model):
 
     def action_post(self):
         errors = self.validate_data_iugu()
-        if len(errors[0]) > 0:
+        if len(errors) and len(errors[0]) > 0:
             msg = "\n".join(
                 ["Por favor corrija os erros antes de prosseguir"] + errors)
             raise ValidationError(msg)

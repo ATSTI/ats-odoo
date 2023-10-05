@@ -32,16 +32,27 @@ class ContractContract(models.Model):
                     msg = move.send_information_to_iugu()
                     errors.append(msg)
             except:
+                if len(errors) and len(errors[0]) > 0:
+                    self.message_post(
+                        body=_(
+                            "<a href='#' data-oe-model='%s' data-oe-id='%s'>Fatura criada</a> Erro '%s'"
+                        ) % (move._name, move.id, errors[0])
+                    )
+                    move.message_post(
+                        body=_(
+                            "<a href='#' data-oe-model='%s' data-oe-id='%s'>Gerado pelo contrato</a> Erro '%s'"
+                        ) % (self._name, self.id, errors[0])
+                    )
+                errors = []
+            if len(errors) and len(errors[0]) > 0:
                 self.message_post(
                     body=_(
                         "<a href='#' data-oe-model='%s' data-oe-id='%s'>Fatura criada</a> Erro '%s'"
                     ) % (move._name, move.id, errors[0])
                 )
-                errors = []
-            if len(errors[0]) > 0:
-                self.message_post(
+                move.message_post(
                     body=_(
-                        "<a href='#' data-oe-model='%s' data-oe-id='%s'>Fatura criada</a> Erro '%s'"
-                    ) % (move._name, move.id, errors[0])
+                            "<a href='#' data-oe-model='%s' data-oe-id='%s'>Gerado pelo contrato</a> Erro '%s'"
+                    ) % (self._name, self.id, errors[0])
                 )
         return moves

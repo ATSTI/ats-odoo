@@ -5,3 +5,4 @@
 #
 #import de recursos do site
 from . import payment_account_move_line
+from . import pos_order

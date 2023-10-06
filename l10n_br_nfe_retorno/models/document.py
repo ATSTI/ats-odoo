@@ -29,7 +29,7 @@ class FiscalDocument(models.Model):
 
 
     def _eletronic_document_send(self):
-        # super(NFe, self)._eletronic_document_send()
+        super(NFe, self)._eletronic_document_send()
         for record in self.filtered(filter_processador_edoc_nfe):
             if self.xml_error_message:
                 return
@@ -95,7 +95,7 @@ class FiscalDocument(models.Model):
                             }
                     )
 
-            elif not record.status_code and processo.resposta.cStat == "225":
+            else:
                 state = SITUACAO_EDOC_REJEITADA
 
                 record._change_state(state)

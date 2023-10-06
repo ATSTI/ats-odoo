@@ -57,10 +57,11 @@ class PosSession(models.Model):
     def insere_pedido_integracao(self):
         # lê arquivos na pasta
         path_file = '/var/www/webroot/arquivos'
+        path_file_return = '/var/www/webroot/retornos/retorno.json'
         arquivos = os.listdir(path_file)
-        # import pudb;pu.db
         # para cada arquivo na pasta
         num_arq = 1
+        lista_pedido = set()
         for i in arquivos:
             if num_arq == 20:
                 continue
@@ -70,6 +71,8 @@ class PosSession(models.Model):
             pos = self.env['pos.order']
             pedido = pos.search([('name', '=', nome_arq)])
             if pedido:
+                lista_pedido.add(nome_arq)
+                # retorno.writelines(list(lista_pedido)+',')
                 os.remove(path_file + '/' + i)
                 continue
             f = open(path_file + '/' + i, mode="r")
@@ -217,7 +220,11 @@ class PosSession(models.Model):
                 #             jrn = dest.env['account.journal'].search([('name', 'ilike', ml.journal_id.name[:2])])
                 #             jrn_id = dest.env['account.journal'].browse(jrn)
                 #             baixa_pagamentos(new_move, jrn_id, 0, aml_id.debit, 0, 0)
-            
+        import pudb;pu.db
+        if len(list(lista_pedido)):
+            with open(path_file_return, 'w+') as tfile:
+	            tfile.write('\n'.join(list(lista_pedido)))
+             
     # for ses in a_session.browse(a_ses): 
     #     #cli_id = b_cliente.search([('name', '=', cli.name)])
     #     #print ('Codigo : %s , Nome : %s.' % (cli.id,cli.name))

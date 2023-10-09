@@ -85,6 +85,7 @@ class ProductTemplate(models.Model):
                             self.online_preco, str(int( self.online_estoque)), peso, self.default_code,
                             largura, altura, comprimento)
                     values = values + var_prod + """]}"""
+                    print((values))
                     self.message_post(body=_("Nuvem post: <em>%s</em>") % (values))
                     r = requests.post(url, headers=headers, data=values)
                     if r.status_code != 201:

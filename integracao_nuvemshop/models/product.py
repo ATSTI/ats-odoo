@@ -112,6 +112,7 @@ class ProductTemplate(models.Model):
                         link = '%s%s' %(  
                             url,
                             str(self.item_id))
+                        print((values))
                         self.message_post(body=_("Nuvem put: <em>%s</em>") % (values))
                         r = requests.put(link, headers=headers, data=values)
                         if r.status_code != 200:
@@ -145,6 +146,7 @@ class ProductTemplate(models.Model):
                             link = '%s%s/variants/%s' %(  
                                 url,
                                 str(self.item_id), str(self.variant_id))
+                            print((values))
                             self.message_post(body=_("Nuvem put: <em>%s</em>") % (values))
                             r = requests.put(link, headers=headers, data=values)
                             if r.status_code != 200:
@@ -157,6 +159,7 @@ class ProductTemplate(models.Model):
                     link = '%s%s' %(  
                         url,
                         str(self.item_id))
+                    print((values))
                     self.message_post(body=_("Nuvem put: <em>%s</em>") % (values))
                     r = requests.put(link, headers=headers, data=prod)
                     if r.status_code != 200:
@@ -243,6 +246,7 @@ class ProductProduct(models.Model):
                             self.online_preco, str(int( self.qty_available)), peso, self.default_code,
                             largura, altura, comprimento)
                     values = values + var_prod + """]}"""
+                    print((values))
                     self.message_post(body=_("Nuvem post: <em>%s</em>") % (values))
                     r = requests.post(url, headers=headers, data=values)
                     if r.status_code != 201:
@@ -278,6 +282,7 @@ class ProductProduct(models.Model):
                     link = '%s%s' %(  
                         url,
                         str(self.item_id))
+                    print((values))
                     self.message_post(body=_("Nuvem put: <em>%s</em>") % (values))
                     r = requests.put(link, headers=headers, data=prod)
                     if r.status_code != 200:

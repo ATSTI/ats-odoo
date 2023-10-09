@@ -128,6 +128,8 @@ class ProductTemplate(models.Model):
                         cor = ''
                         for variant in variant_ids:
                             estoque = variant.qty_available or variant.online_estoque
+                            if estoque < 0:
+                                estoque = 0
                             if variant.online_preco:
                                 preco = variant.online_preco
                             else:

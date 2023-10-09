@@ -13,7 +13,7 @@ class ProductTemplate(models.Model):
     def write(self, vals):
         res = super(ProductTemplate, self).write(vals)
         url =  '%s%s/products/'  %(self.company_id.nuvem_shop_link, self.company_id.nuvem_shop_id)
-        if vals.get('online_venda') or (vals.get('name') or vals.get('description') or vals.get('complemento') or vals.get('online_preco') or vals.get('online_estoque') or vals.get('default_code') or vals.get('online_estoque') == 0):
+        if vals.get('online_venda') or vals.get('list_price') or vals.get('name') or vals.get('description') or vals.get('complemento') or vals.get('online_preco') or vals.get('online_estoque') or vals.get('default_code') or (vals.get('online_estoque') == 0):
             peso = self.peso or '0.0'
             altura = self.altura or '0.0'
             largura = self.largura or '0.0'

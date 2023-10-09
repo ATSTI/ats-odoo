@@ -85,6 +85,7 @@ class ProductTemplate(models.Model):
                             self.online_preco, str(int( self.online_estoque)), peso, self.default_code,
                             largura, altura, comprimento)
                     values = values + var_prod + """]}"""
+                    self.message_post(body=_("Nuvem post: <em>%s</em>") % (values))
                     r = requests.post(url, headers=headers, data=values)
                     if r.status_code != 201:
                         msg_err = 'Erro ao ativar o produto na loja virtual: %s, %s' %(r.status_code, values)
@@ -111,6 +112,7 @@ class ProductTemplate(models.Model):
                         link = '%s%s' %(  
                             url,
                             str(self.item_id))
+                        self.message_post(body=_("Nuvem put: <em>%s</em>") % (values))
                         r = requests.put(link, headers=headers, data=values)
                         if r.status_code != 200:
                             msg_err = 'Erro ao ativar o produto na loja virtual: %s' %(r.status_code)
@@ -143,6 +145,7 @@ class ProductTemplate(models.Model):
                             link = '%s%s/variants/%s' %(  
                                 url,
                                 str(self.item_id), str(self.variant_id))
+                            self.message_post(body=_("Nuvem put: <em>%s</em>") % (values))
                             r = requests.put(link, headers=headers, data=values)
                             if r.status_code != 200:
                                 msg_err = 'Erro ao ativar o produto na loja virtual: %s' %(r.status_code)
@@ -154,6 +157,7 @@ class ProductTemplate(models.Model):
                     link = '%s%s' %(  
                         url,
                         str(self.item_id))
+                    self.message_post(body=_("Nuvem put: <em>%s</em>") % (values))
                     r = requests.put(link, headers=headers, data=prod)
                     if r.status_code != 200:
                         msg_err = 'Erro ao inativar o produto na loja virtual: %s' %(r.status_code)
@@ -239,6 +243,7 @@ class ProductProduct(models.Model):
                             self.online_preco, str(int( self.qty_available)), peso, self.default_code,
                             largura, altura, comprimento)
                     values = values + var_prod + """]}"""
+                    self.message_post(body=_("Nuvem post: <em>%s</em>") % (values))
                     r = requests.post(url, headers=headers, data=values)
                     if r.status_code != 201:
                         msg_err = 'Erro ao inserir produto na loja virtual: %s' %(r.status_code)
@@ -273,6 +278,7 @@ class ProductProduct(models.Model):
                     link = '%s%s' %(  
                         url,
                         str(self.item_id))
+                    self.message_post(body=_("Nuvem put: <em>%s</em>") % (values))
                     r = requests.put(link, headers=headers, data=prod)
                     if r.status_code != 200:
                         msg_err = 'Erro ao inativar produto na loja virtual: %s' %(r.status_code)

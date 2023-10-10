@@ -186,7 +186,14 @@ class ImportarWizard(models.TransientModel):
             for rownum in range(first_sheet.nrows):                                                                                                       
                 rowValues = first_sheet.row_values(rownum)
                 if rownum > self.inicio and rownum < self.fim:
+                    if rowValues[23]:
+                        responsavel = rowValues[23]
+                        vals['name'] = rowValues[23]
+                    p_user = self.env["res.users"].search([('name', '=', responsavel)])
                     vals = {}
+                    if p_user:
+                        vals['user_id'] = p_user.id
+                    vals['stage_id'] = 5
                     vals_contato = {}
                     if rowValues[0]:
                         nome = rowValues[0]
@@ -219,6 +226,11 @@ class ImportarWizard(models.TransientModel):
                             if rowValues[30]:
                                 vals_contato['email'] = rowValues[30]
                             if rowValues[31]:
+                                phone = rowValues[31]
+                                if rowValues[32]:
+                                    phone += ', ' + rowValues[32]
+                                if rowValues[33]:
+                                    phone += ', ' + rowValues[33]
                                 vals_contato['phone'] = rowValues[31]
                             vals_contato['parent_id'] = p_id.id
                             clie_obj.create(vals_contato)

@@ -411,9 +411,21 @@ class IntegracaoPdv(http.Controller):
                     # lista.append(caixa)
         return json.dumps(lista)
 
-    @http.route('/pedidoconsulta', type='json', auth="user", csrf=True)
+    @http.route('/pedidoconsulta', type='json', auth="user", csrf=False)
     def website_pedidoconsulta(self, **kwargs):
         data = request.jsonrequest
+        dados_json = data['params']
+        nome_arquivo = dados_json['name']
+        arquivo = '/var/www/webroot/arquivos/%s.json' %(nome_arquivo)
+        with open(arquivo, 'w') as f:
+           f.write(json.dumps(dados_json))
+        retorno = open('/var/www/webroot/retornos/retorno.json', 'r+')
+        vals = retorno.read()
+        # vals = json.load(retorno.read())
+        return json.dumps(vals)
+    
+        # TODO nao vamos usar mais as rotinas abaixo
+
         # TODO testar aqui se e a empresa mesmo
         user_id = http.request.env['res.users'].browse([request.uid])
         hj = datetime.now()
@@ -675,6 +687,8 @@ class IntegracaoPdv(http.Controller):
                 tem_pagamento = True
                 #dados_json = json.loads(data['pag'])
                 dados_j = dados_json['pagamentos']
+                if len(pedido) == 0:
+                    return True
                 pagamento, desconto, troca, total = self._monta_pagamento(dados_j, 
                     pedido['partner_id'], pedido['session_id'], pedido['name'],
                     pedido['date_order'])

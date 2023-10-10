@@ -9,6 +9,7 @@ import logging
 # import psycopg2
 import os
 import json
+
 # from . import atscon as con
 
 
@@ -55,12 +56,19 @@ class PosSession(models.Model):
             pay.post()
    
     def insere_pedido_integracao(self):
-        # lê arquivos na pasta
+        # lê arquivos json recebido dos pedidos
+        # verifica se o pedido ja foi incluido
+        # gera um arquivo com todos os pedidos da sessao
+        # pra ser enviado para o pdv evitando o envio dos 
+        # arquivos que ja estao neste retorno
+        
         path_file = '/var/www/webroot/arquivos'
+        path_file_return = '/var/www/webroot/retornos/retorno.json'
         arquivos = os.listdir(path_file)
-        # import pudb;pu.db
         # para cada arquivo na pasta
         num_arq = 1
+        # lista_pedido = set()
+        ses = 0
         for i in arquivos:
             if num_arq == 20:
                 continue
@@ -69,11 +77,18 @@ class PosSession(models.Model):
             # buscar pedido ja existe
             pos = self.env['pos.order']
             pedido = pos.search([('name', '=', nome_arq)])
+
             if pedido:
+                # lista_pedido.add(nome_arq)
+                # retorno.writelines(list(lista_pedido)+',')
+                # Usando a sessao pra gerar o RETORNO
+                ses = pedido.session_id
                 os.remove(path_file + '/' + i)
                 continue
             f = open(path_file + '/' + i, mode="r")
             ped = json.load(f)
+            # if ped['name'] == '4561-163115':
+            #     import pudb;pu.db
             session = self.env['pos.session']
             prt_obj = self.env['res.partner']
             prod_obj = self.env['product.product']
@@ -85,6 +100,7 @@ class PosSession(models.Model):
             #     if p_lancado.state == 'draft':
             #         p_lancado.write({'amount_paid': ped.amount_paid})
             #         p_lancado.action_pos_order_paid()
+
             _logger.info(f"Inserido PEDIDO : {nome_arq}")
             vals = {}
             vals['name'] = ped['name']
@@ -95,7 +111,7 @@ class PosSession(models.Model):
             if part:
                 vals['partner_id'] = part.id
             else:
-                f.write(f"############# - Cliente nao encontrado : {ped['partner_id']}")
+                # f.write(f"############# - Cliente nao encontrado : {ped['partner_id']}")
                 continue
             # dicionario felicita
             user = ped['user_id']
@@ -114,17 +130,37 @@ class PosSession(models.Model):
             vals['amount_tax'] = ped['amount_return']
             vals['amount_total'] = ped['amount_return']
             vals['amount_return'] = ped['amount_return']
-            t_paid = 0.0
 
+            # Tem troca
+            troca = 0.0
+            for line_ids in ped['lines']:
+                line = line_ids[2]
+                if 'Troca' in line['name']:
+                    troca += line['price_unit'] * line['qty']
+
+            t_paid = 0.0
             for pg_ids in ped['statement_ids']:
                 pg = pg_ids[2]
                 t_paid += pg['amount']
+            dif_pag = ped['amount_return'] - t_paid + troca
+
+            desconto = 0.0
+            if dif_pag > 0.009:
+                desconto = round(dif_pag / ped['amount_return'] * 100, 2)
+                if desconto < 0.01:
+                    desconto = 0.0
+
             vals['amount_paid'] = t_paid
             vals['company_id'] = 1
             vals['pricelist_id'] = 1
             ped_id = pos.create(vals) 
             list_adi = []
+            
+            linhas = len(ped['lines'])
+            desc_soma = dif_pag
+            print('Inicio : %s' %str(desc_soma))
             for line_ids in ped['lines']:
+                linhas -= 1
                 line = line_ids[2]
                 # prod = dest.env['product.product'].search([('default_code', '=', line.product_id.default_code)])
                 # if not len(prod):
@@ -146,18 +182,33 @@ class PosSession(models.Model):
                     px = 30586
                 if px == 30406:
                     px = 30404
+                # if 'Troca' in line['name']:
+                #     troca += line['price_unit'] * line['qty']
+                    # import pudb;pu.db
+                sub_total = line['price_unit'] * line['qty']
+                print('1-VALOR : %s' %str(sub_total))
+                print('2-Reducao : %s' %str(sub_total * (desconto/100)))
+                if linhas == 0:
+                    desconto =  (desc_soma / sub_total) * 100
+                    print('4-Desc Final : %s' %str(desconto))
+                else:
+                    desc_soma -= sub_total * (desconto/100)
+                    print('3-total desc : %s' %str(desc_soma))
+                sub_total = sub_total - (sub_total * (desconto/100))
                 vals_item = {
                     "name": line['name'],
                     "product_id": px, 
                     "full_product_name" :line['name'],
                     "qty": line['qty'],
                     "price_unit": line['price_unit'],
+                    "discount": desconto,
                     "tipo_venda": line['tipo_venda'],
-                    "price_subtotal": line['price_unit'] * line['qty'],
-                    "price_subtotal_incl": line['price_unit'] * line['qty'],
+                    "price_subtotal": sub_total,
+                    "price_subtotal_incl": sub_total,
                 }
-                if 'discount' in line:
-                    vals_item["discount"] = line['discount']
+                print('5-GERALLLLLLLLLLLLLL : %s' %str(sub_total))
+                # if 'discount' in line:
+                    # vals_item["discount"] = line['discount']
                 # "order_id": ped_id.id,
                 #import pudb;pu.db
                 # ped_id.write({'lines'(vals_iten)
@@ -165,7 +216,15 @@ class PosSession(models.Model):
                 list_adi.append(vals_item)
                 # vals['lines'] = [(0, 0, list_adi)]
                 ped_id.write({'lines': [(0, 0, vals_item)]})
-            
+            if troca or dif_pag:
+                tot = ped_id.amount_total + troca - dif_pag
+                print('Total GERAL XXXXXXXXXXXXXXXXXXX: %s' %(str(tot)))
+                # import pudb;pu.db
+                ped_id.write({
+                    'amount_tax': tot,
+                    'amount_total': tot,
+                    'amount_return': tot,
+                })
             #  aqui aba pagamento 
             list_pag = []
             metodo_pag = ''
@@ -175,6 +234,7 @@ class PosSession(models.Model):
                 metodo_pag = self.env['pos.payment.method'].search([('name', 'ilike', jrn.name[:2])])
                 # datetime.strftime(pag['date'],'%Y-%m-%d'),
                 # "pos_order_id": ped_id.id,
+                print('Total PAGO: %s' %(str(pag['amount'])))
                 vals_pag = {
                     "name": pag['name'],                
                     "amount": pag['amount'],                     
@@ -217,7 +277,24 @@ class PosSession(models.Model):
                 #             jrn = dest.env['account.journal'].search([('name', 'ilike', ml.journal_id.name[:2])])
                 #             jrn_id = dest.env['account.journal'].browse(jrn)
                 #             baixa_pagamentos(new_move, jrn_id, 0, aml_id.debit, 0, 0)
-            
+        if ses:
+            # crio um arquivo com todos os pedidos desta sessao
+            pedido_ses = self.env['pos.order'].search([('session_id', '=', ses.id)])
+            pd = []
+            for px in pedido_ses:
+                px_ids = {}
+                px_ids['session'] = px.session_id.id
+                px_ids['order_id'] = px.id
+                px_ids['codmovimento'] = px.name
+                pd.append(px_ids)
+            # if len(list(lista_pedido)):
+            with open(path_file_return, 'w+') as tfile:
+                # tfile.write(list(pd))
+
+                for items in list(pd):
+                    tfile.write('%s,' % items)
+	            # tfile.write('\n'.join(list(lista_pedido)))
+             
     # for ses in a_session.browse(a_ses): 
     #     #cli_id = b_cliente.search([('name', '=', cli.name)])
     #     #print ('Codigo : %s , Nome : %s.' % (cli.id,cli.name))

@@ -169,6 +169,72 @@ class ImportarWizard(models.TransientModel):
     def onchange_tipo(self):
         self._le_registro()
 
+    def action_importar_diversos(self):
+        mensagem = ""
+        clie_obj = self.env['res.partner']
+        #uom_obj = self.env['product.uom']
+        # tmpl_obj = self.env['product.template']
+        for chain in self:
+            file_path = tempfile.gettempdir()+'/file.xls'
+            data = base64.decodebytes(chain.input_file)
+            f = open(file_path,'wb')
+            f.write(data)
+            f.close()
+            book = xlrd.open_workbook(file_path)
+            first_sheet = book.sheet_by_index(0)
+            conta_registros = 0
+            for rownum in range(first_sheet.nrows):                                                                                                       
+                rowValues = first_sheet.row_values(rownum)
+                if rownum > self.inicio and rownum < self.fim:
+                    vals = {}
+                    vals_contato = {}
+                    if rowValues[0]:
+                        nome = rowValues[0]
+                        vals['name'] = rowValues[0]
+                    p_id = clie_obj.search([('name', '=', nome)])
+                    if not p_id:
+                        if rowValues[1]:
+                            empresa = rowValues[1]
+                            vals['legal_name'] = rowValues[1]
+                        p_id = clie_obj.search([('name', '=', empresa)])
+                        if not p_id:
+                            try:
+                                p_id =  clie_obj.create(vals)
+                            except Exception as error:
+                                if mensagem == "":
+                                    mensagem += "Erro cadastro : <br>"
+                                mensagem += str(error) + "<br>"
+                                if 'name' in vals:
+                                    mensagem += f"{vals['name']}<br>"
+                    if p_id:
+                        contato = rowValues[28]
+                        for cont in p_id.child_ids:
+                            if cont.name == contato:
+                                contato = ''
+                        if contato:
+                            if rowValues[28]:
+                                vals_contato['name'] = rowValues[28]
+                            if rowValues[29]:
+                                vals_contato['function'] = rowValues[29]
+                            if rowValues[30]:
+                                vals_contato['email'] = rowValues[30]
+                            if rowValues[31]:
+                                vals_contato['phone'] = rowValues[31]
+                            vals_contato['parent_id'] = p_id.id
+                            clie_obj.create(vals_contato)
+                        continue
+
+                    conta_registros += 1
+
+            mensagem += f"TOTAL DE REGISTROS INCLUIDOS : {str(conta_registros)}"
+            self.write({'mensagem': mensagem})
+        return {
+            'view_mode': 'form',
+            'res_model': 'importar.wizard',
+            'res_id': self.id,
+            'type': 'ir.actions.act_window',
+        }
+
     def action_importar_produto(self):
         self.gravar_campos()
         linhas = self.input_campos.split('\n')
@@ -198,7 +264,7 @@ class ImportarWizard(models.TransientModel):
                 c_categoria = int(linha[linha.find('=')+1:])
 
         mensagem = ""
-        prod_obj = self.env['product.product']
+        clie_obj = self.env['product.product']
         #uom_obj = self.env['product.uom']
         tmpl_obj = self.env['product.template']
         for chain in self:
@@ -221,7 +287,7 @@ class ImportarWizard(models.TransientModel):
                     if rowValues[c_nome]:
                         descricao = rowValues[c_nome]
                         vals['name'] = rowValues[c_nome]
-                    p_id = prod_obj.search([('name', '=', descricao)])
+                    p_id = clie_obj.search([('name', '=', descricao)])
                     if p_id:
                         continue
                     #if descricao:
@@ -310,7 +376,7 @@ class ImportarWizard(models.TransientModel):
                                 pass
 
                     try:
-                        p_id =  prod_obj.create(vals)
+                        p_id =  clie_obj.create(vals)
                         p_id._onchange_ncm_id()
                     except Exception as error:
                         if mensagem == "":

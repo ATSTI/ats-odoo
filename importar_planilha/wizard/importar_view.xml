@@ -35,7 +35,13 @@
                         string="Importar Dependente"
                         class="btn-primary"
                         type="object"
-                    />                                        
+                    />       
+                    <button
+                        name="action_importar_diversos"
+                        string="Importar Diversos"
+                        class="btn-primary"
+                        type="object"
+                    />                                 
                     <button string="Cancel" class="btn-default" special="cancel" />
                 </footer>
             </form>

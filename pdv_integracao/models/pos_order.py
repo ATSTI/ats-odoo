@@ -87,8 +87,8 @@ class PosSession(models.Model):
                 continue
             f = open(path_file + '/' + i, mode="r")
             ped = json.load(f)
-            if ped['name'] == '4561-163115':
-                import pudb;pu.db
+            # if ped['name'] == '4561-163115':
+            #     import pudb;pu.db
             session = self.env['pos.session']
             prt_obj = self.env['res.partner']
             prod_obj = self.env['product.product']
@@ -216,8 +216,9 @@ class PosSession(models.Model):
                 list_adi.append(vals_item)
                 # vals['lines'] = [(0, 0, list_adi)]
                 ped_id.write({'lines': [(0, 0, vals_item)]})
-            if troca:
-                tot = ped_id.amount_total + troca
+            if troca or dif_pag:
+                tot = ped_id.amount_total + troca - dif_pag
+                print('Total GERAL XXXXXXXXXXXXXXXXXXX: %s' %(str(tot)))
                 # import pudb;pu.db
                 ped_id.write({
                     'amount_tax': tot,
@@ -233,6 +234,7 @@ class PosSession(models.Model):
                 metodo_pag = self.env['pos.payment.method'].search([('name', 'ilike', jrn.name[:2])])
                 # datetime.strftime(pag['date'],'%Y-%m-%d'),
                 # "pos_order_id": ped_id.id,
+                print('Total PAGO: %s' %(str(pag['amount'])))
                 vals_pag = {
                     "name": pag['name'],                
                     "amount": pag['amount'],                     

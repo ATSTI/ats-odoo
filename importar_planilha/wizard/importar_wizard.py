@@ -188,7 +188,6 @@ class ImportarWizard(models.TransientModel):
                 if rownum > self.inicio and rownum < self.fim:
                     if rowValues[23]:
                         responsavel = rowValues[23]
-                        vals['name'] = rowValues[23]
                     p_user = self.env["res.users"].search([('name', '=', responsavel)])
                     vals = {}
                     if p_user:

@@ -230,7 +230,7 @@ class ImportarWizard(models.TransientModel):
                                     phone += ', ' + rowValues[32]
                                 if rowValues[33]:
                                     phone += ', ' + rowValues[33]
-                                vals_contato['phone'] = rowValues[31]
+                                vals_contato['phone'] = phone
                             vals_contato['parent_id'] = p_id.id
                             clie_obj.create(vals_contato)
                         continue

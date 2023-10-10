@@ -171,9 +171,9 @@ class ImportarWizard(models.TransientModel):
 
     def action_importar_diversos(self):
         mensagem = ""
-        prod_obj = self.env['product.product']
+        clie_obj = self.env['res.partner']
         #uom_obj = self.env['product.uom']
-        tmpl_obj = self.env['product.template']
+        # tmpl_obj = self.env['product.template']
         for chain in self:
             file_path = tempfile.gettempdir()+'/file.xls'
             data = base64.decodebytes(chain.input_file)
@@ -187,57 +187,42 @@ class ImportarWizard(models.TransientModel):
                 rowValues = first_sheet.row_values(rownum)
                 if rownum > self.inicio and rownum < self.fim:
                     vals = {}
+                    vals_contato = {}
                     if rowValues[0]:
-                        cod = rowValues[0]
-                        vals['default_code'] = str(cod)
-                    descricao = ''
-                    if rowValues[1]:
-                        descricao = rowValues[c_nome]
-                        vals['name'] = rowValues[c_nome]
-                    p_id = prod_obj.search([('name', '=', descricao)])
+                        nome = rowValues[0]
+                        vals['name'] = rowValues[0]
+                    p_id = clie_obj.search([('name', '=', nome)])
+                    if not p_id:
+                        if rowValues[1]:
+                            empresa = rowValues[1]
+                            vals['legal_name'] = rowValues[1]
+                        p_id = clie_obj.search([('name', '=', empresa)])
+                        if not p_id:
+                            try:
+                                p_id =  clie_obj.create(vals)
+                            except Exception as error:
+                                if mensagem == "":
+                                    mensagem += "Erro cadastro : <br>"
+                                mensagem += str(error) + "<br>"
+                                if 'name' in vals:
+                                    mensagem += f"{vals['name']}<br>"
                     if p_id:
+                        contato = rowValues[28]
+                        for cont in p_id.child_ids:
+                            if cont.name == contato:
+                                contato = ''
+                        if contato:
+                            if rowValues[28]:
+                                vals_contato['name'] = rowValues[28]
+                            if rowValues[29]:
+                                vals_contato['function'] = rowValues[29]
+                            if rowValues[30]:
+                                vals_contato['email'] = rowValues[30]
+                            if rowValues[31]:
+                                vals_contato['phone'] = rowValues[31]
+                            vals_contato['parent_id'] = p_id.id
+                            clie_obj.create(vals_contato)
                         continue
-                    #if descricao:
-                    #    print ('Produto: %s' %(descricao))                        
-
-                    # Marca
-                    if len(rowValues) > c_marca-1 and rowValues[c_marca]:
-                        marca = rowValues[c_marca]
-                        mc = self.env["product.brand"]
-                        marca_id = mc.search([('name', '=', marca)])
-                        if not marca_id:
-                            marca_id = mc.create({'name': marca})
-                        vals['product_brand_id'] = marca_id.id
-
-                    # Categoria
-                    if len(rowValues) > c_categoria-1 and rowValues[c_categoria]:
-                        categoria = rowValues[c_categoria]
-                        pc = self.env["product.category"]
-                        cat_id = pc.search([('name', 'ilike', categoria)])
-                        if not cat_id:
-                            cat_id = pc.create({'name': categoria, 'parent_id': 1})
-                        vals['categ_id'] = cat_id.id
-
-                    if len(rowValues) > c_preco_venda-1 and rowValues[c_preco_venda]:
-                        try:
-                            vals['lst_price'] = float(rowValues[c_preco_venda])
-                        except:
-                            pass
-                    if len(rowValues) > c_custo-1 and rowValues[c_custo]:
-                        try:
-                            vals['standard_price'] = float(rowValues[c_custo])
-                        except:
-                            pass
-
-                    try:
-                        p_id =  prod_obj.create(vals)
-                        p_id._onchange_ncm_id()
-                    except Exception as error:
-                        if mensagem == "":
-                            mensagem += "Erro cadastro : <br>"
-                        mensagem += str(error) + "<br>"
-                        if 'name' in vals:
-                            mensagem += f"{vals['name']}<br>"
 
                     conta_registros += 1
 
@@ -279,7 +264,7 @@ class ImportarWizard(models.TransientModel):
                 c_categoria = int(linha[linha.find('=')+1:])
 
         mensagem = ""
-        prod_obj = self.env['product.product']
+        clie_obj = self.env['product.product']
         #uom_obj = self.env['product.uom']
         tmpl_obj = self.env['product.template']
         for chain in self:
@@ -302,7 +287,7 @@ class ImportarWizard(models.TransientModel):
                     if rowValues[c_nome]:
                         descricao = rowValues[c_nome]
                         vals['name'] = rowValues[c_nome]
-                    p_id = prod_obj.search([('name', '=', descricao)])
+                    p_id = clie_obj.search([('name', '=', descricao)])
                     if p_id:
                         continue
                     #if descricao:
@@ -391,7 +376,7 @@ class ImportarWizard(models.TransientModel):
                                 pass
 
                     try:
-                        p_id =  prod_obj.create(vals)
+                        p_id =  clie_obj.create(vals)
                         p_id._onchange_ncm_id()
                     except Exception as error:
                         if mensagem == "":

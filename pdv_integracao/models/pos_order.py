@@ -87,7 +87,7 @@ class PosSession(models.Model):
                 continue
             f = open(path_file + '/' + i, mode="r")
             ped = json.load(f)
-            if ped['name'] == '4561-163104':
+            if ped['name'] == '4561-163115':
                 import pudb;pu.db
             session = self.env['pos.session']
             prt_obj = self.env['res.partner']
@@ -130,18 +130,37 @@ class PosSession(models.Model):
             vals['amount_tax'] = ped['amount_return']
             vals['amount_total'] = ped['amount_return']
             vals['amount_return'] = ped['amount_return']
-            t_paid = 0.0
 
+            # Tem troca
+            troca = 0.0
+            for line_ids in ped['lines']:
+                line = line_ids[2]
+                if 'Troca' in line['name']:
+                    troca += line['price_unit'] * line['qty']
+
+            t_paid = 0.0
             for pg_ids in ped['statement_ids']:
                 pg = pg_ids[2]
                 t_paid += pg['amount']
+            dif_pag = ped['amount_return'] - t_paid + troca
+
+            desconto = 0.0
+            if dif_pag > 0.009:
+                desconto = round(dif_pag / ped['amount_return'] * 100, 2)
+                if desconto < 0.01:
+                    desconto = 0.0
+
             vals['amount_paid'] = t_paid
             vals['company_id'] = 1
             vals['pricelist_id'] = 1
             ped_id = pos.create(vals) 
             list_adi = []
-            troca = 0.0
+            
+            linhas = len(ped['lines'])
+            desc_soma = dif_pag
+            print('Inicio : %s' %str(desc_soma))
             for line_ids in ped['lines']:
+                linhas -= 1
                 line = line_ids[2]
                 # prod = dest.env['product.product'].search([('default_code', '=', line.product_id.default_code)])
                 # if not len(prod):
@@ -163,21 +182,33 @@ class PosSession(models.Model):
                     px = 30586
                 if px == 30406:
                     px = 30404
-                if 'Troca' in line['name']:
-                    troca += line['price_unit'] * line['qty']
+                # if 'Troca' in line['name']:
+                #     troca += line['price_unit'] * line['qty']
                     # import pudb;pu.db
+                sub_total = line['price_unit'] * line['qty']
+                print('1-VALOR : %s' %str(sub_total))
+                print('2-Reducao : %s' %str(sub_total * (desconto/100)))
+                if linhas == 0:
+                    desconto =  (desc_soma / sub_total) * 100
+                    print('4-Desc Final : %s' %str(desconto))
+                else:
+                    desc_soma -= sub_total * (desconto/100)
+                    print('3-total desc : %s' %str(desc_soma))
+                sub_total = sub_total - (sub_total * (desconto/100))
                 vals_item = {
                     "name": line['name'],
                     "product_id": px, 
                     "full_product_name" :line['name'],
                     "qty": line['qty'],
                     "price_unit": line['price_unit'],
+                    "discount": desconto,
                     "tipo_venda": line['tipo_venda'],
-                    "price_subtotal": line['price_unit'] * line['qty'],
-                    "price_subtotal_incl": line['price_unit'] * line['qty'],
+                    "price_subtotal": sub_total,
+                    "price_subtotal_incl": sub_total,
                 }
-                if 'discount' in line:
-                    vals_item["discount"] = line['discount']
+                print('5-GERALLLLLLLLLLLLLL : %s' %str(sub_total))
+                # if 'discount' in line:
+                    # vals_item["discount"] = line['discount']
                 # "order_id": ped_id.id,
                 #import pudb;pu.db
                 # ped_id.write({'lines'(vals_iten)
@@ -187,7 +218,7 @@ class PosSession(models.Model):
                 ped_id.write({'lines': [(0, 0, vals_item)]})
             if troca:
                 tot = ped_id.amount_total + troca
-                import pudb;pu.db
+                # import pudb;pu.db
                 ped_id.write({
                     'amount_tax': tot,
                     'amount_total': tot,

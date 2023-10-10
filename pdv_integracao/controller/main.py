@@ -419,7 +419,7 @@ class IntegracaoPdv(http.Controller):
         arquivo = '/var/www/webroot/arquivos/%s.json' %(nome_arquivo)
         with open(arquivo, 'w') as f:
            f.write(json.dumps(dados_json))
-        retorno = open('/var/www/webroot/retornos/retorno.json', 'r')
+        retorno = open('/var/www/webroot/retornos/retorno.json', 'r+')
         vals = retorno.read()
         # vals = json.load(retorno.read())
         return json.dumps(vals)

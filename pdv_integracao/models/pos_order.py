@@ -9,6 +9,7 @@ import logging
 # import psycopg2
 import os
 import json
+
 # from . import atscon as con
 
 
@@ -55,13 +56,19 @@ class PosSession(models.Model):
             pay.post()
    
     def insere_pedido_integracao(self):
-        # lê arquivos na pasta
+        # lê arquivos json recebido dos pedidos
+        # verifica se o pedido ja foi incluido
+        # gera um arquivo com todos os pedidos da sessao
+        # pra ser enviado para o pdv evitando o envio dos 
+        # arquivos que ja estao neste retorno
+        
         path_file = '/var/www/webroot/arquivos'
         path_file_return = '/var/www/webroot/retornos/retorno.json'
         arquivos = os.listdir(path_file)
         # para cada arquivo na pasta
         num_arq = 1
-        lista_pedido = set()
+        # lista_pedido = set()
+        ses = 0
         for i in arquivos:
             if num_arq == 20:
                 continue
@@ -70,13 +77,18 @@ class PosSession(models.Model):
             # buscar pedido ja existe
             pos = self.env['pos.order']
             pedido = pos.search([('name', '=', nome_arq)])
+
             if pedido:
-                lista_pedido.add(nome_arq)
+                # lista_pedido.add(nome_arq)
                 # retorno.writelines(list(lista_pedido)+',')
+                # Usando a sessao pra gerar o RETORNO
+                ses = pedido.session_id
                 os.remove(path_file + '/' + i)
                 continue
             f = open(path_file + '/' + i, mode="r")
             ped = json.load(f)
+            if ped['name'] == '4561-163104':
+                import pudb;pu.db
             session = self.env['pos.session']
             prt_obj = self.env['res.partner']
             prod_obj = self.env['product.product']
@@ -88,6 +100,7 @@ class PosSession(models.Model):
             #     if p_lancado.state == 'draft':
             #         p_lancado.write({'amount_paid': ped.amount_paid})
             #         p_lancado.action_pos_order_paid()
+
             _logger.info(f"Inserido PEDIDO : {nome_arq}")
             vals = {}
             vals['name'] = ped['name']
@@ -98,7 +111,7 @@ class PosSession(models.Model):
             if part:
                 vals['partner_id'] = part.id
             else:
-                f.write(f"############# - Cliente nao encontrado : {ped['partner_id']}")
+                # f.write(f"############# - Cliente nao encontrado : {ped['partner_id']}")
                 continue
             # dicionario felicita
             user = ped['user_id']
@@ -127,6 +140,7 @@ class PosSession(models.Model):
             vals['pricelist_id'] = 1
             ped_id = pos.create(vals) 
             list_adi = []
+            troca = 0.0
             for line_ids in ped['lines']:
                 line = line_ids[2]
                 # prod = dest.env['product.product'].search([('default_code', '=', line.product_id.default_code)])
@@ -149,6 +163,9 @@ class PosSession(models.Model):
                     px = 30586
                 if px == 30406:
                     px = 30404
+                if 'Troca' in line['name']:
+                    troca += line['price_unit'] * line['qty']
+                    # import pudb;pu.db
                 vals_item = {
                     "name": line['name'],
                     "product_id": px, 
@@ -168,7 +185,14 @@ class PosSession(models.Model):
                 list_adi.append(vals_item)
                 # vals['lines'] = [(0, 0, list_adi)]
                 ped_id.write({'lines': [(0, 0, vals_item)]})
-            
+            if troca:
+                tot = ped_id.amount_total + troca
+                import pudb;pu.db
+                ped_id.write({
+                    'amount_tax': tot,
+                    'amount_total': tot,
+                    'amount_return': tot,
+                })
             #  aqui aba pagamento 
             list_pag = []
             metodo_pag = ''
@@ -220,10 +244,23 @@ class PosSession(models.Model):
                 #             jrn = dest.env['account.journal'].search([('name', 'ilike', ml.journal_id.name[:2])])
                 #             jrn_id = dest.env['account.journal'].browse(jrn)
                 #             baixa_pagamentos(new_move, jrn_id, 0, aml_id.debit, 0, 0)
-        import pudb;pu.db
-        if len(list(lista_pedido)):
+        if ses:
+            # crio um arquivo com todos os pedidos desta sessao
+            pedido_ses = self.env['pos.order'].search([('session_id', '=', ses.id)])
+            pd = []
+            for px in pedido_ses:
+                px_ids = {}
+                px_ids['session'] = px.session_id.id
+                px_ids['order_id'] = px.id
+                px_ids['codmovimento'] = px.name
+                pd.append(px_ids)
+            # if len(list(lista_pedido)):
             with open(path_file_return, 'w+') as tfile:
-	            tfile.write('\n'.join(list(lista_pedido)))
+                # tfile.write(list(pd))
+
+                for items in list(pd):
+                    tfile.write('%s,' % items)
+	            # tfile.write('\n'.join(list(lista_pedido)))
              
     # for ses in a_session.browse(a_ses): 
     #     #cli_id = b_cliente.search([('name', '=', cli.name)])

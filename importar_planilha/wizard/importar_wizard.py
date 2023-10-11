@@ -186,12 +186,12 @@ class ImportarWizard(models.TransientModel):
             for rownum in range(first_sheet.nrows):                                                                                                       
                 rowValues = first_sheet.row_values(rownum)
                 if rownum > self.inicio and rownum < self.fim:
+                    vals = {}
                     if rowValues[23]:
                         responsavel = rowValues[23]
-                    p_user = self.env["res.users"].search([('name', '=', responsavel)])
-                    vals = {}
-                    if p_user:
-                        vals['user_id'] = p_user.id
+                        p_user = self.env["res.users"].search([('name', '=', responsavel)])
+                        if p_user:
+                            vals['user_id'] = p_user.id
                     vals['stage_id'] = 5
                     vals_contato = {}
                     if rowValues[0]:
@@ -206,6 +206,18 @@ class ImportarWizard(models.TransientModel):
                         if not p_id:
                             try:
                                 p_id =  clie_obj.create(vals)
+                                crm = self.env["crm.lead"].create({"name": p_id.name, "partner_id": p_id.id, "user_id": p_user.id})
+                                if rowValues[16]:
+                                    n = rowValues[16]
+                                    data = f"{n[6:10]}-{n[3:5]}-{n[:2]}"
+                                    todos = {
+                                            'res_id': crm.id,
+                                            'res_model_id': self.env['ir.model'].search([('model', '=', 'crm.lead')]).id,
+                                            'user_id': p_user.id,
+                                            'activity_type_id': 4,
+                                            'date_deadline': data,
+                                        }
+                                    self.env['mail.activity'].create(todos)
                             except Exception as error:
                                 if mensagem == "":
                                     mensagem += "Erro cadastro : <br>"

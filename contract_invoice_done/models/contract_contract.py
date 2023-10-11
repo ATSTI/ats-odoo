@@ -25,6 +25,7 @@ class ContractContract(models.Model):
                 if move.document_type_id:
                     errors.append("Erro na transmissão do documento fiscal")
                     move.fiscal_document_id.action_document_send()
+                    errors = []
                 # Enviar o Boleto (IUGU nao precisa, ja e feito por la)
                 # errors.append("Erro na geracao do boleto")
                 # move.generate_payment_transactions()

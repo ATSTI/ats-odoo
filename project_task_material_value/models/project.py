@@ -42,12 +42,18 @@ class ProjectTaskMaterial(models.Model):
     product_id = fields.Many2one(
         comodel_name="product.product", string="Product", required=True
     )
-    quantity = fields.Float(string="Quantidade")
+    quantity = fields.Float(
+            string="Quantidade" ,
+            default=1  ,                  
+        )
     total_item = fields.Float(
             string="Total",
             compute="_compute_total_id",
         )
-    preco_unit= fields.Float(related='product_id.standard_price', string="Valor Unit.")
+    preco_unit= fields.Float(
+        string="Valor Unit.",
+        readonly=False,
+        store=True)
 
     @api.constrains("quantity")
     def _check_quantity(self):
@@ -65,4 +71,8 @@ class ProjectTaskMaterial(models.Model):
             else:
                 item.total_item = 0.0
     
+    @api.onchange("product_id")
+    def _onchange_product_id(self):
+        if self.product_id:
+            self.preco_unit = self.product_id.standard_price
     

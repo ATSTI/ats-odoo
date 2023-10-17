@@ -10,6 +10,7 @@ from datetime import timedelta
 from unidecode import unidecode
 import json
 import re
+import os
 from odoo import http
 from odoo.http import request
 from math import floor
@@ -340,6 +341,25 @@ class IntegracaoPdv(http.Controller):
             if not line:
                 arp = http.request.env['account.payment.register']
                 arp.lanca_sangria_reforco(diario_id, caixa, valor, cod_forma, cod_venda, user_id.partner_id, motivo)
+
+    @http.route('/integrapdv', type='json', auth="user", csrf=False)
+    def website_integrapdv(self, **kwargs):
+        data = request.jsonrequest
+        # import pudb;pu.db
+        dados_json = data['params']
+        nome_arquivo = f"{data['tipo']}_{dados_json['name'].replace('/', '_')}"
+        arquivo = '/var/www/webroot/arquivos/%s.json' %(nome_arquivo)
+        with open(arquivo, 'w') as f:
+           f.write(json.dumps(dados_json))
+        file_retorno = '/var/www/webroot/retornos/retorno.json'
+        vals = {}
+        if os.path.exists(file_retorno) and os.stat(file_retorno).st_size > 0:
+            retorno = open(file_retorno, 'r+')
+            vals = retorno.read()
+        # retorno = open('/var/www/webroot/retornos/cai_retorno.json', 'r+')
+        # vals += retorno.read()
+        # vals = json.load(retorno.read())
+        return json.dumps(vals)
 
     @http.route('/caixaconsulta', type='json', auth="user", csrf=False)
     def website_caixaconsulta(self, **kwargs):

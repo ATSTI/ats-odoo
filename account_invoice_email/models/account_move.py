@@ -54,13 +54,13 @@ class AccountMove(models.Model):
                 for atts in attachment_ids:
                     atts_ids.append(atts.id)
                 mail.attachment_ids = [(6, 0, atts_ids)]
-                mail.send_mail(inv.move_id.id)
+                mail.send_mail(inv.id)
                 inv.move_id.message_post(body=_('Email enviado'))
                 inv.move_id.email_send = True
             else:
                 # if inv.move_id.payment_mode_id.boleto_type:
                 #     inv.move_id.message_post(body=_('Sem boleto anexo na Fatura, Email não enviado.'))
-                mail.send_mail(inv.move_id.id)
+                mail.send_mail(inv.id)
                 inv.move_id.message_post(body=_('Email enviado'))
                 inv.move_id.email_send = True
         return True

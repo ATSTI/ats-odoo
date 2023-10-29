@@ -15,3 +15,8 @@ Alterar na linha do CRON, o dia_vencimento, e o tipo do email:
    tipo_email = Usar VCTO para template : 'Fatura: Cobranca'
                 Usar AVISO para template : 'Fatura: aviso vencimento'
 
+Email : 
+    será criado dois modelos :
+       - Fatura: Cobranca
+       - Fatura: aviso vencimento
+

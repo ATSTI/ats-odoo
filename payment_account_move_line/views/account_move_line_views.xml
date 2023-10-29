@@ -185,7 +185,7 @@
 
 	<menuitem
 		id="menu_receivable_payable_report"
-		name="Financeiro"
+		name="Contas Receber/Pagar"
 		groups="account.group_account_invoice"
 		parent="account.menu_finance"
 		sequence="4"/>

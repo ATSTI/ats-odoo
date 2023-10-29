@@ -189,20 +189,25 @@ class ImportarWizard(models.TransientModel):
                     vals = {}
                     if rowValues[23]:
                         responsavel = rowValues[23]
+                        responsavel = responsavel.strip()
                         p_user = self.env["res.users"].search([('name', '=', responsavel)])
                         if p_user:
                             vals['user_id'] = p_user.id
-                    vals['stage_id'] = 5
+                    if rowValues[4]:
+                        stage = self.env["res.partner.stage"].search([('name', '=', rowValues[4])])
+                        if stage:
+                            vals['stage_id'] = stage.id
                     vals_contato = {}
                     if rowValues[0]:
                         nome = rowValues[0]
-                        vals['name'] = rowValues[0]
-                    p_id = clie_obj.search([('name', '=', nome)])
+                        nome = nome.strip()
+                        vals['name'] = nome.strip()
+                    p_id = clie_obj.search([('name', '=', nome), ('parent_id', '=', False)], limit=1)
                     if not p_id:
                         if rowValues[1]:
                             empresa = rowValues[1]
                             vals['legal_name'] = rowValues[1]
-                        p_id = clie_obj.search([('name', '=', empresa)])
+                        p_id = clie_obj.search([('name', '=', empresa), ('parent_id', '=', False)], limit=1)
                         if not p_id:
                             try:
                                 p_id =  clie_obj.create(vals)
@@ -226,6 +231,7 @@ class ImportarWizard(models.TransientModel):
                                     mensagem += f"{vals['name']}<br>"
                     if p_id:
                         contato = rowValues[28]
+                        contato = contato.strip()
                         for cont in p_id.child_ids:
                             if cont.name == contato:
                                 contato = ''
@@ -238,10 +244,19 @@ class ImportarWizard(models.TransientModel):
                                 vals_contato['email'] = rowValues[30]
                             if rowValues[31]:
                                 phone = rowValues[31]
+                                if type(phone) == float:
+                                    phone = str(int(phone))
+                                #phone = str(rowValues[31])
                                 if rowValues[32]:
-                                    phone += ', ' + rowValues[32]
+                                    p = rowValues[32]
+                                    if type(p) == float:
+                                        p = str(int(p))
+                                    phone += ', ' + p
                                 if rowValues[33]:
-                                    phone += ', ' + rowValues[33]
+                                    p = rowValues[33]
+                                    if type(p) == float:
+                                        p = str(int(p))
+                                    phone += ', ' + p
                                 vals_contato['phone'] = phone
                             vals_contato['parent_id'] = p_id.id
                             clie_obj.create(vals_contato)

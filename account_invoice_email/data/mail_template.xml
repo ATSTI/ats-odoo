@@ -23,6 +23,16 @@
        &nbsp;&nbsp;<strong>Fatura</strong><br />
        &nbsp;&nbsp;Número: <strong>${object.move_id.name}</strong><br />
        &nbsp;&nbsp;Data Vencimento: <strong>${object.date_maturity.strftime('%d/%m/%Y')}</strong><br />
+       % for boleto in object.move_id.transaction_ids:
+       &nbsp;&nbsp;Boleto: <strong><a href="${boleto.transaction_url}">${boleto.transaction_url}</a></strong><br>
+       %endfor
+       % if object.move_id.document_type_id:
+       &nbsp;&nbsp;Nota Fiscal: <strong><a href="https://nfe.prefeitura.sp.gov.br/nfe.aspx?ccm=XXXXXXX&nf=${object.move_id.document_number}&cod=${object.move_id.verify_code}">Nota Fiscal ${object.move_id.document_number}</a></strong><br />
+       &nbsp;&nbsp;Alternativamente, acesse o portal <a href="https://nfe.prefeitura.sp.gov.br/publico/verificacao.aspx">Portal NFS-e SP</a> e verifique a autenticidade da nota fiscal informando:<br />
+       &nbsp;&nbsp;CNPJ do prestador do serviço = 00.000.000/0001-00<br />
+       &nbsp;&nbsp;Número da NFS-e = ${object.move_id.document_number}<br />
+       &nbsp;&nbsp;Código de verificação = ${object.move_id.verify_code}<br />
+       %endif
     </p>
 
     <br/>

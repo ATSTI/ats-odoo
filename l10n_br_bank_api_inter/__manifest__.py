@@ -15,9 +15,18 @@
         "l10n_br_account_payment_order",
     ],
     "data": [
+<<<<<<< HEAD
         "views/account_move.xml",
         "views/account_move_line.xml",
         "views/account_journal.xml",
+=======
+        "security/ir.model.access.csv",
+        "views/account_move.xml",
+        "views/account_move_line.xml",
+        "views/account_journal.xml",
+        "wizard/bank_api_inter_baixa.xml",
+        "data/automated_query.xml",
+>>>>>>> c28f1232988a5c09788e8ac2c3bee31730e3507e
     ],
     "demo": [
         "demo/res_partner_bank.xml",

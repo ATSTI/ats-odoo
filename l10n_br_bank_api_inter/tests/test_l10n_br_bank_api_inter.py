@@ -175,8 +175,6 @@ class TestBankInter(SavepointCase):
             }
         )
 
-<<<<<<< HEAD
-=======
         cls.invoice_kmee_03 = cls.env["account.move"].create(
             {
                 "name": "Test Payment Order",
@@ -200,7 +198,6 @@ class TestBankInter(SavepointCase):
             }
         )
 
->>>>>>> c28f1232988a5c09788e8ac2c3bee31730e3507e
         cls.env.cr.commit()
 
     def test_principal_workflow(self):
@@ -413,8 +410,6 @@ class TestBankInter(SavepointCase):
         ):
             slip_query = payment_order.move_ids.line_ids.search_bank_slip()
             self.assertEqual(slip_query["situacao"], "EMABERTO")
-<<<<<<< HEAD
-=======
 
     def test_automatic_query(self):
         """
@@ -444,4 +439,3 @@ class TestBankInter(SavepointCase):
         payment_order.generated2uploaded()
 
         self.assertEqual(self.invoice_kmee_03.line_ids[0].bank_inter_state, "emaberto")
->>>>>>> c28f1232988a5c09788e8ac2c3bee31730e3507e

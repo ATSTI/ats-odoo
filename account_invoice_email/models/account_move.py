@@ -20,25 +20,23 @@ class AccountMove(models.Model):
         
         invoice_obj = self.env['account.move.line']
 
-        # import pudb;pu.db
-        # envia errado se data ficar errada
-        #if dia_vcto == 0:
-        #    dia_vencimento = data_vcto[6:10]+'-'+data_vcto[3:5]+'-'+data_vcto[:2]
-        #else:
         dia_vencimento = (datetime.now() + timedelta(dia_vcto)).strftime("%Y-%m-%d")
-        #dia_vencimento = '2017-03-06'
 
         base_domain = [
-            ('date_maturity', '=', dia_vencimento), 
             ('move_id.email_send','=',False),
             ('account_id.internal_type', '=', 'receivable'),
-			('credit', '=', 0),('move_id.state', '=', 'posted'),
+   	        ('credit', '=', 0),('move_id.state', '=', 'posted'),
 			'|',('move_id.fiscal_operation_id.fiscal_type', 'in', ('sale', 'purchase')),
 			('move_id.fiscal_operation_id', '=', False)
         ]
+        if tipo_email != 'CRIADA':
+            base_domain.append(('date_maturity', '=', dia_vencimento))
+        else:
+            newdatetime = (datetime.now() + timedelta(dia_vcto)).replace(hour=1, minute=1)
+            base_domain.append(('create_date', '>', newdatetime))
         invoice_line_ids = invoice_obj.search(base_domain)
         try:
-            if tipo_email == "VCTO":
+            if tipo_email in ('VCTO', 'CRIADA'):
                 domain=[('name','like','Fatura: Cobranca')]
             else:
                 domain=[('name','like','Fatura: aviso vencimento')]

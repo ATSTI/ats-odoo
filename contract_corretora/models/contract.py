@@ -129,20 +129,46 @@ class AccountAnalyticAccount(models.Model):
                 ('dia_vencimento', '=', data_hoje.day),
             ])
         # emails vencimento parcela
+        email_gerencia = '<strong>Relatório dos envios de lembrete</strong>'
+        email_gerencia += '<table border="1" width="100%">'
+        email_gerencia += '<tr><th>Cliente</th><th>Contrato</th><th>Enviado</th><th>Motivo</th></tr>'
         for inv in invoice_ids:
-            if inv.date_end and inv.date_end < data_fim:
+            ctr_email = inv.contract_id
+            email_gerencia += '<tr><td>%s</td><td>%s</td>' %(ctr_email.partner_id.name, ctr_email.name)
+            #if inv.contract_id.id == 601:
+            #    import pudb;pu.db
+            if not inv.date_end:
+                email_gerencia += '<td><strong>Não</strong></td><td>Sem fim da vigência</td></tr>'
+                continue
+
+            # se 1 parcela e pagou no mesmo mes entao nao tem mais
+            if inv.dia_vencimento > inv.date_start.day and inv.quantity == 1:
+                email_gerencia += '<td><strong>Não</strong></td><td>1 parcela, já enviado</td></tr>'
+                continue
+
+            #mes_hoje_end = inv.date_end + relativedelta(day=31)
+            # Pega o primeiro dia do proximo mes
+            mes_hoje_end = (inv.date_end.replace(day=1) + timedelta(days=32)).replace(day=1)
+            if mes_hoje_end < data_fim:
                 #print("nao enviado %s" %(inv.contract_id.partner_id.name))
+                vg = inv.date_end
+                vg = '%s-%s-%s' %(str(vg.day).zfill(2), str(vg.month).zfill(2), 
+                str(vg.year))
+                email_gerencia += '<td><strong>Não</strong></td><td>Encerrado %s</td></tr>' %(vg)
                 continue
 
             # o campo quantidade e usado para o numero de parcelas
-            mes_hoje = inv.date_start + relativedelta(months=+inv.quantity)
+            mes_hoje = inv.date_start + relativedelta(months=+int(inv.quantity))
             mes_hoje = mes_hoje + relativedelta(day=31)
             if data_hoje > mes_hoje:
+                email_gerencia += '<td><strong>Não</strong></td><td>O numero informado em quantidade já enviado.</td></tr>'
                 continue
 
             prt = inv.contract_id.partner_id
             if not prt.email:
+                email_gerencia += '<td><strong>Não</strong></td><td>Sem email.</td></tr>'
                 continue
+
             tipo = 'normal'
             seguro = ''
             
@@ -198,6 +224,8 @@ class AccountAnalyticAccount(models.Model):
                 #template_browse.email_to = 'marcio@somaseguros.com.br'
                 values['email_to'] = email_to
                 values['email_from'] = 'financeiro@somaseguros.com.br'
+                if inv.contract_id.user_id and 'marcia@soma' not in inv.contract_id.user_id.email:
+                    values['email_cc'] = 'marcia@somaseguros.com.br,' + inv.contract_id.user_id.email
                 values['res_id'] = False
                 values['body_html'] = corpo
                 values['model'] = 'contract.contract'
@@ -208,8 +236,9 @@ class AccountAnalyticAccount(models.Model):
                 msg_id = mail_mail_obj.sudo().create(values)
                 if msg_id:
                     mail_mail_obj.send(msg_id)
+                    email_gerencia += '<td>Enviado</td><td></td></tr>'
 
-
+        email_gerencia += '</table>'
 
         # emails para o administrador
         # emails vencimento parcela
@@ -245,7 +274,7 @@ class AccountAnalyticAccount(models.Model):
 
         if lista != '':
             lista = tabela + lista + '</table>'
-            lista = 'Lista de Vencimento de Parcelas:<br />' + lista
+            lista = 'Lista de Vencimento de Parcelas:<br />' + lista + '<br />' + email_gerencia 
             #if template_browse:
             #    template_browse['body_html'] = lista
             #    template_browse['email_to'] = 'financeiro@somaseguros.com.br'
@@ -258,8 +287,8 @@ class AccountAnalyticAccount(models.Model):
                     'email_from': 'marcio@somaseguros.com.br',
                     'auto_delete': False,
                 }
-                #mail_id = self.env['mail.mail'].sudo().create(vals)
-                #mail_id.sudo().send()
+                mail_id = self.env['mail.mail'].sudo().create(vals)
+                mail_id.sudo().send()
             except:
                 lista = ''
 

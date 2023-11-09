@@ -286,6 +286,7 @@ class AccountAnalyticAccount(models.Model):
                     'email_to': 'financeiro@somaseguros.com.br',
                     'email_from': 'marcio@somaseguros.com.br',
                     'auto_delete': False,
+                    'mail_server_id': 4,
                 }
                 mail_id = self.env['mail.mail'].sudo().create(vals)
                 mail_id.sudo().send()

@@ -204,7 +204,9 @@ class IntegracaoPdv(http.Controller):
             for ct in conta_ids:
                 cod_cliente = str(ct.partner_id.id)
                 ja_importou = http.request.env['account.payment'].search([
-                    ('communication', '=', ct.ref)])
+                    ('communication', '=', ct.ref),
+                    ('payment_date', '=', fields.Date.context_today(self))
+                ])
                 for imp in ja_importou:
                     lista.append({'Conta baixada': ct.ref + '-' + ct.partner_id.name + ', ' + str(imp.amount)})
                 if ja_importou:
@@ -305,6 +307,7 @@ class IntegracaoPdv(http.Controller):
 
     @http.route('/enviasangria', type='json', auth="user", csrf=False)
     def website_enviasangria(self, **kwargs):
+        #{"params": {"login": "ats@email.com.br", "password": "123456", "db": "database_name"}, "todos": [{9992, "Sangria", 1, "200,00"}, {9993, "Sangria", 1, "25,00"}]}
         user_id = http.request.env['res.users'].browse([request.uid])
         # receber todas as sangrias e reforco do caixa
         # verificar no odoo se existe       

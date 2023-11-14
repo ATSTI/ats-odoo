@@ -163,7 +163,7 @@ class AccountMoveLine(models.Model):
                         client_id=self.journal_payment_mode_id.bank_client_id,
                         client_secret=self.journal_payment_mode_id.bank_secret_id,
                     )
-                    if self.own_number:
+                    if self.own_number and len(self.own_number) == 11:
 
                         resposta = api.consulta_boleto_detalhado(
                             nosso_numero=self.own_number

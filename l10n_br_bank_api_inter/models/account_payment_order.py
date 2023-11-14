@@ -69,7 +69,7 @@ class AccountPaymentOrder(models.Model):
                 amount=line.amount_currency,
                 payer=payer,
                 issue_date=line.create_date,
-                due_date=line.date,
+                due_date=line.ml_maturity_date or line.move_line_id.date_maturity,
                 identifier=line.order_id.name,
                 instructions=[],
             )

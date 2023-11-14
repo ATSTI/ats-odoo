@@ -92,3 +92,64 @@ class AccountMove(models.Model):
                     )
         except Exception as error:
             raise UserError(_(error))
+
+    def load_cnab_info(self):
+        # Se não possui Modo de Pagto não há nada a ser feito
+        if not self.payment_mode_id:
+            return
+        # Se o Modo de Pagto é de saída (pgto fornecedor) não há nada a ser feito.
+        if self.payment_mode_id.payment_type == "outbound":
+            return
+        # Se não gera Ordem de Pagto não há nada a ser feito
+        if not self.payment_mode_id.payment_order_ok:
+            return
+        if (
+            self.partner_bank_id.bank_id
+            != self.env.ref("l10n_br_base.res_bank_077")
+            and self.payment_mode_id.payment_method_id.code != "electronic"
+            ):
+            return super().generate_payment_file()
+        else:
+            # TODO - apesar do campo financial_move_line_ids ser do tipo
+            #  compute esta sendo preciso chamar o metodo porque as vezes
+            #  ocorre da linha vir vazia o que impede de entrar no FOR
+            #  abaixo causando o não preenchimento de dados usados no Boleto,
+            #  isso deve ser melhor investigado
+            self._compute_financial()
+            for index, interval in enumerate(self.financial_move_line_ids):
+                inv_number = self.get_invoice_fiscal_number().split("/")[-1]
+                numero_documento = inv_number + "/" + str(index + 1).zfill(2)
+
+                sequence = self.payment_mode_id.own_number_sequence_id.next_by_id()
+
+                # vem do Inter
+                # interval.own_number = (
+                #     sequence if interval.payment_mode_id.generate_own_number else "0"
+                # )
+                interval.document_number = numero_documento
+                interval.company_title_identification = hex(interval.id).upper()
+                instructions = ""
+                if self.eval_payment_mode_instructions:
+                    instructions = self.eval_payment_mode_instructions + "\n"
+                if self.instructions:
+                    instructions += self.instructions + "\n"
+                interval.instructions = instructions
+                # Codigo de Instrução do Movimento pode variar,
+                # mesmo no CNAB 240
+                # interval.mov_instruction_code_id = (
+                #     self.payment_mode_id.cnab_sending_code_id.id
+                # )
+            filtered_invoice_ids = self.filtered(
+                lambda s: (
+                    s.payment_mode_id and s.payment_mode_id.auto_create_payment_order
+                )
+            )
+            if filtered_invoice_ids:
+                # Criação das Linha na Ordem de Pagamento
+                pay_order_id = filtered_invoice_ids.create_account_payment_line()
+                # z = filtered_invoice_ids.payment_order_id
+                # Confirmar payment
+                pay = self.env['account.payment.order'].browse([pay_order_id['res_id']])
+                if pay:
+                    pay.draft2open()
+                    pay.open2generated()

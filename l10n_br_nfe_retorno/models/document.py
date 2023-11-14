@@ -29,7 +29,6 @@ class FiscalDocument(models.Model):
 
 
     def _eletronic_document_send(self):
-        super(NFe, self)._eletronic_document_send()
         for record in self.filtered(filter_processador_edoc_nfe):
             if self.xml_error_message:
                 return
@@ -84,17 +83,66 @@ class FiscalDocument(models.Model):
                             protocol_number=processo.resposta.protNFe.infProt.nProt,
                             file_response_xml=file.decode("utf-8"),
                         )
-                    state = "autorizada"
+                    # state = "autorizada"
 
-                    record._change_state(state)
+                    # record._change_state(state)
 
                     record.write(
                             {
                                 "status_code": "100",
                                 "status_name": "Autorizada",
+                                "status_edoc": "autorizada",
                             }
                     )
+                elif processo.resposta.cStat == "104" and not self.authorization_file_id:
+                    # qdo a nota ja foi enviada, o primeiro retorno retConsSitNFe
+                    # sera cStat = 100
+                    arquivo = self.send_file_id
+                    xml_string = base64.b64decode(arquivo.datas).decode()
+                    parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
+                    try:
+                        root = etree.fromstring(xml_string, parser=parser)
+                    except:
+                        # com a erpbrasil.edoc velha da erro acima
+                        root = etree.fromstring(bytes(xml_string, encoding='utf-8'))
+                    ns = {None: "http://www.portalfiscal.inf.br/nfe"}
+                    new_root = etree.Element("nfeProc", nsmap=ns)
 
+                    protNFe_node = etree.Element("protNFe")
+                    infProt = etree.SubElement(protNFe_node, "infProt")
+                    etree.SubElement(infProt, "tpAmb").text = processo.resposta.tpAmb
+                    etree.SubElement(infProt, "verAplic").text = processo.resposta.verAplic
+                    etree.SubElement(infProt, "dhRecbto").text = fields.Datetime.to_string(
+                        processo.resposta.dhRecbto)
+                    protocol_date=fields.Datetime.to_string(
+                        processo.resposta.dhRecbto)
+                    etree.SubElement(infProt, "nProt").text = processo.resposta.protNFe
+                    # etree.SubElement(infProt, "digVal").text = processo.resposta.protNFe.infProt.digVal
+                    etree.SubElement(infProt, "cStat").text = processo.resposta.cStat
+                    etree.SubElement(infProt, "xMotivo").text = processo.resposta.xMotivo
+
+                    new_root.append(root)
+                    new_root.append(protNFe_node)
+                    file = etree.tostring(new_root)
+                    #record.atualiza_status_nfe(processo)
+                    self.authorization_event_id.set_done(
+                            status_code="100",
+                            response="Autorizada",
+                            protocol_date=protocol_date,
+                            protocol_number=processo.resposta.protNFe,
+                            file_response_xml=file.decode("utf-8"),
+                        )
+                    # state = "autorizada"
+
+                    # record._change_state(state)
+
+                    record.write(
+                            {
+                                "status_code": "100",
+                                "status_name": "Autorizada",
+                                "status_edoc": "autorizada",
+                            }
+                    )
             else:
                 state = SITUACAO_EDOC_REJEITADA
 

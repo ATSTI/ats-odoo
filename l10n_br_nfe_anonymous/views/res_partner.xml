@@ -8,7 +8,7 @@
         <field name="inherit_id" ref="base.view_partner_form" />
         <field name="arch" type="xml">
             <field name="category_id" position="after">
-                <field name="is_anonymous_consumer" />
+                <field name="is_anonymous_consumer" string="Consumidor anônimo" />
             </field>
         </field>
     </record>

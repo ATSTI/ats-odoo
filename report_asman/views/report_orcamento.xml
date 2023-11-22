@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="report_saleorder_asman" model="ir.actions.report">
-        <field name="name">Orçamento</field>
+        <field name="name">Cotação / Pedido</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">report_asman.report_documento_asman</field>

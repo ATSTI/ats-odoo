@@ -291,7 +291,7 @@ class ImportarWizard(models.TransientModel):
                 c_estoque = int(linha[linha.find('=')+1:])
         mensagem = ""
         inv = self.env['stock.inventory']
-        nome_invent = f"inventario_{str(self.inicio)}_{str(self.fim)}"
+        nome_invent = f"inventario_{str(self.inicio)}_{str(self.fim)}({self.input_file_name})"
         inv_ids = inv.create({'name': nome_invent})
         for chain in self:
             file_path = tempfile.gettempdir()+'/file.xls'

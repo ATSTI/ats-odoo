@@ -135,6 +135,11 @@ class ImportarWizard(models.TransientModel):
                 arq.write("\n")
                 arq.write("c_birth_state_id=28")
                 arq.write("\n")
+            if self.tipo == "estoque":
+                arq.write("c_codigo=1")
+                arq.write("\n")
+                arq.write("c_estoque=2")
+                arq.write("\n")
             arq.close    
         arq = open(arquivo)
         linhas = arq.readlines()
@@ -146,12 +151,14 @@ class ImportarWizard(models.TransientModel):
         arq.close
 
     input_file = fields.Binary('Arquivo', required=False)
+    input_file_name = fields.Char('Nome arquivo')
     input_campos = fields.Text('Ordem dos Campos')
     tipo = fields.Selection([
             ("produto", "Produto"),
             ("cliente", "Cliente"),
             ("fornecedor", "Fornecedor"),
             ("dependente", "Dependente"),
+            ("estoque", "Estoque"),
         ],
         string="Tipo Importação",
     )
@@ -272,6 +279,77 @@ class ImportarWizard(models.TransientModel):
             'res_id': self.id,
             'type': 'ir.actions.act_window',
         }
+
+    def action_importar_estoque(self):
+        self.gravar_campos()
+        linhas = self.input_campos.split('\n')
+        # Colunas
+        for linha in linhas:    
+            if "c_codigo" in linha:
+                c_codigo = int(linha[linha.find('=')+1:])
+            if "c_estoque" in linha:
+                c_estoque = int(linha[linha.find('=')+1:])
+        mensagem = ""
+        inv = self.env['stock.inventory']
+        nome_invent = f"inventario_{str(self.inicio)}_{str(self.fim)}"
+        inv_ids = inv.create({'name': nome_invent})
+        for chain in self:
+            file_path = tempfile.gettempdir()+'/file.xls'
+            data = base64.decodebytes(chain.input_file)
+            f = open(file_path,'wb')
+            f.write(data)
+            f.close()
+            book = xlrd.open_workbook(file_path)
+            first_sheet = book.sheet_by_index(0)
+            conta_registros = 0
+            list_adi = []
+            for rownum in range(first_sheet.nrows):                                                                                                       
+                rowValues = first_sheet.row_values(rownum)
+                if rownum > self.inicio and rownum < self.fim:
+                    if rowValues[c_codigo]:
+                        cod = str(rowValues[c_codigo])
+                        qt = float(rowValues[c_estoque])
+                        prod = self.env['product.product'].search([('default_code', '=', cod)])
+                        if prod and prod.qty_available != qt:
+                            list_adi.append(prod.id)
+            inv_ids.write({'product_ids': [(6, 0, list_adi)]})
+        inv_ids.action_start()
+        com_produto = False
+        for chain in self:
+            file_path = tempfile.gettempdir()+'/file.xls'
+            data = base64.decodebytes(chain.input_file)
+            f = open(file_path,'wb')
+            f.write(data)
+            f.close()
+            book = xlrd.open_workbook(file_path)
+            first_sheet = book.sheet_by_index(0)
+            conta_registros = 0
+            list_adi = []
+            for rownum in range(first_sheet.nrows):                                                                                                       
+                rowValues = first_sheet.row_values(rownum)
+                if rownum > self.inicio and rownum < self.fim:
+                    if rowValues[c_codigo]:
+                        cod = str(rowValues[c_codigo])
+                        qt = float(rowValues[c_estoque])
+                        prod = self.env['product.product'].search([('default_code', '=', cod)])
+                        if not prod or prod.qty_available == qt:
+                            continue
+                        for inv_prod in inv_ids.line_ids:
+                            if inv_prod.product_id.id == prod.id:
+                                com_produto = True
+                                inv_prod.write({'product_qty': qt})
+                                conta_registros += 1
+        if com_produto:
+            inv_ids.action_validate()
+        mensagem += f"TOTAL DE REGISTROS INCLUIDOS : {str(conta_registros)}"
+        self.write({'mensagem': mensagem})
+        return {
+            'view_mode': 'form',
+            'res_model': 'importar.wizard',
+            'res_id': self.id,
+            'type': 'ir.actions.act_window',
+        }
+    # fim importa estoque
 
     def action_importar_produto(self):
         self.gravar_campos()

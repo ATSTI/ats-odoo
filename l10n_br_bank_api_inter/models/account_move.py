@@ -120,7 +120,7 @@ class AccountMove(models.Model):
                 inv_number = self.get_invoice_fiscal_number().split("/")[-1]
                 numero_documento = inv_number + "/" + str(index + 1).zfill(2)
 
-                sequence = self.payment_mode_id.own_number_sequence_id.next_by_id()
+                #sequence = self.payment_mode_id.own_number_sequence_id.next_by_id()
 
                 # vem do Inter
                 # interval.own_number = (

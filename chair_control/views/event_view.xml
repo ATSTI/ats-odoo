@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="event_view_form" model="ir.ui.view">
+        <field name="name">event.view.form</field>
+        <field name="model">event.event</field>
+        <field name="inherit_id" ref="event.view_event_form"/>
+        <field name="arch" type="xml">
+             <notebook position="inside">
+                    <page string="Cadeiras">
+                        <group>
+                            <field name="criado_cadeiras"/>
+                            <button name="button_criar_cadeiras" type="object" string="Atualizar cadeiras" attrs="{'invisible':[('criado_cadeiras','=',True)]}"/>
+                        </group>
+                        <group>
+                            <field name="chair_id" domain="[('event_id','=',id)]">
+                                <form string="Cadeiras">
+                                    <group>
+                                        <field name="name"/>
+                                        <field name="event_id"/>
+                                        <field name="participant_id" domain="[('event_id','=',event_id)]"/>
+                                    </group>
+                                </form>
+                                <tree string="Cadeiras" editable="botton">
+                                    <field name="name"/>
+                                    <field name="participant_id" string="Nome do participante" 
+                                        domain="[('event_id','=',event_id), ('chair_id', '=', False)]" readonly="1" />
+                                    <field name="event_id" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </page>
+                </notebook>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_chair_event_registration_form">
+        <field name="name">event.chair_registration.form</field>
+        <field name="model">event.registration</field>
+        <field name="inherit_id" ref="event.view_event_registration_form"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="chair_id" />
+                <field name="chair" />
+            </field>
+        </field>
+    </record>             
+
+    <record id="view_event_registration_chair_tree" model="ir.ui.view">
+        <field name="name">event.registration.tree.chair.inherit</field>
+        <field name="model">event.registration</field>
+        <field name="inherit_id" ref="event.view_event_registration_tree" />
+        <field name="arch" type="xml">
+            <field name="event_id" position="after">
+                <field name="chair"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+            id="report_sala"
+            string="Ver salas"
+            model="chair.show"
+            report_type="qweb-html"
+            file="chair_control.report_sala"
+            name="chair_control.report_sala"
+        />
+    </data>
+</odoo>

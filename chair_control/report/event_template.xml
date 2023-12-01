@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="event.event_template">
+        <t t-call="report.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="page">
+                    <div class="oe_structure"/>
+                    <div class="row">
+                        <div style="border=1px;width:100%">
+                            <h1 style="text-align:center">Lousa</h1>
+                        </div>
+                        <table style="border=1px;width:100%;text-align:center">
+                            <t t-foreach="[0,1,2,3,4,5,6,7,8]" t-as="line">
+                                <tr>
+                                    <t t-if="line==8">
+                                            <td style="background-color:white;"><span style="color:white;">0</span></td>
+                                            <td style="background-color:white;"><span style="color:white;">0</span></td>
+                                            <td style="background-color:white;"><span style="color:white;">0</span></td>
+                                    </t>
+                                    <t t-set="id_jafoi" t-value="1"/>
+                                    <t t-foreach="[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
+                                        21,22,23,24,25,26,27,28,29,30,
+                                        31,32,33,34,35,36,37,38,39,40,
+                                        41,42,43,44,45,46,47,48,49,50,
+                                        51,52,53,54,55,56,57,58,59,60]" t-as="linhas">
+                                        <t t-if="(linhas_index &gt;=(line*7)) and (linhas_index &lt; ((line+1)*7))">
+                                            <t t-foreach="o.registration_ids" t-as="column">
+                                                <t t-if="str(linhas_index+1) == str(column.chair)">
+                                                    <t t-if="column.chair and str(column.chair) == str(linhas_index+1)">
+                                                        <t t-set="id_jafoi" t-value="0"/>
+                                                        <t t-set="aluno" t-value="column.name[:50]"/>
+                                                        <td width="150" style="background-color:red;border: 1px solid black;"><span t-esc="aluno"/></td>
+                                                    </t>
+                                                </t>
+                                            </t>
+                                            <t t-if="id_jafoi == 1">
+                                                <td width="150" style="background-color:green;border: 1px solid black"><span t-esc="linhas_index+1"/></td>
+                                            </t>
+                                            <t t-set="id_jafoi" t-value="1"/>
+                                       </t>
+                                    </t>
+                                </tr>
+                            </t>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <report id="event.chair_view"
+        name="event.event_template"
+        file="chair_control.event_template"
+        model="event.event"
+        report_type="qweb-html"
+        string="Ver salas"
+        menu="True"/>
+                
+</odoo>

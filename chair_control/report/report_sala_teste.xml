@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Custom report.-->
+<odoo>
+<data>
+<template id="report_sala_document">
+    <t t-call="report.external_layout">
+        <div class="page">
+            <div class="row">
+                <h3>Title</h3>
+            </div>
+        </div>
+    </t>
+</template>
+
+<template id="report_sala">
+    <t t-call="report.html_container">
+        <t t-foreach="doc_ids" t-as="doc_id">
+            <t t-raw="translate_doc(doc_id, doc_model, 'partner_id.lang', 'account.report_without_prices_document')"/>
+        </t>
+    </t>
+</template>
+</data>
+</odoo>

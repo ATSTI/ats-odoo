@@ -71,6 +71,12 @@ class EventRegistration(models.Model):
         domain="[('participant_id', '=', False), \
         ('event_id','=',event_id)]")
 
+    @api.onchange('chair_id')
+    def _onchange_chair_id(self):
+        self.chair = False
+        if self.chair_id:
+            self.chair = self.chair_id.name
+
     @api.model
     def create(self, vals):
         er_id = super(EventRegistration, self).create(vals)

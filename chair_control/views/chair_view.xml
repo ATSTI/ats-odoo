@@ -25,7 +25,6 @@
         <record id="chair_control_action" model="ir.actions.act_window">
             <field name="name">Cadastro de cadeiras</field>
             <field name="res_model">chair.control</field>
-            <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
@@ -33,6 +32,6 @@
             </field>
         </record>
 
-        <menuitem action="chair_control_action" id="menu_chair_control" parent="account.account_management_menu" sequence="5" groups="account.group_account_invoice"/>
+        <menuitem action="chair_control_action" id="menu_chair_control" parent="event.menu_event_configuration" sequence="5" groups="event.group_event_manager"/>
     </data>
 </odoo>

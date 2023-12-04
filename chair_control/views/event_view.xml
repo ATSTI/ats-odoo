@@ -40,7 +40,7 @@
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
                 <field name="chair_id" />
-                <field name="chair" />
+                <field name="chair" invisible="1"/>
             </field>
         </field>
     </record>             
@@ -51,7 +51,7 @@
         <field name="inherit_id" ref="event.view_event_registration_tree" />
         <field name="arch" type="xml">
             <field name="event_id" position="after">
-                <field name="chair"/>
+                <field name="chair" invisible="1" />
             </field>
         </field>
     </record>

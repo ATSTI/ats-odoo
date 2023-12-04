@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="event.event_template">
-        <t t-call="report.html_container">
+    <template id="event_template_chair">
+        <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <div class="page">
                     <div class="oe_structure"/>
@@ -48,12 +48,13 @@
         </t>
     </template>
 
-    <report id="event.chair_view"
-        name="event.event_template"
-        file="chair_control.event_template"
-        model="event.event"
-        report_type="qweb-html"
-        string="Ver salas"
-        menu="True"/>
+    <record id="chair_template_view" model="ir.actions.report">
+        <field name="name">Ver salas</field>
+        <field name="model">event.event</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">chair_control.event_template_chair</field>
+        <field name="report_file">chair_control.event_template_chair</field>
+        <field name="binding_model_id" ref="event.model_event_event"/>
+    </record>
                 
 </odoo>

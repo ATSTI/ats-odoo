@@ -13,10 +13,11 @@
     'author': 'otaviosilmunhoz@hotmail.com/ATS Soluções',
     'website': '',
     'depends': ['event_sale'],
-    'data': [#'views/chair_view.xml',
-             'views/event_view.xml',
-            #  'report/chair_template.xml',
-            #  'report/event_template.xml',
+    'data': [
+            'views/chair_view.xml',
+            'views/event_view.xml',
+            'report/chair_template.xml',
+            'report/event_template.xml',
             'security/ir.model.access.csv'
     ],
     'installable': True,

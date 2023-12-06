@@ -191,7 +191,7 @@
 
                     <table class="client">
                         <tr>
-                            <td>NOME DO SACADO: <span t-field="doc.partner_id.name"/></td>
+                            <td>CLIENTE : <span t-field="doc.partner_id.name"/></td>
                         </tr>
                         <tr>
                             <td>ENDEREÇO : <span t-field="doc.partner_id.street"/></td>

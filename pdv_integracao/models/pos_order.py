@@ -378,7 +378,7 @@ class PosSession(models.Model):
             metodo_pag = ''
             for pag_ids in ped['statement_ids']:
                 pag = pag_ids[2]
-                jrn = self.env['account.journal'].browse([pag['journal']])
+                jrn = self.env['account.journal'].search([('name', 'like', pag['journal'])])
                 metodo_pag = self.env['pos.payment.method'].search([('name', 'ilike', jrn.name[:2])])
                 # datetime.strftime(pag['date'],'%Y-%m-%d'),
                 # "pos_order_id": ped_id.id,
@@ -434,12 +434,13 @@ class PosSession(models.Model):
             for px in pedido_ses:
                 px_ids = {}
                 px_ids['tipo'] = 'pedido'
-                px_ids['session'] = px.session_id.id
+                px_ids['caixa'] = px.session_id.id
                 px_ids['order_id'] = px.id
                 px_ids['codmovimento'] = px.name
+                px_ids['user_id'] = px.user_id.id
                 pd.append(px_ids)
             # if len(list(lista_pedido)):
-            with open(path_file_return, 'a+') as tfile:
+            with open(path_file_return, 'w') as tfile:
                 # tfile.write(list(pd))
 
                 for items in list(pd):

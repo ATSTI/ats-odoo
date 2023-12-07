@@ -21,7 +21,6 @@ class PosSession(models.Model):
     _inherit = 'pos.session'
     
     def produto_corrige_ncm(self):
-        #import pudb;pu.db
         origem = odoorpc.ODOO('felicita.atsti.com.br', port=48069)
         origem.login('felicita_atsti_com_br', 'ats@atsti.com.br', 'a2t00s7')
         a_prod = origem.env['product.product']
@@ -35,8 +34,6 @@ class PosSession(models.Model):
         arqx = open('/var/www/webroot/ncm_nao_encontrado.txt', '+a')
         for prd in prod_a:
             prod = b_prod.search([('default_code', '=', prd.default_code)])
-            #if prod.id == 11126:
-            #    import pudb;pu.db
             if prod:
                 ncm = prd.product_tmpl_id.fiscal_classification_id.code
                 if not ncm:
@@ -104,12 +101,10 @@ class PosSession(models.Model):
    
     def insere_caixa_integracao(self):
         # lê arquivos na pasta
-        #import pudb;pu.db
         path_file = '/var/www/webroot/arquivos'
         path_file_return = '/var/www/webroot/retornos/retorno.json'
         # arquivos = os.listdir(path_file)
         arquivos = sorted(fnmatch.filter(os.listdir(path_file), "cai_*.json"))
-        # import pudb;pu.db
         # para cada arquivo na pasta
         num_arq = 1
         user_adic = []
@@ -187,7 +182,6 @@ class PosSession(models.Model):
         # gera um arquivo com todos os pedidos da sessao
         # pra ser enviado para o pdv evitando o envio dos 
         # arquivos que ja estao neste retorno
-        # import pudb;pu.db
         path_file = '/var/www/webroot/arquivos'
         path_file_return = '/var/www/webroot/retornos/retorno.json'
         # arquivos = os.listdir(path_file)
@@ -217,8 +211,6 @@ class PosSession(models.Model):
                 continue
             f = open(path_file + '/' + i, mode="r")
             ped = json.load(f)
-            # if ped['name'] == '4561-163115':
-            #     import pudb;pu.db
             session = self.env['pos.session']
             prt_obj = self.env['res.partner']
             prod_obj = self.env['product.product']
@@ -313,14 +305,16 @@ class PosSession(models.Model):
                 # if not len(prod):
                 #if len(prod):
                 #    print (f"ITEM : {line.product_id.default_code}")
-                descricao  = line['name']
-                prd = prod_obj.search([('name', 'ilike', line['name'])], limit=1)
+                codpro = line['product_id']
+                prd = prod_obj.search([('default_code', '=', codpro)])
                 if not prd:
-                    prd = prod_obj.search([('id', '=', line['product_id'])])
-
-                if not prd:
-                    prd = prod_obj.search([('default_code', '=', '321')])
-                    descricao = f"{descricao} - PRODUTO NAO LOCALIZADO"
+                    descricao  = line['name']
+                    prd = prod_obj.search([('name', 'ilike', line['name'])], limit=1)
+                    if not prd:
+                        prd = prod_obj.search([('id', '=', line['product_id'])])
+                    if not prd:
+                        prd = prod_obj.search([('default_code', '=', '321')])
+                        descricao = f"{descricao} - PRODUTO NAO LOCALIZADO"
                 #TODO buscar pelo codigo nao id
                 # px = line['product_id']
                 # if px == 30979:

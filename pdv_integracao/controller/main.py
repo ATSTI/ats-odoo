@@ -31,7 +31,7 @@ class IntegracaoPdv(http.Controller):
         data = request.jsonrequest
         # TODO testar aqui se e a empresa mesmo
         hj = datetime.now()
-        hj = hj - timedelta(days=30)
+        hj = hj - timedelta(days=3)
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
         audit = http.request.env['auditlog.log'].sudo().search([
             ('create_date', '>=', hj),
@@ -48,20 +48,30 @@ class IntegracaoPdv(http.Controller):
         #         prd_ids.add(pr.id)
         # else:
         for pr in audit:
-            if len(pr.line_ids):
-                prd_ids.add(pr.res_id)
+            for line in pr.line_ids:
+                if line.field_name in (
+                    'default_code', 'barcode', 'standard_price', 'list_price', 'tipo_venda',
+                    'qtde_atacado', 'preco_atacado', 'name'
+                ):
+                    prod_ids = http.request.env['product.template'].sudo().browse([pr.res_id])
+                    if prod_ids:
+                        prd_ids.add(prod_ids.product_variant_id.id)
     
         audit = http.request.env['auditlog.log'].sudo().search([
             ('create_date', '>=', hj),
             ('model_id', '=', 'product.product'),
         ])
         for pr in audit:
-            if len(pr.line_ids):
-                prd_ids.add(pr.res_id)
-
+            for line in pr.line_ids:
+                if line.field_name in (
+                    'default_code', 'barcode', 'standard_price', 'list_price', 'tipo_venda',
+                    'qtde_atacado', 'preco_atacado', 'name'
+                ):
+                    prd_ids.add(pr.res_id)
+        # import pudb;pu.db
         if len(prd_ids):
             prod_ids = http.request.env['product.product'].sudo().search([
-                ('product_tmpl_id','in',list(prd_ids))])
+                ('id','in',list(prd_ids))])
         #print ('Qtde de Produtos %s\n' %(str(len(prod_ids))))
         lista = []
         for prd in prod_ids:
@@ -80,6 +90,11 @@ class IntegracaoPdv(http.Controller):
             produto = unidecode(produto)
             prod['produto'] = produto
             prod['valor_prazo'] = prd.list_price
+            prod['custo'] = prd.standard_price
+            prod['tipo_venda'] = prd.tipo_venda
+            # prod['rateio'] = prd.rateio
+            prod['qtdeatacado'] = prd.qtde_atacado
+            prod['precoatacado'] = prd.preco_atacado
             data_alt = prd.write_date
             data_alterado = data_alt + timedelta(hours=+3)
             prod['datacadastro'] = datetime.strftime(data_alterado,'%m/%d/%Y %H:%M:%S')
@@ -95,8 +110,6 @@ class IntegracaoPdv(http.Controller):
             if prd.barcode and len(prd.barcode) < 14:
                 prod['cod_barra'] = prd.barcode.strip()
             lista.append(prod)
-
-
 
         # Itens inativos
         prod_tmpl = http.request.env['product.template'].sudo().search([
@@ -589,7 +602,7 @@ class IntegracaoPdv(http.Controller):
                 try:
                     prdname = unidecode(md['DESCPRODUTO'])
                 except:
-                    prdname = 'Nada'
+                    prdname = md['DESCPRODUTO']
                 pco = float(md['PRECO'].replace(',','.'))
                 qtd = float(md['QUANTIDADE'].replace(',','.'))
                 desc = float(md['VALOR_DESCONTO'].replace(',','.'))

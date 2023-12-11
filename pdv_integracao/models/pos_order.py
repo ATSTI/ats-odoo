@@ -307,8 +307,8 @@ class PosSession(models.Model):
                 #    print (f"ITEM : {line.product_id.default_code}")
                 codpro = line['product_id']
                 prd = prod_obj.search([('default_code', '=', codpro)])
+                descricao  = line['name']
                 if not prd:
-                    descricao  = line['name']
                     prd = prod_obj.search([('name', 'ilike', line['name'])], limit=1)
                     if not prd:
                         prd = prod_obj.search([('id', '=', line['product_id'])])

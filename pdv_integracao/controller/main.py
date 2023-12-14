@@ -31,7 +31,7 @@ class IntegracaoPdv(http.Controller):
         data = request.jsonrequest
         # TODO testar aqui se e a empresa mesmo
         hj = datetime.now()
-        hj = hj - timedelta(days=3)
+        hj = hj - timedelta(days=5)
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
         audit = http.request.env['auditlog.log'].sudo().search([
             ('create_date', '>=', hj),
@@ -168,7 +168,7 @@ class IntegracaoPdv(http.Controller):
         hj = hj - timedelta(days=10)
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
         cliente = http.request.env['res.partner']
-        cli_ids = cliente.sudo().search([('write_date', '>=', hj), ('category_id','=', 1)])
+        cli_ids = cliente.sudo().search([('write_date', '>=', hj)])
         lista = []
         for partner_id in cli_ids:
             cliente = {}
@@ -181,9 +181,13 @@ class IntegracaoPdv(http.Controller):
             cliente['tipofirma'] = 0
             cliente['segmento'] = 1
             cliente['regiao'] = 1
+            if partner_id.curso:
+                cliente['regiao'] = partner_id.curso
             cliente['codusuario'] = 1
             cliente['status'] = 1
-            cliente['cnpj'] = partner_id.cnpj_cpf
+            cliente['cnpj'] = ''
+            if partner_id.cnpj_cpf:
+                cliente['cnpj'] = partner_id.cnpj_cpf
             data_alt = partner_id.write_date
             data_alterado = data_alt + timedelta(hours=+3)
             cliente['data_matricula'] = datetime.strftime(data_alterado,'%m/%d/%Y %H:%M:%S')

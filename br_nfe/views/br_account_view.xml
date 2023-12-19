@@ -362,14 +362,13 @@
         </field>
     </record>
 
-    <!--<record id="br_account_cfop_action" model="ir.actions.act_window">
+    <record id="br_account_cfop_action" model="ir.actions.act_window">
         <field name="name">CFOP</field>
         <field name="type">ir.actions.act_window</field>
-        <field name="res_model">br_account.cfop</field>
+        <field name="res_model">l10n_br_fiscal.cfop</field>
         <field name="view_mode">tree,form</field>
-        <field name="view_type">form</field>
         <field name="view_id" ref="br_account_cfop_tree"/>
-    </record>-->
+    </record>
 
     <!--<record id="br_account_cfop_structure_action" model="ir.actions.act_window">
         <field name="name">Estrutura do CFOP</field>
@@ -447,16 +446,16 @@
     id="menu_br_account_fiscal_manager"
     name="Cadastros"
     parent="menu_br_account"
-    sequence="0"/>
+    sequence="0"/>-->
 
-    <menuitem
+    <!--<menuitem
     id="br_account_cfop_menu"
     name="CFOP"
-    parent="br_account.menu_br_account_fiscal_manager"
+    parent="l10n_br_fiscal.fiscal_menu"
     action="br_account_cfop_action"
-    sequence="10" />
+    sequence="10" />-->
 
-    <menuitem
+    <!--<menuitem
     id="br_account_cfop_structure_menu"
     name="Estrutura do CFOP"
     parent="br_account.menu_br_account_fiscal_manager"

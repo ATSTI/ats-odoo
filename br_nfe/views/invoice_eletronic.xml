@@ -442,8 +442,22 @@
                 </search>
             </field>
         </record>
+        <record id="action_invoice_eletronic_trust" model="ir.actions.act_window">
+            <field name="name">NFe Trust</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">invoice.eletronic</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="sped_base_eletronic_doc_search"/>
+            <field name="target">new</field>
+        </record>
+        <!--Colocar em outra base e ver se funciona (locefaca nao tem nfe)-->
 
-        <!--<menuitem id="menu_eletronic_doc_base" name="Automação de NFe" parent="account.menu_finance_entries" sequence="20"/>
-        <menuitem id="menu_action_sped_base_eletronic_doc" parent="menu_eletronic_doc_base" action="action_sped_base_eletronic_doc" sequence="5" />-->
+        <menuitem
+        id="menu_action_invoice_eletronic_trust"
+        name="NFe Trust"
+        action="br_nfe.action_invoice_eletronic_trust"
+        parent="l10n_br_fiscal.document_menu"
+        sequence="99"/>
+
     </data>
 </openerp>

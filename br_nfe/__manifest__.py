@@ -16,6 +16,8 @@
     ],
     'depends': [
         'l10n_br_account',
+        'l10n_br_fiscal',
+        'l10n_br_base',
     ],
     'data': [
         'security/ir.model.access.csv',

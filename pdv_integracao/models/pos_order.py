@@ -124,16 +124,22 @@ class PosSession(models.Model):
             # caixa = f"-{nome_arq[:6]}"
             caixa = f"-{arq['caixa']}"
             session = ses.search([('name', 'like', caixa)])
+            state = arq["state"]
             if session:
                 sesd = []
                 for px in session:
-                    px_ids = {}
-                    px_ids['tipo'] = 'sessao'
-                    px_ids['user_id'] = px.user_id.id
-                    px_ids['name'] = px.name
-                    caixa = px.name[px.name.find('-')+1:]
-                    px_ids['caixa'] = caixa
-                    sesd.append(px_ids)
+                    if px.state == "opened" and state == "closed":
+                        px.action_pos_session_closing_control()
+                    if px.state == "closing_control" and state == "closed":
+                        px._validate_session()
+                    else:    
+                        px_ids = {}
+                        px_ids['tipo'] = 'sessao'
+                        px_ids['user_id'] = px.user_id.id
+                        px_ids['name'] = px.name
+                        caixa = px.name[px.name.find('-')+1:]
+                        px_ids['caixa'] = caixa
+                        sesd.append(px_ids)
                 with open(path_file_return, 'a+') as tfile:
                     for items in list(sesd):
                         tfile.write('%s,' % items)
@@ -150,6 +156,8 @@ class PosSession(models.Model):
             user_adic.append(usuario.id)
             session_open = ses.search([('user_id', '=', usuario.id), ('state', '=', 'opened')])
             if session_open:
+                # if state == "closed":
+                    # session_open.action_pos_session_closing_control()
                 continue
             pv = self.env['pos.config'].search([('name', 'ilike', usuario.name)], limit=1)
             ses_id = []
@@ -305,12 +313,12 @@ class PosSession(models.Model):
                 # if not len(prod):
                 #if len(prod):
                 #    print (f"ITEM : {line.product_id.default_code}")
-                codpro = line['product_id']
+                codpro = str(line['product_id'])
                 prd = prod_obj.search([('default_code', '=', codpro)])
                 descricao  = line['name']
                 if not prd:
                     prd = prod_obj.search([('name', 'ilike', line['name'])], limit=1)
-                    if not prd:
+                    if len(line['product_id']) < 10 and not prd:
                         prd = prod_obj.search([('id', '=', line['product_id'])])
                     if not prd:
                         prd = prod_obj.search([('default_code', '=', '321')])
@@ -331,7 +339,6 @@ class PosSession(models.Model):
                 #     px = 30404
                 # if 'Troca' in line['name']:
                 #     troca += line['price_unit'] * line['qty']
-                    # import pudb;pu.db
                 sub_total = line['price_unit'] * line['qty']
                 # print('1-VALOR : %s' %str(sub_total))
                 # print('2-Reducao : %s' %str(sub_total * (desconto/100)))
@@ -359,7 +366,6 @@ class PosSession(models.Model):
                 # if 'discount' in line:
                     # vals_item["discount"] = line['discount']
                 # "order_id": ped_id.id,
-                #import pudb;pu.db
                 # ped_id.write({'lines'(vals_iten)
             
                 list_adi.append(vals_item)
@@ -368,7 +374,6 @@ class PosSession(models.Model):
             if troca or dif_pag:
                 tot = ped_id.amount_total + troca - dif_pag
                 # print('Total GERAL XXXXXXXXXXXXXXXXXXX: %s' %(str(tot)))
-                # import pudb;pu.db
                 ped_id.write({
                     'amount_tax': tot,
                     'amount_total': tot,
@@ -391,7 +396,6 @@ class PosSession(models.Model):
                     "payment_date": pag['date'][:10],
                     "session_id": ses.id,
                 }
-                #import pudb;pu.db
                 # list_pag.append(vals_pag)
                 # vLine = b_pedidoPag.create(vals_pag)
                 ped_id.write({'payment_ids': [(0, 0, vals_pag)]})
@@ -403,7 +407,6 @@ class PosSession(models.Model):
 
             # se a prazo criando a Fatura
             if metodo_pag and metodo_pag.name[:2] == '4-':
-                #import pudb;pu.db
                 ped_id.write({'to_invoice': True})
                 move_vals = ped_id._prepare_invoice_vals()
                 new_move = ped_id._create_invoice(move_vals)
@@ -487,7 +490,6 @@ class PosSession(models.Model):
 
     #     if len(pedidos_10) == len(pedidos_14):
     #         continue
-    #     #import pudb;pu.db
     #     #logger.info(f"Sessão : {ses.name}")
     #     if len(pSession):
     #         insere_pedido(pSes.id,ses.id)

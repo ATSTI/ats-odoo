@@ -1,27 +1,35 @@
 <odoo>
-    <record id="product_view_order_form" model="ir.ui.view">
-        <field name="name">product.template.form</field>
+    <record id="product_view_order_form_simple" model="ir.ui.view">
+        <field name="name">product.template.form.simple</field>
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_only_form_view" />
+        <field name="priority">9999</field>
         <field name="arch" type="xml">
             <field name="description" position="attributes">
                 <attribute name="attrs">{'invisible': True}</attribute>
             </field>
-            <field name="fiscal" position="attributes">
+            <xpath expr="//page[@name='fiscal']" position="attributes">
                 <attribute name="attrs">{'invisible': True}</attribute>
-            </field>
-            <field name="sale" position="attributes">
+            </xpath>
+            <xpath expr="//group[@name='sale']" position="attributes">
                 <attribute name="attrs">{'invisible': True}</attribute>
-            </field>
-            <field name="inventory" position="attributes">
+            </xpath>
+            <xpath expr="//page[@name='inventory']" position="attributes">
                 <attribute name="attrs">{'invisible': True}</attribute>
-            </field>
-            <xpath expr="//page[@name='general_information']" position="after">
+            </xpath>
+            <xpath expr="//page[@name='general_information']" position="replace">
                 <page name="general_information" string="Informações Gerais">
                     <group>
+                        <field name="company_id" groups="base.group_multi_company"
+                            options="{'no_create': True}" invisible="1"/>
+                        <field name="uom_po_id" groups="uom.group_uom" options="{'no_create': True}"/>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="cost_currency_id" invisible="1"/>
+                        <field name="product_variant_id" invisible="1"/>
+                        <field name="active" invisible="1"/>
                         <field name="type" attrs="{'invisible': [('product_variant_count', '&gt;', 1)]}"/>
                         <field name="categ_id" attrs="{'invisible': [('product_variant_count', '&gt;', 1)]}"/>
-                        <field name="default_code" string="Código" attrs="{'invisible': [('product_variant_count', '&gt;', 1)]}"/>
+                        <field name="default_code" string="Código" attrs="{'invisible': [('product_variant_count', '&gt;', 1)], 'required': True}"/>
                         <field name="barcode" attrs="{'invisible': [('product_variant_count', '&gt;', 1)]}"/>
                         <field name="list_price" attrs="{'invisible': [('product_variant_count', '&gt;', 1)]}"/>
                         <field name="standard_price" attrs="{'invisible': [('product_variant_count', '&gt;', 1)]}"/>

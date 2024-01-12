@@ -29,7 +29,7 @@
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['l10n_br_sale', 'l10n_br_fiscal', 'product'],
+    'depends': ['l10n_br_sale', 'l10n_br_fiscal', 'product', 'product_sequence'],
     'data': [
         'views/product_view.xml',
     ],

@@ -15,6 +15,8 @@ import json
 
 
 _logger = logging.getLogger(__name__)
+path_file = '/opt/odoo/arquivos'
+path_file_return = '/opt/odoo/retornos/retorno.json'
 
 class PosSession(models.Model):
     _inherit = 'pos.session'
@@ -58,8 +60,8 @@ class PosSession(models.Model):
    
     def insere_caixa_integracao(self):
         # lê arquivos na pasta
-        path_file = '/var/www/webroot/arquivos'
-        path_file_return = '/var/www/webroot/retornos/retorno.json'
+        # path_file = '/var/www/webroot/arquivos'
+        # path_file_return = '/var/www/webroot/retornos/retorno.json'
         # arquivos = os.listdir(path_file)
         arquivos = fnmatch.filter(os.listdir(path_file), "cai_*.json")
         # import pudb;pu.db
@@ -134,8 +136,8 @@ class PosSession(models.Model):
         # pra ser enviado para o pdv evitando o envio dos 
         # arquivos que ja estao neste retorno
         # import pudb;pu.db
-        path_file = '/var/www/webroot/arquivos'
-        path_file_return = '/var/www/webroot/retornos/retorno.json'
+        # path_file = '/var/www/webroot/arquivos'
+        # path_file_return = '/var/www/webroot/retornos/retorno.json'
         # arquivos = os.listdir(path_file)
         arquivos = fnmatch.filter(os.listdir(path_file), "ped_*.json")
         # para cada arquivo na pasta
@@ -246,7 +248,6 @@ class PosSession(models.Model):
             
             linhas = len(ped['lines'])
             desc_soma = dif_pag
-            # print('Inicio : %s' %str(desc_soma))
             for line_ids in ped['lines']:
                 linhas -= 1
                 line = line_ids[2]
@@ -261,36 +262,14 @@ class PosSession(models.Model):
                 prd = prod_obj.search([('name', 'ilike', line['name'])], limit=1)
                 if not prd:
                     prd = prod_obj.search([('id', '=', line['product_id'])])
-
                 if not prd:
                     prd = prod_obj.search([('default_code', '=', '321')])
                     descricao = f"{descricao} - PRODUTO NAO LOCALIZADO"
-                #TODO buscar pelo codigo nao id
-                # px = line['product_id']
-                # if px == 30979:
-                #     px = 30683
-                # if px == 31344:
-                #     px = 31242
-                # if px == 30430:
-                #     px = 30495
-                # if px == 29899:
-                #     px = 30586
-                # if px == 30406:
-                #     px = 30404
-                # if px == 30406:
-                #     px = 30404
-                # if 'Troca' in line['name']:
-                #     troca += line['price_unit'] * line['qty']
-                    # import pudb;pu.db
                 sub_total = line['price_unit'] * line['qty']
-                # print('1-VALOR : %s' %str(sub_total))
-                # print('2-Reducao : %s' %str(sub_total * (desconto/100)))
                 if linhas == 0:
                     desconto =  (desc_soma / sub_total) * 100
-                    # print('4-Desc Final : %s' %str(desconto))
                 else:
                     desc_soma -= sub_total * (desconto/100)
-                    # print('3-total desc : %s' %str(desc_soma))
                 sub_total = sub_total - (sub_total * (desconto/100))
                 vals_item = {
                     "name": descricao, 
@@ -302,21 +281,11 @@ class PosSession(models.Model):
                     "tipo_venda": line['tipo_venda'],
                     "price_subtotal": sub_total,
                     "price_subtotal_incl": sub_total,
-                }
-                # print('5-GERALLLLLLLLLLLLLL : %s' %str(sub_total))
-                # if 'discount' in line:
-                    # vals_item["discount"] = line['discount']
-                # "order_id": ped_id.id,
-                #import pudb;pu.db
-                # ped_id.write({'lines'(vals_iten)
-            
+                }           
                 list_adi.append(vals_item)
-                # vals['lines'] = [(0, 0, list_adi)]
                 ped_id.write({'lines': [(0, 0, vals_item)]})
             if troca or dif_pag:
                 tot = ped_id.amount_total + troca - dif_pag
-                # print('Total GERAL XXXXXXXXXXXXXXXXXXX: %s' %(str(tot)))
-                # import pudb;pu.db
                 ped_id.write({
                     'amount_tax': tot,
                     'amount_total': tot,
@@ -329,9 +298,6 @@ class PosSession(models.Model):
                 pag = pag_ids[2]
                 jrn = self.env['account.journal'].browse([pag['journal']])
                 metodo_pag = self.env['pos.payment.method'].search([('name', 'ilike', jrn.name[:2])])
-                # datetime.strftime(pag['date'],'%Y-%m-%d'),
-                # "pos_order_id": ped_id.id,
-                # print('Total PAGO: %s' %(str(pag['amount'])))
                 vals_pag = {
                     "name": pag['name'],                
                     "amount": pag['amount'],                     
@@ -339,41 +305,16 @@ class PosSession(models.Model):
                     "payment_date": pag['date'][:10],
                     "session_id": ses.id,
                 }
-                #import pudb;pu.db
-                # list_pag.append(vals_pag)
-                # vLine = b_pedidoPag.create(vals_pag)
                 ped_id.write({'payment_ids': [(0, 0, vals_pag)]})
-            # vals['payment_ids'] = [(0, 0, list_pag)]
-            # ped_id = pos.create(vals) 
-            # mudando o status pra pago
             if metodo_pag and metodo_pag.name[:2] != '4-':
                 ped_id.action_pos_order_paid()
-
             # se a prazo criando a Fatura
             if metodo_pag and metodo_pag.name[:2] == '4-':
-                #import pudb;pu.db
                 ped_id.write({'to_invoice': True})
                 move_vals = ped_id._prepare_invoice_vals()
                 new_move = ped_id._create_invoice(move_vals)
                 ped_id.write({'account_move': new_move.id, 'state': 'invoiced'})
                 new_move.sudo().with_company(ped_id.company_id)._post()
-            
-                # ver se esta paga
-
-                # if ped.invoice_id.state == 'paid':
-                # for ct in ped.invoice_id.receivable_move_line_ids:
-                #     if ct.reconciled:
-                #         bancos = origem.env['account.journal'].search([
-                #             ('type', 'in', ('cash', 'bank'))])
-                #         aml = origem.env['account.move.line'].search([
-                #             ('ref','=',ped.name),
-                #             ('journal_id', 'in', bancos)
-                #         ])
-                #         for ml in aml:
-                #             aml_id = origem.env['account.move.line'].browse(ml)
-                #             jrn = dest.env['account.journal'].search([('name', 'ilike', ml.journal_id.name[:2])])
-                #             jrn_id = dest.env['account.journal'].browse(jrn)
-                #             baixa_pagamentos(new_move, jrn_id, 0, aml_id.debit, 0, 0)
         if ses:
             # crio um arquivo com todos os pedidos desta sessao
             pedido_ses = self.env['pos.order'].search([('session_id', '=', ses.id)])
@@ -385,14 +326,70 @@ class PosSession(models.Model):
                 px_ids['order_id'] = px.id
                 px_ids['codmovimento'] = px.name
                 pd.append(px_ids)
-            # if len(list(lista_pedido)):
             with open(path_file_return, 'a+') as tfile:
-                # tfile.write(list(pd))
-
                 for items in list(pd):
                     tfile.write('%s,' % items)
-	            # tfile.write('\n'.join(list(lista_pedido)))
-             
+
+    def insere_devolucao_integracao(self):
+        # arquivos = os.listdir(path_file)
+        arquivos = fnmatch.filter(os.listdir(path_file), "dev_*.json")
+        # para cada arquivo na pasta
+        num_arq = 1
+        for i in arquivos:
+            nome_arq = i[:i.index('.')][4:]
+            if num_arq == 50:
+                continue
+            num_arq += 1           
+            # buscar pedido ja existe
+            pick = self.env['stock.picking']
+            picking = pick.search([('name', '=', nome_arq)])
+
+            if picking:
+                os.remove(path_file + '/' + i)
+                continue
+            f = open(path_file + '/' + i, mode="r")
+            p = json.load(f)
+            user_id = self.env['res.users'].browse([p['user_id']])
+            # nome_busca = str(p['origin'])
+            # dev = pick.sudo().search([
+            #             ('origin', 'like', nome_busca)
+            #         ]) 
+            item = []
+            vals = {}            
+            for lines in p['move_lines']:
+                line = lines[2]
+                vals['origin'] = str(p['origin'])
+                vals['name'] = nome_arq
+                operacao = self.env['stock.picking.type'].sudo().search([
+                    ('name', 'ilike', 'devolucao')
+                ])
+                prd = {}
+                for tipo in operacao:
+                    if tipo.warehouse_id.company_id.id == user_id.company_id.id:
+                        # tipo_operacao = tipo
+                        vals['picking_type_id'] = tipo.id
+                        vals['location_id'] = tipo.default_location_src_id.id
+                        vals['location_dest_id'] = tipo.default_location_dest_id.id
+                        vals['note'] = p['motivo'] 
+                        prd['location_id'] = tipo.default_location_src_id.id
+                        prd['location_dest_id'] = tipo.default_location_dest_id.id
+                prod = self.search([('default_code', '=', line['product_code'])])
+                if not prod:
+                    prod = self.search([('name', 'ilike', line['name'])], limit=1)
+                prd['product_id'] =  prod.id
+                prd['product_uom_qty'] = line['qty_done'] 
+                prd['product_uom'] = prod.uom_id.id
+                prd['quantity_done'] = line['qty_done'] 
+                prd['name'] = line['name']               
+                item.append((0, 0,prd))
+                vals['move_ids_without_package'] = item
+
+                pos = self.env['stock.picking']
+                pick = pos.sudo().create(vals)
+                pick.action_confirm()
+                pick.action_assign()            
+                pick.button_validate()
+
     # for ses in a_session.browse(a_ses): 
     #     #cli_id = b_cliente.search([('name', '=', cli.name)])
     #     #print ('Codigo : %s , Nome : %s.' % (cli.id,cli.name))

@@ -22,7 +22,8 @@ import werkzeug.wrappers
 import werkzeug.wsgi
 from werkzeug.urls import url_decode, iri_to_uri
 
-
+path_file = '/opt/odoo/arquivos'
+path_file_return = '/opt/odoo/retornos/retorno.json'
 
 class IntegracaoPdv(http.Controller):
 
@@ -364,17 +365,14 @@ class IntegracaoPdv(http.Controller):
         data = request.jsonrequest
         dados_json = data['params']
         nome_arquivo = f"{data['tipo']}_{dados_json['name'].replace('/', '_')}"
-        arquivo = '/opt/odoo/arquivos/%s.json' %(nome_arquivo)
+        arquivo = f"{path_file}/{nome_arquivo}%s.json"
         with open(arquivo, 'w') as f:
            f.write(json.dumps(dados_json))
-        file_retorno = '/opt/odoo/retornos/retorno.json'
+        file_retorno = f"{path_file_return}/retorno.json"
         vals = {}
         if os.path.exists(file_retorno) and os.stat(file_retorno).st_size > 0:
             retorno = open(file_retorno, 'r+')
             vals = retorno.read()
-        # retorno = open('/var/www/webroot/retornos/cai_retorno.json', 'r+')
-        # vals += retorno.read()
-        # vals = json.load(retorno.read())
         return json.dumps(vals)
 
     @http.route('/caixaconsulta', type='json', auth="user", csrf=False)
@@ -452,10 +450,10 @@ class IntegracaoPdv(http.Controller):
         data = request.jsonrequest
         dados_json = data['params']
         nome_arquivo = dados_json['name']
-        arquivo = '/var/www/webroot/arquivos/%s.json' %(nome_arquivo)
+        arquivo = f"{path_file}/{nome_arquivo}.json"
         with open(arquivo, 'w') as f:
            f.write(json.dumps(dados_json))
-        retorno = open('/var/www/webroot/retornos/retorno.json', 'r+')
+        retorno = open(f"{path_file_return}/retorno.json", 'r+')
         vals = retorno.read()
         # vals = json.load(retorno.read())
         return json.dumps(vals)

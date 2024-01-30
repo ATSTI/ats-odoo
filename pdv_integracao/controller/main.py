@@ -365,7 +365,7 @@ class IntegracaoPdv(http.Controller):
         data = request.jsonrequest
         dados_json = data['params']
         nome_arquivo = f"{data['tipo']}_{dados_json['name'].replace('/', '_')}"
-        arquivo = f"{path_file}/{nome_arquivo}%s.json"
+        arquivo = f"{path_file}/{nome_arquivo}.json"
         with open(arquivo, 'w') as f:
            f.write(json.dumps(dados_json))
         file_retorno = f"{path_file_return}/retorno.json"

@@ -64,7 +64,6 @@ class PosSession(models.Model):
         # path_file_return = '/var/www/webroot/retornos/retorno.json'
         # arquivos = os.listdir(path_file)
         arquivos = fnmatch.filter(os.listdir(path_file), "cai_*.json")
-        # import pudb;pu.db
         # para cada arquivo na pasta
         num_arq = 1
         for i in arquivos:
@@ -135,7 +134,6 @@ class PosSession(models.Model):
         # gera um arquivo com todos os pedidos da sessao
         # pra ser enviado para o pdv evitando o envio dos 
         # arquivos que ja estao neste retorno
-        # import pudb;pu.db
         # path_file = '/var/www/webroot/arquivos'
         # path_file_return = '/var/www/webroot/retornos/retorno.json'
         # arquivos = os.listdir(path_file)
@@ -165,8 +163,6 @@ class PosSession(models.Model):
                 continue
             f = open(path_file + '/' + i, mode="r")
             ped = json.load(f)
-            # if ped['name'] == '4561-163115':
-            #     import pudb;pu.db
             session = self.env['pos.session']
             prt_obj = self.env['res.partner']
             prod_obj = self.env['product.product']
@@ -429,7 +425,6 @@ class PosSession(models.Model):
 
     #     if len(pedidos_10) == len(pedidos_14):
     #         continue
-    #     #import pudb;pu.db
     #     #logger.info(f"Sessão : {ses.name}")
     #     if len(pSession):
     #         insere_pedido(pSes.id,ses.id)

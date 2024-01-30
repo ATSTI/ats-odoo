@@ -362,7 +362,6 @@ class IntegracaoPdv(http.Controller):
     @http.route('/integrapdv', type='json', auth="user", csrf=False)
     def website_integrapdv(self, **kwargs):
         data = request.jsonrequest
-        integracao_odoo_pdv
         dados_json = data['params']
         nome_arquivo = f"{data['tipo']}_{dados_json['name'].replace('/', '_')}"
         arquivo = '/opt/odoo/arquivos/%s.json' %(nome_arquivo)

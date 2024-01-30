@@ -44,6 +44,14 @@ class DocumentSerie(models.Model):
         if sql_num:
             for num in sql_num:
                 document_number = int(num[0]) + 1
+            next_seq = self.internal_sequence_id._next()
+            try:
+                if abs(int(next_seq) - document_number) > 2:
+                    document_number = next_seq
+                else:
+                    self.internal_sequence_id.write({'number_next': document_number})
+            except:
+                next_seq = 0
         else:
             document_number = self.internal_sequence_id._next()
         if self._is_invalid_number(document_number) or self.check_number_in_use(

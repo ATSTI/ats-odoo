@@ -4,14 +4,9 @@
 
 import pytz
 import base64
-import logging
-import re
 import io
-from datetime import datetime
-from io import StringIO
-from unicodedata import normalize
 
-from erpbrasil.edoc.nfe import NFe as edoc_nfe
+from odoo import _, models
 
 from ..models.danfe import danfe
 from lxml import etree
@@ -23,10 +18,6 @@ from odoo.addons.l10n_br_fiscal.constants.fiscal import (
     MODELO_FISCAL_NFE,
     PROCESSADOR_OCA,
 )
-from odoo.addons.spec_driven_model.models import spec_models
-
-_logger = logging.getLogger(__name__)
-
 
 def filter_processador_edoc_nfe(record):
     if record.processador_edoc == PROCESSADOR_OCA and record.document_type_id.code in [
@@ -36,28 +27,8 @@ def filter_processador_edoc_nfe(record):
         return True
     return False
 
-
-class NFe(spec_models.StackedModel):
-    _name = "l10n_br_fiscal.document"
-    _inherit = ["l10n_br_fiscal.document", "nfe.40.infnfe"]
-    _stacked = "nfe.40.infnfe"
-    _stack_skip = "nfe40_veicTransp"
-    _field_prefix = "nfe40_"
-    _schema_name = "nfe"
-    _schema_version = "4.0.0"
-    _odoo_module = "l10n_br_nfe"
-    _spec_module = "odoo.addons.l10n_br_nfe_spec.models.v4_0.leiaute_nfe_v4_00"
-    _spec_tab_name = "NFe"
-    _nfe_search_keys = ["nfe40_Id"]
-
-    # all m2o at this level will be stacked even if not required:
-    _force_stack_paths = (
-        "infnfe.total",
-        "infnfe.infAdic",
-        "infnfe.exporta",
-        # "infnfe.cobr",
-        # "infnfe.cobr.fat",
-    )
+class DocumentNfe(models.Model):
+    _inherit = "l10n_br_fiscal.document"
 
     def make_pdf(self):
         if not self.filtered(filter_processador_edoc_nfe):

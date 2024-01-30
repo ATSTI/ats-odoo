@@ -14,14 +14,189 @@
             <xpath expr="//page[@name='accounting']" position="attributes">
                 <attribute name="attrs">{'invisible': True}</attribute>
             </xpath>
+            <field name="legal_name" position="replace" >
+                <field colspan="4" name="legal_name" nolabel="1" style="background-color: #d2d2ff;" class="oe_edit_only"/>
+                <field colspan="4" name="legal_name" nolabel="1" class="oe_read_only"/>
+            </field>
+            <field name="cnpj_cpf" position="replace" >
+                <field colspan="4" name="cnpj_cpf" nolabel="1" style="background-color: #d2d2ff;" class="oe_edit_only"/>
+                <field colspan="4" name="cnpj_cpf" nolabel="1" class="oe_read_only"/>
+            </field>
+            <xpath expr="//span[@name='address_name']" position="replace">
+                <span class="o_form_label o_td_label" name="address_name">
+                    <b attrs="{'invisible': ['|', ('parent_id', '=', False), ('type', '!=', 'contact')]}">Company Address</b>
+                    <b attrs="{'invisible': ['|', ('parent_id', '=', False), ('type', '!=', 'invoice')]}">Invoice Address</b>
+                    <b attrs="{'invisible': ['|', ('parent_id', '=', False), ('type', '!=', 'delivery')]}">Delivery Address</b>
+                    <b attrs="{'invisible': ['|', ('parent_id', '=', False), ('type', '!=', 'other')]}">Other Address</b>
+                    <b attrs="{'invisible': ['|', ('parent_id', '=', False), ('type', '!=', 'private')]}">Private Address</b>
+                    <b attrs="{'invisible': ['&amp;', ('parent_id', '!=', False), ('type', '!=', False)]}">Endereço</b>
+                </span>
+            </xpath>
+            <xpath expr="//div[@class='o_address_format']" position="replace">
+                <div class="oe_read_only">
+                    <table>
+                        <field
+                            name="zip"
+                            placeholder="CEP..."
+                            style="width: 70%"
+                            class="o_address_zip"
+                        />
+                        <button
+                            name="zip_search"
+                            type="object"
+                            attrs="{'invisible': [('country_id', '!=', %(base.br)d)]}"
+                            class="btn-sm btn-link mb4 fa fa-search oe_edit_only"
+                            aria-label="Pesquisar CEP"
+                            title="Pesquisar CEP"
+                        />
+                    </table>
+                    <table style="width: 90%">
+                        <field
+                            name="street_name"
+                            placeholder="Rua..."
+                            class="o_address_street"
+                        />
+                    </table>
+                    <table style="width: 90%">
+                        <field
+                            name="street_number"
+                            placeholder="Número..."
+                            class="o_address_street"
+                        />
+                    </table>
+                    <table style="width: 90%">
+                        <field
+                            name="street2"
+                            placeholder="Complemento..."
+                            class="o_address_street"
+                        />
+                    </table>
+                    <table style="width: 90%">
+                        <field
+                            name="district"
+                            placeholder="Bairro..."
+                            class="o_address_street"
+                        />
+                    </table>
+                    <field
+                        name="state_id"
+                        domain="[('country_id', '=', country_id)]"
+                        placeholder="Estado..."
+                        style="width: 45%"
+                        class="o_address_state"
+                        options='{"no_open": True, "no_create": True}'
+                    />
+                    <field
+                        name="city_id"
+                        placeholder="Cidade..."
+                        style="width: 50%"
+                        class="o_address_city"
+                        options='{"no_open": True, "no_create": True}'
+                        attrs="{'invisible': [('country_id', '!=', %(base.br)d)]}"
+                    />
+                    <field
+                        name="city"
+                        placeholder="Cidade..."
+                        style="background-color: #d2d2ff; width: 50%"
+                        class="o_address_city"
+                        force_save="True"
+                        attrs="{'invisible': [('country_id', '=', %(base.br)d)]}"
+                    />
+                    <field
+                        name="country_id"
+                        placeholder="País..."
+                        class="o_address_country"
+                        options='{"no_open": True, "no_create": True}'
+                    />
+                </div>
+                <div class="oe_edit_only">
+                    <table>
+                        <field
+                            name="zip"
+                            placeholder="CEP..."
+                            style="background-color: #d2d2ff; width: 70%"
+                            class="o_address_zip"
+                        />
+                        <button
+                            name="zip_search"
+                            type="object"
+                            attrs="{'invisible': [('country_id', '!=', %(base.br)d)]}"
+                            class="btn-sm btn-link mb4 fa fa-search oe_edit_only"
+                            aria-label="Pesquisar CEP"
+                            title="Pesquisar CEP"
+                        />
+                    </table>
+                    <table style="width: 90%">
+                        <field
+                            name="street_name"
+                            placeholder="Rua..."
+                            class="o_address_street"
+                            style="background-color: #d2d2ff;"
+                        />
+                    </table>
+                    <table style="width: 90%">
+                        <field
+                            name="street_number"
+                            placeholder="Número..."
+                            class="o_address_street"
+                            style="background-color: #d2d2ff;"
+                        />
+                    </table>
+                    <table style="width: 90%">
+                        <field
+                            name="street2"
+                            placeholder="Complemento..."
+                            class="o_address_street"
+                        />
+                    </table>
+                    <table style="width: 90%">
+                        <field
+                            name="district"
+                            placeholder="Bairro..."
+                            class="o_address_street"
+                            style="background-color: #d2d2ff;"
+                        />
+                    </table>
+                    <field
+                        name="state_id"
+                        domain="[('country_id', '=', country_id)]"
+                        placeholder="Estado..."
+                        style="background-color: #d2d2ff; width: 45%"
+                        class="o_address_state"
+                        options='{"no_open": True, "no_create": True}'
+                    />
+                    <field
+                        name="city_id"
+                        placeholder="Cidade..."
+                        style="background-color: #d2d2ff; width: 50%"
+                        class="o_address_city"
+                        options='{"no_open": True, "no_create": True}'
+                        attrs="{'invisible': [('country_id', '!=', %(base.br)d)]}"
+                    />
+                    <field
+                        name="city"
+                        placeholder="Cidade..."
+                        style="background-color: #d2d2ff; width: 50%"
+                        class="o_address_city"
+                        force_save="True"
+                        attrs="{'invisible': [('country_id', '=', %(base.br)d)]}"
+                    />
+                    <field
+                        name="country_id"
+                        placeholder="País..."
+                        class="o_address_country"
+                        options='{"no_open": True, "no_create": True}'
+                    />
+                </div>
+            </xpath>
             <page position="replace" name="fiscal"/>
             <page position="before" name="contact_addresses">
                 <page string="Fiscal" name="fiscal" autofocus="autofocus">
                     <group name="fiscal_numbers" position="replace">
-                        <group string="Fiscal Profile" name="fiscal_profile">
+                        <group string="Perfil Fiscal" name="fiscal_profile">
                             <field name="fiscal_profile_id" force_save="1" groups="l10n_br_fiscal.group_user" />
                             <field name="ind_ie_dest" force_save="1" attrs="{'readonly': [('fiscal_profile_id', '!=', False)]}" />
-                            <field name="tax_framework" force_save="1" attrs="{'readonly': [('fiscal_profile_id', '!=', False)]}" />
+                            <field name="tax_framework" string="Tipo empresa" force_save="1" attrs="{'readonly': [('fiscal_profile_id', '!=', False)]}" />
                             <field name="ind_final" />
                         </group>
                     </group>
@@ -52,6 +227,25 @@
                     </group>
                 </page>
             </page>
+        </field>
+    </record>
+    
+
+    <record id="l10n_br_base_res_partner_address_simple" model="ir.ui.view">
+        <field name="name">l10n_br_base.res.partner.address.simple</field>
+        <field name="model">res.partner</field>
+        <field name="priority">9999</field>
+        <field name="inherit_id" ref="l10n_br_base.l10n_br_base_res_partner_address" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='o_address_format']" position="replace">
+                <field
+                    name="zip"
+                    placeholder="Zip code..."
+                    style="width: 70%"
+                    class="o_address_zip"
+                    required="True"
+                />
+            </xpath>
         </field>
     </record>
 </odoo>

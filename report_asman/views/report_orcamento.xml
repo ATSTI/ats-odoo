@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="report_saleorder_asman" model="ir.actions.report">
+        <field name="name">Cotação / Pedido</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">report_asman.report_documento_asman</field>
+        <field name="report_file">report_asman.report_documento_asman</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+    </record>
+</odoo>

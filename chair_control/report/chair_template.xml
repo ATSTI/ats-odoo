@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="chair_control.chair_template">
+        <t t-call="report.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="page">
+                    <t t-esc="o.name" />
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <report id="chair_control.chair_view"
+        name="chair_control.chair_template"
+        file="chair_control.chair_template"
+        model="chair.control"
+        report_type="qweb-html"
+        string="Relatorio Teste"
+        menu="True"/>
+</odoo>

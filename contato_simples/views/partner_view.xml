@@ -9,9 +9,9 @@
             <xpath expr="//page[@name='sales_purchases']" position="attributes">
                 <attribute name="attrs">{'invisible': True}</attribute>
             </xpath>
-            <xpath expr="//page[@name='accounting']" position="attributes">
+            <!-- <xpath expr="//page[@name='accounting']" position="attributes">
                 <attribute name="attrs">{'invisible': True}</attribute>
-            </xpath>
+            </xpath> -->
             <xpath expr="//page[@name='fiscal']" position="attributes">
                 <attribute name="attrs">{'invisible': True}</attribute>
             </xpath>

@@ -10,6 +10,7 @@ import logging
 import os
 import fnmatch
 import json
+import odoorpc
 
 # from . import atscon as con
 
@@ -20,6 +21,48 @@ path_file_return = '/opt/odoo/retornos/retorno.json'
 
 class PosSession(models.Model):
     _inherit = 'pos.session'
+    
+    def produto_corrige_ncm(self):
+        origem = odoorpc.ODOO('felicita.atsti.com.br', port=48069)
+        origem.login('felicita_atsti_com_br', 'ats@atsti.com.br', 'a2t00s7')
+        a_prod = origem.env['product.product']
+        b_prod = self.env['product.product']
+        arq = open('/var/www/webroot/ncm_nao_encontrado.txt', '+r')
+        itens = []
+        for item in arq.readlines():
+            itens.append(int(item.strip()))
+        prod_b = b_prod.search([('ncm_id', '=', False), ('type', '=', 'product'), ('id', 'not in', itens)], order="id", limit=100)
+        prod_a = a_prod.browse(prod_b._ids)
+        arqx = open('/var/www/webroot/ncm_nao_encontrado.txt', '+a')
+        for prd in prod_a:
+            prod = b_prod.search([('default_code', '=', prd.default_code)])
+            if prod:
+                ncm = prd.product_tmpl_id.fiscal_classification_id.code
+                if not ncm:
+                    continue
+                pr_ncm = self.env['l10n_br_fiscal.ncm'].search([('code', '=', ncm)])
+                if not pr_ncm:
+                    pr_ncm = self.env['l10n_br_fiscal.ncm'].search([('code', 'ilike', ncm[:7])], limit=1)
+                if pr_ncm:
+                    #_logger.info(f"ITEM : {prod.default_code}")
+                    vp = {}
+                    fiscal_genre_id = self.env["l10n_br_fiscal.product.genre"].search([("code", "=", ncm[0:2])])
+                    vp['ncm_id'] = pr_ncm[0]
+                    if fiscal_genre_id:
+                        vp['fiscal_genre_id'] = fiscal_genre_id[0]
+                    if not prod.fiscal_type:
+                        vp['fiscal_type'] = '00'
+                    if not prod.icms_origin:
+                        vp['icms_origin'] = '0'
+                    if len(vp):
+                        prod.write(vp)
+                else:
+                    _logger.info(f"NCM nao encontrado : {ncm}, produto {prd.default_code}")
+                    if prod.id not in itens:
+                        arqx.write(str(prod.id) + '\n')
+                    continue
+        arq.close()
+        arqx.close()
     
     def baixa_pagamentos(self, move_line_id, journal_id, caixa, valor, cod_forma, juros):
         if journal_id:
@@ -82,16 +125,22 @@ class PosSession(models.Model):
             # caixa = f"-{nome_arq[:6]}"
             caixa = f"-{arq['caixa']}"
             session = ses.search([('name', 'like', caixa)])
+            state = arq["state"]
             if session:
                 sesd = []
                 for px in session:
-                    px_ids = {}
-                    px_ids['tipo'] = 'sessao'
-                    px_ids['user_id'] = px.user_id.id
-                    px_ids['name'] = px.name
-                    caixa = px.name[px.name.find('-')+1:]
-                    px_ids['caixa'] = caixa
-                    sesd.append(px_ids)
+                    if px.state == "opened" and state == "closed":
+                        px.action_pos_session_closing_control()
+                    if px.state == "closing_control" and state == "closed":
+                        px._validate_session()
+                    else:    
+                        px_ids = {}
+                        px_ids['tipo'] = 'sessao'
+                        px_ids['user_id'] = px.user_id.id
+                        px_ids['name'] = px.name
+                        caixa = px.name[px.name.find('-')+1:]
+                        px_ids['caixa'] = caixa
+                        sesd.append(px_ids)
                 with open(path_file_return, 'a+') as tfile:
                     for items in list(sesd):
                         tfile.write('%s,' % items)
@@ -103,6 +152,14 @@ class PosSession(models.Model):
             vals["start_at"] = arq["start_at"]
             usuario = self.env['res.users'].browse(arq["user_id"])
             vals["user_id"] = usuario.id
+            if usuario.id in user_adic:
+                continue
+            user_adic.append(usuario.id)
+            session_open = ses.search([('user_id', '=', usuario.id), ('state', '=', 'opened')])
+            if session_open:
+                # if state == "closed":
+                    # session_open.action_pos_session_closing_control()
+                continue
             pv = self.env['pos.config'].search([('name', 'ilike', usuario.name)], limit=1)
             ses_id = []
             if pv:
@@ -181,8 +238,10 @@ class PosSession(models.Model):
             vals['session_id'] = ses.id
             # vals['date_order'] = datetime.strftime(ped['date_order'],'%Y-%m-%d %H:%M:%S')
             vals['date_order'] = ped['date_order'][:19]
-
-            prt = prt_obj.search([('name', 'ilike', ped['nomecliente'])], limit=1)
+            cli_n = ped['nomecliente']
+            if ped['nomecliente'] == 'Cliente do Sistema':
+                cli_n = 'Consumidor'
+            prt = prt_obj.search([('name', 'ilike', cli_n)], limit=1)
             if not prt:
                 prt = prt_obj.search([('id', '=', ped['partner_id'])])
             
@@ -244,6 +303,7 @@ class PosSession(models.Model):
             
             linhas = len(ped['lines'])
             desc_soma = dif_pag
+            # print('Inicio : %s' %str(desc_soma))
             for line_ids in ped['lines']:
                 linhas -= 1
                 line = line_ids[2]
@@ -254,18 +314,43 @@ class PosSession(models.Model):
                 # if not len(prod):
                 #if len(prod):
                 #    print (f"ITEM : {line.product_id.default_code}")
+                codpro = str(line['product_id'])
+                prd = prod_obj.search([('default_code', '=', codpro)])
                 descricao  = line['name']
-                prd = prod_obj.search([('name', 'ilike', line['name'])], limit=1)
                 if not prd:
-                    prd = prod_obj.search([('id', '=', line['product_id'])])
-                if not prd:
-                    prd = prod_obj.search([('default_code', '=', '321')])
-                    descricao = f"{descricao} - PRODUTO NAO LOCALIZADO"
+                    prd = prod_obj.search([('name', 'ilike', line['name'])], limit=1)
+                    if len(line['product_id']) < 10 and not prd:
+                        prd = prod_obj.search([('id', '=', line['product_id'])])
+                    if not prd:
+                        prd = prod_obj.search([('default_code', '=', '321')])
+                        descricao = f"{descricao} - PRODUTO NAO LOCALIZADO"
+                #TODO buscar pelo codigo nao id
+                # px = line['product_id']
+                # if px == 30979:
+                #     px = 30683
+                # if px == 31344:
+                #     px = 31242
+                # if px == 30430:
+                #     px = 30495
+                # if px == 29899:
+                #     px = 30586
+                # if px == 30406:
+                #     px = 30404
+                # if px == 30406:
+                #     px = 30404
+                # if 'Troca' in line['name']:
+                #     troca += line['price_unit'] * line['qty']
                 sub_total = line['price_unit'] * line['qty']
+                # print('1-VALOR : %s' %str(sub_total))
+                # print('2-Reducao : %s' %str(sub_total * (desconto/100)))
                 if linhas == 0:
-                    desconto =  (desc_soma / sub_total) * 100
+                    desconto = 0.0
+                    if sub_total:
+                        desconto =  (desc_soma / sub_total) * 100
+                    # print('4-Desc Final : %s' %str(desconto))
                 else:
                     desc_soma -= sub_total * (desconto/100)
+                    # print('3-total desc : %s' %str(desc_soma))
                 sub_total = sub_total - (sub_total * (desconto/100))
                 vals_item = {
                     "name": descricao, 
@@ -277,11 +362,19 @@ class PosSession(models.Model):
                     "tipo_venda": line['tipo_venda'],
                     "price_subtotal": sub_total,
                     "price_subtotal_incl": sub_total,
-                }           
+
+                }
+                # print('5-GERALLLLLLLLLLLLLL : %s' %str(sub_total))
+                # if 'discount' in line:
+                    # vals_item["discount"] = line['discount']
+                # "order_id": ped_id.id,
+                # ped_id.write({'lines'(vals_iten)
+     
                 list_adi.append(vals_item)
                 ped_id.write({'lines': [(0, 0, vals_item)]})
             if troca or dif_pag:
                 tot = ped_id.amount_total + troca - dif_pag
+                # print('Total GERAL XXXXXXXXXXXXXXXXXXX: %s' %(str(tot)))
                 ped_id.write({
                     'amount_tax': tot,
                     'amount_total': tot,
@@ -292,8 +385,11 @@ class PosSession(models.Model):
             metodo_pag = ''
             for pag_ids in ped['statement_ids']:
                 pag = pag_ids[2]
-                jrn = self.env['account.journal'].browse([pag['journal']])
+                jrn = self.env['account.journal'].search([('name', 'like', pag['journal'])])
                 metodo_pag = self.env['pos.payment.method'].search([('name', 'ilike', jrn.name[:2])])
+                # datetime.strftime(pag['date'],'%Y-%m-%d'),
+                # "pos_order_id": ped_id.id,
+                # print('Total PAGO: %s' %(str(pag['amount'])))
                 vals_pag = {
                     "name": pag['name'],                
                     "amount": pag['amount'],                     
@@ -301,6 +397,8 @@ class PosSession(models.Model):
                     "payment_date": pag['date'][:10],
                     "session_id": ses.id,
                 }
+                # list_pag.append(vals_pag)
+                # vLine = b_pedidoPag.create(vals_pag)
                 ped_id.write({'payment_ids': [(0, 0, vals_pag)]})
             if metodo_pag and metodo_pag.name[:2] != '4-':
                 ped_id.action_pos_order_paid()
@@ -311,6 +409,25 @@ class PosSession(models.Model):
                 new_move = ped_id._create_invoice(move_vals)
                 ped_id.write({'account_move': new_move.id, 'state': 'invoiced'})
                 new_move.sudo().with_company(ped_id.company_id)._post()
+            
+            ped_id._create_order_picking()
+            
+                # ver se esta paga
+
+                # if ped.invoice_id.state == 'paid':
+                # for ct in ped.invoice_id.receivable_move_line_ids:
+                #     if ct.reconciled:
+                #         bancos = origem.env['account.journal'].search([
+                #             ('type', 'in', ('cash', 'bank'))])
+                #         aml = origem.env['account.move.line'].search([
+                #             ('ref','=',ped.name),
+                #             ('journal_id', 'in', bancos)
+                #         ])
+                #         for ml in aml:
+                #             aml_id = origem.env['account.move.line'].browse(ml)
+                #             jrn = dest.env['account.journal'].search([('name', 'ilike', ml.journal_id.name[:2])])
+                #             jrn_id = dest.env['account.journal'].browse(jrn)
+                #             baixa_pagamentos(new_move, jrn_id, 0, aml_id.debit, 0, 0)
         if ses:
             # crio um arquivo com todos os pedidos desta sessao
             pedido_ses = self.env['pos.order'].search([('session_id', '=', ses.id)])
@@ -318,11 +435,15 @@ class PosSession(models.Model):
             for px in pedido_ses:
                 px_ids = {}
                 px_ids['tipo'] = 'pedido'
-                px_ids['session'] = px.session_id.id
+                px_ids['caixa'] = px.session_id.id
                 px_ids['order_id'] = px.id
                 px_ids['codmovimento'] = px.name
+                px_ids['user_id'] = px.user_id.id
                 pd.append(px_ids)
-            with open(path_file_return, 'a+') as tfile:
+            # if len(list(lista_pedido)):
+            with open(path_file_return, 'w') as tfile:
+                # tfile.write(list(pd))
+
                 for items in list(pd):
                     tfile.write('%s,' % items)
 

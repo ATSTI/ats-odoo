@@ -21,7 +21,20 @@ path_file_return = '/opt/odoo/retornos/retorno.json'
 
 class PosSession(models.Model):
     _inherit = 'pos.session'
-    
+
+    def excluir_pedido_pos(self, pos_id, pos_cx):
+        pos = self.env['pos.order'].browse([pos_id])
+        if pos.session_id.id == pos_cx:
+            for pay in pos.payment_ids:
+                pay.unlink()
+            # for pick in pos.picking_ids:    
+                # wiz = self.env['stock.return.picking']
+                # pick_new = wiz._create_returns(pick)
+                # pk = self.env['stock.picking'].browse([pick_new])
+                #back = pick._create_backorder()
+                #pick.button_validate()
+            pos.write({'state': 'cancel'})
+
     def produto_corrige_ncm(self):
         origem = odoorpc.ODOO('felicita.atsti.com.br', port=48069)
         origem.login('felicita_atsti_com_br', 'ats@atsti.com.br', 'a2t00s7')

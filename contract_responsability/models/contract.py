@@ -17,9 +17,20 @@ class ContractContract(models.Model):
         invoice_vals, move_form = super()._prepare_invoice(
             date_invoice, journal=journal
         )
-        if self.partner_responsability_id != self.partner_id:
+        if self.partner_responsability_id and self.partner_responsability_id != self.partner_id:
             invoice_vals["partner_id"] = self.partner_responsability_id.id
+        else:
+            invoice_vals["partner_id"] = self.partner_id.id
         return invoice_vals, move_form
+    
+    def _recurring_create_invoice(self, date_ref=False):
+        invoices_values = self._prepare_recurring_invoices_values(date_ref)
+        moves = self.env["account.move"].create(invoices_values)
+        self._add_contract_origin(moves)
+        self._invoice_followers(moves)
+        self._compute_recurring_next_date()
+        moves.action_post()
+        return moves
     
     def contract_responsability(self, resp):
         create_type="invoice"

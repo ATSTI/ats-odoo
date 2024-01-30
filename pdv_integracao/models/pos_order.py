@@ -16,6 +16,8 @@ import odoorpc
 
 
 _logger = logging.getLogger(__name__)
+path_file = '/opt/odoo/arquivos'
+path_file_return = '/opt/odoo/retornos/retorno.json'
 
 class PosSession(models.Model):
     _inherit = 'pos.session'
@@ -101,13 +103,12 @@ class PosSession(models.Model):
    
     def insere_caixa_integracao(self):
         # lê arquivos na pasta
-        path_file = '/var/www/webroot/arquivos'
-        path_file_return = '/var/www/webroot/retornos/retorno.json'
+        # path_file = '/var/www/webroot/arquivos'
+        # path_file_return = '/var/www/webroot/retornos/retorno.json'
         # arquivos = os.listdir(path_file)
-        arquivos = sorted(fnmatch.filter(os.listdir(path_file), "cai_*.json"))
+        arquivos = fnmatch.filter(os.listdir(path_file), "cai_*.json")
         # para cada arquivo na pasta
         num_arq = 1
-        user_adic = []
         for i in arquivos:
             # nome_arq = i[:i.index('.')]
             # if nome_arq[:4] != 'cai_POS_':
@@ -190,8 +191,8 @@ class PosSession(models.Model):
         # gera um arquivo com todos os pedidos da sessao
         # pra ser enviado para o pdv evitando o envio dos 
         # arquivos que ja estao neste retorno
-        path_file = '/var/www/webroot/arquivos'
-        path_file_return = '/var/www/webroot/retornos/retorno.json'
+        # path_file = '/var/www/webroot/arquivos'
+        # path_file_return = '/var/www/webroot/retornos/retorno.json'
         # arquivos = os.listdir(path_file)
         arquivos = fnmatch.filter(os.listdir(path_file), "ped_*.json")
         # para cada arquivo na pasta
@@ -361,15 +362,15 @@ class PosSession(models.Model):
                     "tipo_venda": line['tipo_venda'],
                     "price_subtotal": sub_total,
                     "price_subtotal_incl": sub_total,
+
                 }
                 # print('5-GERALLLLLLLLLLLLLL : %s' %str(sub_total))
                 # if 'discount' in line:
                     # vals_item["discount"] = line['discount']
                 # "order_id": ped_id.id,
                 # ped_id.write({'lines'(vals_iten)
-            
+     
                 list_adi.append(vals_item)
-                # vals['lines'] = [(0, 0, list_adi)]
                 ped_id.write({'lines': [(0, 0, vals_item)]})
             if troca or dif_pag:
                 tot = ped_id.amount_total + troca - dif_pag
@@ -399,12 +400,8 @@ class PosSession(models.Model):
                 # list_pag.append(vals_pag)
                 # vLine = b_pedidoPag.create(vals_pag)
                 ped_id.write({'payment_ids': [(0, 0, vals_pag)]})
-            # vals['payment_ids'] = [(0, 0, list_pag)]
-            # ped_id = pos.create(vals) 
-            # mudando o status pra pago
             if metodo_pag and metodo_pag.name[:2] != '4-':
                 ped_id.action_pos_order_paid()
-
             # se a prazo criando a Fatura
             if metodo_pag and metodo_pag.name[:2] == '4-':
                 ped_id.write({'to_invoice': True})
@@ -449,8 +446,67 @@ class PosSession(models.Model):
 
                 for items in list(pd):
                     tfile.write('%s,' % items)
-	            # tfile.write('\n'.join(list(lista_pedido)))
-             
+
+    def insere_devolucao_integracao(self):
+        # arquivos = os.listdir(path_file)
+        arquivos = fnmatch.filter(os.listdir(path_file), "dev_*.json")
+        # para cada arquivo na pasta
+        num_arq = 1
+        for i in arquivos:
+            nome_arq = i[:i.index('.')][4:]
+            if num_arq == 50:
+                continue
+            num_arq += 1           
+            # buscar pedido ja existe
+            pick = self.env['stock.picking']
+            picking = pick.search([('name', '=', nome_arq)])
+
+            if picking:
+                os.remove(path_file + '/' + i)
+                continue
+            f = open(path_file + '/' + i, mode="r")
+            p = json.load(f)
+            user_id = self.env['res.users'].browse([p['user_id']])
+            # nome_busca = str(p['origin'])
+            # dev = pick.sudo().search([
+            #             ('origin', 'like', nome_busca)
+            #         ]) 
+            item = []
+            vals = {}            
+            for lines in p['move_lines']:
+                line = lines[2]
+                vals['origin'] = str(p['origin'])
+                vals['name'] = nome_arq
+                operacao = self.env['stock.picking.type'].sudo().search([
+                    ('name', 'ilike', 'devolucao')
+                ])
+                prd = {}
+                for tipo in operacao:
+                    if tipo.warehouse_id.company_id.id == user_id.company_id.id:
+                        # tipo_operacao = tipo
+                        vals['picking_type_id'] = tipo.id
+                        vals['location_id'] = tipo.default_location_src_id.id
+                        vals['location_dest_id'] = tipo.default_location_dest_id.id
+                        vals['note'] = p['motivo'] 
+                        prd['location_id'] = tipo.default_location_src_id.id
+                        prd['location_dest_id'] = tipo.default_location_dest_id.id
+                prod = self.search([('default_code', '=', line['product_code'])])
+                if not prod:
+                    prod = self.search([('name', 'ilike', line['name'])], limit=1)
+                prd['product_id'] =  prod.id
+                prd['product_uom_qty'] = line['qty_done'] 
+                prd['product_uom'] = prod.uom_id.id
+                prd['quantity_done'] = line['qty_done'] 
+                prd['name'] = line['name']               
+                item.append((0, 0,prd))
+                vals['move_ids_without_package'] = item
+
+                pos = self.env['stock.picking']
+                pick = pos.sudo().create(vals)
+                pick.action_confirm()
+                pick.action_assign()            
+                pick.button_validate()
+
     # for ses in a_session.browse(a_ses): 
     #     #cli_id = b_cliente.search([('name', '=', cli.name)])
     #     #print ('Codigo : %s , Nome : %s.' % (cli.id,cli.name))

@@ -362,13 +362,13 @@ class IntegracaoPdv(http.Controller):
     @http.route('/integrapdv', type='json', auth="user", csrf=False)
     def website_integrapdv(self, **kwargs):
         data = request.jsonrequest
-        # import pudb;pu.db
+        integracao_odoo_pdv
         dados_json = data['params']
         nome_arquivo = f"{data['tipo']}_{dados_json['name'].replace('/', '_')}"
-        arquivo = '/var/www/webroot/arquivos/%s.json' %(nome_arquivo)
+        arquivo = '/opt/odoo/arquivos/%s.json' %(nome_arquivo)
         with open(arquivo, 'w') as f:
            f.write(json.dumps(dados_json))
-        file_retorno = '/var/www/webroot/retornos/retorno.json'
+        file_retorno = '/opt/odoo/retornos/retorno.json'
         vals = {}
         if os.path.exists(file_retorno) and os.stat(file_retorno).st_size > 0:
             retorno = open(file_retorno, 'r+')

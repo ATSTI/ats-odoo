@@ -119,9 +119,10 @@ class PosSession(models.Model):
         # path_file = '/var/www/webroot/arquivos'
         # path_file_return = '/var/www/webroot/retornos/retorno.json'
         # arquivos = os.listdir(path_file)
-        arquivos = fnmatch.filter(os.listdir(path_file), "cai_*.json")
+        arquivos = sorted(fnmatch.filter(os.listdir(path_file), "cai_*.json"))
         # para cada arquivo na pasta
         num_arq = 1
+        user_adic = []
         for i in arquivos:
             # nome_arq = i[:i.index('.')]
             # if nome_arq[:4] != 'cai_POS_':

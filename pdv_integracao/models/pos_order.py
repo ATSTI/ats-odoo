@@ -274,12 +274,15 @@ class PosSession(models.Model):
                 continue
             # dicionario felicita
             user = ped['user_id']
-            if user == 40:
-                user = 50
-            # user = self.env['res.users'].browse([])
-            # if user:
-            #     vals['user_id'] = user.id
-            # else:
+            user_id = self.env['res.users'].browse([user])
+            if user_id:
+                if user == 40:
+                    user_id = self.env['res.users'].browse([50])
+                vals['user_id'] = user_id.id
+            else:
+                vals['user_id'] = ses.user_id.id
+            
+
             #     f.write(f"############## - User nao encontrado : {ped['user_id']}")
             #     continue
             # if ped.amount_total and not ped.amount_paid:

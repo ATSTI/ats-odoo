@@ -274,7 +274,7 @@ class PosSession(models.Model):
                 continue
             # dicionario felicita
             user = ped['user_id']
-            user_id = self.env['res.users'].browse([user])
+            user_id = self.env['res.users'].search([('id', '=', user)])
             if user_id:
                 if user == 40:
                     user_id = self.env['res.users'].browse([50])

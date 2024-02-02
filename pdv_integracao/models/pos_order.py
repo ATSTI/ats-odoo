@@ -524,6 +524,48 @@ class PosSession(models.Model):
                 pick.action_assign()            
                 pick.button_validate()
 
+    def insere_sangria(self):
+        arquivos = sorted(fnmatch.filter(os.listdir(path_file), "san_*.json"))
+        # para cada arquivo na pasta
+        num_arq = 1
+        user_adic = []
+        for i in arquivos:
+            f = open(path_file + '/' + i, mode="r")
+            lt = json.load(f)
+
+            # caixa = f"-{nome_arq[:6]}"
+            caixa = f"-{lt['caixa']}"
+            sg_obj = self.env['account.bank.statement.line']
+        
+            # vejo os diarios usados no PDV do Caixa aberto       
+            session = self.env['pos.session'].sudo().search([('name', 'ilike', caixa)])
+            if not session:
+                continue
+            
+            lista_st = []
+            for lt_st in session.statement_ids:
+                lista_st.append(lt_st.id)
+
+            motivo = lt['motivo']
+            valor = lt['amount']
+            cod_forma = lt['name']
+            cod_venda = int(lt['cod_venda'])
+            
+            diario = '1-'
+            if cod_venda == 2: 
+                diario = motivo[:2]
+            diario_obj = self.env['account.journal']    
+            diario_id = diario_obj.search([
+                ('company_id', '=', session.user_id.company_id.id),
+                ('name', 'ilike', diario)])
+            # verifica se ja foi feito
+            line = sg_obj.search([
+                ('ref', '=', str(cod_forma)),
+                ('statement_id', 'in', (lista_st)),
+            ])
+            if not line:
+                arp = self.env['account.payment.register']
+                arp.lanca_sangria_reforco(diario_id, caixa, valor, cod_forma, cod_venda, session.user_id.partner_id, motivo)
     # for ses in a_session.browse(a_ses): 
     #     #cli_id = b_cliente.search([('name', '=', cli.name)])
     #     #print ('Codigo : %s , Nome : %s.' % (cli.id,cli.name))

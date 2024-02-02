@@ -17,7 +17,7 @@ class AccountPaymentRegister(models.TransientModel):
             valor = valor * (-1)
         hj = datetime.now()
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
-        session = f"/{caixa}"
+        session = f"{caixa}"
         session_id = self.env['pos.session'].sudo().search([('name', 'ilike', session)])
         for ses in session_id: 
             vals = {

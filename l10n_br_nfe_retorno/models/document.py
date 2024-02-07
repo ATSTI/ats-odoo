@@ -91,7 +91,7 @@ class FiscalDocument(models.Model):
                             {
                                 "status_code": "100",
                                 "status_name": "Autorizada",
-                                "status_edoc": "autorizada",
+                                "state_edoc": "autorizada",
                             }
                     )
                 elif processo.resposta.cStat == "104" and not self.authorization_file_id:
@@ -140,7 +140,7 @@ class FiscalDocument(models.Model):
                             {
                                 "status_code": "100",
                                 "status_name": "Autorizada",
-                                "status_edoc": "autorizada",
+                                "state_edoc": "autorizada",
                             }
                     )
             else:

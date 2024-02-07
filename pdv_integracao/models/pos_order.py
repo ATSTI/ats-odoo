@@ -258,14 +258,6 @@ class PosSession(models.Model):
             prt = prt_obj.search([('name', 'ilike', cli_n)], limit=1)
             if not prt:
                 prt = prt_obj.search([('id', '=', ped['partner_id'])])
-            
-            #prt = ped['partner_id']
-            #if ped['partner_id'] == 11924:
-            #    prt = 11723
-            #if ped['partner_id'] == 12215:
-            #    prt = 11879
-
-            #part = prt_obj.browse([prt])
             if prt:
                 vals['partner_id'] = prt.id
             else:
@@ -281,12 +273,6 @@ class PosSession(models.Model):
                 vals['user_id'] = user_id.id
             else:
                 vals['user_id'] = ses.user_id.id
-            
-
-            #     f.write(f"############## - User nao encontrado : {ped['user_id']}")
-            #     continue
-            # if ped.amount_total and not ped.amount_paid:
-            #     continue
             
             vals['pos_reference'] = ped['pos_reference']
             vals['amount_tax'] = ped['amount_return']

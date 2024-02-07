@@ -91,10 +91,10 @@ class FiscalDocument(models.Model):
                             {
                                 "status_code": "100",
                                 "status_name": "Autorizada",
-                                "status_edoc": "autorizada",
+                                "state_edoc": "autorizada",
                             }
                     )
-                elif processo.resposta.cStat == "104" and not self.authorization_file_id:
+                elif ((processo.resposta.cStat == "104") or (processo.resposta.cStat == "204")) and not self.authorization_file_id:
                     # qdo a nota ja foi enviada, o primeiro retorno retConsSitNFe
                     # sera cStat = 100
                     arquivo = self.send_file_id
@@ -107,7 +107,7 @@ class FiscalDocument(models.Model):
                         root = etree.fromstring(bytes(xml_string, encoding='utf-8'))
                     ns = {None: "http://www.portalfiscal.inf.br/nfe"}
                     new_root = etree.Element("nfeProc", nsmap=ns)
-
+                    #print (etree.tostring(processo.resposta, pretty_print=True))
                     protNFe_node = etree.Element("protNFe")
                     infProt = etree.SubElement(protNFe_node, "infProt")
                     etree.SubElement(infProt, "tpAmb").text = processo.resposta.tpAmb
@@ -140,7 +140,7 @@ class FiscalDocument(models.Model):
                             {
                                 "status_code": "100",
                                 "status_name": "Autorizada",
-                                "status_edoc": "autorizada",
+                                "state_edoc": "autorizada",
                             }
                     )
             else:

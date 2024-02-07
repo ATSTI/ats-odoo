@@ -17,24 +17,23 @@ class AccountPaymentRegister(models.TransientModel):
             valor = valor * (-1)
         hj = datetime.now()
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
-        session = f"{caixa}"
-        session_id = self.env['pos.session'].sudo().search([('name', 'ilike', session)])
+        session_id = self.env['pos.session'].sudo().search([('name', 'ilike', caixa)])
         for ses in session_id: 
             vals = {
                 'date': hj,
                 'amount': valor,
                 #'name': lancamento,
-                'name': str(cod_forma)+session ,
+                'name': str(cod_forma)+caixa ,
                 #'ref': str(cod_forma),
                 'ref': lancamento,
             }
             if partner_id:
                 vals['partner_id'] = partner_id.id
             ja_importou = self.env['account.bank.statement.line'].search([
-                ('name', '=', str(cod_forma)+session)])
-            #print(cod_forma + session)
+                ('name', '=', str(cod_forma)+caixa)])
+            #print(cod_forma + caixa)
             if ja_importou:
-                #print(cod_forma +session + 'X')
+                #print(cod_forma +caixa + 'X')
                 continue
             for cx in ses.statement_ids:
                 if cx.journal_id.id == journal_id.id:

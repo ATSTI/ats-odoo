@@ -3,6 +3,7 @@
 
 from odoo import api, fields, models
 from odoo.osv import expression
+from dateutil.relativedelta import relativedelta
 
 
 class ContractContract(models.Model):
@@ -28,7 +29,9 @@ class ContractContract(models.Model):
         moves = self.env["account.move"].create(invoices_values)
         self._add_contract_origin(moves)
         self._invoice_followers(moves)
-        self._compute_recurring_next_date()
+        # mv = moves[-1]
+        # self._compute_recurring_next_date()
+        self._change_recurring_next_date()
         moves.action_post()
         return moves
     
@@ -101,6 +104,30 @@ class ContractContract(models.Model):
                 previous = line
         return lines2invoice.sorted()
     
+    def _change_recurring_next_date(self):
+        # Compute the recurring_next_date on the contract based on the one
+        # defined on line level.
+        for contract in self:
+            if contract.recurring_rule_type == 'monthly':
+                contract.recurring_next_date = contract.recurring_next_date + relativedelta(months=1)
+            # if contract.recurring_next_date.month < data_venc.month:
+            # fatura = self._get_related_invoices()
+            # for fat in fatura:
+            #     venc = fat.invoice_date_due.month
+                
+            # recurring_next_date = contract.contract_line_ids.filtered(
+            #     lambda l: (
+            #         l.recurring_next_date
+            #         and not l.is_canceled
+            #         and (not l.display_type or l.is_recurring_note)
+            #     )
+            # ).mapped("recurring_next_date")
+            # # Take the earliest or set it as False if contract is stopped
+            # # (no recurring_next_date).
+            # contract.recurring_next_date = (
+            #     min(recurring_next_date) if recurring_next_date else False
+            # )
+    
     def _prepare_recurring_invoices_values(self, date_ref=False):
         """
         This method builds the list of invoices values to create, based on
@@ -154,11 +181,11 @@ class ContractContract(models.Model):
             invoices_values.append(invoice_vals)
             # Force the recomputation of journal items
             del invoice_vals["line_ids"]
-            if ctr_ids_resp:
-                ctr_ids_r = self.contract_responsability(contract.partner_responsability_id)
-                for ct in ctr_ids_r:
-                    for line in ct.contract_line_ids:
-                        line._update_recurring_next_date()
-                else:
-                    contract_lines._update_recurring_next_date()
+            # if ctr_ids_resp:
+            #     ctr_ids_r = self.contract_responsability(contract.partner_responsability_id)
+            #     for ct in ctr_ids_r:
+            #         for line in ct.contract_line_ids:
+            #             line._update_recurring_next_date()
+            #     else:
+            #         contract_lines._update_recurring_next_date()
         return invoices_values

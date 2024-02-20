@@ -154,6 +154,7 @@
 			('account_id.internal_type', '=', 'receivable'),
 			('partner_id', '!=', False),
 			('credit', '=', 0),('move_id.state', '=', 'posted'),
+			'|',('move_id.payment_mode_id','=',False),
 			('move_id.payment_mode_id.fiscal_payment_mode', '!=', '90'),
 			'|',('move_id.fiscal_operation_id.fiscal_type', 'in', ('sale', 'purchase')),
 			('move_id.fiscal_operation_id', '=', False)

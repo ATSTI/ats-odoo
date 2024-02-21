@@ -36,7 +36,7 @@ class DocumentStatusWizard(models.TransientModel):
 
         if self.document_id.authorization_protocol:
             raise UserError(_("Authorization Protocol Not Found!"))
-        if 'nRec' in self.document_id.status_description:
+        if self.document_id.status_description and 'nRec' in self.document_id.status_description:
             msg = self.document_id.status_description
             recibo = msg[msg.find('nRec')+5:]
             recibo = re.sub(u'[^a-zA-Z0-9áéíóúÁÉÍÓÚâêîôÂÊÎÔãõÃÕçÇ: ]', '', recibo)

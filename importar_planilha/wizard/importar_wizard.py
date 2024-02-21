@@ -292,7 +292,8 @@ class ImportarWizard(models.TransientModel):
         mensagem = ""
         inv = self.env['stock.inventory']
         nome_invent = f"inventario_{str(self.inicio)}_{str(self.fim)}({self.input_file_name})"
-        inv_ids = inv.create({'name': nome_invent})
+        inv_ids = inv.create({'name': nome_invent, 'exhausted': True})
+        com_produto_a = False
         for chain in self:
             file_path = tempfile.gettempdir()+'/file.xls'
             data = base64.decodebytes(chain.input_file)
@@ -312,8 +313,21 @@ class ImportarWizard(models.TransientModel):
                         prod = self.env['product.product'].search([('default_code', '=', cod)])
                         if prod and prod.qty_available != qt:
                             list_adi.append(prod.id)
-            inv_ids.write({'product_ids': [(6, 0, list_adi)]})
-        inv_ids.action_start()
+                            com_produto_a = True
+            if com_produto_a:
+                inv_ids.write({'product_ids': [(6, 0, list_adi)]})
+
+        if com_produto_a:
+            inv_ids.action_start()
+        else:
+            return {
+                'view_mode': 'form',
+                'res_model': 'importar.wizard',
+                'res_id': self.id,
+               'type': 'ir.actions.act_window',
+            }
+        #inv_ids.write({'line_ids': [(6, 0, list_adi)]})
+        inv_ids._get_inventory_lines_values()
         com_produto = False
         for chain in self:
             file_path = tempfile.gettempdir()+'/file.xls'
@@ -331,6 +345,8 @@ class ImportarWizard(models.TransientModel):
                     if rowValues[c_codigo]:
                         cod = str(rowValues[c_codigo])
                         qt = float(rowValues[c_estoque])
+                        if qt < 0.0:
+                            qt = 0.0
                         prod = self.env['product.product'].search([('default_code', '=', cod)])
                         if not prod or prod.qty_available == qt:
                             continue
@@ -422,7 +438,7 @@ class ImportarWizard(models.TransientModel):
                     if len(rowValues) > c_categoria-1 and rowValues[c_categoria]:
                         categoria = rowValues[c_categoria]
                         pc = self.env["product.category"]
-                        cat_id = pc.search([('name', 'ilike', categoria)])
+                        cat_id = pc.search([('name', 'ilike', categoria)], limit=1)
                         if not cat_id:
                             cat_id = pc.create({'name': categoria, 'parent_id': 1})
                         vals['categ_id'] = cat_id.id
@@ -705,7 +721,6 @@ class ImportarWizard(models.TransientModel):
                     # else:
                     #     # Nao Contribuinte
                     #     vals['fiscal_profile_id'] = 8
-                    #import pudb;pu.db
                     try:
                         c_id =  cli_obj.create(vals)
                         vals_u = {}

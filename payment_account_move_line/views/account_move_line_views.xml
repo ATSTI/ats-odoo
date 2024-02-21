@@ -152,7 +152,7 @@
 		<field name="context">{'search_default_open': 1}</field>
 		<field name="domain">[
 			('account_id.internal_type', '=', 'receivable'),
-			('partner_id', '!=', False),
+			('partner_id', '!=', False),('amount_residual','>',0),
 			('credit', '=', 0),('move_id.state', '=', 'posted'),
 			'|',('move_id.payment_mode_id','=',False),
 			('move_id.payment_mode_id.fiscal_payment_mode', '!=', '90'),
@@ -175,7 +175,7 @@
 		<field name="context">{'search_default_open': 1}</field>
 		<field name="domain">[
 			('account_id.internal_type', '=', 'payable'),
-			('partner_id', '!=', False),
+			('partner_id', '!=', False),('amount_residual','>',0),
 			('debit', '=', 0),('move_id.state', '=', 'posted'),
 			('move_id.payment_mode_id.fiscal_payment_mode', '!=', '90'),
 			'|',('move_id.fiscal_operation_id.fiscal_type', 'in', ('sale', 'purchase')),

@@ -4,7 +4,7 @@ import re
 import base64
 from lxml import etree
 from datetime import datetime
-from odoo import _, models, api
+from odoo import _, models, api, fields
 from odoo.exceptions import UserError
 from requests import Session
 from erpbrasil.transmissao import TransmissaoSOAP
@@ -36,6 +36,7 @@ class DocumentStatusWizard(models.TransientModel):
 
         if self.document_id.authorization_protocol:
             raise UserError(_("Authorization Protocol Not Found!"))
+        # se deu erro de duplicidade entra nesta funcao altera o status e o xml
         if self.document_id.status_description and 'nRec' in self.document_id.status_description:
             msg = self.document_id.status_description
             recibo = msg[msg.find('nRec')+5:]
@@ -69,6 +70,61 @@ class DocumentStatusWizard(models.TransientModel):
                     etree.SubElement(infProt, "tpAmb").text = p.tpAmb
                     etree.SubElement(infProt, "verAplic").text = p.verAplic
                     etree.SubElement(infProt, "dhRecbto").text = p.dhRecbto
+                    etree.SubElement(infProt, "nProt").text = p.nProt
+                    etree.SubElement(infProt, "cStat").text = p.cStat
+                    etree.SubElement(infProt, "xMotivo").text = p.xMotivo
+
+                    new_root.append(root)
+                    new_root.append(protNFe_node)
+                    file = etree.tostring(new_root)
+                    self.document_id.authorization_event_id.set_done(
+                            status_code="100",
+                            response="Autorizada",
+                            protocol_date=data_rec.strftime('%Y-%m-%d %H:%M:%S'),
+                            protocol_number=p.nProt,
+                            file_response_xml=file.decode("utf-8"),
+                        )
+                    self.document_id.write(
+                            {
+                                "status_code": "100",
+                                "status_name": "Autorizada",
+                                "state_edoc": "autorizada",
+                            }
+                    )
+        else:
+            # nota enviada para a receita mas nao recebeu o retorno correto,
+            # entra aqui qdo na consulta encontra a nfe
+            # caso o retorno seja 100, entao muda o status e adiciona o protocolo no xml
+            evento = nfe.consulta_documento(self.document_id.document_key)
+            if evento.resposta.cStat != '100':
+                msg = f"Retorno: {str(evento.resposta.cStat)}-{evento.resposta.xMotivo}!"
+                raise UserError(_(msg))
+            prot = evento.resposta.protNFe
+            # protocolo = prot[0].infProt.nProt
+            p = prot.infProt
+            if p:
+                # p = p_id.infProt
+                # protocolo = p.nProt
+                # chave = p.chNFe
+                data_rec = datetime.fromisoformat(fields.Datetime.to_string(p.dhRecbto))
+                # dig_val = p.digVal
+                if p.nProt:
+                    arquivo = self.document_id.send_file_id
+                    xml_string = base64.b64decode(arquivo.datas).decode()
+                    parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
+                    try:
+                        root = etree.fromstring(xml_string, parser=parser)
+                    except:
+                        # com a erpbrasil.edoc velha da erro acima
+                        root = etree.fromstring(bytes(xml_string, encoding='utf-8'))
+                    ns = {None: "http://www.portalfiscal.inf.br/nfe"}
+                    new_root = etree.Element("nfeProc", nsmap=ns)
+                    #print (etree.tostring(processo.resposta, pretty_print=True))
+                    protNFe_node = etree.Element("protNFe")
+                    infProt = etree.SubElement(protNFe_node, "infProt")
+                    etree.SubElement(infProt, "tpAmb").text = p.tpAmb
+                    etree.SubElement(infProt, "verAplic").text = p.verAplic
+                    etree.SubElement(infProt, "dhRecbto").text = fields.Datetime.to_string(p.dhRecbto)
                     etree.SubElement(infProt, "nProt").text = p.nProt
                     etree.SubElement(infProt, "cStat").text = p.cStat
                     etree.SubElement(infProt, "xMotivo").text = p.xMotivo

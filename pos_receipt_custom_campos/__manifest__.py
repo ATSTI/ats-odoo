@@ -6,7 +6,7 @@
     'category': 'Accounting/Localizations/Point of Sale',
     'description': """Customização para o recibo da Campos Flores, pos""",
     'license': 'LGPL-3',
-    'depends': ['l10n_br_pos'],
+    'depends': ['point_of_sale'],
     'data': [
         #'views/assets.xml',
     ],

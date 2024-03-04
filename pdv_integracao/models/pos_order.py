@@ -37,7 +37,7 @@ class PosSession(models.Model):
 
     def produto_corrige_ncm(self):
         origem = odoorpc.ODOO('felicita.atsti.com.br', port=48069)
-        origem.login('felicita_atsti_com_br', 'ats@atsti.com.br', 'a2t00s7')
+        origem.login('url', 'user', 'password')
         a_prod = origem.env['product.product']
         b_prod = self.env['product.product']
         arq = open('/var/www/webroot/ncm_nao_encontrado.txt', '+r')

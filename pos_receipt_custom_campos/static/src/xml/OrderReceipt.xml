@@ -16,12 +16,18 @@
             <t t-if='receipt.client'>
                 <div><t t-esc='receipt.client.name'/>
                 </div>
-                <div><t t-esc='receipt.client.street_name'/>, <t t-esc='receipt.client.street_number'/>, <t t-esc='receipt.client.zip'/>, <t t-esc='receipt.client.city_id'/> <t t-esc='receipt.client.state_id'/>
-                </div>
-                <div><t t-esc='receipt.client.phone'/>
-                </div>
-                <div><t t-esc='receipt.client.email'/>
-                </div>
+                <t t-if='receipt.client.street_name'>
+                    <div><t t-esc='receipt.client.street_name'/>, <t t-esc='receipt.client.street_number'/>, <t t-esc='receipt.client.zip'/>, <t t-esc='receipt.client.city_id'/> <t t-esc='receipt.client.state_id'/>
+                    </div>
+                </t>
+                <t t-if='receipt.client.phone'>
+                    <div><t t-esc='receipt.client.phone'/>
+                    </div>
+                </t>
+                <t t-if='receipt.client.email'>
+                    <div><t t-esc='receipt.client.email'/>
+                    </div>
+                </t>
             </t>
             ------------------------------------------------------
         </xpath>

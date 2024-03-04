@@ -36,7 +36,7 @@ class PosSession(models.Model):
             pos.write({'state': 'cancel'})
 
     def produto_corrige_ncm(self):
-        origem = odoorpc.ODOO('felicita.atsti.com.br', port=48069)
+        origem = odoorpc.ODOO('url', port=8069)
         origem.login('url', 'user', 'password')
         a_prod = origem.env['product.product']
         b_prod = self.env['product.product']

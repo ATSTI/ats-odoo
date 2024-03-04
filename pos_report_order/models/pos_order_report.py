@@ -32,6 +32,7 @@ class PosOrderReport(models.Model):
                 s.sale_journal AS journal_id,
                 l.product_id AS product_id,
                 pt.categ_id AS product_categ_id,
+                l.tipo_venda AS tipo_venda,
                 p.product_tmpl_id,
                 ps.config_id,
                 pt.pos_categ_id,
@@ -58,7 +59,7 @@ class PosOrderReport(models.Model):
                 s.id, s.date_order, s.partner_id,s.state, pt.categ_id,
                 s.user_id, s.company_id, s.sale_journal,
                 s.pricelist_id, s.account_move, s.create_date, s.session_id,
-                l.product_id,
+                l.product_id, l.tipo_venda,
                 pt.categ_id, pt.pos_categ_id,
                 p.product_tmpl_id,
                 ps.config_id

@@ -30,7 +30,7 @@
         'point_of_sale',
     ],
     'data': [
-        'views/pos_order_report_view.xml',
+        # 'views/pos_order_report_view.xml',
     ],
     'demo': [],
     'installable': True,

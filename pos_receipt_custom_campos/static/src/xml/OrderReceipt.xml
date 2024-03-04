@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension" owl="1">
+        <xpath expr="//img[hasclass('pos-receipt-logo')]" position="after">
+            <!-- <img class="pos-receipt-logo" t-att-src="pos.company_logo_base64" alt="Logo"/> -->
+            <div><b>CAMPOS-FLORES E ARTIGOS DECORATIVOS LTDA</b>
+            </div>
+            <div><b>CNPJ:</b> 05.108.091/0001-05
+            </div>
+            <div><b>Tel:</b> (19)98375-4587 / (19)3802-1004
+            </div>
+            <br/>
+            ------------------------------------------------------
+            <div><b>CLIENTE</b>
+            </div>
+            <t t-if='receipt.client'>
+                <div><t t-esc='receipt.client.name'/>
+                </div>
+                <t t-if='receipt.client.street_name'>
+                    <div><t t-esc='receipt.client.street_name'/>, <t t-esc='receipt.client.street_number'/>, <t t-esc='receipt.client.zip'/>, <t t-esc='receipt.client.city_id'/> <t t-esc='receipt.client.state_id'/>
+                    </div>
+                </t>
+                <t t-if='receipt.client.phone'>
+                    <div><t t-esc='receipt.client.phone'/>
+                    </div>
+                </t>
+                <t t-if='receipt.client.email'>
+                    <div><t t-esc='receipt.client.email'/>
+                    </div>
+                </t>
+            </t>
+            ------------------------------------------------------
+        </xpath>
+    </t>
+</templates>

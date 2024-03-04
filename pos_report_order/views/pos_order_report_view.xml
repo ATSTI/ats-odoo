@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <record id="view_report_pos_order_search" model="ir.ui.view">
+            <field name="name">report.pos.order.search</field>
+            <field name="model">report.pos.order</field>
+            <field name="arch" type="xml">
+                <search string="Point of Sale Analysis">
+                    <field name="date"/>
+                    <separator/>
+                    <filter string="Invoiced" name="invoiced" domain="[('state','=',('invoiced'))]"/>
+                    <filter string="Not Invoiced" name="not_invoiced" domain="[('state','in',['paid', 'done'])]"/>
+                    <separator/>
+                    <filter name="filter_date" date="date"/>
+                    <field name="config_id"/>
+                    <field name="partner_id"/>
+                    <field name="product_id"/>
+                    <field name="product_categ_id"/>
+                    <field name="tipo_venda"/>
+                    <group expand="1" string="Group By">
+                        <filter string="User" name="User" context="{'group_by':'user_id'}"/>
+                        <filter string="Point of Sale" name="pos" context="{'group_by':'config_id'}"/>
+                        <filter string="Product" name="product" context="{'group_by':'product_id'}"/>
+                        <filter string="Product Category" name="product_category" context="{'group_by':'product_categ_id'}"/>
+                        <separator/>
+                        <filter string="Order Date" name="order_month" context="{'group_by':'date:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+</odoo>

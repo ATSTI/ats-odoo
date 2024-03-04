@@ -7,7 +7,15 @@ from odoo import api, fields, models, tools
 class PosOrderReport(models.Model):
     _inherit = "report.pos.order"
 
-    tipo_venda = fields.Char('Tipo Venda')
+    tipo_venda = fields.Selection([
+        ('1', '1 - Normal'),
+        ('2', '2 - Venda Extra'),
+        ('3', '3 - Melhor Beneficio'),
+        ('4', '4 - Atacado'),
+        ('5', '5 - Curso'),
+        ('6', '6 - Outros'),
+        ('7', '7 - Quinta-feira do Chocolate'),
+        ], 'Tipo de Venda', String='Tipo Venda')
 
     def _select(self):
         return """

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="transp_frete_tree" model="ir.ui.view">
+        <field name="name">transp.frete.tree</field>
+        <field name="model">transp.frete</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="nfe40_transporta" />
+                <field name="incoterm_id" />
+                <field name="carrier_id" />
+                <!-- <button 
+                    name="edit_di"
+                    string="Editar" 
+                    type="object"
+                    class="oe_highlight"
+                /> -->
+            </tree>
+        </field>
+    </record>
+
+    <record id="transp_frete_form" model="ir.ui.view">
+        <field name="name">transp.frete.form</field>
+        <field name="model">transp.frete</field>
+        <field name="arch" type="xml">
+            <form string="Declaração Importação">
+                <sheet>
+                    <group>
+                        <field name="nfe40_transporta" />
+                        <field name="incoterm_id" />
+                        <field name="carrier_id" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Customer Invoice views -->
+    <record id="account_invoice_transp_form" model="ir.ui.view">
+        <field name="name">l10n_br_account.invoice.transp.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="l10n_br_account.invoice_form" />
+        <field name="priority">399</field>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='other_info']" position="after">
+                <page name="transp_frete" string="Transporte/Frete" >
+                    <header>
+                    <button
+                        name="button_wizard_transp"
+                        string="Adicionar"
+                        class="btn-success"
+                        type="object"
+                        attrs="{'invisible': [('state', '!=', 'draft')]}"
+                    />
+                </header>
+                    <field name="trans_ids" context="{'default_am_id': active_id}" readonly="1" >
+                        <tree string="Info Transporte">
+                            <field name="incoterm_id" />
+                            <field name="carrier_id" />
+                            <field name="nfe40_transporta" />
+                            <field name="vehicle_id" />
+                            <!-- <button 
+                                name="edit_di"
+                                string="Editar" 
+                                type="object"
+                                class="oe_highlight"
+                            /> -->
+                            <button type="object" icon="fa-trash-o" name="unlink"/>
+                        </tree>
+                        <form>
+                            <sheet>
+                                <group string="Info Transporte">
+                                    <group>
+                                        <field name="incoterm_id" />
+                                        <field name="carrier_id" />
+                                        <field name="nfe40_transporta" />
+                                        <field name="vehicle_id" />
+                                    </group>
+                                </group>
+                            </sheet>
+                        </form>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="pos_fechar_caixa_form" model="ir.ui.view">
+        <field name="name">pos.fechar.caixa.form</field>
+        <field name="model">fechar.caixa</field>
+        <field name="arch" type="xml">
+            <form string="Fechamento de caixa">
+                <group>
+                    <group>
+                        <field name="data" />
+                        <field name="cx" />
+                        <field name="sessao" />
+                        <field name="sangria" />
+                        <field name="num_sangria" />
+                    </group>
+                    <group>
+                        <field name="response" />
+                        <field name="valor_falta" />
+                        <field name="valor_sobra" />
+                        <field name="situation" />
+                        <field name="udd" />
+                        <field name="motivo" />
+                    </group> 
+                    <group>
+                        <field name="analise" />
+                        <field name="env_banco" />
+                        <field name="env_caixa" />
+                        <field name="env_troco" />
+                        <field name="obs" />
+                    </group> 
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="pos_fechar_caixa_tree" model="ir.ui.view">
+        <field name="name">pos.fechar.caixa.tree</field>
+        <field name="model">fechar.caixa</field>
+        <field name="arch" type="xml">
+            <tree string="Fechamento de caixa">
+                <field name="data" />
+                <field name="cx" />
+                <field name="sessao" />
+                <field name="sangria" />
+                <field name="num_sangria" />
+                <field name="valor_falta" />
+                <field name="valor_sobra" />
+                <field name="udd" />
+                <field name="env_banco" />
+                <field name="env_caixa" />
+                <field name="env_troco" />
+                <field name="situation" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_pos_fechamento_caixa_view" model="ir.actions.act_window">
+        <field name="name">Fechar Caixa</field>
+        <field name="res_model">fechar.caixa</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem
+        id="menu_fechar_caixa"
+        name="Resumo Fechamento Caixa"
+        action="action_pos_fechamento_caixa_view"
+        parent="point_of_sale.menu_point_of_sale"
+        sequence="99"/>
+
+</odoo>

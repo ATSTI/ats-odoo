@@ -15,7 +15,7 @@ class WizardCreateTransp(models.TransientModel):
 
     carrier_id = fields.Many2one(
         comodel_name="delivery.carrier",
-        string="Carrier",
+        string="Transportadora",
         ondelete="restrict",
     )
 
@@ -27,7 +27,7 @@ class WizardCreateTransp(models.TransientModel):
 
     incoterm_id = fields.Many2one(
         comodel_name="account.incoterms",
-        string="Incoterm",
+        string="Tipo Frete",
         help="International Commercial Terms are a series of"
         " predefined commercial terms used in international"
         " transactions.",
@@ -41,6 +41,26 @@ class WizardCreateTransp(models.TransientModel):
     am_id = fields.Many2one(
         comodel_name="account.move",
         string="Accoutn Move"
+    )
+    nfe40_qVol = fields.Char(string="Quantidade")
+    nfe40_esp = fields.Char(string="Espécie")
+    nfe40_marca = fields.Char(string="Marca")
+    nfe40_nVol = fields.Char(string="Numero volumes")
+    nfe40_pesoL = fields.Float(
+        string="Peso líq.(kg)",
+        xsd_type="TDec_1203",
+        digits=(
+            12,
+            3,
+        ),
+    )
+    nfe40_pesoB = fields.Float(
+        string="Peso bruto(kg)",
+        xsd_type="TDec_1203",
+        digits=(
+            12,
+            3,
+        ),
     )
 
     def action_create_transp(self):
@@ -59,6 +79,13 @@ class WizardCreateTransp(models.TransientModel):
         tr["carrier_id"] = self.carrier_id.id
         tr["vehicle_id"] = self.vehicle_id.id
         tr["am_id"] = self.am_id.id
+        tr["nfe40_qVol"] = self.nfe40_qVol
+        tr["nfe40_esp"] = self.nfe40_esp
+        tr["nfe40_marca"] = self.nfe40_marca
+        tr["nfe40_nVol"] = self.nfe40_nVol
+        tr["nfe40_pesoL"] = self.nfe40_pesoL
+        tr["nfe40_pesoB"] = self.nfe40_pesoB
+
         self.env["transp.frete"].create(tr)
         # tr["carrier_id"] = self.carrier_id
         #     adi["chava_nfe"] = line.nfe40_chNFe

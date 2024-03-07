@@ -59,6 +59,12 @@
                             <field name="carrier_id" />
                             <field name="nfe40_transporta" />
                             <field name="vehicle_id" />
+                            <field name="nfe40_qVol" />
+                            <field name="nfe40_esp" />
+                            <field name="nfe40_marca" />
+                            <field name="nfe40_nVol" />
+                            <field name="nfe40_pesoL" />
+                            <field name="nfe40_pesoB" />
                             <!-- <button 
                                 name="edit_di"
                                 string="Editar" 
@@ -75,6 +81,14 @@
                                         <field name="carrier_id" />
                                         <field name="nfe40_transporta" />
                                         <field name="vehicle_id" />
+                                    </group>
+                                    <group>
+                                        <field name="nfe40_qVol" />
+                                        <field name="nfe40_esp" />
+                                        <field name="nfe40_marca" />
+                                        <field name="nfe40_nVol" />
+                                        <field name="nfe40_pesoL" />
+                                        <field name="nfe40_pesoB" />
                                     </group>
                                 </group>
                             </sheet>

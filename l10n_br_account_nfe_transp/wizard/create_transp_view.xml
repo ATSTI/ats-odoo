@@ -7,11 +7,19 @@
         <field name="arch" type="xml">
             <form string="Detalhe Transportadora">
                 <group>
-                    <group>
-                        <field name="nfe40_transporta" />
+                    <group string="Transportador" >
                         <field name="incoterm_id" />
                         <field name="carrier_id" />
+                        <field name="nfe40_transporta" />
                         <field name="vehicle_id" />
+                    </group>
+                    <group string="Volumes" >
+                        <field name="nfe40_qVol" />
+                        <field name="nfe40_esp" />
+                        <field name="nfe40_marca" />
+                        <field name="nfe40_nVol" />
+                        <field name="nfe40_pesoL" />
+                        <field name="nfe40_pesoB" />
                     </group>
                 </group>
                 <footer>

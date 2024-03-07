@@ -67,6 +67,26 @@ class TranspFrete(models.Model):
         comodel_name="account.move", 
         string="Documento"
     )
+    nfe40_qVol = fields.Char(string="Quantidade")
+    nfe40_esp = fields.Char(string="Espécie")
+    nfe40_marca = fields.Char(string="Marca")
+    nfe40_nVol = fields.Char(string="Numero volumes")
+    nfe40_pesoL = fields.Float(
+        string="Peso líq.(kg)",
+        xsd_type="TDec_1203",
+        digits=(
+            12,
+            3,
+        ),
+    )
+    nfe40_pesoB = fields.Float(
+        string="Peso bruto(kg)",
+        xsd_type="TDec_1203",
+        digits=(
+            12,
+            3,
+        ),
+    )
 
     # def edit_detexp(self):
     #     ctx = {

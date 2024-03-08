@@ -14,22 +14,22 @@ class FecharCaixa(models.Model):
         'done': [('readonly', True)],
         'aproved': [('readonly', True)],
     }
-    data = fields.Date(string="Data", states=READONLY_STATES)
+    data = fields.Date(string="Data", states=READONLY_STATES, default=fields.Date.today())
     cx = fields.Many2one(
-        "res.users", string="Cx", index=True, states=READONLY_STATES
+        "res.users", string="Cx", index=True, states=READONLY_STATES, track_visibility='onchange'
     )
     sessao = fields.Many2one("pos.session", string="Sessão", index=True, states=READONLY_STATES)
     sangria = fields.Float("Valor Total das sangrias", compute="_compute_valor_sangria", readonly=True, states=READONLY_STATES)
     num_sangria = fields.Integer("Nº da sangria", default=1, states=READONLY_STATES)
     response = fields.Many2one(
-        "res.users", string="Responsavel", index=True, states=READONLY_STATES
+        "res.users", string="Responsavel", index=True, states=READONLY_STATES, track_visibility='onchange'
     )
     valor_falta = fields.Float("Valor falta", states=READONLY_STATES)
     valor_sobra = fields.Float("Valor sobra", states=READONLY_STATES)
     udd = fields.Float("Uso Dinheiro Dia", states=READONLY_STATES)
     motivo = fields.Char("Motivo", states=READONLY_STATES)
     analise = fields.Many2one(
-        "res.users", string="Analise", index=True, states=READONLY_STATES
+        "res.users", string="Analise", index=True, states=READONLY_STATES, track_visibility='onchange'
     )
     env_banco = fields.Float("Envio banco", states=READONLY_STATES)
     env_caixa = fields.Float("Envio caixa geral", states=READONLY_STATES)
@@ -43,6 +43,7 @@ class FecharCaixa(models.Model):
         ],
         string="Situação",
         default="draft",
+        track_visibility='onchange',
         readonly=True
     )
 

@@ -53,7 +53,7 @@
                         attrs="{'invisible': [('state', '!=', 'draft')]}"
                     />
                 </header>
-                    <field name="trans_ids" context="{'default_am_id': active_id}" readonly="1" >
+                    <field name="trans_ids" context="{'default_am_id': active_id}" >
                         <tree string="Info Transporte">
                             <field name="incoterm_id" />
                             <field name="carrier_id" />

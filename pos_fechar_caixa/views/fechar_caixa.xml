@@ -11,35 +11,41 @@
                     <button name="action_return_aproved" string="Aprovar" type="object" class="btn-primary"  attrs="{'invisible': [('state', '!=', 'done')]}"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done,aproved"/>
                 </header>
-                <group>
+                <sheet>
                     <group>
-                        <field name="data" />
-                        <field name="cx" />
-                        <field name="sessao" />
-                        <field name="sangria" />
-                        <field name="num_sangria" />
+                        <group string="Sessão/Caixa">
+                            <field name="data" />
+                            <field name="cx" />
+                            <field name="sessao" />
+                        </group>
+                        <group string="Responsável">
+                            <field name="response" />
+                            <field name="analise" />
+                        </group>
+                        <group string="Movimento">
+                            <field name="env_banco" />
+                            <field name="env_caixa" />
+                            <field name="env_troco" />
+                        </group>    
+                        <group string="Sangria">
+                            <field name="udd" />
+                            <field name="motivo" />
+                            <field name="sangria" />
+                            <field name="num_sangria" />
+                        </group> 
+                        <group string="Saldo">
+                            <field name="valor_falta" />
+                            <field name="valor_sobra" />
+                            <field name="obs" />
+                        </group> 
                     </group>
-                    <group>
-                        <field name="response" />
-                        <field name="valor_falta" />
-                        <field name="valor_sobra" />
-                        <field name="udd" />
-                        <field name="motivo" />
-                    </group> 
-                    <group>
-                        <field name="analise" />
-                        <field name="env_banco" />
-                        <field name="env_caixa" />
-                        <field name="env_troco" />
-                        <field name="obs" />
-                    </group> 
-                </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
             </form>
-            <div class="oe_chatter">
-                <field name="message_follower_ids"/>
-                <field name="activity_ids"/>
-                <field name="message_ids"/>
-            </div>
         </field>
     </record>
 

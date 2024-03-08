@@ -14,19 +14,19 @@ class FecharCaixa(models.Model):
         'done': [('readonly', True)],
         'aproved': [('readonly', True)],
     }
-    data = fields.Date(string="Data", states=READONLY_STATES, default=fields.Date.today())
+    data = fields.Date(string="Data lançamento", states=READONLY_STATES, default=fields.Date.today)
     cx = fields.Many2one(
-        "res.users", string="Cx", index=True, states=READONLY_STATES, track_visibility='onchange'
+        "res.users", string="Caixa", index=True, states=READONLY_STATES, track_visibility='onchange'
     )
-    sessao = fields.Many2one("pos.session", string="Sessão", index=True, states=READONLY_STATES)
-    sangria = fields.Float("Valor Total das sangrias", compute="_compute_valor_sangria", readonly=True, states=READONLY_STATES)
+    sessao = fields.Many2one("pos.session", string="Sessão", index=True, states=READONLY_STATES, domain="[('user_id', '=', cx)]")
+    sangria = fields.Float("Valor total das sangrias", compute="_compute_valor_sangria", readonly=True, states=READONLY_STATES)
     num_sangria = fields.Integer("Nº da sangria", default=1, states=READONLY_STATES)
     response = fields.Many2one(
         "res.users", string="Responsavel", index=True, states=READONLY_STATES, track_visibility='onchange'
     )
     valor_falta = fields.Float("Valor falta", states=READONLY_STATES)
     valor_sobra = fields.Float("Valor sobra", states=READONLY_STATES)
-    udd = fields.Float("Uso Dinheiro Dia", states=READONLY_STATES)
+    udd = fields.Float("Uso dinheiro no dia", states=READONLY_STATES)
     motivo = fields.Char("Motivo", states=READONLY_STATES)
     analise = fields.Many2one(
         "res.users", string="Analise", index=True, states=READONLY_STATES, track_visibility='onchange'

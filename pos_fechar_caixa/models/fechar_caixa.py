@@ -2,35 +2,40 @@
 
 from odoo import fields, models, _, api
 from datetime import datetime, date
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError
 
 
 class FecharCaixa(models.Model):
     _name = "fechar.caixa"
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = "Fechamento de caixa"
 
-    data = fields.Date(string="Data")
+    READONLY_STATES = {
+        'done': [('readonly', True)],
+        'aproved': [('readonly', True)],
+    }
+    data = fields.Date(string="Data", states=READONLY_STATES)
     cx = fields.Many2one(
-        "res.users", string="Cx", index=True
+        "res.users", string="Cx", index=True, states=READONLY_STATES
     )
-    sessao = fields.Many2one("pos.session", string="Sessão", index=True)
-    sangria = fields.Float("Valor Total das sangrias", compute="_compute_valor_sangria", readonly=True)
-    num_sangria = fields.Integer("Nº da sangria", default=1)
+    sessao = fields.Many2one("pos.session", string="Sessão", index=True, states=READONLY_STATES)
+    sangria = fields.Float("Valor Total das sangrias", compute="_compute_valor_sangria", readonly=True, states=READONLY_STATES)
+    num_sangria = fields.Integer("Nº da sangria", default=1, states=READONLY_STATES)
     response = fields.Many2one(
-        "res.users", string="Responsavel", index=True
+        "res.users", string="Responsavel", index=True, states=READONLY_STATES
     )
-    valor_falta = fields.Float("Valor falta")
-    valor_sobra = fields.Float("Valor sobra")
-    udd = fields.Float("Uso Dinheiro Dia")
-    motivo = fields.Char("Motivo")
+    valor_falta = fields.Float("Valor falta", states=READONLY_STATES)
+    valor_sobra = fields.Float("Valor sobra", states=READONLY_STATES)
+    udd = fields.Float("Uso Dinheiro Dia", states=READONLY_STATES)
+    motivo = fields.Char("Motivo", states=READONLY_STATES)
     analise = fields.Many2one(
-        "res.users", string="Analise", index=True
+        "res.users", string="Analise", index=True, states=READONLY_STATES
     )
-    env_banco = fields.Float("Envio banco")
-    env_caixa = fields.Float("Envio caixa geral")
-    env_troco = fields.Float("Envio troco")
-    obs = fields.Char("Observação")
-    situation = fields.Selection(
+    env_banco = fields.Float("Envio banco", states=READONLY_STATES)
+    env_caixa = fields.Float("Envio caixa geral", states=READONLY_STATES)
+    env_troco = fields.Float("Envio troco", states=READONLY_STATES)
+    obs = fields.Char("Observação", states=READONLY_STATES)
+    state = fields.Selection(
         selection=[
             ("draft", "Rascunho"),
             ("done", "Feito"),
@@ -38,9 +43,27 @@ class FecharCaixa(models.Model):
         ],
         string="Situação",
         default="draft",
+        readonly=True
     )
 
     @api.depends('udd', 'env_banco', 'env_caixa', 'env_troco')
     def _compute_valor_sangria(self):
         for record in self:
             record.sangria = record.udd + record.env_banco + record.env_caixa + record.env_troco
+    
+    def action_return_draft(self):
+        return self.write({'state': 'draft'})
+
+    def action_return_done(self):
+        return self.write({'state': 'done'})
+
+    def action_return_aproved(self):
+        if self.env.user != self.analise:
+            raise UserError(_('Usuario não autorizado a aprovar este lançamento.'))
+        return self.write({'state': 'aproved'})
+    
+    # @api.returns('mail.message', lambda value: value.id)
+    # def message_post(self, **kwargs):
+    #     if self.env.context.get('mark_rfq_as_sent'):
+    #         self.filtered(lambda o: o.state == 'draft').write({'state': 'sent'})
+    #     return super(FecharCaixa, self.with_context(mail_post_autofollow=True)).message_post(**kwargs)

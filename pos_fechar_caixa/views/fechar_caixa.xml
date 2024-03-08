@@ -5,6 +5,12 @@
         <field name="model">fechar.caixa</field>
         <field name="arch" type="xml">
             <form string="Fechamento de caixa">
+                <header>
+                    <button name="action_return_draft" string="Voltar ao rascunho" type="object" class="btn-primary"  attrs="{'invisible': [('state', '!=', 'done')]}"/>
+                    <button name="action_return_done" string="Finalizar" type="object" class="btn-primary"  attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                    <button name="action_return_aproved" string="Aprovar" type="object" class="btn-primary"  attrs="{'invisible': [('state', '!=', 'done')]}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done,aproved"/>
+                </header>
                 <group>
                     <group>
                         <field name="data" />
@@ -17,7 +23,6 @@
                         <field name="response" />
                         <field name="valor_falta" />
                         <field name="valor_sobra" />
-                        <field name="situation" />
                         <field name="udd" />
                         <field name="motivo" />
                     </group> 
@@ -30,6 +35,11 @@
                     </group> 
                 </group>
             </form>
+            <div class="oe_chatter">
+                <field name="message_follower_ids"/>
+                <field name="activity_ids"/>
+                <field name="message_ids"/>
+            </div>
         </field>
     </record>
 
@@ -49,7 +59,7 @@
                 <field name="env_banco" />
                 <field name="env_caixa" />
                 <field name="env_troco" />
-                <field name="situation" />
+                <field name="state" />
             </tree>
         </field>
     </record>

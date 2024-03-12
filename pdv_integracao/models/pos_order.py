@@ -545,13 +545,18 @@ class PosSession(models.Model):
                 ('company_id', '=', session.user_id.company_id.id),
                 ('name', 'ilike', diario)])
             # verifica se ja foi feito
-            line = sg_obj.search([
-                ('ref', '=', str(cod_forma)),
-                ('statement_id', 'in', (lista_st)),
-            ])
-            if not line:
+            #line = sg_obj.search([
+            #    ('ref', '=', str(cod_forma)),
+            #    ('statement_id', 'in', (lista_st)),
+            #])
+            ja_importou = self.env['account.bank.statement.line'].search([
+                ('name', '=', str(cod_forma)+caixa)])
+            if not ja_importou:
                 arp = self.env['account.payment.register']
                 arp.lanca_sangria_reforco(diario_id, caixa, valor, cod_forma, cod_venda, session.user_id.partner_id, motivo)
+            else:
+                os.remove(path_file + '/' + i)
+
     # for ses in a_session.browse(a_ses): 
     #     #cli_id = b_cliente.search([('name', '=', cli.name)])
     #     #print ('Codigo : %s , Nome : %s.' % (cli.id,cli.name))

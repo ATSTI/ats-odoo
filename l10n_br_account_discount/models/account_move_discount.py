@@ -71,17 +71,20 @@ class AccountMove(models.Model):
                 amount_total = sum(
                     record._get_product_amount_lines().mapped("price_subtotal")
                 )
+                if len(record._get_product_amount_lines()) == 1:
+                    for line in record._get_product_amount_lines():
+                        line.discount_value = amount_discount_value
                 for line in record._get_product_amount_lines()[:-1]:
                     if line.price_subtotal and amount_total:
                         line.discount_value = amount_discount_value * (
                             line.price_subtotal / amount_total
                         )
-                record._get_product_amount_lines()[
-                    -1
-                ].discount_value = amount_discount_value - sum(
-                    line.discount_value
-                    for line in record._get_product_amount_lines()[:-1]
-                )
+                # record._get_product_amount_lines()[
+                #     -1
+                # ].discount_value = amount_discount_value - sum(
+                #     line.discount_value
+                #     for line in record._get_product_amount_lines()[:-1]
+                # )
             for line in record._get_product_amount_lines():
                 line._onchange_fiscal_taxes()
             record._fields["amount_total"].compute_value(record)

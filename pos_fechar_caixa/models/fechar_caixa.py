@@ -18,7 +18,13 @@ class FecharCaixa(models.Model):
     cx = fields.Many2one(
         "res.users", string="Caixa", index=True, states=READONLY_STATES, track_visibility='onchange'
     )
-    sessao = fields.Many2one("pos.session", string="Sessão", index=True, states=READONLY_STATES, domain="[('user_id', '=', cx)]")
+    sessao = fields.Many2one(
+        "pos.session", 
+        string="Sessão", 
+        index=True, 
+        states=READONLY_STATES, 
+        domain="[('user_id', '=', cx)]"
+    )
     sangria = fields.Float("Valor total das sangrias", compute="_compute_valor_sangria", readonly=True, states=READONLY_STATES)
     num_sangria = fields.Integer("Nº da sangria", default=1, states=READONLY_STATES)
     response = fields.Many2one(
@@ -46,6 +52,15 @@ class FecharCaixa(models.Model):
         track_visibility='onchange',
         readonly=True
     )
+    saldo_final = fields.Float("Saldo final", states=READONLY_STATES )
+
+    @api.onchange('sessao')
+    def onchange_sessao(self):
+        for record in self:
+            if record.sessao.state == 'opened':
+                record.saldo_final = record.sessao.cash_register_total_entry_encoding
+            if record.sessao.state == 'closed':
+                record.saldo_final = record.sessao.cash_real_transaction
 
     @api.depends('udd', 'env_banco', 'env_caixa', 'env_troco')
     def _compute_valor_sangria(self):

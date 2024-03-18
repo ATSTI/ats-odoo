@@ -12,6 +12,7 @@
     "license": "AGPL-3",
     "depends": [
         "web_notify",
+        "l10n_br_certificate",
         ],
     "data": [
         # "security/ir.model.access.csv",

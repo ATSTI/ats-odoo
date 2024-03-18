@@ -1,26 +1,15 @@
 
-Este modulo envia email de Vencimento de Fatura e Aviso de vencimento
+Este modulo cria um cron para notificação de vencimento dos certificados
 
 Uso
 ===
 
-Alterar na linha do CRON, o dia_vencimento, e o tipo do email:
-   
-   cron_email_fatura_cobranca(dia_vcto=5, tipo_email="VCTO")
+Criado um cron "Lembrete de vencimento do certificado", nele é possivel administrar duas datas:
+-vencimento = A primeira é quantos dias você quer ser lembrado antes de vencer o certificado;
+-intervalo = O segundo é o intervalo, que tem interferencia direto nas notificações que vão aparecer;
+    Exemplo: vencimento = 30 , intervalo = 5
+        Caso o certificado vença em mais de 30 dias não aparece nada; 30 dias = intervalo x 6
+        Faltando 25 dias para vencer, irá aparecer uma notificação de informação; intervalo x 5
+        Faltando 5 dias ou menos irá aparecer um alerta de perigo para renovação; intervalo
 
-
-   dia_vcto = Número de dias que o email será enviado ANTES do vencimento ou data que a fatura foi CRIADA, 
-
-       exemplo: O Vencimento é dia 12 quero que o email vá dois dias ANTES, então o dia_vcto = 2
-
-       exemplo 2: Enviando todas as faturas criadas na semana, programa o CRON para Sexta-feira, e usa dia_vcto = -5
-
-   tipo_email = Usar VCTO para template : 'Fatura: Cobranca'
-                Usar CRIADA para template : 'Fatura: Cobranca', busca a faturas criadas
-                Usar AVISO para template : 'Fatura: aviso vencimento'
-
-Email : 
-    será criado dois modelos :
-       - Fatura: Cobranca
-       - Fatura: aviso vencimento
 

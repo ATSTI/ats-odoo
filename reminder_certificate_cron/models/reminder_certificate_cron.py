@@ -4,10 +4,8 @@ from odoo import api, fields, models, _
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-class ReminderCertificateCron(models.Model):
-    _name = 'reminder.certificate.cron'
-    _inherit = ['mail.thread']
-    _description = "Lembrete de vencimento do certificado"
+class Certificate(models.Model):
+    _inherit = ['l10n_br_fiscal.certificate']
 
     def cron_lembrete_certificate(self, dia_vcto=0, intervalo=5):
         cert_obj = self.env['l10n_br_fiscal.certificate']
@@ -18,11 +16,10 @@ class ReminderCertificateCron(models.Model):
         usuarios = self.env['res.users'].search([])
         for cert in cert_ids:
             dif_venc = dia_vencimento - cert.date_expiration
-            if dif_venc.days > 30:
+            if dif_venc.days > (intervalo*6):
                 continue
             msg = f"Certificado {cert.name}, vence em {str(dia_vcto - dif_venc.days)} dias"
             for user in usuarios:
-                # x.notify_info(message=msg)
                 if dif_venc.days > (intervalo*5):
                     user.notify_info(message=msg)
                 elif dif_venc.days > (intervalo*3):

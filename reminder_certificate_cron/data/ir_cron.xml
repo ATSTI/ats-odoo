@@ -12,6 +12,6 @@
         <field name="interval_type">days</field>
         <field name="numbercall">-1</field>
         <field name="model_id" ref="model_reminder_certificate_cron" />
-        <field name="code">model.cron_lembrete_certificate(20)</field>
+        <field name="code">model.cron_lembrete_certificate(20,5)</field>
     </record>
 </odoo>

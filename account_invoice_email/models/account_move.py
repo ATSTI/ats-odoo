@@ -50,14 +50,25 @@ class AccountMove(models.Model):
             atts_ids = []
             if attachment_ids:
                 for atts in attachment_ids:
-                    atts_ids.append(atts.id)
-                mail.attachment_ids = [(6, 0, atts_ids)]
+                    #attachment = {
+                    #   'name': ("%s" %atts.filename),
+                    #   'datas': atts.get_file_data(),
+                    #   'datas_fname': atts.filename,
+                    #   'res_model': 'account.move.line',
+                    #   'type': 'binary'
+                    #}
+                    anexo = atts.copy()
+                    #atts_ids.append(atts.id)
+                mail.attachment_ids =  False
+                #mail.attachment_ids = [(0, 0, anexo.id)]
+                mail.attachment_ids =  [(4, anexo.id)]    
                 mail.send_mail(inv.id)
                 inv.move_id.message_post(body=_('Email enviado'))
                 inv.move_id.email_send = True
             else:
                 # if inv.move_id.payment_mode_id.boleto_type:
                 #     inv.move_id.message_post(body=_('Sem boleto anexo na Fatura, Email não enviado.'))
+                mail.attachment_ids =  False
                 mail.send_mail(inv.id)
                 inv.move_id.message_post(body=_('Email enviado'))
                 inv.move_id.email_send = True

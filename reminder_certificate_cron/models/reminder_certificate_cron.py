@@ -21,7 +21,6 @@ class ReminderCertificateCron(models.Model):
             if dif_venc.days > 30:
                 continue
             msg = f"Certificado {cert.name}, vence em {str(dia_vcto - dif_venc.days)} dias"
-            import pudb;pu.db
             for user in usuarios:
                 # x.notify_info(message=msg)
                 if dif_venc.days > (intervalo*5):

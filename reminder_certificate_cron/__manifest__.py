@@ -12,11 +12,12 @@
     "license": "AGPL-3",
     "depends": [
         "web_notify",
-        "l10n_br_certificate",
+        "l10n_br_fiscal_certificate",
         ],
     "data": [
         # "security/ir.model.access.csv",
         "data/ir_cron.xml",
+        "data/mail_template.xml",
     ],
     "installable": True,
     "auto_install": False

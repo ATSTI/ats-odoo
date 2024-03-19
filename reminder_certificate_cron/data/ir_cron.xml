@@ -11,7 +11,7 @@
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
         <field name="numbercall">-1</field>
-        <field name="model_id" ref="model_reminder_certificate_cron" />
-        <field name="code">model.cron_lembrete_certificate(20,5)</field>
+        <field name="model_id" ref="model_l10n_br_fiscal_certificate" />
+        <field name="code">model.cron_lembrete_certificate(20,5,'AMBOS')</field>
     </record>
 </odoo>

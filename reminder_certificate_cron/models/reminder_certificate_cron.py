@@ -12,21 +12,21 @@ class Certificate(models.Model):
         cert_obj = self.env['l10n_br_fiscal.certificate']
         hj = datetime.now()
         dia_vencimento = hj + relativedelta(days=dia_vcto)
-        base_domain = [('date_expiration', '<', dia_vencimento)]
+        base_domain = [('date_expiration', '>', dia_vencimento)]
         cert_ids = cert_obj.search(base_domain)
         usuarios = self.env['res.users'].search([])
         if tipo in ('AMBOS', 'EMAIL'):
             domain=[('name','like','Aviso certificado')]
             mail = self.env['mail.template'].search(domain, limit=1)
-            body = "<table><caption>Certificados vencendo</caption>"
-            body += "<tr><th>Empresa</th><th>Vence em(dias)</th><th>Vencimento</th></tr>"
+            body = "<table style='border: solid 1px #DDD;border-collapse: collapse;padding: 2px 3px;text-align: center;'><caption>Certificados vencendo</caption>"
+            body += "<tr><th style='border: solid 1px #DDD;border-collapse: collapse;padding: 2px 3px;text-align: center;'>Empresa</th><th style='border: solid 1px #DDD;border-collapse: collapse;padding: 2px 3px;text-align: center;'>Vence em(dias)</th><th style='border: solid 1px #DDD;border-collapse: collapse;padding: 2px 3px;text-align: center;'>Vencimento</th></tr>"
             body_cert = ""
             body_save = mail.body_html
             for cert in cert_ids:
                 dif_venc = dia_vencimento - cert.date_expiration
                 if dif_venc.days > (intervalo*6):
                     continue
-                body_cert += f"<tr><td>{cert.owner_name}</td><td>{dif_venc.days}</td><td>{cert.date_expiration}</td></tr>"
+                body_cert += f"<tr><td style='border: solid 1px #DDD;border-collapse: collapse;padding: 2px 3px;text-align: center;'>{cert.owner_name}</td><td style='border: solid 1px #DDD;border-collapse: collapse;padding: 2px 3px;text-align: center;'>{dif_venc.days}</td><td style='border: solid 1px #DDD;border-collapse: collapse;padding: 2px 3px;text-align: center;'>{cert.date_expiration}</td></tr>"
             if body_cert:
                 body_cert += "</table><br>"
                 mail.body_html = mail.body_html.replace('msg_certificate', body + body_cert)
@@ -51,3 +51,16 @@ class Certificate(models.Model):
                     else:
                         user.notify_danger(message=msg)
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        res = super().create(vals_list)
+        data = res.date_expiration - relativedelta(days=15)
+        todos = {
+            'res_id': res.id,
+            'res_model_id': self.env['ir.model'].search([('model', '=', 'l10n_br_fiscal.certificate')]).id,
+            'user_id': self.env.uid,
+            'activity_type_id': 1,
+            'date_deadline': data,
+        }
+        self.env['mail.activity'].create(todos)
+        return res

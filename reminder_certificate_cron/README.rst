@@ -11,5 +11,4 @@ Criado um cron "Lembrete de vencimento do certificado", nele é possivel adminis
         Caso o certificado vença em mais de 30 dias não aparece nada; 30 dias = intervalo x 6
         Faltando 25 dias para vencer, irá aparecer uma notificação de informação; intervalo x 5
         Faltando 5 dias ou menos irá aparecer um alerta de perigo para renovação; intervalo
-
-
+-tipo = O terceiro é escolher onde você quer que saia o recado: MENSAGEM, EMAIL, AMBOS. 

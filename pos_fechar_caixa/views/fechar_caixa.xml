@@ -7,18 +7,19 @@
             <form string="Fechamento de caixa">
                 <header>
                     <button name="action_return_draft" string="Voltar ao rascunho" type="object" class="btn-primary"  attrs="{'invisible': [('state', '!=', 'done')]}"/>
-                    <button name="action_return_done" string="Finalizar" type="object" class="btn-primary"  attrs="{'invisible': [('state', '!=', 'draft')]}"/>
-                    <button name="action_return_aproved" string="Aprovar" type="object" class="btn-primary"  attrs="{'invisible': [('state', '!=', 'done')]}"/>
+                    <button name="action_done" string="Finalizar" type="object" class="btn-primary"  attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                    <button name="action_aproved" string="Aprovar" type="object" class="btn-primary"  attrs="{'invisible': [('state', '!=', 'done')]}"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done,aproved"/>
                 </header>
                 <sheet>
                     <group>
                         <group string="Sessão/Caixa">
+                            <field name="name" />
                             <field name="data" />
-                            <field name="cx" />
                             <field name="sessao" />
                         </group>
                         <group string="Responsável">
+                            <field name="cx" />
                             <field name="response" />
                             <field name="analise" />
                         </group>
@@ -54,7 +55,7 @@
         <field name="name">pos.fechar.caixa.tree</field>
         <field name="model">fechar.caixa</field>
         <field name="arch" type="xml">
-            <tree string="Fechamento de caixa">
+            <tree string="Fechamento de caixa" default_order="data desc">
                 <field name="data" />
                 <field name="cx" />
                 <field name="sessao" />

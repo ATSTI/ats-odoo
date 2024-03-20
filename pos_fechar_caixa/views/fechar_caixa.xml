@@ -13,15 +13,15 @@
                 </header>
                 <sheet>
                     <group>
-                        <group string="Sessão/Caixa">
-                            <field name="name" />
-                            <field name="data" />
-                            <field name="sessao" />
-                        </group>
                         <group string="Responsável">
                             <field name="cx" />
                             <field name="response" />
                             <field name="analise" />
+                        </group>
+                        <group string="Sessão/Caixa">                            
+                            <field name="data" />
+                            <field name="sessao" />
+                            <field name="name" />
                         </group>
                         <group string="Movimento">
                             <field name="env_banco" />

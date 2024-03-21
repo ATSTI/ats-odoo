@@ -272,7 +272,13 @@ class PosSession(models.Model):
                     user_id = self.env['res.users'].browse([50])
                 vals['user_id'] = user_id.id
             else:
-                vals['user_id'] = ses.user_id.id
+                if user == 40:
+                    user_id = self.env['res.users'].browse([50])
+                    if user_id:
+                        vals['user_id'] = user_id.id
+                else:
+                    vals['note'] = f"USER: {ped['user_id']}"
+                    vals['user_id'] = ses.user_id.id
             
             vals['pos_reference'] = ped['pos_reference']
             vals['amount_tax'] = ped['amount_return']

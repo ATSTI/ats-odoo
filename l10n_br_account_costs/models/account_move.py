@@ -15,25 +15,22 @@ from ...l10n_br_fiscal.constants.fiscal import (
 )
 
 
-# class AccountMove(models.Model):
-#     _inherit = "account.move"
 class AccountMove(models.Model):
     _name = "account.move"
     _inherit = [
         _name,
-        "l10n_br_fiscal.document.mixin.methods",
-        "l10n_br_fiscal.document.invoice.mixin",
+        "l10n_br_fiscal.document.move.mixin",
     ]
     _inherits = {"l10n_br_fiscal.document": "fiscal_document_id"}
     _order = "date DESC, name DESC"
     
-    amount_freight_value = fields.Monetary(
-        inverse="_inverse_amount_freight",
-    )
+    # amount_freight_value = fields.Monetary(
+    #     inverse="_inverse_amount_freight",
+    # )
     
-    amount_insurance_value = fields.Monetary(
-        inverse="_inverse_amount_insurance",
-    )
+    # amount_insurance_value = fields.Monetary(
+    #     inverse="_inverse_amount_insurance",
+    # )
 
     amount_other_value = fields.Monetary(
         inverse="_inverse_amount_other",
@@ -56,7 +53,7 @@ class AccountMove(models.Model):
                 continue
             # se ja existe tem q excluir
             for line in move.line_ids:
-                if line.name in ["[FREIGHT]"]:
+                if line.name in ["[FRETE]"]:
                     move.with_context(
                         check_move_validity=False,
                         skip_account_move_synchronization=True,
@@ -67,19 +64,30 @@ class AccountMove(models.Model):
                             "to_check": False,
                         }
                     )
-            for line in move.line_ids:               
+            freight = 0.0
+            for line in move.line_ids: 
                 if not line.exclude_from_invoice_tab and line.freight_value > 0:
-                    new_line = self.env["account.move.line"].new(
-                            {
-                                "name": "[FREIGHT]",
-                                "account_id": line.account_id.id,
-                                "move_id": self.id,
-                                "exclude_from_invoice_tab": True,
-                                "price_unit": line.freight_value,
-                            }
-                    )
-                    move.line_ids += new_line
-                    move.with_context(check_move_validity=False)._onchange_currency()
+                    freight += line.freight_value
+            if freight:
+                acc_freight = self.env['account.account'].search([('name','ilike', 'frete')]).id
+                if not acc_freight:
+                    acc_freight = line.account_id.id
+                new_line = self.env["account.move.line"].new(
+                        {
+                            "name": "[FRETE]",
+                            "account_id": acc_freight,
+                            "move_id": self.id,
+                            "exclude_from_invoice_tab": True,
+                            "price_unit": freight,
+                        }
+                )
+                move.line_ids += new_line
+                move.with_context(check_move_validity=False)._onchange_currency()
+                for line in move.line_ids:
+                    if line.credit:
+                        line.credit -= line.freight_value
+                    if line.name ==  "[FRETE]":
+                        line.credit = freight
 
     @api.depends('amount_other_value')
     def _inverse_amount_other(self):
@@ -92,7 +100,7 @@ class AccountMove(models.Model):
                 continue
             # se ja existe tem q excluir
             for line in move.line_ids:
-                if line.name in ["[OTHER]"]:
+                if line.name in ["[OUTROS]"]:
                     move.with_context(
                         check_move_validity=False,
                         skip_account_move_synchronization=True,
@@ -103,20 +111,30 @@ class AccountMove(models.Model):
                             "to_check": False,
                         }
                     )
-            for line in move.line_ids:
+            other = 0.0
+            for line in move.line_ids: 
                 if not line.exclude_from_invoice_tab and line.other_value > 0:
-                    if line.other_value:
-                        new_line = self.env["account.move.line"].new(
-                            {
-                                "name": "[OTHER]",
-                                "account_id": line.account_id.id,
-                                "move_id": self.id,
-                                "exclude_from_invoice_tab": True,
-                                "price_unit": line.other_value,
-                            }
-                        )
-                    move.line_ids += new_line
-                    move.with_context(check_move_validity=False)._onchange_currency()
+                    other += line.other_value
+            if other:
+                acc_other = self.env['account.account'].search([('name','ilike', 'outras despesa venda')]).id
+                if not acc_other:
+                    acc_other = line.account_id.id
+                new_line = self.env["account.move.line"].new(
+                        {
+                            "name": "[OUTROS]",
+                            "account_id": acc_other,
+                            "move_id": self.id,
+                            "exclude_from_invoice_tab": True,
+                            "price_unit": other,
+                        }
+                )
+                move.line_ids += new_line
+                move.with_context(check_move_validity=False)._onchange_currency()
+                for line in move.line_ids:
+                    if line.credit:
+                        line.credit -= line.other_value
+                    if line.name ==  "[OUTROS]":
+                        line.credit = other
 
     @api.depends('amount_insurance_value')
     def _inverse_amount_insurance(self):

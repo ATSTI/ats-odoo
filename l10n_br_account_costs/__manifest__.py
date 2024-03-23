@@ -18,7 +18,7 @@
         # "security/l10n_br_sale_security.xml",
 
         # View
-        "views/account_invoice_view.xml",
+        # "views/account_invoice_view.xml",
     ],
     "demo": [
         # Demo

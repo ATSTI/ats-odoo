@@ -336,3 +336,52 @@ class AccountMove(models.Model):
     #     move = super().copy(default)
     #     move.with_context(check_move_validity=False)._onchange_currency()
     #     return move
+            
+    @api.model
+    def _move_autocomplete_invoice_lines_create(self, vals_list):
+        new_lines = super()._move_autocomplete_invoice_lines_create(vals_list)
+        # import pudb;pu.db
+        #  necessario para o COPY
+        # RODANDO SOMENTE EM NOTA DE SAIDA FAZER PARA ENTRADA
+
+        for lines in new_lines:
+            total = 0.0
+            i = 0
+            remove = False
+            for line in lines['line_ids']:
+                if 'FRETE' in line[2]['name']:
+                    remove = True
+                    total += line[2]['credit']
+                    break
+                i += 1
+            if remove:
+                del lines['line_ids'][i]
+            i = 0
+            remove = False
+            for line in lines['line_ids']:
+                if 'OUTRO' in line[2]['name']:
+                    remove = True
+                    total += line[2]['credit']
+                    break
+                i += 1
+            if remove:
+                del lines['line_ids'][i]
+            i = 0
+            remove = False
+            for line in lines['line_ids']:
+                if 'SEGURO' in line[2]['name']:
+                    remove = True
+                    total += line[2]['credit']
+                    break
+                i += 1
+            if remove:
+                del lines['line_ids'][i]
+
+            for line in lines['line_ids']:
+                if total:
+                    if line[2]['debit']:
+                        line[2]['debit'] = line[2]['debit'] - total
+                    line[2]['freight_value'] = 0.0
+                    line[2]['other_value'] = 0.0
+                    line[2]['insurance_value'] = 0.0
+        return new_lines

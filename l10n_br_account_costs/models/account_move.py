@@ -71,8 +71,10 @@ class AccountMove(models.Model):
                 move.payment_state = move.payment_state
                 continue
             # se ja existe tem q excluir
+            remove = False
             for line in move.line_ids:
                 if line.name in ["[SEGURO]", "[FRETE]", "[OUTROS]"]:
+                    remove = True
                     move.with_context(
                         check_move_validity=False,
                         skip_account_move_synchronization=True,
@@ -83,6 +85,8 @@ class AccountMove(models.Model):
                             "to_check": False,
                         }
                     )
+            if remove:
+                move.with_context(check_move_validity=False)._onchange_currency()
             insurance = 0.0
             other = 0.0
             freight = 0.0
@@ -325,3 +329,10 @@ class AccountMove(models.Model):
                     new_pmt_state = 'reversed'
 
             move.payment_state = new_pmt_state
+    
+    # @api.returns('self', lambda value: value.id)
+    # def copy(self, default=None):
+    #     import pudb;pu.db
+    #     move = super().copy(default)
+    #     move.with_context(check_move_validity=False)._onchange_currency()
+    #     return move

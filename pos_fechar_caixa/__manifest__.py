@@ -1,4 +1,4 @@
-# © 2022 Carlos R. Silveira, Manoel dos Santos, ATSti Solucoes
+# © 2024 Carlos R. Silveira, Maurício Rodrigues Silveira, ATSti Solucoes
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 {

@@ -272,7 +272,13 @@ class PosSession(models.Model):
                     user_id = self.env['res.users'].browse([50])
                 vals['user_id'] = user_id.id
             else:
-                vals['user_id'] = ses.user_id.id
+                if user == 40:
+                    user_id = self.env['res.users'].browse([50])
+                    if user_id:
+                        vals['user_id'] = user_id.id
+                else:
+                    vals['note'] = f"USER: {ped['user_id']}"
+                    vals['user_id'] = ses.user_id.id
             
             vals['pos_reference'] = ped['pos_reference']
             vals['amount_tax'] = ped['amount_return']
@@ -301,7 +307,14 @@ class PosSession(models.Model):
             vals['amount_paid'] = t_paid
             vals['company_id'] = 1
             vals['pricelist_id'] = 1
-            ped_id = pos.create(vals) 
+            try:
+                ped_id = pos.create(vals)
+            except Error as e:
+                ses.message_post(
+                    body=_(
+                        "ERRO para inserir pedido %s, Erro %s"
+                    ) % (ped['name'], e.pgerror)
+                )               
             list_adi = []
             
             linhas = len(ped['lines'])
@@ -386,9 +399,20 @@ class PosSession(models.Model):
             #  aqui aba pagamento 
             list_pag = []
             metodo_pag = ''
+            falha_pag = True
             for pag_ids in ped['statement_ids']:
                 pag = pag_ids[2]
+                if pag['journal'] in ('R-', 'S-','U-'):
+                    continue
                 jrn = self.env['account.journal'].search([('name', 'like', pag['journal'])])
+                if not jrn:
+                    ses.message_post(
+                        body=_(
+                            "ERRO DIARIO NAO ENCONTRADO: %s - %s"
+                        ) % (ped['name'], pag['journal'])
+                    )
+                    falha_pag = False
+                    continue 
                 metodo_pag = self.env['pos.payment.method'].search([('name', 'ilike', jrn.name[:2])])
                 # datetime.strftime(pag['date'],'%Y-%m-%d'),
                 # "pos_order_id": ped_id.id,
@@ -403,7 +427,7 @@ class PosSession(models.Model):
                 # list_pag.append(vals_pag)
                 # vLine = b_pedidoPag.create(vals_pag)
                 ped_id.write({'payment_ids': [(0, 0, vals_pag)]})
-            if metodo_pag and metodo_pag.name[:2] != '4-':
+            if metodo_pag and metodo_pag.name[:2] != '4-' and falha_pag:
                 ped_id.action_pos_order_paid()
             # se a prazo criando a Fatura
             if metodo_pag and metodo_pag.name[:2] == '4-':
@@ -545,13 +569,18 @@ class PosSession(models.Model):
                 ('company_id', '=', session.user_id.company_id.id),
                 ('name', 'ilike', diario)])
             # verifica se ja foi feito
-            line = sg_obj.search([
-                ('ref', '=', str(cod_forma)),
-                ('statement_id', 'in', (lista_st)),
-            ])
-            if not line:
+            #line = sg_obj.search([
+            #    ('ref', '=', str(cod_forma)),
+            #    ('statement_id', 'in', (lista_st)),
+            #])
+            ja_importou = self.env['account.bank.statement.line'].search([
+                ('name', '=', str(cod_forma)+caixa)])
+            if not ja_importou:
                 arp = self.env['account.payment.register']
                 arp.lanca_sangria_reforco(diario_id, caixa, valor, cod_forma, cod_venda, session.user_id.partner_id, motivo)
+            else:
+                os.remove(path_file + '/' + i)
+
     # for ses in a_session.browse(a_ses): 
     #     #cli_id = b_cliente.search([('name', '=', cli.name)])
     #     #print ('Codigo : %s , Nome : %s.' % (cli.id,cli.name))

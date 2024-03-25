@@ -1,4 +1,3 @@
-# Copyright (C) 2009  Renato Lima - Akretion
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 {
@@ -8,7 +7,7 @@
     "author": "ATSTi, ",
     "website": "",
     "version": "14.0.1.0.0",
-    "depends": ["l10n_br_fiscal", "l10n_br_sale", "l10n_br_account", "l10n_br_purchase"],
+    "depends": ["l10n_br_fiscal", "l10n_br_account"],
     "data": [
         # Data
         # "data/company.xml",
@@ -18,15 +17,13 @@
         # "security/l10n_br_sale_security.xml",
 
         # View
-        "views/account_invoice_view.xml",
+        "views/res_company_view.xml",
     ],
     "demo": [
         # Demo
         # "demo/l10n_br_account_invoice.xml",
     ],
     "installable": True,
-    "auto_install": True,
-    # "post_init_hook": "post_init_hook",
-    # "development_status": "Production/Stable",
+    "auto_install": False,
     "maintainers": ["carlos"],
 }

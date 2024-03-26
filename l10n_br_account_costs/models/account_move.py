@@ -133,6 +133,8 @@ class AccountMove(models.Model):
                 move.line_ids += new_line
             if new_line:
                 move.with_context(check_move_validity=False)._onchange_currency()
+                # in_invoices = self.filtered(lambda m: m.move_type == 'in_invoice')
+                # out_invoices = self.filtered(lambda m: m.move_type == 'out_invoice')
                 for line in move.line_ids:
                     if line.credit:
                         line.credit -= line.freight_value + line.insurance_value + line.other_value
@@ -349,7 +351,7 @@ class AccountMove(models.Model):
             i = 0
             remove = False
             for line in lines['line_ids']:
-                if 'FRETE' in line[2]['name']:
+                if line[2]['name'] and 'FRETE' in line[2]['name']:
                     remove = True
                     total += line[2]['credit']
                     break
@@ -359,7 +361,7 @@ class AccountMove(models.Model):
             i = 0
             remove = False
             for line in lines['line_ids']:
-                if 'OUTRO' in line[2]['name']:
+                if line[2]['name'] and 'OUTRO' in line[2]['name']:
                     remove = True
                     total += line[2]['credit']
                     break
@@ -369,7 +371,7 @@ class AccountMove(models.Model):
             i = 0
             remove = False
             for line in lines['line_ids']:
-                if 'SEGURO' in line[2]['name']:
+                if line[2]['name'] and 'SEGURO' in line[2]['name']:
                     remove = True
                     total += line[2]['credit']
                     break

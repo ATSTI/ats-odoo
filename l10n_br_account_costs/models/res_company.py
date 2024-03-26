@@ -1,21 +1,14 @@
-# Copyright (C) 2014  Renato Lima - Akretion
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
-from odoo import _, fields, models
+import logging
 
-ACCOUNT_DOMAIN = "['&', '&', '&', ('deprecated', '=', False), ('internal_type','=','other'), ('company_id', '=', current_company_id), ('is_off_balance', '=', False)]"
+from odoo import api, fields, models
 
-class Company(models.Model):
+
+class ResCompany(models.Model):
     _inherit = "res.company"
 
-    property_account_income_freight_id = fields.Many2one(
-        'account.account', company_dependent=True,
-        string="Despesas vendas com Frete",
-        domain=ACCOUNT_DOMAIN,
-    )
-    property_account_expense_freight_id = fields.Many2one(
-        'account.account', company_dependent=True,
-        string="Despesas com Frete",
-        domain=ACCOUNT_DOMAIN,
-    )
+    acc_freight_id = fields.Many2one(comodel_name="account.account", string="Frete")
+    acc_other_id = fields.Many2one(comodel_name="account.account", string="Outro")
+    acc_insurance_id = fields.Many2one(comodel_name="account.account", string="Seguro")
 

@@ -33,6 +33,7 @@ class ContractContract(models.Model):
         # self._compute_recurring_next_date()
         self._change_recurring_next_date()
         moves.action_post()
+        moves.generate_boleto_pdf()
         return moves
     
     def contract_responsability(self, resp):

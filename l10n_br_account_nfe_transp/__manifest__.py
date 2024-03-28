@@ -1,8 +1,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    "name": "ATSTO-Account NFe Transportadora",
-    "summary": "Dados da Transportadora e Veiculo",
+    "name": "ATSTi-Account NFe Transportadora",
+    "summary": "Dados Transportadora e Veiculo",
     "category": "Localisation",
     "license": "AGPL-3",
     "author": "Odoo Community Association (OCA)",
@@ -17,7 +17,7 @@
     "data": [
         "security/ir.model.access.csv",
         "views/account_invoice_view.xml",
-        "wizard/create_transp_view.xml",
+        # "wizard/create_transp_view.xml",
     ],
     "demo": [
     ],

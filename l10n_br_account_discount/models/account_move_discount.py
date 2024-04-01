@@ -49,8 +49,8 @@ class AccountMove(models.Model):
             doc.update(values)
 
     def _inverse_amount_discount(self):
-        import wdb;
-        wdb.set_trace()
+        # import wdb;
+        # wdb.set_trace()
         for record in self.filtered(lambda doc: doc._get_product_amount_lines()):
             amount_discount_value = record.amount_discount_value
             if all(record._get_product_amount_lines().mapped("discount_value")):

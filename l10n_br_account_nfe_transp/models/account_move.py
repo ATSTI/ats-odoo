@@ -8,6 +8,7 @@ class AccountMove(models.Model):
         "transp.frete",
         "am_id",
         string='Transportadora',
+        copy=False
     )
 
     @api.depends("trans_ids")

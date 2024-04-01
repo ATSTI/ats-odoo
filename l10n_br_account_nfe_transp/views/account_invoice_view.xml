@@ -30,7 +30,7 @@
                         <field name="nfe40_transporta" />
                         <field name="incoterm_id" />
                         <field name="carrier_id"  invisible="1" />
-                        <field name="vehicle_id" context="{'default_carrier_id': carrier_id}" domain="[('carrier_id', '=', carrier_id)]" />
+                        <field name="vehicle_id" context="{'default_carrier_id': carrier_id, 'default_active': True}" domain="[('carrier_id', '=', carrier_id)]" />
                         <field name="vehicle" />
                         <field name="message_warning" readonly="1" colors="yellow"/>
                     </group>
@@ -100,7 +100,7 @@
                                         <field name="incoterm_id" />
                                         <field name="carrier_id" invisible="1" />
                                         <field name="nfe40_transporta" />
-                                        <field name="vehicle_id" context="{'default_carrier_id': carrier_id}" domain="[('carrier_id', '=', carrier_id)]" />
+                                        <field name="vehicle_id" context="{'default_carrier_id': carrier_id, 'default_active': True}" domain="[('carrier_id', '=', carrier_id)]" />
                                         <field name="vehicle" readonly="1" />
                                         <field name="plate" readonly="1" />
                                         <field name="rntc_code" readonly="1" />

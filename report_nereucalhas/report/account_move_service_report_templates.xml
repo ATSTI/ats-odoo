@@ -143,19 +143,19 @@
                     <br/>
                     <table style="border: 0px solid; width:100%">
                         <tr>
-                            <td style="border: 0px solid; width:30% ; height:35px">
+                            <td style="border: 0px solid; width:24% ; height:35px">
                                 <div style="width: 100%;float: left;">
                                     <img t-attf-src="data:image/*;base64,{{o.company_id.logo}}"
                                         t-att-alt="o.company_id.name" style="width:100%; height:70px"/>
                                 </div>
                             </td>
-                            <td style="text-align: right; border: 0px solid; width:35%; text-align: left" >
+                            <td style="text-align: right; border: 0px solid; width:38%; text-align: left" >
                                 <span style="font-size:12px" t-field="o.company_id.name"/>                                
                                 <br/><span style="font-size:12px">CNPJ/CPF: </span><span style="font-size:12px" t-field="o.company_id.cnpj_cpf"/>
                                 <br/><span style="font-size:12px" t-field="o.company_id.street_name"/><span style="font-size:12px"> , </span><span style="font-size:12px" t-field="o.company_id.street_number"/>
                                 <br/><span style="font-size:12px">CEP: </span><span style="font-size:12px" t-field="o.company_id.zip"/>
                             </td>
-                            <td style="text-align: right; border: 0px solid; width:35%" >
+                            <td style="text-align: right; border: 0px solid; width:38%" >
                                 <span style="font-size:12px" t-field="o.company_id.phone"/>
                                 <br/><span style="font-size:12px" t-field="o.company_id.email"/>
                                 <br/><span style="font-size:12px" t-field="o.company_id.website"/>
@@ -183,7 +183,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <span t-field="o.partner_id.street_name" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-field="o.partner_id.street_number" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-field="o.partner_id.city_id.id" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-fieldpa="o.partner_id.district" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-field="o.partner_id.state_id.name" style="font-size:14px"/>
+                                <span t-field="o.partner_id.street_name" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-field="o.partner_id.street_number" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-field="o.partner_id.city_id.name" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-fieldpa="o.partner_id.district" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-field="o.partner_id.state_id.name" style="font-size:14px"/>
                             </td>
                         </tr>
                     </table>
@@ -216,38 +216,26 @@
                     <t t-set="display_discount" t-value="any(l.discount for l in o.order_line)"/>
                     <table style="border: solid 1px #DDD; border-collapse: collapse; width: 100%;">
                         <tr>
-                            <th name="th_description" class="text-left" style="border: solid 1px #000000; border-collapse: collapse; width: 44%;; font-size: 16px" >Descrição</th>
-                            <th name="th_quantity" class="text-right" style="border: solid 1px #000000; border-collapse: collapse; width: 8%;; font-size: 16px">Qntd</th>
-                            <th name="th_priceunit" class="text-right" style="border: solid 1px #000000; border-collapse: collapse; width: 8%;; font-size: 16px">Preço Un.</th>
-                            <th name="th_taxes" class="text-right" style="border: solid 1px #000000; border-collapse: collapse; width: 20%;; font-size: 16px">Impostos</th>
-                            <th name="th_subtotal" class="text-right" style="border: solid 1px #000000; border-collapse: collapse; width: 20%;; font-size: 16px">
+                            <th name="th_description" class="text-left" style="border: solid 1px #000000; border-collapse: collapse; width: 44%;; font-size: 16px; height:45px" >Descrição</th>
+                            <th name="th_quantity" class="text-right" style="border: solid 1px #000000; border-collapse: collapse; width: 8%;; font-size: 16px; height:45px">Qntd</th>
+                            <th name="th_subtotal" class="text-right" style="border: solid 1px #000000; border-collapse: collapse; width: 20%;; font-size: 16px; height:45px">
                                 <span groups="account.group_show_line_subtotals_tax_excluded">Subtotal</span>
                                 <span groups="account.group_show_line_subtotals_tax_included">Preço total</span>
                             </th>
                         </tr>
                         <tbody class="sale_tbody">
-
                             <t t-set="current_subtotal" t-value="0"/>
-
                             <t t-foreach="o.order_line" t-as="line">
-
                                 <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal" groups="account.group_show_line_subtotals_tax_excluded"/>
                                 <t t-set="current_subtotal" t-value="current_subtotal + line.price_total" groups="account.group_show_line_subtotals_tax_included"/>
-
                                 <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
                                     <t t-if="not line.display_type">
-                                        <td name="td_name" style="border: solid 1px #000000; border-collapse: collapse; width: 44%; font-size: 12px"><span t-field="line.name"/></td>
-                                        <td name="td_quantity" class="text-right" style="border: solid 1px #000000; border-collapse: collapse; width: 8%; font-size: 12px; text-align: right">
+                                        <td name="td_name" style="border: solid 1px #000000; border-collapse: collapse; width: 44%; font-size: 12px; height:35px"><span t-field="line.name"/></td>
+                                        <td name="td_quantity" class="text-right" style="border: solid 1px #000000; border-collapse: collapse; width: 8%; font-size: 12px; text-align: right; height:35px">
                                             <span t-field="line.product_uom_qty"/>
                                             <span t-field="line.product_uom"/>
                                         </td>
-                                        <td name="td_priceunit" class="text-right" style="border: solid 1px #000000; border-collapse: collapse; width: 8%; font-size: 12px; text-align: right">
-                                            <span t-field="line.price_unit"/>
-                                        </td>
-                                        <td name="td_taxes" class="text-right" style="border: solid 1px #000000; border-collapse: collapse; width: 20%; font-size: 12px">
-                                            <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.tax_id))"/>
-                                        </td>
-                                        <td name="td_subtotal" class="text-right o_price_total" style="border: solid 1px #000000; border-collapse: collapse; width: 20%; font-size: 12px; text-align: right">
+                                        <td name="td_subtotal" class="text-right o_price_total" style="border: solid 1px #000000; border-collapse: collapse; width: 20%; font-size: 12px; text-align: right; height:35px">
                                             <span t-field="line.price_subtotal" groups="account.group_show_line_subtotals_tax_excluded"/>
                                             <span t-field="line.price_total" groups="account.group_show_line_subtotals_tax_included"/>
                                         </td>

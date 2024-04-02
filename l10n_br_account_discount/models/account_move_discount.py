@@ -13,13 +13,14 @@ class AccountMove(models.Model):
     _inherit = "account.move"
 
     amount_discount_value = fields.Monetary(
-        string="Amount Discount",
+        string="Total do desconto",
         compute="_compute_amount",
         store=True,
         inverse="_inverse_amount_discount",
     )
 
     def _compute_amount(self):
+        result = super()._compute_amount()
         fields = self._get_amount_fields()
         for doc in self:
             values = {key: 0.0 for key in fields}
@@ -47,10 +48,9 @@ class AccountMove(models.Model):
                 values["amount_discount_value"] = doc.amount_discount_value
 
             doc.update(values)
+        return result
 
     def _inverse_amount_discount(self):
-        import wdb;
-        wdb.set_trace()
         for record in self.filtered(lambda doc: doc._get_product_amount_lines()):
             amount_discount_value = record.amount_discount_value
             if all(record._get_product_amount_lines().mapped("discount_value")):

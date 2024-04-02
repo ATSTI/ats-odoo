@@ -812,7 +812,7 @@ obsCont[@xCampo='NomeVendedor']"
             self.nLeft + 138, self.nlin + 7.7, tagtext(oNode=el_transp, cTag="placa")
         )
         self.string(
-            self.nLeft + 157, self.nlin + 7.7, tagtext(oNode=veic_transp, cTag="UF")
+            self.nLeft + 158, self.nlin + 7.7, tagtext(oNode=veic_transp, cTag="UF")
         )
         self.string(
             nMr - 25,

@@ -806,7 +806,7 @@ obsCont[@xCampo='NomeVendedor']"
             self.oFrete[tagtext(oNode=el_transp, cTag="modFrete")],
         )
         self.string(
-            self.nLeft + 122, self.nlin + 7.7, tagtext(oNode=el_transp, cTag="RNTC")
+            self.nLeft + 124, self.nlin + 7.7, tagtext(oNode=el_transp, cTag="RNTC")
         )
         self.string(
             self.nLeft + 138, self.nlin + 7.7, tagtext(oNode=el_transp, cTag="placa")

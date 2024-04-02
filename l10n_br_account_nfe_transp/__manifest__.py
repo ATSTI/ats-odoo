@@ -1,11 +1,11 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    "name": "ATSTi-Account NFe Transportadora",
-    "summary": "Dados Transportadora e Veiculo",
+    "name": "NFe Transportadora/Volumes",
+    "summary": "Dados Transportadora/Veiculo e Volumes adicionando pela fatura",
     "category": "Localisation",
     "license": "AGPL-3",
-    "author": "Odoo Community Association (OCA)",
+    "author": "ATSTi",
     "website": "https://github.com/OCA/l10n-brazil",
     "version": "14.0.1.0.2",
     "development_status": "Beta",
@@ -17,7 +17,6 @@
     "data": [
         "security/ir.model.access.csv",
         "views/account_invoice_view.xml",
-        # "wizard/create_transp_view.xml",
     ],
     "demo": [
     ],

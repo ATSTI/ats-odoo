@@ -80,6 +80,15 @@
         <field name="arch" type="xml">
             <xpath expr="//page[@name='other_info']" position="after">
                 <page name="transp_frete" string="Transporte/Frete" >
+                    <!-- <header>
+                        <button
+                            name="button_nfe_transp"
+                            string="Adicionar"
+                            class="btn-success"
+                            type="object"
+                            attrs="{'invisible': [('state', '!=', 'draft')]}"
+                        />
+                    </header> -->
                     <field name="trans_ids" context="{'default_am_id': active_id}" >
                         <tree string="Info Transporte">
                             <field name="incoterm_id" />
@@ -122,6 +131,10 @@
                     </field>
                 </page>
             </xpath>
+            <field name="invoice_incoterm_id" position="replace">
+                <field name="invoice_incoterm_id" string="Tipo Frete" />
+                <field name="carrier_id" />
+            </field>
         </field>
     </record>
 

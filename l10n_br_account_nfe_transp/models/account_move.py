@@ -3,34 +3,21 @@ from odoo import models, _, api, fields
 
 class AccountMove(models.Model):
     _inherit = "account.move"
+    _inherits = {"l10n_br_fiscal.document": "fiscal_document_id"}
     
     trans_ids = fields.One2many(
         "transp.frete",
         "am_id",
         string='Transportadora',
-        copy=False
+        copy=False,
     )
 
-    @api.depends("trans_ids")
-    def _compute_freight(self):
-        for record in self.trans_ids:
-            self.invoice_incoterm_id = record.incoterm_id.id
-            self.carrier_id = record.carrier_id.id
-
-    # def button_wizard_transp(self):
-    #     for move in self:
-    #         ctx = {
-    #             'default_am_id': move.id,
-    #         }
-    #     return {
-    #         'type': 'ir.actions.act_window',
-    #         'view_mode': 'form',
-    #         'res_model': 'wizard.create.transp',
-    #         'views': [(False, 'form')],
-    #         'view_id': False,
-    #         'target': 'new',
-    #         'context': ctx,
-    #     }
+    @api.onchange("trans_ids")
+    def _onchange_trans_ids(self):
+        if self.trans_ids:
+            for record in self.trans_ids:
+                self.invoice_incoterm_id = record.incoterm_id.id
+                self.carrier_id = record.carrier_id.id
 
 
 class TranspFrete(models.Model):
@@ -52,7 +39,6 @@ class TranspFrete(models.Model):
         ondelete="restrict",
     )
 
-    # related="carrier_id.partner_id",
     nfe40_transporta = fields.Many2one(
         comodel_name="res.partner",        
         string="Dados do transportador",
@@ -105,7 +91,6 @@ class TranspFrete(models.Model):
     @api.onchange("incoterm_id")
     def _onchange_incoterm_id(self):
         if self.incoterm_id:
-            # import pudb;pu.db
             key = self.incoterm_id.freight_responsibility
             if key:
                 if key == '0':
@@ -121,8 +106,8 @@ class TranspFrete(models.Model):
                 elif key == '9':
                     self.message_warning = "9 - Sem Ocorrência de transporte."
                 
-            if self.am_id:
-                self.am_id.invoice_incoterm_id = self.incoterm_id.id
+            # if self.am_id:
+            #     self.am_id.write({'invoice_incoterm_id': self.incoterm_id.id})
 
     @api.onchange("vehicle_id")
     def _onchange_vehicle_id(self):
@@ -137,6 +122,8 @@ class TranspFrete(models.Model):
     @api.onchange("nfe40_transporta")
     def _onchange_nfe40_transporta(self):
         if self.nfe40_transporta:
+            if not self.message_warning:
+                self.message_warning = ""
             carrier = self.env["delivery.carrier"]
             carrier_id = carrier.search([
                 ('partner_id', '=', self.nfe40_transporta.id)
@@ -157,7 +144,7 @@ class TranspFrete(models.Model):
             self.carrier_id = carrier_id.id
             if self.am_id:
                 self.am_id.carrier_id = carrier_id.id
-            if not self.nfe40_transporta.cnpj_cpf:
+            if self.nfe40_transporta and not self.nfe40_transporta.cnpj_cpf:
                 self.message_warning += " ATENÇÃO: Dados da tranportadora sem CNPJ/CPF"
                 if not self.nfe40_transporta.inscr_est:
                     self.message_warning += " e sem Inscrição Estadual."

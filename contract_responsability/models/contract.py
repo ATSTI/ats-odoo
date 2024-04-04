@@ -28,11 +28,12 @@ class ContractContract(models.Model):
         invoices_values, contratos = self._prepare_recurring_invoices_values(date_ref)
         moves = self.env["account.move"].create(invoices_values)
         for ctr in contratos:
-            moves.action_post()
-            try:
-                moves.generate_boleto_pdf()
-            except:
-                moves.narration = "Erro na geracao do boleto"
+            if moves.state == "draft":
+                moves.action_post()
+                try:
+                    moves.generate_boleto_pdf()
+                except:
+                    moves.narration = "Erro na geracao do boleto"
             ctr._add_contract_origin(moves)
             ctr._invoice_followers(moves)
             # mv = moves[-1]

@@ -14,26 +14,30 @@ class ContractContract(models.Model):
             comodel_name="res.partner", string="Responsavel faturamento"
         )
 
-    def _prepare_invoice(self, date_invoice, journal=None):
-        invoice_vals, move_form = super()._prepare_invoice(
-            date_invoice, journal=journal
-        )
-        if self.partner_responsability_id and self.partner_responsability_id != self.partner_id:
-            invoice_vals["partner_id"] = self.partner_responsability_id.id
-        else:
-            invoice_vals["partner_id"] = self.partner_id.id
-        return invoice_vals, move_form
+    # def _prepare_invoice(self, date_invoice, journal=None):
+    #     invoice_vals, move_form = super()._prepare_invoice(
+    #         date_invoice, journal=journal
+    #     )
+    #     if self.partner_responsability_id and self.partner_responsability_id != self.partner_id:
+    #         invoice_vals["partner_id"] = self.partner_responsability_id.id
+    #     else:
+    #         invoice_vals["partner_id"] = self.partner_id.id
+    #     return invoice_vals, move_form
     
     def _recurring_create_invoice(self, date_ref=False):
-        invoices_values = self._prepare_recurring_invoices_values(date_ref)
+        invoices_values, contratos = self._prepare_recurring_invoices_values(date_ref)
         moves = self.env["account.move"].create(invoices_values)
-        self._add_contract_origin(moves)
-        self._invoice_followers(moves)
-        # mv = moves[-1]
-        # self._compute_recurring_next_date()
-        self._change_recurring_next_date()
-        moves.action_post()
-        moves.generate_boleto_pdf()
+        for ctr in contratos:
+            moves.action_post()
+            try:
+                moves.generate_boleto_pdf()
+            except:
+                moves.narration = "Erro na geracao do boleto"
+            ctr._add_contract_origin(moves)
+            ctr._invoice_followers(moves)
+            # mv = moves[-1]
+            # self._compute_recurring_next_date()
+            ctr._change_recurring_next_date()            
         return moves
     
     def contract_responsability(self, resp):
@@ -136,30 +140,34 @@ class ContractContract(models.Model):
         !!! The date of next invoice (recurring_next_date) is updated here !!!
         :return: list of dictionaries (invoices values)
         """
-        ctr_ids = set()
-        ctr_ids_resp = set()
-        for ctr in self:
+        # ctr_ids = set()
+        # ctr_ids_resp = set()
+        for ctr in self[:1]:
             if ctr.partner_responsability_id:
-                ctr_ids_resp.add(ctr.partner_responsability_id.id)
+                # procura por todos os contratos q tbem tem este responsaveol
+                ctr_ids = self.env['contract.contract'].search([(
+                    'partner_responsability_id', '=', ctr.partner_responsability_id.id
+                )])
+                # ctr_ids_resp.add(ctr.partner_responsability_id.id)
             else:
-                ctr_ids.add(ctr.partner_id.id)
+                ctr_ids = ctr
         invoices_values = []
-        ja_faturado = set()
-        for contract in self:
-            faturar = False
-            if ctr_ids_resp and contract.partner_responsability_id and contract.partner_responsability_id.id in ctr_ids_resp:
-                faturar = True
-                prt_id = contract.partner_responsability_id.id
-            elif ctr_ids and contract.partner_id.id in ctr_ids:
-                faturar = True
-                prt_id = contract.partner_id.id
-            if not faturar:
-                continue
-            if ja_faturado and prt_id in ja_faturado:
-                continue
-            ja_faturado.add(prt_id)
-            if not date_ref:
-                date_ref = contract.recurring_next_date
+        # ja_faturado = set()
+        for contract in ctr_ids[:1]:
+            # faturar = False
+            # if ctr_ids_resp and contract.partner_responsability_id and contract.partner_responsability_id.id in ctr_ids_resp:
+            #     faturar = True
+            #     prt_id = contract.partner_responsability_id.id
+            # elif ctr_ids and contract.partner_id.id in ctr_ids:
+            #     faturar = True
+            #     prt_id = contract.partner_id.id
+            # if not faturar:
+            #     continue
+            # if ja_faturado and prt_id in ja_faturado:
+            #     continue
+            # ja_faturado.add(prt_id)
+            # if not date_ref:
+            date_ref = contract.recurring_next_date
             if not date_ref:
                 # this use case is possible when recurring_create_invoice is
                 # called for a finished contract
@@ -168,6 +176,11 @@ class ContractContract(models.Model):
             if not contract_lines:
                 continue
             invoice_vals, move_form = contract._prepare_invoice(date_ref)
+            if contract.partner_responsability_id and contract.partner_responsability_id != contract.partner_id:
+                invoice_vals["partner_id"] = contract.partner_responsability_id.id
+            else:
+                invoice_vals["partner_id"] = contract.partner_id.id
+
             invoice_vals["invoice_line_ids"] = []
             for line in contract_lines:
                 invoice_line_vals = line._prepare_invoice_line(move_form=move_form)
@@ -189,4 +202,4 @@ class ContractContract(models.Model):
             #             line._update_recurring_next_date()
             #     else:
             #         contract_lines._update_recurring_next_date()
-        return invoices_values
+        return invoices_values, ctr_ids

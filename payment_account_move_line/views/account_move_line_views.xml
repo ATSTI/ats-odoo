@@ -152,12 +152,8 @@
 		<field name="context">{'search_default_open': 1}</field>
 		<field name="domain">[
 			('account_id.internal_type', '=', 'receivable'),
-			('partner_id', '!=', False),('amount_residual','&gt;',0),
-			('credit', '=', 0),('move_id.state', '=', 'posted'),
-			'|',('move_id.payment_mode_id','=',False),
-			('move_id.payment_mode_id.fiscal_payment_mode', '!=', '90'),
-			'|',('move_id.fiscal_operation_id.fiscal_type', 'in', ('sale', 'purchase')),
-			('move_id.fiscal_operation_id', '=', False)
+			('partner_id', '!=', False),
+			('debit', '&gt;', 0),('move_id.state', '=', 'posted'),
 			]</field>
 		<field name="help" type="html">
 			<p class="o_view_nocontent_smiling_face">
@@ -175,11 +171,8 @@
 		<field name="context">{'search_default_open': 1}</field>
 		<field name="domain">[
 			('account_id.internal_type', '=', 'payable'),
-			('partner_id', '!=', False),('amount_residual','&lt;',0),
-			('debit', '=', 0),('move_id.state', '=', 'posted'),
-			('move_id.payment_mode_id.fiscal_payment_mode', '!=', '90'),
-			'|',('move_id.fiscal_operation_id.fiscal_type', 'in', ('sale', 'purchase')),
-			('move_id.fiscal_operation_id', '=', False)
+			('partner_id', '!=', False),
+			('credit', '&gt;', 0),('move_id.state', '=', 'posted'),
 			]</field>
 		<field name="help" type="html">
 			<p class="o_view_nocontent_smiling_face">

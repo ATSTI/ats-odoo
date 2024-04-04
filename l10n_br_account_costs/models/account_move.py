@@ -351,7 +351,7 @@ class AccountMove(models.Model):
             i = 0
             remove = False
             for line in lines['line_ids']:
-                if line[2]['name'] and 'FRETE' in line[2]['name']:
+                if line[2] and line[2]['name'] and 'FRETE' in line[2]['name']:
                     remove = True
                     total += line[2]['credit']
                     break
@@ -361,7 +361,7 @@ class AccountMove(models.Model):
             i = 0
             remove = False
             for line in lines['line_ids']:
-                if line[2]['name'] and 'OUTRO' in line[2]['name']:
+                if line[2] and line[2]['name'] and 'OUTRO' in line[2]['name']:
                     remove = True
                     total += line[2]['credit']
                     break
@@ -371,7 +371,7 @@ class AccountMove(models.Model):
             i = 0
             remove = False
             for line in lines['line_ids']:
-                if line[2]['name'] and 'SEGURO' in line[2]['name']:
+                if line[2] and line[2]['name'] and 'SEGURO' in line[2]['name']:
                     remove = True
                     total += line[2]['credit']
                     break

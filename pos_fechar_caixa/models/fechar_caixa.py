@@ -54,6 +54,8 @@ class FecharCaixa(models.Model):
         readonly=True
     )
     saldo_final = fields.Float("Saldo final", states=READONLY_STATES )
+    saldo_inicial = fields.Float("Saldo inicial", states=READONLY_STATES )
+
 
     @api.onchange('sessao')
     def onchange_sessao(self):

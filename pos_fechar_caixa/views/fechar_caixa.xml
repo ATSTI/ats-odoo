@@ -35,6 +35,7 @@
                             <field name="num_sangria" />
                         </group> 
                         <group string="Saldo">
+                            <field name="saldo_inicial" />
                             <field name="saldo_final" />
                             <field name="valor_falta" />
                             <field name="valor_sobra" />

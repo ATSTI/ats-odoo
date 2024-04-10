@@ -2,17 +2,8 @@
 # Copyright (C) 2012  Raphaël Valyi - Akretion
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
-from functools import partial
-
 from odoo import api, fields, models
-from odoo.tools import float_is_zero
-from odoo.tools.misc import formatLang
 from collections import defaultdict
-
-from ...l10n_br_fiscal.constants.fiscal import (
-    CFOP_DESTINATION_EXPORT,
-    FISCAL_IN
-)
 
 
 class AccountMove(models.Model):

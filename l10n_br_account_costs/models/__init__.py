@@ -1,4 +1,4 @@
 from . import res_company
 from . import account_move
-# from . import account_move_line
-from . import purchase_order
+from . import document
+# from . import purchase_order

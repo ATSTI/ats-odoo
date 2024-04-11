@@ -117,12 +117,12 @@ class AccountMove(models.Model):
                         line.discount_value = amount_discount_value * (
                             line.price_gross / amount_total
                         )
-                # record._get_product_amount_lines()[
-                #     -1
-                # ].discount_value = amount_discount_value - sum(
-                #     line.discount_value
-                #     for line in record._get_product_amount_lines()[:-1]
-                # )
+                record._get_product_amount_lines()[
+                    -1
+                ].discount_value = amount_discount_value - sum(
+                    line.discount_value
+                    for line in record._get_product_amount_lines()[:-1]
+                )
             for line in record._get_product_amount_lines():
                 line._onchange_fiscal_taxes()
                 line.update(line._get_price_total_and_subtotal())
@@ -137,5 +137,5 @@ class AccountMove(models.Model):
                     and not record._fields[name].inverse
                 }
             )
-
-   
+            record._recompute_dynamic_lines(recompute_all_taxes=True)
+            self._compute_amount()

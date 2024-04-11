@@ -45,6 +45,7 @@ class AccountMove(models.Model):
     def _inverse_amount_freight(self):
         super()._inverse_amount_freight()
         self._calc_inverse_amount()
+        self._compute_amount()
 
     def _inverse_amount_other(self):
         super()._inverse_amount_other()
@@ -127,6 +128,9 @@ class AccountMove(models.Model):
                 # in_invoices = self.filtered(lambda m: m.move_type == 'in_invoice')
                 # out_invoices = self.filtered(lambda m: m.move_type == 'out_invoice')
                 for line in move.line_ids:
+                    # line._update_taxes()
+                    # Call mixin compute method
+                    # line._compute_amounts()
                     if line.credit:
                         line.credit -= line.freight_value + line.insurance_value + line.other_value
                     if line.name ==  "[SEGURO]":
@@ -135,6 +139,27 @@ class AccountMove(models.Model):
                         line.credit = freight
                     if line.name ==  "[OUTROS]":
                         line.credit = other
+                    # line._update_taxes()
+                    # line._onchange_mark_recompute_taxes()                  
+                    # line._onchange_fiscal_tax_ids()
+                    # line.update(line._get_price_total_and_subtotal())
+                    # # line.update(line._get_amount_credit_debit())
+                    # line.update(
+                    #     {
+                    #         "price_subtotal": line.amount_untaxed,
+                    #         "price_gross": line.amount_untaxed + line.discount_value,
+                    #         "price_total": line.amount_total,
+                    #     }
+                    # )
+                # for item in move.invoice_line_ids:
+                # for line in move.invoice_line_ids:
+                #     line._onchange_fiscal_operation_id()
+                move._recompute_dynamic_lines(recompute_all_taxes=True)
+                # move.compute_taxes()
+                # import pudb;pu.db
+                # move._recompute_payment_terms_lines()
+                # move._compute_amount()
+                # move.with_context(check_move_validity=False)._onchange_currency()
 
     @api.depends('amount_icms_relief_value')
     def _inverse_amount_icms_relief(self):

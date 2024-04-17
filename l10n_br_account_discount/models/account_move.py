@@ -1,6 +1,6 @@
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
-from odoo import _, fields, models
+from odoo import _, fields, models, api
 
 class AccountMove(models.Model):
     _name = "account.move"
@@ -13,75 +13,31 @@ class AccountMove(models.Model):
 
     amount_discount_value = fields.Monetary(
         string="Total do desconto",
-        compute="_compute_amount",
+        # compute="_compute_amount_one",
         store=True,
         inverse="_inverse_amount_discount",
     )
 
-    # @api.depends(
-    #     "line_ids.quantity",
-    #     "line_ids.price_unit",
-    #     "line_ids.discount",
-    #     "line_ids.fiscal_price",
-    #     "line_ids.fiscal_quantity",
-    #     "line_ids.discount_value",
-    #     "line_ids.freight_value",
-    #     "line_ids.insurance_value",
-    #     "line_ids.other_value",
-    # )
-    # def _compute_amount(self):
-    #     """Compute the amounts of the SO line."""
-    #     result = super()._compute_amount()
-    #     # for line in self:
-    #     #     # Update taxes fields
-    #     #     line._onchange_price_subtotal()
-    #     #     # Call mixin compute method
-    #     #     line._compute_amounts()
-    #     #     # Update record
-    #     #     line.update(
-    #     #         {
-    #     #             "price_subtotal": line.amount_untaxed,
-    #     #             "price_tax": line.amount_tax,
-    #     #             "price_gross": line.amount_untaxed + line.discount_value,
-    #     #             "price_total": line.amount_total,
-    #     #         }
-    #     #     )
-    #     return result
-
-    # @api.depends(
-    #     "amount_discount_value",
-    # )
-    # def _compute_discount(self):
-    #     import pudb;pu.db
-    #     result = super()._compute_amount()
-    #     fields = self._get_amount_fields()
-    #     for doc in self:
-    #         values = {key: 0.0 for key in fields}
-    #         for line in doc._get_amount_lines():
-    #             for field in fields:
-    #                 if field in line._fields.keys():
-    #                     values[field] += line[field]
-    #                 if field.replace("amount_", "") in line._fields.keys():
-    #                     # FIXME this field creates an error in invoice form
-    #                     if field == "amount_financial_discount_value":
-    #                         values[
-    #                             "amount_financial_discount_value"
-    #                         ] += 0  # line.financial_discount_value
-    #                     else:
-    #                         values[field] += line[field.replace("amount_", "")]
-
-    #         # Valores definidos pelo Total e não pela Linha
-    #         if (
-    #             doc.company_id.delivery_costs == "total"
-    #             or doc.force_compute_delivery_costs_by_total
-    #         ):
-    #             values["amount_freight_value"] = doc.amount_freight_value
-    #             values["amount_insurance_value"] = doc.amount_insurance_value
-    #             values["amount_other_value"] = doc.amount_other_value
-    #             values["amount_discount_value"] = doc.amount_discount_value
-
-    #         doc.update(values)
-    #     return result
+    @api.onchange("amount_discount_value")
+    def _onchange_amount_discount_value(self):
+        if not self.amount_discount_value or not self.amount_price_gross:
+            return
+        round_curr = self.currency_id.round
+        self.amount_untaxed = self.amount_price_gross - self.amount_discount_value
+        self.amount_total = self.amount_untaxed + self.amount_tax
+        amount_untaxed_signed = self.amount_untaxed
+        if (
+            self.currency_id
+            and self.company_id
+            and self.currency_id != self.company_id.currency_id
+        ):
+            date = self.invoice_date or fields.Date.today()
+            amount_untaxed_signed = self.currency_id._convert(
+                self.amount_untaxed, self.company_id.currency_id, self.company_id, date
+            )
+        sign = self.move_type in ["in_invoice", "out_refund"] and -1 or 1
+        self.amount_total_signed = self.amount_total * sign
+        self.amount_untaxed_signed = amount_untaxed_signed * sign
 
     def _inverse_amount_discount(self):
         for record in self.filtered(lambda doc: doc._get_product_amount_lines()):
@@ -107,6 +63,8 @@ class AccountMove(models.Model):
                 if len(record._get_product_amount_lines()) == 1:
                     for line in record._get_product_amount_lines():
                         line.discount_value = amount_discount_value
+                        line._onchange_fiscal_taxes()
+                        line._compute_amounts()
                 for line in record._get_product_amount_lines()[:-1]:
                     if line.price_gross and amount_total:
                         line.discount_value = amount_discount_value * (
@@ -118,9 +76,13 @@ class AccountMove(models.Model):
                     line.discount_value
                     for line in record._get_product_amount_lines()[:-1]
                 )
+
             for line in record._get_product_amount_lines():
                 line._onchange_fiscal_taxes()
+                line._create_exchange_difference_move()
                 line.update(line._get_price_total_and_subtotal())
+                line._compute_amount_residual()
+                # sem esta linha abaixo qdo edita nao calcula
                 line.update(line._get_amount_credit_debit())
                 
             record._fields["amount_total"].compute_value(record)
@@ -133,4 +95,3 @@ class AccountMove(models.Model):
                 }
             )
             record._recompute_dynamic_lines(recompute_all_taxes=True)
-            self._compute_amount()

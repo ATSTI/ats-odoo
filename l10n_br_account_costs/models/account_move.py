@@ -50,10 +50,12 @@ class AccountMove(models.Model):
     def _inverse_amount_other(self):
         super()._inverse_amount_other()
         self._calc_inverse_amount()
+        self._compute_amount()
 
     def _inverse_amount_insurance(self):
         super()._inverse_amount_insurance()
         self._calc_inverse_amount()
+        self._compute_amount()
 
     def _calc_inverse_amount(self):
         if len(self) > 1:
@@ -197,6 +199,51 @@ class AccountMove(models.Model):
                         )
                     move.line_ids += new_line
                     move.with_context(check_move_validity=False)._onchange_currency()
+
+    # @api.onchange('invoice_line_ids')
+    # def _onchange_invoice_line_ids(self):
+    #     import pudb;pu.db
+    #     result = super()._onchange_invoice_line_ids()
+    #     for record in self:
+    #         if record.amount_freight_value > 0.0:
+    #             for line in record.invoice_line_ids:
+    #                 line.write({"freight_value": 0.0})
+    #     # import pudb;pu.db
+    #     self._inverse_amount_freight()
+    #     return result
+    
+    # def write(self, values):       
+    #     if 'invoice_line_ids' in values:
+    #         # print (values['invoice_line_ids'])
+    #         # for line in values['invoice_line_ids']:
+    #         #     print ('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+    #         #     print (line)
+    #         # for line in values['invoice_line_ids']:
+    #         #     print ('===============================================')
+    #         #     # if len(line[2])
+    #         #     print (line[2])
+    #         # import pudb;pu.db
+    #         if self.amount_freight_value > 0.0:
+    #             for line in values['invoice_line_ids']:
+    #                 line[2].update({'freight_value': 0.0})
+    #             self._inverse_amount_freight()
+    #         # for line in values['invoice_line_ids']:
+    #         #     print ('===============================================')
+    #         #     print (line[2])
+    #             # print (values['invoice_line_ids'])
+    #     result = super().write(values)
+    #     return result
+
+
+    # def _compute_new_invoice_quantity(self, invoice_move):
+    #     result = super()._compute_new_invoice_quantity(invoice_move=invoice_move)
+    #     import pudb;pu.db
+    #     if invoice_move:
+    #         for line in invoice_move.invoice_line_ids:
+    #             line.write({"fiscal_quantity": line.quantity})
+    #             line._onchange_fiscal_tax_ids()
+    #         invoice_move._onchange_invoice_line_ids()
+    #     return result
 
     @api.depends(
         'line_ids.matched_debit_ids.debit_move_id.move_id.payment_id.is_matched',
@@ -355,51 +402,97 @@ class AccountMove(models.Model):
     #     move.with_context(check_move_validity=False)._onchange_currency()
     #     return move
             
-    @api.model
-    def _move_autocomplete_invoice_lines_create(self, vals_list):
-        new_lines = super()._move_autocomplete_invoice_lines_create(vals_list)
-        # import pudb;pu.db
-        #  necessario para o COPY
-        # RODANDO SOMENTE EM NOTA DE SAIDA FAZER PARA ENTRADA
+    # @api.model
+    # def _move_autocomplete_invoice_lines_create(self, vals_list):
+    #     new_lines = super()._move_autocomplete_invoice_lines_create(vals_list)
+    #     # import pudb;pu.db
+    #     #  necessario para o COPY
+    #     # RODANDO SOMENTE EM NOTA DE SAIDA FAZER PARA ENTRADA
 
-        for lines in new_lines:
-            total = 0.0
-            i = 0
-            remove = False
-            for line in lines['line_ids']:
-                if line[2]['name'] and 'FRETE' in line[2]['name']:
-                    remove = True
-                    total += line[2]['credit']
-                    break
-                i += 1
-            if remove:
-                del lines['line_ids'][i]
-            i = 0
-            remove = False
-            for line in lines['line_ids']:
-                if line[2]['name'] and 'OUTRO' in line[2]['name']:
-                    remove = True
-                    total += line[2]['credit']
-                    break
-                i += 1
-            if remove:
-                del lines['line_ids'][i]
-            i = 0
-            remove = False
-            for line in lines['line_ids']:
-                if line[2]['name'] and 'SEGURO' in line[2]['name']:
-                    remove = True
-                    total += line[2]['credit']
-                    break
-                i += 1
-            if remove:
-                del lines['line_ids'][i]
+    #     for lines in new_lines:
+    #         total = 0.0
+    #         i = 0
+    #         remove = False
+    #         for line in lines['line_ids']:
+    #             if line[2]['name'] and 'FRETE' in line[2]['name']:
+    #                 remove = True
+    #                 total += line[2]['credit']
+    #                 break
+    #             i += 1
+    #         if remove:
+    #             del lines['line_ids'][i]
+    #         i = 0
+    #         remove = False
+    #         for line in lines['line_ids']:
+    #             if line[2]['name'] and 'OUTRO' in line[2]['name']:
+    #                 remove = True
+    #                 total += line[2]['credit']
+    #                 break
+    #             i += 1
+    #         if remove:
+    #             del lines['line_ids'][i]
+    #         i = 0
+    #         remove = False
+    #         for line in lines['line_ids']:
+    #             if line[2]['name'] and 'SEGURO' in line[2]['name']:
+    #                 remove = True
+    #                 total += line[2]['credit']
+    #                 break
+    #             i += 1
+    #         if remove:
+    #             del lines['line_ids'][i]
 
-            for line in lines['line_ids']:
-                if total:
-                    if line[2]['debit']:
-                        line[2]['debit'] = line[2]['debit'] - total
-                    line[2]['freight_value'] = 0.0
-                    line[2]['other_value'] = 0.0
-                    line[2]['insurance_value'] = 0.0
-        return new_lines
+    #         for line in lines['line_ids']:
+    #             if total:
+    #                 if line[2]['debit']:
+    #                     line[2]['debit'] = line[2]['debit'] - total
+    #                 line[2]['freight_value'] = 0.0
+    #                 line[2]['other_value'] = 0.0
+    #                 line[2]['insurance_value'] = 0.0
+    #     return new_lines
+
+
+class AccountMoveLine(models.Model):
+    _inherit = "account.move.line"
+
+    # def write(self, values):
+    #     result = super().write(values)
+        # if 'freight_value' in values:
+            # import pudb;pu.db
+            # if values['freight_value'] == 0.0:
+            # self.move_id._recompute_dynamic_lines(recompute_all_taxes=True)
+            # print (values['invoice_line_ids'])
+            # for line in values['invoice_line_ids']:
+            #     print ('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+            #     print (line)
+            # for line in values['invoice_line_ids']:
+            #     print ('===============================================')
+            #     # if len(line[2])
+            #     print (line[2])
+            # import pudb;pu.db
+            # if self.amount_freight_value > 0.0:
+            #     for line in values['invoice_line_ids']:
+            #         line[2].update({'freight_value': 0.0})
+            #     self._inverse_amount_freight()
+            # for line in values['invoice_line_ids']:
+            #     print ('===============================================')
+            #     print (line[2])
+                # print (values['invoice_line_ids'])
+        # return result
+
+#     # @api.onchange("quantity")
+#     # def _onchange_quantity(self):
+#     #     """To call the method in the mixin to update
+#     #     the price and fiscal quantity."""
+#     #     result = super()._onchange_quantity()
+
+    @api.onchange('quantity', 'discount', 'price_unit', 'tax_ids')
+    def _onchange_price_subtotal(self):
+        result = super()._onchange_price_subtotal()
+        self.move_id._recompute_dynamic_lines(recompute_all_taxes=True)
+#         for line in self:
+#             if line.freight_value:
+#                 import pudb;pu.db
+#                 if line.move_id.amount_freight_value:
+#                     line.freight_value = 0.0
+        return result

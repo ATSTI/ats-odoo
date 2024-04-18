@@ -57,16 +57,48 @@ class AccountMove(models.Model):
         self._calc_inverse_amount()
         self._compute_amount()
 
-    def _calc_inverse_amount(self):
+    @api.onchange("amount_freight_value","amount_insurance_value","amount_other_value")
+    def _onchange_amount_freight_value(self):
+        self._compute_amount()
+        other = self.amount_freight_value + self.amount_insurance_value + self.amount_other_value
+        if other:
+            # round_curr = self.currency_id.round
+            self.amount_total = self.amount_untaxed + self.amount_tax + other
+            amount_untaxed_signed = self.amount_untaxed
+            if (
+                self.currency_id
+                and self.company_id
+                and self.currency_id != self.company_id.currency_id
+            ):
+                date = self.invoice_date or fields.Date.today()
+                amount_untaxed_signed = self.currency_id._convert(
+                    self.amount_untaxed, self.company_id.currency_id, self.company_id, date
+                )
+            sign = self.move_type in ["in_invoice", "out_refund"] and -1 or 1
+            self.amount_total_signed = self.amount_total * sign
+            self.amount_untaxed_signed = amount_untaxed_signed * sign
+
+    def _calc_inverse_amount(self):       
         if len(self) > 1:
             return
         for move in self:
+            move._compute_amount()
             if move.payment_state == 'invoicing_legacy':
                 move.payment_state = move.payment_state
                 continue
             # se ja existe tem q excluir
-            remove = False
+            insurance = 0.0
+            other = 0.0
+            freight = 0.0
             for line in move.line_ids:
+                if not line.exclude_from_invoice_tab and line.insurance_value > 0:
+                    insurance += line.insurance_value
+                if not line.exclude_from_invoice_tab and line.freight_value > 0:
+                    freight += line.freight_value
+                if not line.exclude_from_invoice_tab and line.other_value > 0:
+                    other += line.other_value
+            remove = False
+            for line in move.line_ids:    
                 if line.name in ["[SEGURO]", "[FRETE]", "[OUTROS]"]:
                     remove = True
                     move.with_context(
@@ -81,16 +113,6 @@ class AccountMove(models.Model):
                     )
             if remove:
                 move.with_context(check_move_validity=False)._onchange_currency()
-            insurance = 0.0
-            other = 0.0
-            freight = 0.0
-            for line in move.line_ids: 
-                if not line.exclude_from_invoice_tab and line.insurance_value > 0:
-                    insurance += line.insurance_value
-                if not line.exclude_from_invoice_tab and line.freight_value > 0:
-                    freight += line.freight_value
-                if not line.exclude_from_invoice_tab and line.other_value > 0:
-                    other += line.other_value
             new_line = False
             if insurance:
                 new_line = self.env["account.move.line"].new(
@@ -127,41 +149,29 @@ class AccountMove(models.Model):
                 move.line_ids += new_line
             if new_line:
                 move.with_context(check_move_validity=False)._onchange_currency()
-                # in_invoices = self.filtered(lambda m: m.move_type == 'in_invoice')
-                # out_invoices = self.filtered(lambda m: m.move_type == 'out_invoice')
+                in_invoices = self.filtered(lambda m: m.move_type == 'in_invoice')
+                out_invoices = self.filtered(lambda m: m.move_type == 'out_invoice')
                 for line in move.line_ids:
-                    # line._update_taxes()
-                    # Call mixin compute method
-                    # line._compute_amounts()
-                    if line.credit:
+                    if out_invoices and line.credit:
                         line.credit -= line.freight_value + line.insurance_value + line.other_value
+                    if in_invoices and line.debit:
+                        line.debit += line.freight_value + line.insurance_value + line.other_value
                     if line.name ==  "[SEGURO]":
-                        line.credit = insurance
+                        if out_invoices:
+                            line.credit = insurance
+                        if in_invoices:
+                            line.debit = insurance
                     if line.name ==  "[FRETE]":
-                        line.credit = freight
+                        if out_invoices:
+                            line.credit = freight
+                        if in_invoices:
+                            line.debit = freight
                     if line.name ==  "[OUTROS]":
-                        line.credit = other
-                    # line._update_taxes()
-                    # line._onchange_mark_recompute_taxes()                  
-                    # line._onchange_fiscal_tax_ids()
-                    # line.update(line._get_price_total_and_subtotal())
-                    # # line.update(line._get_amount_credit_debit())
-                    # line.update(
-                    #     {
-                    #         "price_subtotal": line.amount_untaxed,
-                    #         "price_gross": line.amount_untaxed + line.discount_value,
-                    #         "price_total": line.amount_total,
-                    #     }
-                    # )
-                # for item in move.invoice_line_ids:
-                # for line in move.invoice_line_ids:
-                #     line._onchange_fiscal_operation_id()
+                        if out_invoices:
+                            line.credit = other
+                        if in_invoices:
+                            line.debit = other
                 move._recompute_dynamic_lines(recompute_all_taxes=True)
-                # move.compute_taxes()
-                # import pudb;pu.db
-                # move._recompute_payment_terms_lines()
-                # move._compute_amount()
-                # move.with_context(check_move_validity=False)._onchange_currency()
 
     @api.depends('amount_icms_relief_value')
     def _inverse_amount_icms_relief(self):
@@ -199,51 +209,6 @@ class AccountMove(models.Model):
                         )
                     move.line_ids += new_line
                     move.with_context(check_move_validity=False)._onchange_currency()
-
-    # @api.onchange('invoice_line_ids')
-    # def _onchange_invoice_line_ids(self):
-    #     import pudb;pu.db
-    #     result = super()._onchange_invoice_line_ids()
-    #     for record in self:
-    #         if record.amount_freight_value > 0.0:
-    #             for line in record.invoice_line_ids:
-    #                 line.write({"freight_value": 0.0})
-    #     # import pudb;pu.db
-    #     self._inverse_amount_freight()
-    #     return result
-    
-    # def write(self, values):       
-    #     if 'invoice_line_ids' in values:
-    #         # print (values['invoice_line_ids'])
-    #         # for line in values['invoice_line_ids']:
-    #         #     print ('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
-    #         #     print (line)
-    #         # for line in values['invoice_line_ids']:
-    #         #     print ('===============================================')
-    #         #     # if len(line[2])
-    #         #     print (line[2])
-    #         # import pudb;pu.db
-    #         if self.amount_freight_value > 0.0:
-    #             for line in values['invoice_line_ids']:
-    #                 line[2].update({'freight_value': 0.0})
-    #             self._inverse_amount_freight()
-    #         # for line in values['invoice_line_ids']:
-    #         #     print ('===============================================')
-    #         #     print (line[2])
-    #             # print (values['invoice_line_ids'])
-    #     result = super().write(values)
-    #     return result
-
-
-    # def _compute_new_invoice_quantity(self, invoice_move):
-    #     result = super()._compute_new_invoice_quantity(invoice_move=invoice_move)
-    #     import pudb;pu.db
-    #     if invoice_move:
-    #         for line in invoice_move.invoice_line_ids:
-    #             line.write({"fiscal_quantity": line.quantity})
-    #             line._onchange_fiscal_tax_ids()
-    #         invoice_move._onchange_invoice_line_ids()
-    #     return result
 
     @api.depends(
         'line_ids.matched_debit_ids.debit_move_id.move_id.payment_id.is_matched',
@@ -393,106 +358,13 @@ class AccountMove(models.Model):
                 if reverse_moves_full_recs.mapped('reconciled_line_ids.move_id').filtered(lambda x: x not in (caba_moves + reverse_moves + reverse_moves_full_recs.mapped('exchange_move_id'))) == move:
                     new_pmt_state = 'reversed'
 
-            move.payment_state = new_pmt_state
-    
-    # @api.returns('self', lambda value: value.id)
-    # def copy(self, default=None):
-    #     import pudb;pu.db
-    #     move = super().copy(default)
-    #     move.with_context(check_move_validity=False)._onchange_currency()
-    #     return move
-            
-    # @api.model
-    # def _move_autocomplete_invoice_lines_create(self, vals_list):
-    #     new_lines = super()._move_autocomplete_invoice_lines_create(vals_list)
-    #     # import pudb;pu.db
-    #     #  necessario para o COPY
-    #     # RODANDO SOMENTE EM NOTA DE SAIDA FAZER PARA ENTRADA
-
-    #     for lines in new_lines:
-    #         total = 0.0
-    #         i = 0
-    #         remove = False
-    #         for line in lines['line_ids']:
-    #             if line[2]['name'] and 'FRETE' in line[2]['name']:
-    #                 remove = True
-    #                 total += line[2]['credit']
-    #                 break
-    #             i += 1
-    #         if remove:
-    #             del lines['line_ids'][i]
-    #         i = 0
-    #         remove = False
-    #         for line in lines['line_ids']:
-    #             if line[2]['name'] and 'OUTRO' in line[2]['name']:
-    #                 remove = True
-    #                 total += line[2]['credit']
-    #                 break
-    #             i += 1
-    #         if remove:
-    #             del lines['line_ids'][i]
-    #         i = 0
-    #         remove = False
-    #         for line in lines['line_ids']:
-    #             if line[2]['name'] and 'SEGURO' in line[2]['name']:
-    #                 remove = True
-    #                 total += line[2]['credit']
-    #                 break
-    #             i += 1
-    #         if remove:
-    #             del lines['line_ids'][i]
-
-    #         for line in lines['line_ids']:
-    #             if total:
-    #                 if line[2]['debit']:
-    #                     line[2]['debit'] = line[2]['debit'] - total
-    #                 line[2]['freight_value'] = 0.0
-    #                 line[2]['other_value'] = 0.0
-    #                 line[2]['insurance_value'] = 0.0
-    #     return new_lines
-
+            move.payment_state = new_pmt_state   
 
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
-
-    # def write(self, values):
-    #     result = super().write(values)
-        # if 'freight_value' in values:
-            # import pudb;pu.db
-            # if values['freight_value'] == 0.0:
-            # self.move_id._recompute_dynamic_lines(recompute_all_taxes=True)
-            # print (values['invoice_line_ids'])
-            # for line in values['invoice_line_ids']:
-            #     print ('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
-            #     print (line)
-            # for line in values['invoice_line_ids']:
-            #     print ('===============================================')
-            #     # if len(line[2])
-            #     print (line[2])
-            # import pudb;pu.db
-            # if self.amount_freight_value > 0.0:
-            #     for line in values['invoice_line_ids']:
-            #         line[2].update({'freight_value': 0.0})
-            #     self._inverse_amount_freight()
-            # for line in values['invoice_line_ids']:
-            #     print ('===============================================')
-            #     print (line[2])
-                # print (values['invoice_line_ids'])
-        # return result
-
-#     # @api.onchange("quantity")
-#     # def _onchange_quantity(self):
-#     #     """To call the method in the mixin to update
-#     #     the price and fiscal quantity."""
-#     #     result = super()._onchange_quantity()
 
     @api.onchange('quantity', 'discount', 'price_unit', 'tax_ids')
     def _onchange_price_subtotal(self):
         result = super()._onchange_price_subtotal()
         self.move_id._recompute_dynamic_lines(recompute_all_taxes=True)
-#         for line in self:
-#             if line.freight_value:
-#                 import pudb;pu.db
-#                 if line.move_id.amount_freight_value:
-#                     line.freight_value = 0.0
         return result

@@ -20,18 +20,18 @@
 ##############################################################################
 
 {
-    'name': 'Cadastro de produto simplificado',
+    'name': 'Data da venda na cotação',
     'version': '1.0',
     'category': 'Others',
     'sequence': 2,
-    'summary': 'relatorios personalizados',
+    'summary': 'Campo de data da venda na cotação adicionado',
     'description': """
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['l10n_br_fiscal', 'product', 'product_sequence'],
+    'depends': ['sale'],
     'data': [
-        'views/product_view.xml',
+        'views/sale_view.xml',
     ],
     'installable': True,
     'application': False,

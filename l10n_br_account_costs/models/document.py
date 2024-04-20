@@ -15,5 +15,5 @@ class FiscalDocumentTransp(models.Model):
                     self.update({'nfe40_vSeg': tr.amount_insurance_value})
                 if tr.amount_other_value:
                     self.update({'nfe40_vOutro': tr.amount_other_value})
-                    
+
         return super()._export_fields(xsd_fields, class_obj, export_dict)

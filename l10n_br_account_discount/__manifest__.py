@@ -9,7 +9,7 @@
     "version": "14.0.10.1.1",
     "maintainers": ["Carlos , Mauricio"],
     "depends": [
-        "l10n_br_account",
+        "l10n_br_account", "l10n_br_account_costs",
     ],
     "data": [
     ],

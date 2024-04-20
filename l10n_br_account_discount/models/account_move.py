@@ -13,31 +13,18 @@ class AccountMove(models.Model):
 
     amount_discount_value = fields.Monetary(
         string="Total do desconto",
-        # compute="_compute_amount_one",
-        store=True,
         inverse="_inverse_amount_discount",
     )
 
     @api.onchange("amount_discount_value")
     def _onchange_amount_discount_value(self):
-        if not self.amount_discount_value or not self.amount_price_gross:
-            return
-        round_curr = self.currency_id.round
-        self.amount_untaxed = self.amount_price_gross - self.amount_discount_value
-        self.amount_total = self.amount_untaxed + self.amount_tax
-        amount_untaxed_signed = self.amount_untaxed
-        if (
-            self.currency_id
-            and self.company_id
-            and self.currency_id != self.company_id.currency_id
-        ):
-            date = self.invoice_date or fields.Date.today()
-            amount_untaxed_signed = self.currency_id._convert(
-                self.amount_untaxed, self.company_id.currency_id, self.company_id, date
-            )
-        sign = self.move_type in ["in_invoice", "out_refund"] and -1 or 1
-        self.amount_total_signed = self.amount_total * sign
-        self.amount_untaxed_signed = amount_untaxed_signed * sign
+        self._compute_amount()
+        self._inverse_amount_discount()
+        if self.amount_discount_value:
+            for record in self.filtered(lambda doc: doc._get_product_amount_lines()):
+                for line in record.invoice_line_ids:
+                    line._onchange_price_subtotal()
+                record._recompute_payment_terms_lines()
 
     def _inverse_amount_discount(self):
         for record in self.filtered(lambda doc: doc._get_product_amount_lines()):
@@ -76,15 +63,6 @@ class AccountMove(models.Model):
                     line.discount_value
                     for line in record._get_product_amount_lines()[:-1]
                 )
-
-            for line in record._get_product_amount_lines():
-                line._onchange_fiscal_taxes()
-                line._create_exchange_difference_move()
-                line.update(line._get_price_total_and_subtotal())
-                line._compute_amount_residual()
-                # sem esta linha abaixo qdo edita nao calcula
-                line.update(line._get_amount_credit_debit())
-                
             record._fields["amount_total"].compute_value(record)
             record.write(
                 {
@@ -94,4 +72,13 @@ class AccountMove(models.Model):
                     and not record._fields[name].inverse
                 }
             )
-            record._recompute_dynamic_lines(recompute_all_taxes=True)
+
+
+class AccountMoveLine(models.Model):
+    _inherit = "account.move.line"
+
+    @api.onchange('quantity', 'discount', 'price_unit', 'tax_ids', 'freight_value', 'other_value', 'insurance_value', 'discount_value')
+    def _onchange_price_subtotal(self):
+        result = super()._onchange_price_subtotal()
+        self.move_id._recompute_dynamic_lines(recompute_all_taxes=True)
+        return result

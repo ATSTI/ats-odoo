@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_invoice_in_line_tree" model="ir.ui.view">
+            <field name="name">account.invoice.in_line.tree</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="l10n_br_account.invoice_form" />
+            <field name="priority">210</field>
+            <field name="arch" type="xml">   
+                <xpath expr="//field[@name='invoice_line_ids']/tree" position="attributes">
+                    <attribute name="editable">bottom</attribute>
+                </xpath>
+                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='tax_ids']" position="before">
+                    <field name="fiscal_operation_type" invisible="1" />
+                </xpath>
+            </field>
+        </record>      
+    </data>
+</odoo>

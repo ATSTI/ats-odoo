@@ -190,7 +190,6 @@ class AccountMove(models.Model):
         if self.move_type not in ('in_invoice','out_invoice'):
             return
         for move in self:
-            import pudb;pu.db
             if move.payment_state == 'invoicing_legacy':
                 move.payment_state = move.payment_state
                 continue

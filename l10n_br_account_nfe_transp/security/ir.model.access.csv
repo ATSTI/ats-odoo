@@ -1,2 +1,5 @@
 "id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
 "l10n_br_account_transp_frete","Transp/Frete","model_transp_frete","account.group_account_invoice",1,1,1,1
+"l10n_br_account_transp_frete_fiscal","delivery.carrier","delivery.model_delivery_carrier","l10n_br_nfe.group_user",1,1,1,1
+"l10n_br_account_transp_veic_fiscal","l10n_br_delivery_carrier_vehicle","l10n_br_delivery.model_l10n_br_delivery_carrier_vehicle","l10n_br_nfe.group_user",1,1,1,1
+"l10n_br_account_transp_veic_lacres","l10n_br_delivery_carrier_lacres","l10n_br_nfe_spec.model_nfe_40_lacres","l10n_br_nfe.group_user",1,1,1,1

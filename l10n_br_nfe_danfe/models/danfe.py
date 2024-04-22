@@ -758,6 +758,9 @@ obsCont[@xCampo='NomeVendedor']"
         el_transp = oXML.find(".//{http://www.portalfiscal.inf.br/nfe}transp")
         veic_transp = oXML.find(".//{http://www.portalfiscal.inf.br/nfe}veicTransp")
         nMr = self.width - self.nRight
+        cnpj_cpf = tagtext(oNode=el_transp, cTag="CNPJ")
+        if not cnpj_cpf:
+            cnpj_cpf = tagtext(oNode=el_transp, cTag="CPF")
 
         self.canvas.setFont("NimbusSanL-Bold", 7)
         self.string(
@@ -817,7 +820,7 @@ obsCont[@xCampo='NomeVendedor']"
         self.string(
             nMr - 25,
             self.nlin + 7.7,
-            format_cnpj_cpf(tagtext(oNode=el_transp, cTag="CNPJ")),
+            format_cnpj_cpf(cnpj_cpf),
         )
         self.canvas.setFont("NimbusSanL-Regu", 8)
         self.string(

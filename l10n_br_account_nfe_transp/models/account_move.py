@@ -112,12 +112,13 @@ class TranspFrete(models.Model):
     @api.onchange("vehicle_id")
     def _onchange_vehicle_id(self):
         if self.vehicle_id and self.carrier_id:
-            for vehicle in self.carrier_id.vehicle_ids:
-                self.vehicle = vehicle.name
-                self.plate = vehicle.plate
-                self.rntc_code = vehicle.rntc_code
-                self.vehicle_id = vehicle.id
-                self.state_id = vehicle.state_id.id            
+            # for vehicle in self.carrier_id.vehicle_ids:
+            vehicle = self.vehicle_id
+            self.vehicle = vehicle.name
+            self.plate = vehicle.plate
+            self.rntc_code = vehicle.rntc_code
+            #self.vehicle_id = vehicle.id
+            self.state_id = vehicle.state_id.id            
 
     @api.onchange("nfe40_transporta")
     def _onchange_nfe40_transporta(self):

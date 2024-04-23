@@ -191,7 +191,7 @@ class AccountMove(models.Model):
             return
         for move in self:
             if move.payment_state == 'invoicing_legacy':
-                move.payment_state = move.payment_state
+                # move.payment_state = move.payment_state
                 continue
             for line in move.line_ids:
                 if line.name in ["[DESONERACAO]"]:

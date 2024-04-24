@@ -8,26 +8,26 @@ class AccountMove(models.Model):
 
     _inherit = "account.move"
 
-    amount_freight_value = fields.Monetary(
-        string="Frete",
-        # compute="_compute_amount",
-        # store=True,
-        inverse="_inverse_amount_freight",
-    )
+    # amount_freight_value = fields.Monetary(
+    #     string="Frete",
+    #     # compute="_compute_amount",
+    #     # store=True,
+    #     inverse="_inverse_amount_freight",
+    # )
     
-    amount_insurance_value = fields.Monetary(
-        string="Seguro",
-        # compute="_compute_amount",
-        # store=True,
-        inverse="_inverse_amount_insurance",
-    )
+    # amount_insurance_value = fields.Monetary(
+    #     string="Seguro",
+    #     # compute="_compute_amount",
+    #     # store=True,
+    #     inverse="_inverse_amount_insurance",
+    # )
 
-    amount_other_value = fields.Monetary(
-        string="Outro",
-        # compute="_compute_amount",
-        # store=True,
-        inverse="_inverse_amount_other",
-    )
+    # amount_other_value = fields.Monetary(
+    #     string="Outro",
+    #     # compute="_compute_amount",
+    #     # store=True,
+    #     inverse="_inverse_amount_other",
+    # )
 
     # amount_icms_relief_value = fields.Monetary(
     #     inverse="_inverse_amount_icms_relief",
@@ -49,44 +49,47 @@ class AccountMove(models.Model):
         for order in self:
             order._compute_amount()
 
-    def _inverse_amount_freight(self):
-        return super()._inverse_amount_freight()
+    # def _inverse_amount_freight(self):
+    #     return super()._inverse_amount_freight()
 
-    def _inverse_amount_other(self):
-        return super()._inverse_amount_other()
+    # def _inverse_amount_other(self):
+    #     return super()._inverse_amount_other()
 
-    def _inverse_amount_insurance(self):
-        return super()._inverse_amount_insurance()
+    # def _inverse_amount_insurance(self):
+    #     return super()._inverse_amount_insurance()
 
     @api.onchange("amount_freight_value")
     def _onchange_amount_freight_value(self):
         self._compute_amount()
-        self._inverse_amount_freight()
-        if self.amount_freight_value:
-            for record in self.filtered(lambda doc: doc._get_product_amount_lines()):
-                for line in record.invoice_line_ids:
-                    line._onchange_price_subtotal()
-                record._recompute_payment_terms_lines()
+        self._inverse_amount_freight()        
+        # if self.amount_freight_value:
+        for record in self.filtered(lambda doc: doc._get_product_amount_lines()):
+            for line in record.invoice_line_ids:
+                line._onchange_price_subtotal()
+            record._recompute_dynamic_lines(recompute_all_taxes=True)
+            record._recompute_payment_terms_lines()
 
     @api.onchange("amount_insurance_value")
     def _onchange_amount_insurance_value(self):
         self._compute_amount()
         self._inverse_amount_insurance()
-        if self.amount_insurance_value:
-            for record in self.filtered(lambda doc: doc._get_product_amount_lines()):
-                for line in record.invoice_line_ids:
-                    line._onchange_price_subtotal()
-                record._recompute_payment_terms_lines()
+        # if self.amount_insurance_value:
+        for record in self.filtered(lambda doc: doc._get_product_amount_lines()):
+            for line in record.invoice_line_ids:
+                line._onchange_price_subtotal()
+            record._recompute_dynamic_lines(recompute_all_taxes=True)
+            record._recompute_payment_terms_lines()
 
     @api.onchange("amount_other_value")
     def _onchange_amount_other_value(self):
         self._compute_amount()
         self._inverse_amount_other()
-        if self.amount_other_value:
-            for record in self.filtered(lambda doc: doc._get_product_amount_lines()):
-                for line in record.invoice_line_ids:
-                    line._onchange_price_subtotal()
-                record._recompute_payment_terms_lines()
+        # if self.amount_other_value:
+        for record in self.filtered(lambda doc: doc._get_product_amount_lines()):
+            for line in record.invoice_line_ids:
+                line._onchange_price_subtotal()
+            record._recompute_dynamic_lines(recompute_all_taxes=True)
+            record._recompute_payment_terms_lines()
 
     # def _calc_inverse_amount(self):       
     #     if len(self) > 1:
@@ -223,11 +226,11 @@ class AccountMove(models.Model):
                     move.with_context(check_move_validity=False)._onchange_currency()
     """
 
-class AccountMoveLine(models.Model):
-    _inherit = "account.move.line"
+# class AccountMoveLine(models.Model):
+#     _inherit = "account.move.line"
 
-    @api.onchange('quantity', 'discount', 'price_unit', 'tax_ids', 'freight_value', 'other_value', 'insurance_value')
-    def _onchange_price_subtotal(self):
-        result = super()._onchange_price_subtotal()
-        # self.move_id._recompute_dynamic_lines(recompute_all_taxes=True)
-        return result
+#     @api.onchange('quantity', 'discount', 'price_unit', 'tax_ids', 'freight_value', 'other_value', 'insurance_value')
+#     def _onchange_price_subtotal(self):
+#         result = super()._onchange_price_subtotal()
+#         # self.move_id._recompute_dynamic_lines(recompute_all_taxes=True)
+#         return result

@@ -14,15 +14,20 @@ class FiscalDocument(models.Model):
         wdb.set_trace()
         erros = Nfe.schema_validation(xml_file)
         erros = "\n".join(erros)
-        lista_erros = erros.split('\n')
+        lista_erros = erros.splitlines()
         for erros_msg in lista_erros:            
             max_len = erros_msg.find('maxLength')
             if max_len > 0:
                 campo_erro = erros_msg[45:max_len-11]
                 if campo_erro == "xLgr":
-                    erros += " \n Rua + Bairro + Complemento, tem que ser no máximo 60 caracteres"
+                    erros += " \n Rua + Bairro + Complemento: máximo 60 caracteres."
                 if campo_erro == "xNome":
-                    erros += " \n Nome, tem que ser no máximo 60 caracteres"
+                    erros += " \n Nome: máximo 60 caracteres."
                 if campo_erro == "xFant":
-                    erros += " \n Razão social, tem que ser no máximo 60 caracteres"
+                    erros += " \n Razão social:máximo 60 caracteres."
+            max_len = erros_msg.find('nro')
+            max1_len = erros_msg.find('xBairro')
+            if max_len > 0 and max_len > max1_len:
+                erros += " \n Campo número no Endereço não preenchido."
+
         self.write({"xml_error_message": erros or False})

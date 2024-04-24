@@ -29,11 +29,11 @@ class AccountMove(models.Model):
         inverse="_inverse_amount_other",
     )
 
-    amount_icms_relief_value = fields.Monetary(
-        inverse="_inverse_amount_icms_relief",
-        # compute="_compute_amount",
-        # store=True,
-    )
+    # amount_icms_relief_value = fields.Monetary(
+    #     inverse="_inverse_amount_icms_relief",
+    #     # compute="_compute_amount",
+    #     # store=True,
+    # )
 
     def _get_amount_lines(self):
         """Get object lines instaces used to compute fields"""
@@ -183,8 +183,10 @@ class AccountMove(models.Model):
     #                         line.debit = other
     #             move._recompute_dynamic_lines(recompute_all_taxes=True)
 
+    """
     @api.depends('amount_icms_relief_value')
     def _inverse_amount_icms_relief(self):
+        import pudb;pu.db
         if len(self) > 1:
             return
         if self.move_type not in ('in_invoice','out_invoice'):
@@ -219,7 +221,7 @@ class AccountMove(models.Model):
                         )
                     move.line_ids += new_line
                     move.with_context(check_move_validity=False)._onchange_currency()
-
+    """
 
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"

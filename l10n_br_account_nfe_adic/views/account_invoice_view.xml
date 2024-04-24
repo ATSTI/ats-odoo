@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Customer Invoice views -->
+    <record id="account_invoice_adic_form" model="ir.ui.view">
+        <field name="name">l10n_br_account.invoice.adic.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="l10n_br_account.invoice_form" />
+        <field name="priority">399</field>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='other_info']" position="after">
+                <page name="adic_ids" string="Dados adicionais" >
+                    <form>
+                        <sheet>
+                            <group string="Dados adicionais">
+                                <group>
+                                    <field name="comment_ids" widget="many2many_tags"/>
+                                    <field name="fiscal_additional_data" readonly="1"/>
+                                    <field name="manual_customer_additional_data" />
+                                    <field name="customer_additional_data" readonly="1"/>
+                                </group>
+                            </group>
+                        </sheet>
+                    </form>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

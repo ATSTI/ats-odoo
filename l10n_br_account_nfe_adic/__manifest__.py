@@ -1,8 +1,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    "name": "NFe Transportadora/Volumes",
-    "summary": "Dados Transportadora/Veiculo e Volumes adicionando pela fatura",
+    "name": "NFe Dados adicionais",
+    "summary": "Dados adicionas adicionado na fatura",
     "category": "Localisation",
     "license": "AGPL-3",
     "author": "ATSTi",
@@ -15,8 +15,6 @@
         "l10n_br_delivery_nfe",
     ],
     "data": [
-        "data/account_incoterms_data.xml",
-        "security/ir.model.access.csv",
         "views/account_invoice_view.xml",
     ],
     "demo": [

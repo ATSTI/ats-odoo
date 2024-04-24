@@ -1,6 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import fields, models
+from nfelib.nfe.bindings.v4_0.nfe_v4_00 import Nfe
 
 
 class FiscalDocument(models.Model):
@@ -9,13 +10,19 @@ class FiscalDocument(models.Model):
 
     def _valida_xml(self, xml_file):
         self.ensure_one()
+        import wdb
+        wdb.set_trace()
         erros = Nfe.schema_validation(xml_file)
         erros = "\n".join(erros)
-        if erros:
-            # import pudb;pu.db
-            max_len = erros.find('maxLength')
+        lista_erros = erros.split('\n')
+        for erros_msg in lista_erros:            
+            max_len = erros_msg.find('maxLength')
             if max_len > 0:
-                campo_erro = erros[45:max_len-9]
+                campo_erro = erros_msg[45:max_len-11]
                 if campo_erro == "xLgr":
                     erros += " \n Rua + Bairro + Complemento, tem que ser no máximo 60 caracteres"
+                if campo_erro == "xNome":
+                    erros += " \n Nome, tem que ser no máximo 60 caracteres"
+                if campo_erro == "xFant":
+                    erros += " \n Razão social, tem que ser no máximo 60 caracteres"
         self.write({"xml_error_message": erros or False})

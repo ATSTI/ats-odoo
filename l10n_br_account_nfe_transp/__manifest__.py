@@ -15,6 +15,7 @@
         "l10n_br_delivery_nfe",
     ],
     "data": [
+        "data/account_incoterms_data.xml",
         "security/ir.model.access.csv",
         "views/account_invoice_view.xml",
     ],

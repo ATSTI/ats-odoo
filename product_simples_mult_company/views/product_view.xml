@@ -21,7 +21,10 @@
                 <page name="general_information" string="Informações Gerais">
                     <group>
                         <group>
-                            <field name="company_ids" /> 
+                            <field name="company_ids" 
+                                groups="base.group_multi_company"
+                                widget="many2many_tags"
+                                options="{'no_create': True}" /> 
                             <field name="categ_id" attrs="{'invisible': [('product_variant_count', '&gt;', 1)]}"/>
                             <field name="type" attrs="{'invisible': [('product_variant_count', '&gt;', 1)]}"/>
                             <field name="default_code" string="Código" class="oe_edit_only" style="background-color: #d2d2ff;" attrs="{'invisible': [('product_variant_count', '&gt;', 1)]}"/>

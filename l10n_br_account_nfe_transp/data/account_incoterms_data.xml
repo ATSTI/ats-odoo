@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="incoterm_0" model="account.incoterms">
+            <field name="code">0</field>
+            <field name="name">Contratação do Frete por conta do Remetente (CIF)</field>
+            <field name="freight_responsibility">0</field>
+        </record>
+        <record id="incoterm_1" model="account.incoterms">
+            <field name="code">1</field>
+            <field name="name">Contratação do Frete por conta do destinatário/remetente (FOB)</field>
+            <field name="freight_responsibility">1</field>
+        </record>
+        <record id="incoterm_2" model="account.incoterms">
+            <field name="code">2</field>
+            <field name="name">Contratação do Frete por conta de terceiros</field>
+            <field name="freight_responsibility">2</field>
+        </record>
+        <record id="incoterm_3" model="account.incoterms">
+            <field name="code">3</field>
+            <field name="name">Transporte próprio por conta do remetente</field>
+            <field name="freight_responsibility">3</field>
+        </record>
+        <record id="incoterm_4" model="account.incoterms">
+            <field name="code">4</field>
+            <field name="name">Transporte próprio por conta do destinatário</field>
+            <field name="freight_responsibility">4</field>
+        </record>
+        <record id="incoterm_9" model="account.incoterms">
+            <field name="code">9</field>
+            <field name="name">Sem Ocorrência de transporte</field>
+            <field name="freight_responsibility">9</field>
+        </record>
+        <record id="account.incoterm_EXW" model="account.incoterms">
+            <field name="active">False</field>
+        </record>
+        <record id="account.incoterm_FCA" model="account.incoterms">
+            <field name="active">False</field>
+        </record>
+        <record id="account.incoterm_FAS" model="account.incoterms">
+            <field name="active">False</field>
+        </record>
+        <record id="account.incoterm_FOB" model="account.incoterms">
+            <field name="active">False</field>
+        </record>
+        <record id="account.incoterm_CFR" model="account.incoterms">
+            <field name="active">False</field>
+        </record>
+
+        <record id="account.incoterm_CIF" model="account.incoterms">
+            <field name="active">False</field>
+        </record>
+        <record id="account.incoterm_CPT" model="account.incoterms">
+            <field name="active">False</field>
+        </record>
+        <record id="account.incoterm_CIP" model="account.incoterms">
+            <field name="active">False</field>
+        </record>
+        <record id="account.incoterm_DPU" model="account.incoterms">
+            <field name="active">False</field>
+        </record>
+        <record id="account.incoterm_DAP" model="account.incoterms">
+            <field name="active">False</field>
+        </record>
+        <record id="account.incoterm_DDP" model="account.incoterms">
+            <field name="active">False</field>
+        </record>
+    </data>
+</odoo>

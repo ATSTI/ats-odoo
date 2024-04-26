@@ -24,9 +24,15 @@ class FiscalDocument(models.Model):
                 if campo_erro == "xNome":
                     erros += " \n Nome: máximo 60 caracteres."
                 if campo_erro == "xFant":
-                    erros += " \n Razão social:máximo 60 caracteres."
+                    erros += " \n Razão social: máximo 60 caracteres."
+            max_len = erros_msg.find('CNPJ')
+            max1_len = erros_msg.find('xNome')
+            if max_len > 0 and max1_len > 0 and max_len > max1_len:
+                erros += " \n Campo Cnpj/Cpf não preenchido."
             max_len = erros_msg.find('nro')
             max1_len = erros_msg.find('xBairro')
+            if max1_len < 0:
+                max1_len = erros_msg.find('xCpl')
             if max_len > 0 and max_len > max1_len:
                 erros += " \n Campo número no Endereço não preenchido."
 

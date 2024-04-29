@@ -7,8 +7,9 @@
     "author": "ATSTi, ",
     "website": "",
     "version": "14.0.1.0.0",
-    "depends": ["l10n_br_nfe"],
+    "depends": ["l10n_br_account", "l10n_br_nfe"],
     "data": [
+        "views/account_invoice_view.xml",
     ],
     "demo": [
     ],

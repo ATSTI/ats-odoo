@@ -2,6 +2,8 @@
 
 from odoo import _, models
 from nfelib.nfe.bindings.v4_0.nfe_v4_00 import Nfe
+from erpbrasil.base.fiscal.edoc import ChaveEdoc
+
 
 
 class FiscalDocument(models.Model):
@@ -43,8 +45,10 @@ class FiscalDocument(models.Model):
             if max_len > 0 and max1_len > 0 and max_len > max1_len:
                 msg.add(" \n Campo número no endereço do parceiro não preenchido." + link_partner)
         for doc in self.document_related_ids:
-            if doc.document_key and len(doc.document_key) > 44:
-                msg.add(f" \n Chave invalida: chave não pode ter mais que 44 caracteres ou espaço entre os números.{link_partner}")
+            if doc.document_key:
+                doc_key = re.sub('[^0-9]', '', doc.document_key)
+                if len(doc_key) < 44:
+                    msg.add(f" \n Chave invalida: chave não pode ter mais que 44 caracteres ou espaço entre os números.{link_partner}")
         if len(msg):
             mensagem = ""
             for m in list(msg):

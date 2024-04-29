@@ -17,7 +17,7 @@ class FiscalDocument(models.Model):
         for erros_msg in lista_erros:
             # TODO - colocar o LINK pra arrumar o erro
             # data-oe-model="stock.picking" t-att-data-oe-id="picking.id">
-            link_partner = "<a href=# data-oe-model=" + self.partner_id._name + " data-oe-id=" + str(self.partner_id.id) + ">CORRIGIR</a>"
+            # link_partner = "<a href=# data-oe-model=" + self.partner_id._name + " data-oe-id=" + str(self.partner_id.id) + ">CORRIGIR</a>"
             # link_partner = f"<a href=#id={self.partner_id.id}&model={self.partner_id._name}>CORRIGIR</a>"
             link_partner = ""
             max_len = erros_msg.find('maxLength')
@@ -42,6 +42,9 @@ class FiscalDocument(models.Model):
                 max1_len = erros_msg.find('xCpl')
             if max_len > 0 and max1_len > 0 and max_len > max1_len:
                 msg.add(" \n Campo número no endereço do parceiro não preenchido." + link_partner)
+        for doc in self.document_related_ids:
+            if doc.document_key and len(doc.document_key) > 44:
+                msg.add(f" \n Chave invalida: chave não pode ter mais que 44 caracteres ou espaço entre os números.{link_partner}")
         if len(msg):
             mensagem = ""
             for m in list(msg):

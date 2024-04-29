@@ -3,7 +3,7 @@
 from odoo import _, models
 from nfelib.nfe.bindings.v4_0.nfe_v4_00 import Nfe
 from erpbrasil.base.fiscal.edoc import ChaveEdoc
-
+import re
 
 
 class FiscalDocument(models.Model):
@@ -32,7 +32,7 @@ class FiscalDocument(models.Model):
                 if campo_erro == "xFant":
                     msg.add(f" \n Razão social: máximo 60 caracteres.{link_partner}")
                 if campo_erro == "natOp":
-                    msg.add(f" \n Natureza da Operação: máximo 60 caracteres.{link_partner}")
+                    msg.add(f" \n Natureza da Operação: máximo 60 caracteres.")
 
             max_len = erros_msg.find('CNPJ')
             max1_len = erros_msg.find('xNome')
@@ -48,7 +48,7 @@ class FiscalDocument(models.Model):
             if doc.document_key:
                 doc_key = re.sub('[^0-9]', '', doc.document_key)
                 if len(doc_key) < 44:
-                    msg.add(f" \n Chave invalida: chave não pode ter mais que 44 caracteres ou espaço entre os números.{link_partner}")
+                    msg.add(f" \n Chave inválida: chave tem que ter 44 caracteres sem espaços.")
         if len(msg):
             mensagem = ""
             for m in list(msg):

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="responsavel_partner_form_view" model="ir.ui.view">
+        <field name="name">responsavel.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="category_id" attribute="after">
+                    <field name="financeiro" colspan="2"/>
+                </field>
+            </form>
+        </field>
+    </record>
+</odoo>

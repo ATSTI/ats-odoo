@@ -1,5 +1,11 @@
 
 from odoo import models, _, api, fields
+from odoo.exceptions import UserError
+
+from odoo.addons.l10n_br_fiscal.constants.fiscal import (
+    MODELO_FISCAL_NFE,
+ )
+
 
 class AccountMove(models.Model):
     _inherit = "account.move"
@@ -48,25 +54,17 @@ class AccountMove(models.Model):
             self.xml_error_message = erros or False
         return result
 
-    # def _valida_itens(self):
-    #     if not self.document_type_id:
-    #         return True
-    #     erros = ""
-    #     for item in self.invoice_line_ids:
-    #         if not item.ncm:
-    #             erros += f"\n Item {item.name} sem NCM."
-    #     return erros
-
-    # @api.model_create_multi
-    # def create(self, vals_list):
-    #     valida = self._valida_itens()
-    #     if valida:
-    #         vals_list['xml_error_message'] = valida
-    #     return super().create(vals_list)
-
-    # def write(self, vals):
-    #     # import pudb;pu.db
-    #     valida = self._valida_itens()
-    #     if valida:
-    #         vals['xml_error_message'] = valida
-    #     return super().write(vals)
+    def action_post(self):
+        if self.document_type_id and self.document_type_id.code in (
+                MODELO_FISCAL_NFE
+        ):
+            item = 0
+            msg = ""
+            for line in self.invoice_line_ids:                
+                if not line.icms_cst_id:
+                    item += 1
+                    msg += f"\n {item} - {line.name};"
+            if msg:
+                msg = f"{'Item' if item == 1 else 'Itens'} sem informação do CST do ICMS: \n {msg}"
+                raise UserError(_(msg))
+        return super().action_post()

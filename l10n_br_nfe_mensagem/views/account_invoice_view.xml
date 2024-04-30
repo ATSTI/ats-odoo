@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Customer Invoice views -->
+    <record id="account_invoice_msg_form" model="ir.ui.view">
+        <field name="name">l10n_br_account.invoice.msg.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="l10n_br_account.invoice_form" />
+        <field name="priority">399</field>
+        <field name="arch" type="xml">
+            <!-- <xpath expr="//div[@class='alert alert-danger']" position="insert"> -->
+            <xpath expr="//sheet" position="before">
+                <div
+                    class="alert alert-danger"
+                    role="alert"
+                    attrs="{'invisible': [('xml_error_message','=',False)]}"
+                >
+                    <strong>XML validation errors:</strong>
+                    <field name="xml_error_message" readonly="1" />
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

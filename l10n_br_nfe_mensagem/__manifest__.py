@@ -1,7 +1,11 @@
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 {
-    "name": "Brazilian Localization Accounts costs",
+    "name": "Brazilian Localization Accounts Mensage",
+    "summary": """
+        Adiciona mensagem de validação campos obrigatorios do cliente
+        na fatura, e deixa algumas msg de validação da nfe mais fáceis.
+    """,
     "category": "Localisation",
     "license": "AGPL-3",
     "author": "ATSTi, ",

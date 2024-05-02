@@ -93,7 +93,7 @@ class IntegracaoPdv(http.Controller):
                         continue
                 if not ja_incluido:
                     vals_line = {
-                        'name': lista,
+                        'name': cnpj,
                         'product_id': 60,
                         'qty': 1,
                         'price_unit': 1,

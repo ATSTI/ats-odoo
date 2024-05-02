@@ -73,15 +73,21 @@ class IntegracaoPdv(http.Controller):
                 # inserir uma linha por CNPJ
             else:              
                 # verificar se cnpj ja inserido na linha
+                order_line = []
                 for line in order_id:
                     if lista in line.name:
                         continue
                     else:
                         # insere
                         vals_line = {
-
+                            'name': lista,
+                            'product_id': 60,
+                            'qty': 1,
+                            'price_unit': 1,
                         }
                         order_id.sudo().write(vals_line)
+                        order_line.append((0, 0,vals_line))
+                order_id['lines'] = order_line
 
 
             # for key in data[chave]:

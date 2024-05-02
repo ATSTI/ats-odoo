@@ -12,6 +12,10 @@
                 </xpath>
                 <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='tax_ids']" position="before">
                     <field name="fiscal_operation_type" invisible="1" />
+                    <!-- <field name="fiscal_operation_id" />
+                    <field name="fiscal_operation_line_id" /> -->
+                    <field name="ipi_cst_id" invisible="1"/>
+                    <field name="ipi_guideline_id" invisible="1"/>
                 </xpath>
             </field>
         </record>      

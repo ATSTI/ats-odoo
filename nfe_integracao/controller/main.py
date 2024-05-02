@@ -6,7 +6,8 @@
 #
 from datetime import datetime
 import logging
-from datetime import timedelta
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from unidecode import unidecode
 import json
 import re
@@ -42,6 +43,7 @@ class IntegracaoPdv(http.Controller):
             cnpj = re.sub('[^0-9]', '', cnpj_emitente)
             cnpj = '%s.%s.%s/%s-%s' %(cnpj[:2],cnpj[2:5],cnpj[5:8],cnpj[8:12],cnpj[12:14])
             lista_cnpj.add(cnpj)
+            num_nota -= 1
 
         # criar lista do financeiro
         lista_financeiro = set()
@@ -49,14 +51,14 @@ class IntegracaoPdv(http.Controller):
             cli_ids = cliente.sudo().search([('cnpj_cpf', '=', lista),])
             # se cliente tem financeiro, cobranca e dele
             if cli_ids.financeiro:
-                lista_financeiro.add(cli_ids.id)
+                lista_financeiro.add(cli_ids.financeiro.id)
 
         # criando ou alterando pedidos
         for fin in lista_financeiro:
             # procura se existe um pedido de venda, deste financeiro
             data_pedido = datetime.strptime(data_nota, "%Y-%m-%d %H:%M:%S")
-            data_pedido = data_pedido + timedelta(months=1)
-            data_pedido = data_pedido.replace(day=1, hour=0, minute=59, second=0, microsecond=0)
+            data_pedido = data_pedido + relativedelta(months=1)
+            data_pedido = data_pedido.replace(day=1, hour=3, minute=59, second=0, microsecond=0)
 
             order_id = order.sudo().search([
                 ('partner_id', '=', fin),
@@ -70,24 +72,35 @@ class IntegracaoPdv(http.Controller):
                     'date_order': data_pedido,
                 }
                 order_id = order.sudo().create(vals)
+                # order_line = []
+                # vals_line = {
+                #     'name': lista,
+                #     'product_id': 60,
+                #     'qty': 1,
+                #     'price_unit': 1,
+                # }
+                # # order_id.sudo().write(vals_line)
+                # order_line.append((0, 0,vals_line))
+                # order_id['order_line'] = order_line
                 # inserir uma linha por CNPJ
-            else:              
+            for cnpj in lista_cnpj:            
                 # verificar se cnpj ja inserido na linha
                 order_line = []
-                for line in order_id:
-                    if lista in line.name:
+                ja_incluido = False
+                for line in order_id.order_line:
+                    if cnpj in line.name:
+                        ja_incluido = True
                         continue
-                    else:
-                        # insere
-                        vals_line = {
-                            'name': lista,
-                            'product_id': 60,
-                            'qty': 1,
-                            'price_unit': 1,
-                        }
-                        order_id.sudo().write(vals_line)
-                        order_line.append((0, 0,vals_line))
-                order_id['lines'] = order_line
+                if not ja_incluido:
+                    vals_line = {
+                        'name': lista,
+                        'product_id': 60,
+                        'qty': 1,
+                        'price_unit': 1,
+                    }
+                    # order_id.sudo().write(vals_line)
+                    order_line.append((0, 0,vals_line))
+                    order_id['order_line'] = order_line
 
 
             # for key in data[chave]:

@@ -34,7 +34,7 @@ class IntegracaoPdv(http.Controller):
         cliente = http.request.env['res.partner']
 
         # crio uma lista com CNPJs unicos
-        lista_cnpj = set()
+        lista_cnpj = []
         while num_nota > 0:
             # print (f" ---- Nota {num_nota} -----------")
             chave = str(num_nota)
@@ -42,13 +42,18 @@ class IntegracaoPdv(http.Controller):
             data_nota = data[chave]['nota_data']
             cnpj = re.sub('[^0-9]', '', cnpj_emitente)
             cnpj = '%s.%s.%s/%s-%s' %(cnpj[:2],cnpj[2:5],cnpj[5:8],cnpj[8:12],cnpj[12:14])
-            lista_cnpj.add(cnpj)
+            dados_cli = {
+                'nome': data[chave]['empresa_nome'],
+                'cnpj': cnpj
+            }
+            lista_cnpj.append(dados_cli)
             num_nota -= 1
 
         # criar lista do financeiro
         lista_financeiro = set()
         for lista in lista_cnpj:
-            cli_ids = cliente.sudo().search([('cnpj_cpf', '=', lista),])
+            cnpj = lista['cnpj']
+            cli_ids = cliente.sudo().search([('cnpj_cpf', '=', cnpj),])
             # se cliente tem financeiro, cobranca e dele
             if cli_ids.financeiro:
                 lista_financeiro.add(cli_ids.financeiro.id)
@@ -70,30 +75,23 @@ class IntegracaoPdv(http.Controller):
                 vals = {
                     'partner_id': fin,
                     'date_order': data_pedido,
+                    'origin': 'produtor',
                 }
                 order_id = order.sudo().create(vals)
-                # order_line = []
-                # vals_line = {
-                #     'name': lista,
-                #     'product_id': 60,
-                #     'qty': 1,
-                #     'price_unit': 1,
-                # }
-                # # order_id.sudo().write(vals_line)
-                # order_line.append((0, 0,vals_line))
-                # order_id['order_line'] = order_line
-                # inserir uma linha por CNPJ
-            for cnpj in lista_cnpj:            
+            for lista in lista_cnpj:
+                cnpj = lista['cnpj']
+                cnpj = '%s.%s.%s/%s-%s' %(cnpj[:2],cnpj[2:5],cnpj[5:8],cnpj[8:12],cnpj[12:14])
+                emitente = f"{cnpj} - {lista['nome']}"
                 # verificar se cnpj ja inserido na linha
                 order_line = []
-                ja_incluido = False
+                nao_incluido = True
                 for line in order_id.order_line:
                     if cnpj in line.name:
-                        ja_incluido = True
+                        nao_incluido = False
                         continue
-                if not ja_incluido:
+                if nao_incluido:
                     vals_line = {
-                        'name': cnpj,
+                        'name': emitente,
                         'product_id': 60,
                         'qty': 1,
                         'price_unit': 1,
@@ -101,13 +99,4 @@ class IntegracaoPdv(http.Controller):
                     # order_id.sudo().write(vals_line)
                     order_line.append((0, 0,vals_line))
                     order_id['order_line'] = order_line
-
-
-            # for key in data[chave]:
-                # print(key, data[chave][key])
-            # num_nota -= 1
-
-            # prod_ids = http.request.env['product.product'].sudo().search([
-            #     ('product_tmpl_id','in',list(prd_ids))])
-
     

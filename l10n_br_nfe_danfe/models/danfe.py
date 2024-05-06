@@ -378,9 +378,9 @@ class danfe(object):
         )
 
         if self.logo:
-            img = get_image(self.logo, width=2 * cm)
+            img = get_image(self.logo, width=2.8 * cm)
             img.drawOn(
-                self.canvas, (self.nLeft + 5) * mm, (self.height - self.nlin - 22) * mm
+                self.canvas, (self.nLeft + 1) * mm, (self.height - self.nlin - 30) * mm
             )
 
         cEnd = (

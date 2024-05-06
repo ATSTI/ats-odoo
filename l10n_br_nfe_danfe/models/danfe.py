@@ -344,6 +344,13 @@ class danfe(object):
             cDt = cProtocolo + " - " + cDt + " " + cHr
             nW_Rect = (self.width - self.nLeft - self.nRight - 110) / 2
             self.stringcenter(self.nLeft + 115 + nW_Rect, self.nlin + 38.7, cDt)
+        else:
+            self.canvas.saveState()
+            self.canvas.rotate(90)
+            self.canvas.setFont("Times-Bold", 40)
+            self.canvas.setFillColorRGB(0.57, 0.57, 0.57)
+            self.string(self.nLeft + 65, 449, "SEM VALOR FISCAL")
+            self.canvas.restoreState()            
         self.canvas.setFont("NimbusSanL-Regu", 8)
         self.string(
             self.nLeft + 1, self.nlin + 38.7, tagtext(oNode=elem_ide, cTag="natOp")

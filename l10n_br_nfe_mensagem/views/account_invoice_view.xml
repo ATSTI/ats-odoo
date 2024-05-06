@@ -19,6 +19,23 @@
                     <field name="xml_error_message" readonly="1" />
                 </div>
             </xpath>
+            <xpath expr="//button[@name='open_fiscal_document']" position="replace">            
+                <button
+                    name="open_fiscal_document"
+                    type="object"
+                    class="btn-success"
+                    icon="fa-pencil-square-o"
+                    attrs="{'invisible': [('document_type_id', '=', False)]}"
+                    style="background-color:#ffffe9;"                
+                >
+                    <span>Nota Fiscal - NFe</span>
+                </button>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="open_fiscal_document" string="Nota Fiscal" class="oe_highlight"
+                type="object" attrs="{'invisible': [('document_type_id', '=', False)]}" 
+                icon="fa-pencil-square-o"/>
+            </xpath>
         </field>
     </record>
 

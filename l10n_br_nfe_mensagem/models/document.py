@@ -22,6 +22,9 @@ class FiscalDocument(models.Model):
             # link_partner = "<a href=# data-oe-model=" + self.partner_id._name + " data-oe-id=" + str(self.partner_id.id) + ">CORRIGIR</a>"
             # link_partner = f"<a href=#id={self.partner_id.id}&model={self.partner_id._name}>CORRIGIR</a>"
             link_partner = ""
+            erro_cep = erros_msg.find('CEP')
+            if erro_cep > 0:
+                msg.add(f" \n Erro no CEP informado.")
             max_len = erros_msg.find('maxLength')
             if max_len > 0:
                 campo_erro = erros_msg[45:max_len-11]

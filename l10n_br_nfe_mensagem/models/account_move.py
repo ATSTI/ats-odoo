@@ -35,6 +35,10 @@ class AccountMove(models.Model):
                 erros += "\n Cadastro do parceiro sem CNPJ/CPF."
             if not self.partner_id.zip:
                 erros += "\n Cadastro do parceiro sem CEP."
+            if self.partner_id.zip:
+                cep = re.sub('[^0-9]', '', self.partner_id.zip)
+                if not len(cep) == 8:
+                    erros += "\n CEP errado no cadastro."
             if not self.partner_id.street_name:
                 erros += "\n Cadastro do parceiro sem Rua."
             if not self.partner_id.street_number:

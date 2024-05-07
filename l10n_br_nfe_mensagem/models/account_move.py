@@ -1,4 +1,6 @@
+# License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
+import re
 from odoo import models, _, api, fields
 from odoo.exceptions import UserError
 
@@ -41,6 +43,10 @@ class AccountMove(models.Model):
                 erros += "\n Cadastro do parceiro sem Bairro."
             if not self.partner_id.city_id:
                 erros += "\n Cadastro do parceiro sem CIDADE."
+            if self.partner_id.phone:
+                fone = re.sub('[^0-9]', '', self.partner_id.phone)
+                if len(fone) > 13:
+                    erros += "\n Número de telefone inválido."
             if len(max) > 60:
                 erros += "\n Rua + Bairro + Complemento deve ser menor que 60 caracteres."
             if self.partner_id.name and len(self.partner_id.name) > 60:

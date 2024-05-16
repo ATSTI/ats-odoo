@@ -1,5 +1,5 @@
-# © 2016 Danimar Ribeiro <danimaribeiro@gmail.com>, Trustcode
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+# © 2024 Carlos Silveira <crsilveira@gmail.com>, Trustcode
+# License AGPL-3.0 or later (http://atsti.com.br).
 
 {  # pylint: disable=C8101,C8103
     'name': 'Envio de NF-e',
@@ -15,8 +15,7 @@
         'Carlos Silveira <crsiveira@gmail.com>',
     ],
     'depends': [
-        'l10n_br_account',
-        'l10n_br_fiscal',
+        'account',
     ],
     'data': [
         'security/ir.model.access.csv',

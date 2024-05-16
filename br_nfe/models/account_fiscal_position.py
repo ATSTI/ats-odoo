@@ -58,7 +58,7 @@ class AccountFiscalPosition(models.Model):
     note = fields.Text(u'Observações')
 
 
-class AccountFiscalPositionTax(models.Model):
-    _inherit = 'account.fiscal.position.tax'
+# class AccountFiscalPositionTax(models.Model):
+#     _inherit = 'account.fiscal.position.tax'
 
-    state_ids = fields.Many2many('res.country.state', string="Estados")
+#     state_ids = fields.Many2many('res.country.state', string="Estados")

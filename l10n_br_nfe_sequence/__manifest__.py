@@ -1,7 +1,7 @@
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 {
-    "name": "NF-e",
+    "name": "NF-e Sequence",
     "summary": "Brazilian Eletronic Invoice NF-e - altera o document_number para usar o último número+1",
     "category": "Localisation",
     "license": "AGPL-3",

@@ -10,7 +10,7 @@ import logging
 import os
 import fnmatch
 import json
-import odoorpc
+# import odoorpc
 
 # from . import atscon as con
 
@@ -35,47 +35,47 @@ class PosSession(models.Model):
                 #pick.button_validate()
             pos.write({'state': 'cancel'})
 
-    def produto_corrige_ncm(self):
-        origem = odoorpc.ODOO('url', port=8069)
-        origem.login('url', 'user', 'password')
-        a_prod = origem.env['product.product']
-        b_prod = self.env['product.product']
-        arq = open('/var/www/webroot/ncm_nao_encontrado.txt', '+r')
-        itens = []
-        for item in arq.readlines():
-            itens.append(int(item.strip()))
-        prod_b = b_prod.search([('ncm_id', '=', False), ('type', '=', 'product'), ('id', 'not in', itens)], order="id", limit=100)
-        prod_a = a_prod.browse(prod_b._ids)
-        arqx = open('/var/www/webroot/ncm_nao_encontrado.txt', '+a')
-        for prd in prod_a:
-            prod = b_prod.search([('default_code', '=', prd.default_code)])
-            if prod:
-                ncm = prd.product_tmpl_id.fiscal_classification_id.code
-                if not ncm:
-                    continue
-                pr_ncm = self.env['l10n_br_fiscal.ncm'].search([('code', '=', ncm)])
-                if not pr_ncm:
-                    pr_ncm = self.env['l10n_br_fiscal.ncm'].search([('code', 'ilike', ncm[:7])], limit=1)
-                if pr_ncm:
-                    #_logger.info(f"ITEM : {prod.default_code}")
-                    vp = {}
-                    fiscal_genre_id = self.env["l10n_br_fiscal.product.genre"].search([("code", "=", ncm[0:2])])
-                    vp['ncm_id'] = pr_ncm[0]
-                    if fiscal_genre_id:
-                        vp['fiscal_genre_id'] = fiscal_genre_id[0]
-                    if not prod.fiscal_type:
-                        vp['fiscal_type'] = '00'
-                    if not prod.icms_origin:
-                        vp['icms_origin'] = '0'
-                    if len(vp):
-                        prod.write(vp)
-                else:
-                    _logger.info(f"NCM nao encontrado : {ncm}, produto {prd.default_code}")
-                    if prod.id not in itens:
-                        arqx.write(str(prod.id) + '\n')
-                    continue
-        arq.close()
-        arqx.close()
+    # def produto_corrige_ncm(self):
+    #     origem = odoorpc.ODOO('url', port=8069)
+    #     origem.login('url', 'user', 'password')
+    #     a_prod = origem.env['product.product']
+    #     b_prod = self.env['product.product']
+    #     arq = open('/var/www/webroot/ncm_nao_encontrado.txt', '+r')
+    #     itens = []
+    #     for item in arq.readlines():
+    #         itens.append(int(item.strip()))
+    #     prod_b = b_prod.search([('ncm_id', '=', False), ('type', '=', 'product'), ('id', 'not in', itens)], order="id", limit=100)
+    #     prod_a = a_prod.browse(prod_b._ids)
+    #     arqx = open('/var/www/webroot/ncm_nao_encontrado.txt', '+a')
+    #     for prd in prod_a:
+    #         prod = b_prod.search([('default_code', '=', prd.default_code)])
+    #         if prod:
+    #             ncm = prd.product_tmpl_id.fiscal_classification_id.code
+    #             if not ncm:
+    #                 continue
+    #             pr_ncm = self.env['l10n_br_fiscal.ncm'].search([('code', '=', ncm)])
+    #             if not pr_ncm:
+    #                 pr_ncm = self.env['l10n_br_fiscal.ncm'].search([('code', 'ilike', ncm[:7])], limit=1)
+    #             if pr_ncm:
+    #                 #_logger.info(f"ITEM : {prod.default_code}")
+    #                 vp = {}
+    #                 fiscal_genre_id = self.env["l10n_br_fiscal.product.genre"].search([("code", "=", ncm[0:2])])
+    #                 vp['ncm_id'] = pr_ncm[0]
+    #                 if fiscal_genre_id:
+    #                     vp['fiscal_genre_id'] = fiscal_genre_id[0]
+    #                 if not prod.fiscal_type:
+    #                     vp['fiscal_type'] = '00'
+    #                 if not prod.icms_origin:
+    #                     vp['icms_origin'] = '0'
+    #                 if len(vp):
+    #                     prod.write(vp)
+    #             else:
+    #                 _logger.info(f"NCM nao encontrado : {ncm}, produto {prd.default_code}")
+    #                 if prod.id not in itens:
+    #                     arqx.write(str(prod.id) + '\n')
+    #                 continue
+    #     arq.close()
+    #     arqx.close()
     
     def baixa_pagamentos(self, move_line_id, journal_id, caixa, valor, cod_forma, juros):
         if journal_id:

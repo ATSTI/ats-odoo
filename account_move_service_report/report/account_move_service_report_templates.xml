@@ -244,6 +244,10 @@
                             <td/>
                         </tr>
                         <tr id="total">
+                            <td colspan="4">Valor Frete</td>
+                            <td><span t-field="doc.amount_freight_value"/></td>
+                        </tr>
+                        <tr id="total">
                             <td colspan="4">VALOR TOTAL</td>
                             <td><span t-field="doc.amount_total"/></td>
                         </tr>

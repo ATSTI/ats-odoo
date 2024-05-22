@@ -268,7 +268,7 @@
                                         <span t-field="line.name"/>
                                     </td>
                                     <td>
-                                        <span t-field="line.uom_id.code"/>
+                                        <span t-field="line.product_uom_id.name"/>
                                     </td>
                                     <td>
                                         <span t-field="line.quantity"/>

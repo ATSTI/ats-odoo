@@ -11,7 +11,7 @@
     "version": "14.0.1.0.0",
     "development_status": "Alpha",
     "depends": [
-        "l10n_br_account",
+        "account",
         "account_payment_mode", 
     ],
     "data": [

@@ -10,7 +10,7 @@
     "depends": ["l10n_br_fiscal", "l10n_br_account"],
     "data": [
         # View
-        "views/res_company_view.xml",
+        #"views/res_company_view.xml",
     ],
     "demo": [
     ],

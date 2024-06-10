@@ -9,19 +9,11 @@
         <field name="priority">399</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='journal_id']" position="after">
-                <form>
-                    <group>
-                        <field name="document_date" />
-                        <field name="date_in_out" />
-                    </group>
-                </form>
+                <field name="document_date" />
+                <field name="date_in_out" />
             </xpath>
             <xpath expr="//field[@name='partner_bank_id']" position="after">
-                <form>
-                    <group>
-                        <field name="edoc_purpose" />
-                    </group>
-                </form>
+                <field name="edoc_purpose" />
             </xpath>
             <xpath expr="//page[@name='other_info']" position="after">
                 <page name="adic_ids" string="Dados adicionais" >

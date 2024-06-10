@@ -8,6 +8,21 @@
         <field name="inherit_id" ref="l10n_br_account.invoice_form" />
         <field name="priority">399</field>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='journal_id']" position="after">
+                <form>
+                    <group>
+                        <field name="document_date" />
+                        <field name="date_in_out" />
+                    </group>
+                </form>
+            </xpath>
+            <xpath expr="//field[@name='partner_bank_id']" position="after">
+                <form>
+                    <group>
+                        <field name="edoc_purpose" />
+                    </group>
+                </form>
+            </xpath>
             <xpath expr="//page[@name='other_info']" position="after">
                 <page name="adic_ids" string="Dados adicionais" >
                     <form>
@@ -18,6 +33,19 @@
                                     <field name="fiscal_additional_data" readonly="1"/>
                                     <field name="manual_customer_additional_data" />
                                     <field name="customer_additional_data" readonly="1"/>
+                                </group>
+                            </group>
+                        </sheet>
+                    </form>
+                </page>
+            </xpath>
+            <xpath expr="//page[@name='other_info']" position="after">
+                <page name="document_related" string="Documentos relacionados" >
+                    <form>
+                        <sheet>
+                            <group string="Documentos relacionados">
+                                <group>
+                                    <field name="document_related_ids" widget="one2many_tags"/>
                                 </group>
                             </group>
                         </sheet>

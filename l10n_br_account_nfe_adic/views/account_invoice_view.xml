@@ -25,6 +25,7 @@
                                     <field name="fiscal_additional_data" readonly="1"/>
                                     <field name="manual_customer_additional_data" />
                                     <field name="customer_additional_data" readonly="1"/>
+                                    <field name="send_file_id" invisible="1"/>
                                 </group>
                             </group>
                         </sheet>

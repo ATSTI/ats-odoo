@@ -24,12 +24,16 @@ class AccountMove(models.Model):
         hj = date.today()
         dia = hj.day
         if dia_preferencia:
+            if dia_preferencia <= dia:
+                parcela += 1
             dia = dia_preferencia
         data_vcto = hj + relativedelta(day=dia,months=parcela)
         return data_vcto
 
     @api.depends('num_parcela', 'dia_vcto', 'vlr_prim_prc')
     def action_calcula_parcela(self):
+        self.parcela_ids = False
+        self._recompute_payment_terms_lines()
         prcs = []       
         prc = 0
         # if self.rateio_frete:
@@ -75,11 +79,26 @@ class AccountMove(models.Model):
             valor_parc = valor_prc
             prc += 1
         if prcs:
+            # import pudb;pu.db
             if self.parcela_ids:
                 self.parcela_ids.unlink()
             self.parcela_ids = prcs
-                
+            self._recompute_payment_terms_lines()
+
+    @api.onchange('num_parcela', 'dia_vcto', 'vlr_prim_prc')
+    def _onchange_recompute_parcelas(self):
+        if self.parcela_ids:
+            # import pudb;pu.db
+            self.parcela_ids = False
+
+    # @api.onchange('parcela_ids')
+    # def _onchange_parcela_ids(self):
+    #     import pudb;pu.db
+    #     if self.parcela_ids._origin:
+    #         self._recompute_payment_terms_lines()
+
     def _recompute_payment_terms_lines(self):
+        import pudb;pu.db
         self.ensure_one()
         self = self.with_company(self.company_id)
         in_draft_mode = self != self._origin

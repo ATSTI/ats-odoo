@@ -32,9 +32,36 @@
                 </button>
             </xpath>
             <xpath expr="//header" position="inside">
-                <button name="open_fiscal_document" string="Nota Fiscal" class="oe_highlight"
-                type="object" attrs="{'invisible': [('document_type_id', '=', False)]}" 
-                icon="fa-pencil-square-o"/>
+                <!-- <button 
+                    name="open_fiscal_document" 
+                    string="Nota Fiscal" 
+                    class="oe_highlight"
+                    type="object" 
+                    attrs="{'invisible': [('document_type_id', '=', False)]}" 
+                    icon="fa-pencil-square-o"
+                /> -->
+                <button
+                    name="action_document_send"
+                    type="object"
+                    string="Enviar"
+                    groups="l10n_br_fiscal.group_user"
+                    class="btn-primary"
+                    attrs="{'invisible': [('state_edoc', 'not in', ('a_enviar', 'rejeitada'))]}"
+                />
+                <button
+                    name="view_pdf"
+                    type="object"
+                    string="Visualizar PDF"
+                    groups="l10n_br_fiscal.group_user"
+                    class="btn-primary"
+                    attrs="{'invisible': [('state_edoc', '=', 'em_digitacao')]}"
+                />
+                <field
+                    name="state_edoc"
+                    widget="statusbar"
+                    invisible="1"
+                    statusbar_visible="em_digitacao,autorizada"
+                />
             </xpath>
         </field>
     </record>

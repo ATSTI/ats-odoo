@@ -13,11 +13,11 @@ class AccountMove(models.Model):
     _inherit = "account.move"
     _inherits = {"l10n_br_fiscal.document": "fiscal_document_id"}
       
-    xml_error_message = fields.Text(
-        readonly=True,
-        string="XML validation errors",
-        copy=False,
-    )
+    # xml_error_message = fields.Text(
+    #     readonly=True,
+    #     string="XML validation errors",
+    #     copy=False,
+    # )
   
     @api.onchange("partner_id")
     def _onchange_partner_id(self):

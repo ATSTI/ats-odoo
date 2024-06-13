@@ -23,7 +23,6 @@ from odoo.addons.l10n_br_fiscal.constants.fiscal import (
     MODELO_FISCAL_NFE,
     PROCESSADOR_OCA,
 )
-from odoo.addons.l10n_br_fiscal.tools import remove_non_ascii_characters
 from odoo.addons.spec_driven_model.models import spec_models
 
 # from ..constants.nfe import (

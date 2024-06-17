@@ -14,43 +14,45 @@ class AccountMove(models.Model):
 
     _inherit = "account.move"
 
-    pdf_boletos_id = fields.Many2one(
-        comodel_name="ir.attachment", string="PDF Boletos", ondelete="cascade"
-    )
+    # pdf_boletos_id = fields.Many2one(
+    #     comodel_name="ir.attachment", string="PDF Boletos", ondelete="cascade"
+    # )
 
-    def _merge_pdf_boletos(self):
-        pdf_merger = PdfFileMerger()
+    # def _merge_pdf_boletos(self):
+    #     # pdf_merger = PdfFileMerger()
 
-        temp_files = []
-        for move_line in self.financial_move_line_ids:
-            move_line.generate_pdf_boleto()
+    #     # temp_files = []
+    #     for move_line in self.financial_move_line_ids:
+    #         move_line.generate_pdf_boleto()
 
-            if move_line.pdf_boleto_id:
-                temp_pdf = tempfile.TemporaryFile()
-                decode_data = b64decode(move_line.pdf_boleto_id.datas, validate=True)
-                temp_pdf.write(decode_data)
-                temp_pdf.seek(0)
-                pdf_merger.append(temp_pdf)
-                temp_files.append(temp_pdf)
+        #     if move_line.pdf_boleto_id:
+        #         temp_pdf = tempfile.TemporaryFile()
+        #         decode_data = b64decode(move_line.pdf_boleto_id.datas, validate=True)
+        #         temp_pdf.write(decode_data)
+        #         temp_pdf.seek(0)
+        #         pdf_merger.append(temp_pdf)
+        #         temp_files.append(temp_pdf)
 
-        temp_merged = tempfile.TemporaryFile()
-        pdf_merger.write(temp_merged)
-        pdf_merger.close()
+        #         temp_merged = tempfile.TemporaryFile()
+        #         pdf_merger.write(temp_merged)
+        #         pdf_merger.close()
 
-        temp_merged.seek(0)
-        datas = b64encode(temp_merged.read())
+        #         temp_merged.seek(0)
+        #         datas = b64encode(temp_merged.read())
 
-        self.pdf_boletos_id = self.env["ir.attachment"].create(
-            {
-                "name": ("Boleto %s" % self.display_name.replace("/", "-")),
-                "datas": datas,
-                "type": "binary",
-                "res_id": self.id,
-            }
-        )
+        # self.pdf_boletos_id = self.env["ir.attachment"].create(
+        #     {
+        #         "name": ("Boleto %s" % self.display_name.replace("/", "-")),
+        #         "res_model": self._name,
+        #         "res_id": self.id,
+        #         "datas": datas,
+        #         "mimetype": "application/pdf",
+        #         "type": "binary",
+        #     }
+        # )
 
-        for file in temp_files:
-            file.close()
+        # for file in temp_files:
+        #     file.close()
 
     def action_pdf_boleto(self):
         """
@@ -58,26 +60,49 @@ class AccountMove(models.Model):
         invoice
         :return: actions.act_window
         """
-        try:
-            if not self.pdf_boletos_id:
-                self._merge_pdf_boletos()
+        for move_line in self.financial_move_line_ids:
+            sem_boleto = False
+            if move_line.own_number and not move_line.pdf_boleto_id:
+                move_line.generate_pdf_boleto()
+            else:
+                sem_boleto = True
+            if sem_boleto:
+                raise UserError("Boleto não gerado. Verifique no menu Clientes/Debit Orders.")
+            # if not self.pdf_boletos_id:
+                # self._merge_pdf_boletos()
+            # boleto_id = move_line.pdf_boleto_id
+            # base_url = self.env["ir.config_parameter"].get_param("web.base.url")
+            # download_url = "/web/content/%s/%s?download=True" % (
+            #     str(boleto_id.id),
+            #     boleto_id.name,
+            # )
 
-            boleto_id = self.pdf_boletos_id
-            base_url = self.env["ir.config_parameter"].get_param("web.base.url")
-            download_url = "/web/content/%s/%s?download=True" % (
-                str(boleto_id.id),
-                boleto_id.name,
-            )
+            # return {
+            #     "type": "ir.actions.act_url",
+            #     "url": str(base_url) + str(download_url),
+            #     "target": "new",
+            # }
+        # try:
+        #     if not self.pdf_boletos_id:
+        #         self._merge_pdf_boletos()
 
-            return {
-                "type": "ir.actions.act_url",
-                "url": str(base_url) + str(download_url),
-                "target": "new",
-            }
-        except Exception as error:
-            raise UserError(error)
+        #     boleto_id = self.pdf_boletos_id
+        #     base_url = self.env["ir.config_parameter"].get_param("web.base.url")
+        #     download_url = "/web/content/%s/%s?download=True" % (
+        #         str(boleto_id.id),
+        #         boleto_id.name,
+        #     )
+
+        #     return {
+        #         "type": "ir.actions.act_url",
+        #         "url": str(base_url) + str(download_url),
+        #         "target": "new",
+        #     }
+        # except Exception as error:
+        #     raise UserError(error)
 
     def action_invoice_cancel(self):
+        import pudb;pu.db
         try:
             for financial_move_line in self.financial_move_line_ids:
                 financial_move_line.drop_bank_slip()
@@ -93,63 +118,81 @@ class AccountMove(models.Model):
         except Exception as error:
             raise UserError(_(error))
 
+    # def _post(self, soft=True):
+    #     res = super()._post(soft=soft)
+    #     if not self.pdf_boletos_id:
+    #         import pudb;pu.db
+    #         self.action_pdf_boleto()
+    #     return res
+
     def load_cnab_info(self):
-        # Se não possui Modo de Pagto não há nada a ser feito
-        if not self.payment_mode_id:
-            return
-        # Se o Modo de Pagto é de saída (pgto fornecedor) não há nada a ser feito.
-        if self.payment_mode_id.payment_type == "outbound":
-            return
-        # Se não gera Ordem de Pagto não há nada a ser feito
-        if not self.payment_mode_id.payment_order_ok:
-            return
+        res = super().load_cnab_info()
         if (
             self.partner_bank_id.bank_id
-            != self.env.ref("l10n_br_base.res_bank_077")
-            and self.payment_mode_id.payment_method_id.code != "electronic"
+            == self.env.ref("l10n_br_base.res_bank_077")
+            and self.payment_mode_id.payment_method_id.code == "electronic"
             ):
-            return super().generate_payment_file()
-        else:
-            # TODO - apesar do campo financial_move_line_ids ser do tipo
-            #  compute esta sendo preciso chamar o metodo porque as vezes
-            #  ocorre da linha vir vazia o que impede de entrar no FOR
-            #  abaixo causando o não preenchimento de dados usados no Boleto,
-            #  isso deve ser melhor investigado
-            self._compute_financial()
-            for index, interval in enumerate(self.financial_move_line_ids):
-                inv_number = self.get_invoice_fiscal_number().split("/")[-1]
-                numero_documento = inv_number + "/" + str(index + 1).zfill(2)
+                # TODO - apesar do campo financial_move_line_ids ser do tipo
+                #  compute esta sendo preciso chamar o metodo porque as vezes
+                #  ocorre da linha vir vazia o que impede de entrar no FOR
+                #  abaixo causando o não preenchimento de dados usados no Boleto,
+                #  isso deve ser melhor investigado
+                self._compute_financial()
+                for index, interval in enumerate(self.financial_move_line_ids):
+                    inv_number = self.get_invoice_fiscal_number().split("/")[-1]
+                    numero_documento = inv_number + "/" + str(index + 1).zfill(2)
 
-                #sequence = self.payment_mode_id.own_number_sequence_id.next_by_id()
+                    #sequence = self.payment_mode_id.own_number_sequence_id.next_by_id()
 
-                # vem do Inter
-                # interval.own_number = (
-                #     sequence if interval.payment_mode_id.generate_own_number else "0"
-                # )
-                interval.document_number = numero_documento
-                interval.company_title_identification = hex(interval.id).upper()
-                instructions = ""
-                if self.eval_payment_mode_instructions:
-                    instructions = self.eval_payment_mode_instructions + "\n"
-                if self.instructions:
-                    instructions += self.instructions + "\n"
-                interval.instructions = instructions
-                # Codigo de Instrução do Movimento pode variar,
-                # mesmo no CNAB 240
-                # interval.mov_instruction_code_id = (
-                #     self.payment_mode_id.cnab_sending_code_id.id
-                # )
-            filtered_invoice_ids = self.filtered(
-                lambda s: (
-                    s.payment_mode_id and s.payment_mode_id.auto_create_payment_order
+                    # vem do Inter
+                    # interval.own_number = (
+                    #     sequence if interval.payment_mode_id.generate_own_number else "0"
+                    # )
+                    interval.document_number = numero_documento
+                    interval.company_title_identification = hex(interval.id).upper()
+                    instructions = ""
+                    if self.eval_payment_mode_instructions:
+                        instructions = self.eval_payment_mode_instructions + "\n"
+                    if self.instructions:
+                        instructions += self.instructions + "\n"
+                    interval.instructions = instructions
+                    # Codigo de Instrução do Movimento pode variar,
+                    # mesmo no CNAB 240
+                    # interval.mov_instruction_code_id = (
+                    #     self.payment_mode_id.cnab_sending_code_id.id
+                    # )
+                filtered_invoice_ids = self.filtered(
+                    lambda s: (
+                        s.payment_mode_id and s.payment_mode_id.auto_create_payment_order
+                    )
                 )
-            )
-            if filtered_invoice_ids:
-                # Criação das Linha na Ordem de Pagamento
-                pay_order_id = filtered_invoice_ids.create_account_payment_line()
-                # z = filtered_invoice_ids.payment_order_id
-                # Confirmar payment
-                pay = self.env['account.payment.order'].browse([pay_order_id['res_id']])
-                if pay:
-                    pay.draft2open()
-                    pay.open2generated()
+                # '{"seuNumero":"PAY0161","nossoNumero":"01345006506","codigoBarras":"07792974600000007800001112063827901345006506","linhaDigitavel":"0779000116     account_move.py:61 (0 hit
+                # 1206382790613450065068297460000000780"}'
+                if filtered_invoice_ids:
+                    # Criação das Linha na Ordem de Pagamento
+                    applicable_lines = False
+                    for move in self:
+                        if move.state != "posted":
+                            raise UserError(_("The invoice %s is not in Posted state") % move.name)
+                        applicable_lines = move.line_ids.filtered(
+                            lambda x: (
+                                not x.reconciled
+                                and x.payment_mode_id.payment_order_ok
+                                and x.account_id.internal_type in ("receivable", "payable")
+                                and not any(
+                                    p_state in ("draft", "open", "generated")
+                                    for p_state in x.payment_line_ids.mapped("state")
+                                )
+                            )
+                        )
+                    if applicable_lines:
+                        pay_order_id = filtered_invoice_ids.create_account_payment_line()
+                        pay = self.env['account.payment.order'].browse([pay_order_id['res_id']])
+                        boleto_registrado = True
+                        for payline in pay.payment_line_ids:
+                            if not payline.move_line_id.own_number:
+                                boleto_registrado = False
+                        if boleto_registrado:
+                            pay.draft2open()
+                            pay.open2generated()
+        return res

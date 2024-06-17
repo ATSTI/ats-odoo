@@ -69,8 +69,8 @@ class AccountPaymentOrder(models.Model):
                 amount=line.amount_currency,
                 payer=payer,
                 issue_date=line.create_date,
-                due_date=line.ml_maturity_date or line.move_line_id.date_maturity,
-                identifier=line.order_id.name,
+                due_date=line.ml_maturity_date,
+                identifier=line.document_number,
                 instructions=[],
             )
             dados.append(slip)
@@ -88,15 +88,19 @@ class AccountPaymentOrder(models.Model):
                 client_secret=self.journal_id.bank_secret_id,
             )
             data = self._generate_bank_inter_boleto_data()
+            import pudb;pu.db
             for item in data:
-                resposta = api.boleto_inclui(item._emissao_data())
+                try:
+                    resposta = api.boleto_inclui(item._emissao_data())
+                except:
+                    return "Erro para enviar o boleto"
                 payment_line_id = self.payment_line_ids.filtered(
-                    lambda line: line.order_id.name == item._identifier
+                    lambda line: line.document_number == item._identifier
                 )
                 if payment_line_id:
                     payment_line_id.move_line_id.own_number = resposta["nossoNumero"]
                     payment_line_id.own_number = resposta["nossoNumero"]
-        return False, False
+        return False
 
     def _gererate_bank_inter_api(self):
         """Realiza a conexão com o a API do banco inter"""
@@ -107,13 +111,16 @@ class AccountPaymentOrder(models.Model):
 
     def generate_payment_file(self):
         self.ensure_one()
+        import pudb;pu.db
         try:
             if (
                 self.company_partner_bank_id.bank_id
                 == self.env.ref("l10n_br_base.res_bank_077")
                 and self.payment_method_id.code == "electronic"
             ):
-                return self._gererate_bank_inter_api()
+                result = self._gererate_bank_inter_api()
+                if result:
+                    raise UserError(_(result))
             else:
                 return super().generate_payment_file()
         except Exception as error:

@@ -12,6 +12,10 @@ from odoo.addons.l10n_br_bank_api_inter.parser.inter_file_parser import InterFil
 
 from .arquivo_certificado import ArquivoCertificado
 
+from odoo.addons.l10n_br_account_payment_order.constants import (
+    BR_CODES_PAYMENT_ORDER,
+)
+
 _logger = logging.getLogger(__name__)
 
 try:
@@ -40,25 +44,31 @@ class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 
     pdf_boleto_id = fields.Many2one(
-        comodel_name="ir.attachment", string="PDF Boleto", ondelete="cascade"
+        comodel_name="ir.attachment",
+        string="PDF Boleto",
+        ondelete="cascade",
+        copy=False,
     )
 
     write_off_choice = fields.Selection(
         selection=BAIXAS,
         string="Drop Bank Slip Options",
         default="apedidodocliente",
+        copy=False,
     )
 
     bank_inter_state = fields.Selection(
         selection=ESTADO,
         string="State",
         default="emaberto",
+        copy=False,
     )
 
     write_off_by_api = fields.Boolean(
         string="Slip write off by Bank Inter Api",
         default=False,
         readonly=True,
+        copy=False,
     )
 
     def generate_pdf_boleto(self):
@@ -67,7 +77,6 @@ class AccountMoveLine(models.Model):
         """
         if self.own_number and self.pdf_boleto_id:
             return
-
         order_id = self.payment_line_ids[0].order_id
         with ArquivoCertificado(order_id.journal_id, "w") as (key, cert):
             api = ApiInter(
@@ -84,9 +93,12 @@ class AccountMoveLine(models.Model):
             self.pdf_boleto_id = self.env["ir.attachment"].create(
                 {
                     "name": ("Boleto %s" % self.name),
+                    "res_model": 'account.move',
+                    "res_id": self.move_id.id,
                     "datas": datas_json["pdf"],
+                    "mimetype": "application/pdf",
                     "type": "binary",
-                    "res_id": self.id,
+
                 }
             )
 
@@ -144,8 +156,9 @@ class AccountMoveLine(models.Model):
                             client_id=self.journal_payment_mode_id.bank_client_id,
                             client_secret=self.journal_payment_mode_id.bank_secret_id,
                         )
-                        api.boleto_baixa(self.own_number, codigo_baixa)
-                self.bank_inter_state = "baixado"
+                        resultado = api.boleto_baixa(self.own_number, codigo_baixa)
+                        if resultado:
+                            self.bank_inter_state = "baixado"
         except Exception as error:
             raise UserError(_(error))
 
@@ -163,7 +176,7 @@ class AccountMoveLine(models.Model):
                         client_id=self.journal_payment_mode_id.bank_client_id,
                         client_secret=self.journal_payment_mode_id.bank_secret_id,
                     )
-                    if self.own_number and len(self.own_number) == 11:
+                    if self.own_number:
 
                         resposta = api.consulta_boleto_detalhado(
                             nosso_numero=self.own_number
@@ -235,3 +248,48 @@ class AccountMoveLine(models.Model):
                 move_line.search_bank_slip()
         except Exception as error:
             raise UserError(_(error))
+
+    def _prepare_payment_line_vals(self, payment_order):
+        vals = super()._prepare_payment_line_vals(payment_order)
+        # PIX pode ser necessário tanto para integragração via CNAB quanto API.
+        if self.partner_id.pix_key_ids:
+            vals["partner_pix_id"] = self.partner_id.pix_key_ids[0].id
+        # Preenchendo apenas nos casos CNAB
+        if self.payment_mode_id.payment_method_code in BR_CODES_PAYMENT_ORDER or self.payment_mode_id.payment_method_code == "electronic":
+            vals.update(
+                {
+                    "own_number": self.own_number,
+                    "document_number": self.document_number,
+                    "company_title_identification": self.company_title_identification,
+                    # Codigo de Instrução do Movimento
+                    "mov_instruction_code_id": self.mov_instruction_code_id.id,
+                    "communication_type": "cnab",
+                    # Campos abaixo estão sendo adicionados devido ao problema de
+                    # Ordens de Pagto vinculadas devido o ondelete=restrict no
+                    # campo move_line_id do account.payment.line
+                    # TODO: Aguardando a possibilidade de alteração no
+                    #  modulo account_payment_order na v14
+                    "ml_maturity_date": self.date_maturity,
+                    "move_id": self.move_id.id,
+                    "service_type": self._get_default_service_type(),
+                    "discount_value": self.currency_id.round(
+                        self.amount_currency * (self.boleto_discount_perc / 100)
+                    ),
+                }
+            )
+
+            # Se for uma solicitação de baixa do título é preciso informar o
+            # campo debit o codigo original coloca o amount_residual
+            if (
+                self.mov_instruction_code_id.id
+                == self.payment_mode_id.cnab_write_off_code_id.id
+            ):
+                vals["amount_currency"] = self.credit or self.debit
+
+            if self.env.context.get("rebate_value"):
+                vals["rebate_value"] = self.env.context.get("rebate_value")
+
+            if self.env.context.get("discount_value"):
+                vals["discount_value"] = self.env.context.get("discount_value")
+
+        return vals

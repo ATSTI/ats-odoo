@@ -60,13 +60,20 @@ class AccountMove(models.Model):
         invoice
         :return: actions.act_window
         """
-        for move_line in self.financial_move_line_ids:
-            sem_boleto = False
+        for move in self:
+            for move_line in move.financial_move_line_ids:
+                if not move_line.own_number:
+                    # gerar boleto
+                    move.payment_order_id.open2generated()
+                    break
+        boleto_gerado = False
+        for move_line in self.financial_move_line_ids:            
             if move_line.own_number and not move_line.pdf_boleto_id:
                 move_line.generate_pdf_boleto()
+                boleto_gerado = True
             else:
-                sem_boleto = True
-            if sem_boleto:
+                boleto_gerado = True
+            if not boleto_gerado:
                 raise UserError("Boleto não gerado. Verifique no menu Clientes/Debit Orders.")
             # if not self.pdf_boletos_id:
                 # self._merge_pdf_boletos()
@@ -101,27 +108,25 @@ class AccountMove(models.Model):
         # except Exception as error:
         #     raise UserError(error)
 
-    def action_invoice_cancel(self):
-        import pudb;pu.db
-        try:
-            for financial_move_line in self.financial_move_line_ids:
-                financial_move_line.drop_bank_slip()
-                if financial_move_line.bank_inter_state == "baixado":
-                    return self.button_cancel()
-                else:
-                    raise UserError(
-                        _(
-                            "All Account Move Line related to Invoice must haver their "
-                            "status set to 'write off' to be able to cancel."
-                        )
-                    )
-        except Exception as error:
-            raise UserError(_(error))
+    # def action_invoice_cancel(self):
+    #     try:
+    #         for financial_move_line in self.financial_move_line_ids:
+    #             financial_move_line.drop_bank_slip()
+    #             if financial_move_line.bank_inter_state == "baixado":
+    #                 return self.button_cancel()
+    #             else:
+    #                 raise UserError(
+    #                     _(
+    #                         "All Account Move Line related to Invoice must haver their "
+    #                         "status set to 'write off' to be able to cancel."
+    #                     )
+    #                 )
+    #     except Exception as error:
+    #         raise UserError(_(error))
 
     # def _post(self, soft=True):
     #     res = super()._post(soft=soft)
     #     if not self.pdf_boletos_id:
-    #         import pudb;pu.db
     #         self.action_pdf_boleto()
     #     return res
 
@@ -188,11 +193,9 @@ class AccountMove(models.Model):
                     if applicable_lines:
                         pay_order_id = filtered_invoice_ids.create_account_payment_line()
                         pay = self.env['account.payment.order'].browse([pay_order_id['res_id']])
-                        boleto_registrado = True
-                        for payline in pay.payment_line_ids:
-                            if not payline.move_line_id.own_number:
-                                boleto_registrado = False
-                        if boleto_registrado:
-                            pay.draft2open()
-                            pay.open2generated()
+                        if not self.payment_order_id:
+                            # nao sei pq este campo nao e gravado
+                            self.payment_order_id = pay_order_id['res_id']
+                        pay.draft2open()
+                        #     pay.open2generated()
         return res

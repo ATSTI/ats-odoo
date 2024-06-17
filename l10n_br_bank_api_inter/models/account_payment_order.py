@@ -88,19 +88,15 @@ class AccountPaymentOrder(models.Model):
                 client_secret=self.journal_id.bank_secret_id,
             )
             data = self._generate_bank_inter_boleto_data()
-            import pudb;pu.db
             for item in data:
-                try:
-                    resposta = api.boleto_inclui(item._emissao_data())
-                except:
-                    return "Erro para enviar o boleto"
+                resposta = api.boleto_inclui(item._emissao_data())
                 payment_line_id = self.payment_line_ids.filtered(
                     lambda line: line.document_number == item._identifier
                 )
                 if payment_line_id:
                     payment_line_id.move_line_id.own_number = resposta["nossoNumero"]
                     payment_line_id.own_number = resposta["nossoNumero"]
-        return False
+        return False, False
 
     def _gererate_bank_inter_api(self):
         """Realiza a conexão com o a API do banco inter"""
@@ -109,19 +105,16 @@ class AccountPaymentOrder(models.Model):
         else:
             raise NotImplementedError
 
-    def generate_payment_file(self):
+    def open2generated(self):
         self.ensure_one()
-        import pudb;pu.db
         try:
             if (
                 self.company_partner_bank_id.bank_id
                 == self.env.ref("l10n_br_base.res_bank_077")
                 and self.payment_method_id.code == "electronic"
             ):
-                result = self._gererate_bank_inter_api()
-                if result:
-                    raise UserError(_(result))
+                self._gererate_bank_inter_api()
             else:
-                return super().generate_payment_file()
+                return super().open2generated()
         except Exception as error:
             raise UserError(_(error))

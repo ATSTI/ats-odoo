@@ -27,6 +27,8 @@ class ContractContract(models.Model):
     def _recurring_create_invoice(self, date_ref=False):
         invoices_values, contratos = self._prepare_recurring_invoices_values(date_ref)
         moves = self.env["account.move"].create(invoices_values)
+        if not contratos:
+            return moves
         for ctr in contratos:
             if moves.state == "draft":
                 moves.action_post()
@@ -114,7 +116,7 @@ class ContractContract(models.Model):
         # Compute the recurring_next_date on the contract based on the one
         # defined on line level.
         for contract in self:
-            if contract.recurring_rule_type == 'monthly':
+            if contract.recurring_rule_type == 'monthly' and contract.recurring_next_date:
                 contract.recurring_next_date = contract.recurring_next_date + relativedelta(months=1)
             # if contract.recurring_next_date.month < data_venc.month:
             # fatura = self._get_related_invoices()
@@ -142,6 +144,7 @@ class ContractContract(models.Model):
         :return: list of dictionaries (invoices values)
         """
         # ctr_ids = set()
+        ctr_ids = False
         # ctr_ids_resp = set()
         for ctr in self[:1]:
             if ctr.partner_responsability_id:
@@ -154,6 +157,8 @@ class ContractContract(models.Model):
                 ctr_ids = ctr
         invoices_values = []
         # ja_faturado = set()
+        if not ctr_ids:
+            return invoices_values, ctr_ids
         for contract in ctr_ids[:1]:
             # faturar = False
             # if ctr_ids_resp and contract.partner_responsability_id and contract.partner_responsability_id.id in ctr_ids_resp:

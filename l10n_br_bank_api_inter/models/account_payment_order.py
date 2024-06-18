@@ -69,8 +69,8 @@ class AccountPaymentOrder(models.Model):
                 amount=line.amount_currency,
                 payer=payer,
                 issue_date=line.create_date,
-                due_date=line.ml_maturity_date or line.move_line_id.date_maturity,
-                identifier=line.order_id.name,
+                due_date=line.ml_maturity_date,
+                identifier=line.document_number,
                 instructions=[],
             )
             dados.append(slip)
@@ -91,7 +91,7 @@ class AccountPaymentOrder(models.Model):
             for item in data:
                 resposta = api.boleto_inclui(item._emissao_data())
                 payment_line_id = self.payment_line_ids.filtered(
-                    lambda line: line.order_id.name == item._identifier
+                    lambda line: line.document_number == item._identifier
                 )
                 if payment_line_id:
                     payment_line_id.move_line_id.own_number = resposta["nossoNumero"]
@@ -105,7 +105,7 @@ class AccountPaymentOrder(models.Model):
         else:
             raise NotImplementedError
 
-    def generate_payment_file(self):
+    def open2generated(self):
         self.ensure_one()
         try:
             if (
@@ -113,8 +113,8 @@ class AccountPaymentOrder(models.Model):
                 == self.env.ref("l10n_br_base.res_bank_077")
                 and self.payment_method_id.code == "electronic"
             ):
-                return self._gererate_bank_inter_api()
+                self._gererate_bank_inter_api()
             else:
-                return super().generate_payment_file()
+                return super().open2generated()
         except Exception as error:
             raise UserError(_(error))

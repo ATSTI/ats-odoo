@@ -36,6 +36,7 @@
                 <field name="bank_inter_state" string="State" />
                 <field name="write_off_choice" string="Write Off" />
                 <field name="write_off_by_api" string="Write Off by API" />
+                <field name="pdf_boleto_id" />
             </field>
 
         </field>

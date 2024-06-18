@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <template id="report_barbosa_template">
+    <t t-name="service_template">
+        <t t-call="web.html_container">            
+            <t t-foreach="docs" t-as="o">
+                <style>
+                    *{
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
+                        text-transform: uppercase;
+                    }
+                    .company{
+                        width: 100%;
+                    }
+                    .logo{
+                        width: 20%;
+                        padding: 0 2px;
+                        border: thin solid black;
+                    }
+                    .address{
+                        width: 49,5%;
+                        border: thin solid black;
+                        padding: 10px;
+                    }
+                    .address span{
+                        font-size: 12px;
+                    }
+                    .shipping{
+                        width: 29,5%;
+                        border: thin solid black;
+                        padding: 10px;
+                    }
+                    .shipping &gt; span{
+                        font-size: 11px;
+                    }
+                    .data_receipt{
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 4px;
+                    }
+                    .data_receipt td{
+                        border: thin solid black;
+                        width: 19%;
+                        text-align: center;
+                        font-size: 12px;
+                        padding: 8px 0;
+                    }
+                    #receipt{
+                        width: 24%;
+                        font-size: 19px;
+                        text-align: center;
+                    }
+                    .extensive_value{
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin: 5px 0;
+                    }
+                    .extensive_value td:first-child{
+                        width: 8%;
+                        border: thin solid black;
+                        text-align: left; 
+                        font-size: 12px;
+                        padding: 8px 4px;
+                    }
+                    .extensive_value td:last-child{
+                        width: 92%;
+                        border: thin solid black;
+                        text-align: left; 
+                        padding: 8px 0 8px 85px;
+                        font-size: 12px;
+                    }
+                    .client{
+                        width: 100%;
+                        border: thin solid black;
+                        padding: 8px;
+                        margin-bottom: 5px;
+                    }
+                    .client td{
+                        font-size: 12px;
+                        padding: 12px 0;
+                        border: 0;
+                    }
+                    .service{
+                        width: 100%;
+                        height: 500px;
+                        border-collapse: collapse;
+                        font-size: 12px;
+                    }
+                    .service td{
+                        text-align: center;
+                        padding: 3px;
+                        border-left: thin solid black;
+                        border-right: thin solid black;
+                    }
+                    #items_head{
+                        height: 20px;
+                        border: thin solid black;
+                    }
+                    #items{
+                        height: 10px;
+                    }
+                    #total td{
+                        padding: 12px 0;
+                        border: thin solid black;
+                        height: 30px;
+                    }
+                    #total td:first-child{
+                        border: 0;
+                        text-align: right;
+                        vertical-align: middle;
+                        padding: 0 12px;
+                    }
+                    .message{
+                        width: 100%;
+                        border: thin solid black;
+                        font-size: 8px;
+                        padding: 5px;
+                        margin-top: 5px;
+                    }
+                    .dashed{
+                        width: 100%;
+                        border: 1px dashed;
+                        margin: 7px 0;
+                    }
+                    .signature{
+                        width: 100%;
+                        height: 80px;
+                        font-size: 8px;
+                        border-collapse: collapse;
+                    }
+                    .signature td{
+                        border: thin solid black;
+                        padding: 4px;
+                    }
+                    .signature p, span{
+                        text-align: left;
+                    }
+                </style>
+                <div class="page">
+                    <div class="oe_structure"/>
+                    <br/>
+                    <table style="border: 0px solid; width:100%">
+                        <tr>
+                            <td style="border: 0px solid; width:24% ; height:50px">
+                                <div style="width: 100%;float: left;">
+                                    <img t-attf-src="data:image/*;base64,{{o.company_id.logo}}" t-att-alt="o.company_id.name" style="width:76%; height:110px"/>
+                                </div>
+                            </td>
+                            <td style="text-align: right; border: 0px solid; width:38%; text-align: left">
+                                <span style="font-size:14px" t-field="o.company_id.name"/>                                
+                                <br/><span style="font-size:14px">CNPJ/CPF: </span><span style="font-size:14px" t-field="o.company_id.cnpj_cpf"/>
+                                <br/><span style="font-size:14px" t-field="o.company_id.street_name"/><span style="font-size:14px"> , </span><span style="font-size:14px" t-field="o.company_id.street_number"/>
+                                <br/><span style="font-size:14px" t-field="o.company_id.phone"/>
+                            </td>
+                            <td style="text-align: right; border: 0px solid; width:38%">
+                                <span style="font-size:14px">CEP: </span><span style="font-size:14px" t-field="o.company_id.zip"/>
+                                <br/><span style="font-size:14px" t-field="o.company_id.email"/>
+                                <br/><span style="font-size:14px" t-field="o.company_id.website"/>
+                            </td>
+                        </tr>
+                    </table>
+                    <br/>
+                    <span>----------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+                    <br/>
+                    <table style="border: 0px solid #dcdcdc; width: 50%; float: left">
+                        <tr>
+                            <td>
+                                <span style="font-size:18px"><b>Dados do Cliente:</b></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span t-field="o.partner_id.name" style="font-size:14px"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span t-field="o.partner_id.cnpj_cpf" style="font-size:14px"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span t-field="o.partner_id.street_name" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-field="o.partner_id.street_number" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-field="o.partner_id.city_id.name" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-fieldpa="o.partner_id.district" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-field="o.partner_id.state_id.name" style="font-size:14px"/>
+                            </td>
+                        </tr>
+                    </table>
+                    <table style="border: 0px solid #dcdcdc; width: 40%; float: right; text-align: right;">
+                        <tr>
+                            <td>
+                                <span style="font-size:14px">Pedido - <span t-field="o.name"/></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span style="font-size:14px">Vendedor: <span t-field="o.user_id"/></span>
+                            </td>
+                        </tr>
+                    </table>
+                    <br></br>
+                    <br></br>
+                    <br></br>
+                    <t t-set="display_discount" t-value="any(l.discount for l in o.invoice_line_ids)"/>
+                    <table style="border: solid 1px #DDD; border-collapse: collapse; width: 100%;">
+                        <tr>
+                            <th name="th_description" class="text-left" style="border: solid 1px #000000; border-collapse: collapse; width: 44%;; font-size: 16px; height:30px" >Descrição</th>
+                            <th name="th_quantity" class="text-right" style="border: solid 1px #000000; border-collapse: collapse; width: 8%;; font-size: 16px; height:30px">Qntd</th>
+                            <th name="th_subtotal" class="text-right" style="border: solid 1px #000000; border-collapse: collapse; width: 20%;; font-size: 16px; height:30px">
+                                <span groups="account.group_show_line_subtotals_tax_excluded">Subtotal</span>
+                                <span groups="account.group_show_line_subtotals_tax_included">Preço total</span>
+                            </th>
+                        </tr>
+                        <t t-set="numero_linhas" t-value="0"/>
+                        <t t-foreach="o.invoice_line_ids" t-as="line">
+                            <t t-set="numero_linhas" t-value="numero_linhas + 1"/>
+                        </t>
+                        <tbody class="sale_tbody">
+                            <t t-set="current_subtotal" t-value="0"/>
+                            <t t-set="linha" t-value="0"/>
+                            <t t-foreach="o.invoice_line_ids" t-as="line">
+                                <t t-set="linha" t-value="linha + 1"/>
+                                <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal" groups="account.group_show_line_subtotals_tax_excluded"/>
+                                <t t-set="current_subtotal" t-value="current_subtotal + line.price_total" groups="account.group_show_line_subtotals_tax_included"/>
+                                <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
+                                    <t t-if="not line.display_type">
+                                        <td name="td_name" style="border: solid 1px #000000; border-collapse: collapse; width: 44%; font-size: 11px; height:20px"><span t-field="line.name"/></td>
+                                        <td name="td_quantity" class="text-right" style="border: solid 1px #000000; border-collapse: collapse; width: 8%; font-size: 11px; text-align: right; height:20px">
+                                            <span t-field="line.quantity"/>
+                                            <span t-field="line.product_uom_id"/>
+                                        </td>
+                                        <td name="td_subtotal" class="text-right o_price_total" style="border: solid 1px #000000; border-collapse: collapse; width: 20%; font-size: 11px; text-align: right; height:20px">
+                                            <span t-field="line.price_subtotal" groups="account.group_show_line_subtotals_tax_excluded"/>
+                                        </td>
+                                    </t>
+                                    <t t-if="line.display_type == 'line_section'">
+                                        <td name="td_section_line" colspan="99">
+                                            <span t-field="line.name"/>
+                                        </td>
+                                        <t t-set="current_section" t-value="line"/>
+                                        <t t-set="current_subtotal" t-value="0"/>
+                                    </t>
+                                    <t t-if="line.display_type == 'line_note'">
+                                        <td name="td_note_line" colspan="99">
+                                            <span t-field="line.name"/>
+                                        </td>
+                                    </t>
+                                </tr>
+
+                                <t t-if="current_section and (line_last or o.order_line[line_index+1].display_type == 'line_section')">
+                                    <tr class="is-subtotal text-right">
+                                        <td name="td_section_subtotal" colspan="99">
+                                            <strong class="mr16">Subtotal</strong>
+                                            <span t-esc="current_subtotal" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.pricelist_id.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </t>
+                            <t t-if="linha < numero_linhas"/>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="clearfix" name="so_total_summary">
+                    <div id="total" class="row" name="total">
+                        <div t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ml-auto">
+                            <br/>
+                            <br/>
+                            <table class="table table-sm" style="border: solid 1px #000000; border-collapse: collapse; width: 50%; float: right">
+                                <tr class="border-black o_subtotal" style="">
+                                    <td name="td_amount_untaxed_label" style="border: solid 0px #000000; border-collapse: collapse; width: 25%;heigth: 25px; font-size: 14px; text-align:left"><strong>Subtotal</strong></td>
+                                    <td name="td_amount_untaxed" class="text-right" style="border: solid 0px #000000; border-collapse: collapse; width: 25%;heigth: 25px; font-size: 14px; text-align:right">
+                                        <span t-field="o.amount_untaxed"/>
+                                    </td>
+                                </tr>
+                                <tr class="border-black o_total">
+                                    <td name="td_amount_total_label" style="border: solid 0px #000000; border-collapse: collapse; width: 25%;heigth: 25px; font-size: 14px; text-align:left; background-color: #939595"><strong>Total</strong></td>
+                                    <td name="td_amount_total" class="text-right" style="border: solid 0px #000000; border-collapse: collapse; width: 25%;heigth: 25px; font-size: 14px; text-align:right; background-color: #939595">
+                                        <span t-field="o.amount_total"/>
+                                    </td>
+                                </tr>
+                            </table>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <span style="font-size:14px">Data da fatura: <span t-field="o.invoice_date"/></span>
+                            <br/>
+                            <br/>
+                            <span>___________________________________</span>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </t>
+    </template>
+    <template id="report_saleorder_barbosa">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="report_barbosa.report_barbosa_template" t-lang="o.partner_id.lang"/>
+                <br/>
+                <t t-call="report_barbosa.report_barbosa_template" t-lang="o.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+</odoo>

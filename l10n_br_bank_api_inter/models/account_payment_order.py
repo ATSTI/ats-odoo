@@ -3,7 +3,7 @@
 
 import logging
 
-from odoo import _, models
+from odoo import _, models, fields
 from odoo.exceptions import UserError
 
 from .arquivo_certificado import ArquivoCertificado
@@ -114,6 +114,11 @@ class AccountPaymentOrder(models.Model):
                 and self.payment_method_id.code == "electronic"
             ):
                 self._gererate_bank_inter_api()
+                self.write({
+                    "date_generated": fields.Date.context_today(self),
+                    "state": "generated",
+                    "generated_user_id": self._uid,
+                })
             else:
                 return super().open2generated()
         except Exception as error:

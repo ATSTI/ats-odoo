@@ -243,13 +243,6 @@
                                         </td>
                                     </t>
                                 </tr>
-                                <t t-foreach="range(linhas)" t-as="compl">
-                                    <tr style="height:17px">
-                                        <td style="border: 1px solid #000000; height:20px; border-collapse: collapse;"></td> 
-                                        <td style="border: 1px solid #000000; height:20px; border-collapse: collapse;"></td>
-                                        <td style="border: 1px solid #000000; height:20px; border-collapse: collapse;"></td>
-                                    </tr>
-                                </t>
 
                                 <t t-if="current_section and (line_last or o.order_line[line_index+1].display_type == 'line_section')">
                                     <tr class="is-subtotal text-right">
@@ -260,7 +253,13 @@
                                     </tr>
                                 </t>
                             </t>
-                            
+                            <t t-foreach="range(linhas)" t-as="compl">
+                                <tr style="height:17px">
+                                    <td style="border: 1px solid #000000; height:20px; border-collapse: collapse;"></td> 
+                                    <td style="border: 1px solid #000000; height:20px; border-collapse: collapse;"></td>
+                                    <td style="border: 1px solid #000000; height:20px; border-collapse: collapse;"></td>
+                                </tr>
+                            </t>
                         </tbody>
                     </table>
                 </div>

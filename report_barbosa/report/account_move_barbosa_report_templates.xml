@@ -201,6 +201,7 @@
                     <br></br>
                     <br></br>
                     <br></br>
+                    <br></br>
                     <t t-set="display_discount" t-value="any(l.discount for l in o.invoice_line_ids)"/>
                     <table style="border: solid 1px #DDD; border-collapse: collapse; width: 100%;">
                         <tr>
@@ -211,15 +212,11 @@
                                 <span groups="account.group_show_line_subtotals_tax_included">Preço total</span>
                             </th>
                         </tr>
-                        <t t-set="numero_linhas" t-value="0"/>
-                        <t t-foreach="o.invoice_line_ids" t-as="line">
-                            <t t-set="numero_linhas" t-value="numero_linhas + 1"/>
-                        </t>
+                        <t t-set="linhas" t-value="8" />
                         <tbody class="sale_tbody">
                             <t t-set="current_subtotal" t-value="0"/>
-                            <t t-set="linha" t-value="0"/>
                             <t t-foreach="o.invoice_line_ids" t-as="line">
-                                <t t-set="linha" t-value="linha + 1"/>
+                                <t t-set="linhas" t-value="linhas - 1"/>
                                 <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal" groups="account.group_show_line_subtotals_tax_excluded"/>
                                 <t t-set="current_subtotal" t-value="current_subtotal + line.price_total" groups="account.group_show_line_subtotals_tax_included"/>
                                 <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
@@ -246,6 +243,13 @@
                                         </td>
                                     </t>
                                 </tr>
+                                <t t-foreach="range(linhas)" t-as="compl">
+                                    <tr style="height:17px">
+                                        <td style="border: 1px solid #000000; height:20px; border-collapse: collapse;"></td> 
+                                        <td style="border: 1px solid #000000; height:20px; border-collapse: collapse;"></td>
+                                        <td style="border: 1px solid #000000; height:20px; border-collapse: collapse;"></td>
+                                    </tr>
+                                </t>
 
                                 <t t-if="current_section and (line_last or o.order_line[line_index+1].display_type == 'line_section')">
                                     <tr class="is-subtotal text-right">
@@ -256,7 +260,7 @@
                                     </tr>
                                 </t>
                             </t>
-                            <t t-if="linha < numero_linhas"/>
+                            
                         </tbody>
                     </table>
                 </div>
@@ -279,8 +283,6 @@
                                     </td>
                                 </tr>
                             </table>
-                            <br/>
-                            <br/>
                             <br/>
                             <span style="font-size:14px">Data da fatura: <span t-field="o.invoice_date"/></span>
                             <br/>

@@ -167,22 +167,22 @@
                     <table style="border: 0px solid #dcdcdc; width: 50%; float: left">
                         <tr>
                             <td>
-                                <span style="font-size:18px"><b>Dados do Cliente:</b></span>
+                                <span style="font-size:16px"><b>Dados do Cliente:</b></span>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <span t-field="o.partner_id.name" style="font-size:14px"/>
+                                <span t-field="o.partner_id.name" style="font-size:13px"/>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <span t-field="o.partner_id.cnpj_cpf" style="font-size:14px"/>
+                                <span t-field="o.partner_id.cnpj_cpf" style="font-size:13px"/>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <span t-field="o.partner_id.street_name" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-field="o.partner_id.street_number" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-field="o.partner_id.city_id.name" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-fieldpa="o.partner_id.district" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-field="o.partner_id.state_id.name" style="font-size:14px"/>
+                                <span t-field="o.partner_id.street_name" style="font-size:11px"/><span style="font-size:11px"> - </span><span t-field="o.partner_id.street_number" style="font-size:11px"/><span style="font-size:11px"> - </span><span t-field="o.partner_id.city_id.name" style="font-size:11px"/><span style="font-size:11px"> - </span><span t-fieldpa="o.partner_id.district" style="font-size:11px"/><span style="font-size:11px"> - </span><span t-field="o.partner_id.state_id.name" style="font-size:11px"/>
                             </td>
                         </tr>
                     </table>
@@ -252,6 +252,7 @@
                                         </td>
                                     </tr>
                                 </t>
+                                
                             </t>
                             <t t-foreach="range(linhas)" t-as="compl">
                                 <tr style="height:17px">
@@ -297,9 +298,19 @@
     <template id="report_saleorder_barbosa">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
+                <t t-set="linhas" t-value="0" />
+                <t t-foreach="o.invoice_line_ids" t-as="line">
+                    <t t-set="linhas" t-value="linhas + 1"/>
+                </t>
                 <t t-call="report_barbosa.report_barbosa_template" t-lang="o.partner_id.lang"/>
                 <br/>
-                <t t-call="report_barbosa.report_barbosa_template" t-lang="o.partner_id.lang"/>
+                <t t-if="linhas &lt; 9" >
+                    <t t-call="report_barbosa.report_barbosa_template" t-lang="o.partner_id.lang"/>
+                </t>
+                <t t-if="linhas &gt; 8" >
+                    <div style="dislay: block;page-break-after: always;"/>
+                    <t t-call="report_barbosa.report_barbosa_template" t-lang="o.partner_id.lang"/>
+                </t>
             </t>
         </t>
     </template>

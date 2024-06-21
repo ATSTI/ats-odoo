@@ -31,9 +31,9 @@ class FiscalDocument(models.Model):
                 if campo_erro == "xLgr":
                     msg.add(f" \n Rua + Bairro + Complemento: máximo 60 caracteres. {link_partner}")
                 if campo_erro == "xNome":
-                    msg.add(f" \n Nome: máximo 60 caracteres.{link_partner}")
-                if campo_erro == "xFant":
                     msg.add(f" \n Razão social: máximo 60 caracteres.{link_partner}")
+                if campo_erro == "xFant":
+                    msg.add(f" \n Nome: máximo 60 caracteres.{link_partner}")
                 if campo_erro == "natOp":
                     msg.add(f" \n Natureza da Operação: máximo 60 caracteres.")
 

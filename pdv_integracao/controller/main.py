@@ -77,7 +77,8 @@ class IntegracaoPdv(http.Controller):
         lista = []
         for prd in prod_ids:
             prod = {}
-            ncm = ''
+            # ncm = ''
+            ncm = '00000000'
             if prd.ncm_id:
                 ncm = prd.ncm_id.code
                 if ncm:
@@ -91,7 +92,7 @@ class IntegracaoPdv(http.Controller):
             produto = unidecode(produto)
             prod['produto'] = produto
             prod['valor_prazo'] = prd.list_price
-            prod['custo'] = prd.standard_price
+            prod['custo'] = prd.standard_price or 0.0
             prod['tipo_venda'] = prd.tipo_venda
             # prod['rateio'] = prd.rateio
             prod['qtdeatacado'] = prd.qtde_atacado
@@ -104,9 +105,12 @@ class IntegracaoPdv(http.Controller):
             else:
                 codpro = str(prd.id)
             prod['codpro'] = codpro[:15]
-            if prd.icms_origin:
-                prod['origem'] = prd.icms_origin
-            prod['ncm'] = ncm
+            #if prd.icms_origin:
+            prod['origem'] = prd.icms_origin or 0
+            if ncm:
+                prod['ncm'] = ncm
+            else:
+                prod['ncm'] = '00000000'
             prod['usa'] = 'S'
             if prd.barcode and len(prd.barcode) < 14:
                 prod['cod_barra'] = prd.barcode.strip()

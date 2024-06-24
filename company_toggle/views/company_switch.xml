@@ -20,7 +20,7 @@
         <menuitem 
             id="menu_reporting_config" 
             name="TESTE JS" 
-            parent="menu_board_root" 
+            parent="sale.sale_menu_root" 
             action="load_js_function"
             sequence="100" 
             groups="base.group_system"

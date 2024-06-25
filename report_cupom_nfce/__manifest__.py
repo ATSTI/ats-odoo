@@ -29,7 +29,7 @@
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['l10n_br_nfe'],
+    'depends': ['l10n_br_nfe', 'l10n_br_account_cpf'],
     'data': [
         'report/report_cupom_nfce.xml',
         # 'report/report_paper_format_lk.xml',

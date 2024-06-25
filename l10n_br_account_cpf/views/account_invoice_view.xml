@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Customer Invoice views -->
+    <record id="invoice_cpf_consumidor_form" model="ir.ui.view">
+        <field name="name">l10n_br_account.invoice.cpf.consumidor.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form" />
+        <field name="priority">299</field>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="cpf_consumidor"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

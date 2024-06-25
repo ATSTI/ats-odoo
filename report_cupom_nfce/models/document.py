@@ -35,6 +35,7 @@ class FiscalDocumentTransp(models.Model):
             "company_district": self.company_id.district,
             "company_city": self.company_id.city_id.display_name,
             "company_state": self.company_id.state_id.name,
+            "partner_cpf": self.move_ids.cpf_consumidor or '',
             "lines": self._prepare_nfce_danfe_line_values(),
             "total_product_quantity": len(
                 self.fiscal_line_ids.filtered(lambda line: line.product_id)

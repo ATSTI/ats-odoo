@@ -6,29 +6,42 @@
 				<script type="text/javascript" src="/odoo_javascript/static/src/js/my_javascript.js"></script> 
 			</xpath> 
 		</template> 
-        <record model="ir.ui.view" id="company_switch_view">
-            <field name="name">company.switch.view</field>
-            <field name="model">res.company</field>
-			<field name="inherit_id" ref="base.view_company_tree"/>
+        <record model="ir.ui.view" id="js_view">
+            <field name="name">js.view</field>
+            <field name="model">js</field>
             <field name="arch" type="xml">
-                <field name="name" position="after">
-					<widget name="my_widget"/>
-				</field>
-				<!-- <form string="js">
+				<form string="js">
                     <header>
                        <widget name="my_widget"/>
+					   <button name="button" class="odoo_javascript.my_widget" string="ok" />
+					   <button name="test_button" class="odoo_javascript.my_widget" string="teste2" />
                     </header>
                      <sheet>
 						<div>
                          	<h1><field name="name" string="New" nolabel="1"></field></h1>
                         </div>
 						<group>
-							<widget name="my_widget"/>
+							<widget name="my_widget" context="{'empresa': 'zzzzzzzzzzzzzzz'}"/>
 						</group>
+						<field name="company_id" >
+							<tree string="Empresas">
+								<field name="name" />
+							</tree>
+					   </field>
                     </sheet>
-                </form> -->	
+                </form>	
             </field>
-        </record>	
+        </record>		
+        <!-- <record model="ir.ui.view" id="company_switch_view">
+            <field name="name">company.switch.view</field>
+            <field name="model">res.company</field>
+			<field name="inherit_id" ref="base.view_company_form"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+					<widget name="my_widget"/>
+				</field>
+            </field>
+        </record>	 -->
 	    <record model="ir.actions.act_window" id="action_js">
 	        <field name="name">JS Button Click Demo</field>
 	        <field name="res_model">js</field>

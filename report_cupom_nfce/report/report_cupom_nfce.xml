@@ -143,8 +143,12 @@
                 <div style="display: flex; flex-direction: row-reverse; align-items: center; justify-content: space-between; margin: 10px 0;">
                     <div>
                         <div>
-                            <!-- TODO: Quando o consumidor for identificado deve haver o CPF ou CNPJ-->
-                            <p style="text-transform: uppercase; text-align: left; fonti-size: 18px; margin: 2px auto;">Consumidor Nao Identificado</p>
+                            <t t-if="partner_cpf">
+                                <p style="text-transform: uppercase; text-align: left; fonti-size: 18px; margin: 2px auto;">CNPJ/CPF: <t t-esc="partner_cpf" /></p>
+                            </t>
+                            <t t-if="partner_cpf == ''">
+                                <p style="text-transform: uppercase; text-align: left; fonti-size: 18px; margin: 2px auto;">Consumidor Nao Identificado</p>
+                            </t>
                         </div>
 
                         <div>

@@ -20,21 +20,24 @@
 ##############################################################################
 
 {
-    'name': 'Cupom NFC-e',
+    'name': 'Teste Alternar empresa',
     'version': '1.0',
     'category': 'Others',
     'sequence': 2,
-    'summary': 'relatorios personalizados',
+    'summary': 'alternar empresa',
     'description': """
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['l10n_br_nfe', 'l10n_br_account_cpf'],
+    'depends': ['sale'],
     'data': [
-        'report/report_cupom_nfce.xml',
-        # 'report/report_paper_format_lk.xml',
-
+        'views/company_switch.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'static/src/js/load_js_function.js',
+        ],
+    },
     'installable': True,
     'application': False,
 }

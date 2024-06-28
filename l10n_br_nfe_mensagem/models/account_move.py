@@ -23,7 +23,7 @@ class AccountMove(models.Model):
     def _onchange_partner_id(self):
         result = super()._onchange_partner_id()
         self.xml_error_message = False
-        if self.partner_id and self.document_type_id:
+        if self.partner_id and self.document_type_id and self.document_type_id.code == MODELO_FISCAL_NFE:
             max = ""
             if self.partner_id.street_name and self.partner_id.district:
                 max = self.partner_id.street_name or "" + self.partner_id.street2 or "" + self.partner_id.district or ""

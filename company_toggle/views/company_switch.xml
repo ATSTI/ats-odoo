@@ -1,29 +1,42 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?> 
 <odoo>
     <data>
-        <record model="ir.actions.server" id="load_js_function">
-            <field name="name">Load JS Function</field>
-            <field name="model_id" ref="sale.model_sale_order"/>
-            <field name="binding_model_id" ref="sale.model_sale_order" />
-            <field name="state">code</field>
-            <field name="code">
-                if records:
-                    records.action_approve()
+		<template id="assets_backend" name="js backend" inherit_id="web.assets_backend"> 
+			<xpath expr="." position="inside"> 
+				<script type="text/javascript" src="/company_toggle/static/src/js/toggle_button.js"></script> 
+			</xpath> 
+		</template> 
+        <record model="ir.ui.view" id="js_view">
+            <field name="name">js.view</field>
+            <field name="model">js</field>
+            <field name="arch" type="xml">
+				<form >
+                    <header>
+                       <!-- <widget name='toaster_button' button_name="send_reminder_preview" class="btn btn-primary" title="Preview the reminder email by sending it to yourself." /> -->
+					</header>
+                     <sheet>
+						<div string="TESTE">
+                         	<h1><field name="name" string="New" nolabel="1"></field></h1>
+                        </div>
+						<field name="company_id" >
+							<tree string="Empresas">
+								<field name="name" />
+								<widget name="toggle_button"/>
+							</tree>
+					   </field>
+					   <widget name="toggle_button" type="button"/>
+                    </sheet>
+                </form>	
             </field>
-        </record>
-        
-        <record id="load_js_function" model="ir.actions.client">
-            <field name="name">Load JS Function</field>
-            <field name="tag">js_function</field>
-        </record>
+        </record>		
+	    <record model="ir.actions.act_window" id="action_js">
+	        <field name="name">ONDE ESTOU</field>
+	        <field name="res_model">js</field>
+	        <field name="view_mode">form</field>
+	    </record>
 
-        <menuitem 
-            id="menu_reporting_config" 
-            name="TESTE JS" 
-            parent="sale.sale_menu_root" 
-            action="load_js_function"
-            sequence="100" 
-            groups="base.group_system"
-        />
-    </data>
+		<menuitem id="js_main_menu" name="TESTE TROCA EMPRESA"/>
+		<menuitem id="js_sub_menu" name="BOTAO" parent="js_main_menu"/>
+		<menuitem id="js_button_click_menu" action="action_js" parent="js_sub_menu"/>
+    </data> 
 </odoo>

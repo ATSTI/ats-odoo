@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<template>
+
+    <t t-name="ToggleButton">
+        <button t-att-name="widget.button_name" type="button" class="btn btn-primary" t-att-title="widget.title">
+            BOTAO TESTE
+        </button>
+    </t>
+
+</template>

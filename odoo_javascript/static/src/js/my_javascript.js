@@ -38,7 +38,7 @@ odoo.define('odoo_javascript.my_widget', function (require) {
 		
 		this.$('#btn_click_me').click(function(context){
 			// alert("I am triggered from odoo javascript.");
-			session.setCompanies(1, [1]);
+			session.setCompanies(1, [2]);
 			console.log(context);
 		});
     },

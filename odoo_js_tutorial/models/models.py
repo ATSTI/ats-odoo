@@ -7,5 +7,5 @@ class odooTutorial(models.Model):
 
     name = fields.Char(string='Tutorial Name', required=True)
     number_of_videos = fields.Integer(string='Number of Videos', required=True)
-    company_id = fields.Many2one('res.company', 'Empresas', required=True)
+    company_id = fields.Many2one('res.company', 'Empresas')
 

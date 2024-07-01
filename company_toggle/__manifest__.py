@@ -29,15 +29,19 @@
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['sale'],
+    'depends': ['base'],
     'data': [
+        'security/ir.model.access.csv',
         'views/company_switch.xml',
     ],
     'assets': {
         'web.assets_backend': [
-            'static/src/js/load_js_function.js',
+            'static/src/js/toggle_button.js',
         ],
     },
+    'qweb': [
+        # "static/src/xml/toaster_button.xml",
+    ],
     'installable': True,
     'application': False,
 }

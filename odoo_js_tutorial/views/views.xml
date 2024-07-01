@@ -30,6 +30,9 @@
                             <field name="name"/>
                             <field name="number_of_videos"/>
                             <field name="company_id"/>
+                            <button name="button_comp" class="btn btn-info" type="button" t-on-click="Mbutton()">
+                                Test Javascript 1
+                            </button>
                         </group>
                     </sheet>
                   

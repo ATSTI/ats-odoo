@@ -3,6 +3,9 @@ odoo.define('odoo_js_tutorial.odoo_tutorial', function (require) {
 
     console.log('popup.js loadedasdsa')
     var FormController = require('web.FormController');
+	var session = require('web.session');
+	var FieldManagerMixin = require('web.FieldManagerMixin');
+    var id_empresa = 1
 
     var ExtendFormController = FormController.include({
         saveRecord: function () {
@@ -37,6 +40,7 @@ odoo.define('odoo_js_tutorial.odoo_tutorial', function (require) {
                 var page_url = url.replace('#', '?');
                 var params = parseURLParams(page_url);
                 console.log(params)
+                id_empresa = params['id'][0]
                 self._rpc({
                     model: 'odoo.tutorial',
                     method: 'search_read',
@@ -55,4 +59,33 @@ odoo.define('odoo_js_tutorial.odoo_tutorial', function (require) {
 
         }
     });
+    
+    var button = Button.extend(FieldManagerMixin, {
+        init: function Mbutton (parent, model, context) {
+            this._super(parent);
+            FieldManagerMixin.init.call(this);
+            this._super.apply(this, arguments);	
+        },
+    
+        start: function Mbutton (context) {
+            var self = this;
+            var nameField = this.$el.find('#name');
+            // nameField.val(barcodeValue);
+            // var dataset = this.dataset;
+            // var active_id = dataset.ids[dataset.index];
+            this._super.apply(this, arguments);
+    
+            // console.log(id_var);
+    
+            var html ='<button id="btn_click_me" class="btn btn-primary" >Click Me</button>';
+            this.$el.html(html);
+            console.log("gggggggggggggggggggggggggg");
+            
+            this.$('#btn_click_me').click(function(context){
+                // alert("I am triggered from odoo javascript.");
+                session.setCompanies(id_empresa, id_empresa);
+                console.log(context);
+            });
+        }
+    })
 });

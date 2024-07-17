@@ -221,8 +221,9 @@ class IntegracaoPdv(http.Controller):
             valor_pago = data['valor_pago']
             juro = data['juro']
         # TODO testar aqui se e a empresa mesmo
-        diarios_usados = http.request.env["ir.config_parameter"].sudo().get_param("pos.diario_contas")
-        diarios_usados = json.loads(diarios_usados)
+        #diarios_usados = http.request.env["ir.config_parameter"].sudo().get_param("pos.diario_contas")
+        #diarios_usados = json.loads(diarios_usados)
+        diarios_usados = [1,2]
         cc = http.request.env['account.account'].search([
             ('name', 'ilike', 'Cliente Padrao'),
             ('company_id', '=', user_id.company_id.id),

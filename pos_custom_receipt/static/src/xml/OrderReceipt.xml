@@ -10,8 +10,6 @@
                 <h2 class="pos-receipt-center-align">
                     <t t-esc="receipt.company.name" />
                 </h2>
-                <br/>
-                <br/>
                 <div style="text-align: Left;font-size: 125%;">
                     <t t-if="receipt.company.contact_address">
                         <div>

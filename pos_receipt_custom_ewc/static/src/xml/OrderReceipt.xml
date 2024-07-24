@@ -8,8 +8,10 @@
                     <br/>
                 </t> -->
                 <h2 class="pos-receipt-center-align">
-                    <t t-esc="receipt.company.name" />
+                    EWC COMERCIO DE FLORES E PLANTAS
                 </h2>
+                <p>EWC COMERCIO DE FLORES E PLANTAS</p>
+                <p>CNPJ/CPF: 55.286.946/0001-58</p>
                 <div style="text-align: Left;font-size: 125%;">
                     <t t-if="receipt.company.contact_address">
                         <div>

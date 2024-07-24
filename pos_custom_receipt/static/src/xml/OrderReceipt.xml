@@ -7,12 +7,10 @@
                     <img style="width: 15%; display: block; margin: 0 auto;" t-att-src="receipt.company.logo" alt="Logo"/>
                     <br/>
                 </t> -->
-                <!-- <t t-if="!receipt.company.logo">
-                    <h2 class="pos-receipt-center-align">
-                        <t t-esc="receipt.company.name" />
-                    </h2>
-                    <br/>
-                </t> -->
+                <h2 class="pos-receipt-center-align">
+                    <t t-esc="receipt.company.name" />
+                </h2>
+                <br/>
                 <br/>
                 <div style="text-align: Left;font-size: 125%;">
                     <t t-if="receipt.company.contact_address">
@@ -98,32 +96,32 @@
                     <t t-foreach="receipt.orderlines" t-as="line" t-key="line.id">
                         <tr>
                             <t t-if="isSimple(line)">
-                                <td style="border: 1px solid black; border-collapse: collapse; font-size:14px">
+                                <td style="font-size:14px">
                                     <div t-esc="line.product_name_wrapped[0]" />
                                 </td>
-                                <td style="border: 1px solid black; border-collapse: collapse; text-align:right ; font-size:14px">
+                                <td style="font-size:14px">
                                     <t t-esc="env.pos.format_currency_no_symbol(Math.round(line.quantity * Math.pow(10, env.pos.dp['Product Unit of Measure'])) / Math.pow(10, env.pos.dp['Product Unit of Measure']))"/>
                                 </td>
-                                <td style="border: 1px solid black; border-collapse: collapse; text-align:right ; font-size:14px">
+                                <td style="font-size:14px">
                                     <t t-esc="env.pos.format_currency_no_symbol(line.price)" />
                                 </td>
-                                <td style="border: 1px solid black; border-collapse: collapse; text-align:right ; font-size:14px">
+                                <td style="font-size:14px">
                                     <span class="price_display">
                                         <t t-esc="env.pos.format_currency_no_symbol(line.price_display)" />
                                     </span>
                                 </td>
                             </t>
                             <t t-else="">
-                                <td style="border: 1px solid black; border-collapse: collapse;  font-size:14px">
+                                <td style="font-size:14px">
                                     <div t-esc="line.product_name_wrapped[0]" />
                                 </td>
-                                <td style="border: 1px solid black; border-collapse: collapse; text-align:right ; font-size:14px">
+                                <td style="font-size:14px">
                                     <t t-esc="env.pos.format_currency_no_symbol(Math.round(line.quantity * Math.pow(10, env.pos.dp['Product Unit of Measure'])) / Math.pow(10, env.pos.dp['Product Unit of Measure']))"/>
                                 </td>
-                                <td style="border: 1px solid black; border-collapse: collapse; text-align:right ; font-size:14px">
+                                <td style="font-size:14px">
                                     <t t-esc="env.pos.format_currency_no_symbol(line.price)" />
                                 </td>
-                                <td style="border: 1px solid black; border-collapse: collapse; text-align:right ; font-size:14px">
+                                <td style="font-size:14px">
                                     <span class="price_display">
                                         <t t-esc="env.pos.format_currency_no_symbol(line.price_display)" />
                                     </span>

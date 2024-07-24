@@ -96,32 +96,32 @@
                     <t t-foreach="receipt.orderlines" t-as="line" t-key="line.id">
                         <tr>
                             <t t-if="isSimple(line)">
-                                <td style="font-size:14px">
+                                <td style="width: 25% ;font-size:14px">
                                     <div t-esc="line.product_name_wrapped[0]" />
                                 </td>
-                                <td style="font-size:14px">
+                                <td style="width: 25% ;text-align: right;font-size:14px">
                                     <t t-esc="env.pos.format_currency_no_symbol(Math.round(line.quantity * Math.pow(10, env.pos.dp['Product Unit of Measure'])) / Math.pow(10, env.pos.dp['Product Unit of Measure']))"/>
                                 </td>
-                                <td style="font-size:14px">
+                                <td style="width: 25% ;text-align: right;font-size:14px">
                                     <t t-esc="env.pos.format_currency_no_symbol(line.price)" />
                                 </td>
-                                <td style="font-size:14px">
+                                <td style="width: 25% ;text-align: right;font-size:14px">
                                     <span class="price_display">
                                         <t t-esc="env.pos.format_currency_no_symbol(line.price_display)" />
                                     </span>
                                 </td>
                             </t>
                             <t t-else="">
-                                <td style="font-size:14px">
+                                <td style="width: 25% ;font-size:14px">
                                     <div t-esc="line.product_name_wrapped[0]" />
                                 </td>
-                                <td style="font-size:14px">
+                                <td style="width: 25% ;text-align: right;font-size:14px">
                                     <t t-esc="env.pos.format_currency_no_symbol(Math.round(line.quantity * Math.pow(10, env.pos.dp['Product Unit of Measure'])) / Math.pow(10, env.pos.dp['Product Unit of Measure']))"/>
                                 </td>
-                                <td style="font-size:14px">
+                                <td style="width: 25% ;text-align: right;font-size:14px">
                                     <t t-esc="env.pos.format_currency_no_symbol(line.price)" />
                                 </td>
-                                <td style="font-size:14px">
+                                <td style="width: 25% ;text-align: right;font-size:14px">
                                     <span class="price_display">
                                         <t t-esc="env.pos.format_currency_no_symbol(line.price_display)" />
                                     </span>

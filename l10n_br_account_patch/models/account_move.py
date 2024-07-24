@@ -55,9 +55,9 @@ class AccountMove(models.Model):
 
         return new_vals_list
 
-    def write(self, values):
-        # No PDV esta dando erro: To Generate EDoc Key ...
-        if "line_ids" in values and "POS/" in values["line_ids"][0][2]["name"]:
-            values["document_type_id"] = False
-        result = super().write(values)
-        return result
+    # def write(self, values):
+    #     # No PDV esta dando erro: To Generate EDoc Key ...
+    #     if "line_ids" in values and "POS/" in values["line_ids"][0][2]["name"]:
+    #         values["document_type_id"] = False
+    #     result = super().write(values)
+    #     return result

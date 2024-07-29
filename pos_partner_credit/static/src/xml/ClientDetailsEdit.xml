@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates id="template" xml:space="preserve">
+    <t
+        t-name="ClientDetailsEdit"
+        t-inherit="point_of_sale.ClientDetailsEdit"
+        t-inherit-mode="extension"
+        owl="1"
+    >
+        <xpath expr="//div[hasclass('client-details-left')]" position="inside">
+            <div class="client-detail">
+                <span class="label">Limite de Credito</span>
+                <input
+                    class="detail"
+                    name="credit_limit"
+                    type="monetary"
+                    t-on-change="captureChange"
+                    t-att-value="props.partner.credit_limit_compute || ''"
+                    placeholder="Limite de credito"
+                />
+            </div>
+        </xpath>
+    </t>
+    <t t-inherit="point_of_sale.PaymentScreen" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('payment-controls')]" position="inside">
+            <t t-if="currentOrder.is_to_invoice()">
+                <span class="label">Limite de Credito disponivel:</span>
+                <t t-if="env.pos.get_client()">
+                    <t t-esc="env.pos.get_client().credit_limit_compute - env.pos.get_client().credit"/>
+                </t>
+            </t>
+        </xpath>
+    </t>
+</templates>

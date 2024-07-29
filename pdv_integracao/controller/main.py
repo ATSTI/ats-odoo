@@ -394,7 +394,7 @@ class IntegracaoPdv(http.Controller):
             for d in dados_json:
                 if session_insert:
                     continue
-                session = f"/{d['CODCAIXA']}"
+                session = f"-{d['CODCAIXA']}"
                 ses_ids = session_obj.sudo().search([
                     ('name', 'like', session),
                 ],limit=4)

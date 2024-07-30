@@ -11,6 +11,7 @@
                         <field name="margin"/>
                         <field name="qtde_atacado"/>
                         <field name="preco_atacado"/>
+                        <field name="image_promocao_512"/>
                     </group>   
                 </xpath> 
                     <field name="categ_id" position="after">                    

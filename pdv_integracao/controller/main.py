@@ -114,6 +114,12 @@ class IntegracaoPdv(http.Controller):
             prod['usa'] = 'S'
             if prd.barcode and len(prd.barcode) < 14:
                 prod['cod_barra'] = prd.barcode.strip()
+            prod['promocao_txt'] = ''
+            if prd.description_sale:
+                prod['promocao_txt'] = prd.description_sale
+            prod['promocao_jpg'] = ''
+            if prd.image_promocao_512:
+                prod['promocao_jpg'] = prd.image_promocao_512
             lista.append(prod)
 
         # Itens inativos

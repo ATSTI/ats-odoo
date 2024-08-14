@@ -240,11 +240,12 @@ class IntegracaoPdv(http.Controller):
         # ])        
         conta_obj = http.request.env['account.move.line']
         conta_ids = conta_obj.sudo().search([('partner_id', '=',int(cod_cliente)), 
-            ('full_reconcile_id', '=', False), ('balance','!=', 0),
+            ('full_reconcile_id', '=', False),
             ('company_id', '=', user_id.company_id.id),
             ('account_id.reconcile','=',True),
             ('account_id', '=', cc.id),
-            ('journal_id', 'in', diarios_usados),
+            ('journal_id', '=', 1),
+                ('debit', '>', 0),
         ], order='date_maturity')
         vlr = float(valor_pago)
         juros = float(juro)
@@ -282,16 +283,18 @@ class IntegracaoPdv(http.Controller):
                     arp.baixa_pagamentos(conta, diario_id, caixa, vlr, cod_forma, juros)
                     vlr = 0.0
             conta_ids = conta_obj.sudo().search([('partner_id', '=',int(cod_cliente)), 
-                ('full_reconcile_id', '=', False), ('balance','!=', 0),
+                ('full_reconcile_id', '=', False), 
                 ('company_id', '=', user_id.company_id.id),
                 ('account_id.reconcile','=',True),
                 ('account_id', '=', cc.id),
-                ('journal_id', 'in', diarios_usados),
+                ('journal_id', '=', 1),
+                ('debit', '>', 0),
             ], order='date_maturity')        
         lista = []
         for conta in conta_ids:
             #if not '4-' in conta.journal_id.name or conta.debit == 0.0:
             #    continue
+            #import pudb;pu.db
             contas = {}
             nome = conta.name.strip()
             nome = nome.replace("'"," ")
@@ -300,7 +303,9 @@ class IntegracaoPdv(http.Controller):
             data_fatura = datetime.strftime(conta.date,'%d/%m/%Y')
             contas['valor'] = conta.amount_residual
             contas['data_fatura'] = data_fatura
-            data_vencimento = datetime.strftime(conta.date_maturity,'%d/%m/%Y')
+            print (' DATA ' + str(conta.date_maturity))
+            print (' nome ' + conta.name + ' - ' + conta.move_id.name)
+            data_vencimento = datetime.strftime(conta.date_maturity or conta.date,'%d/%m/%Y')
             contas['data_vencimento'] = data_vencimento
             contas['fatura'] = conta.move_id.ref
             contas['codigo'] = conta.id

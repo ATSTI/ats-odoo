@@ -31,48 +31,23 @@
     <record model="ir.ui.view" id="crm_case_tree_view_leads">
         <field name="name">Add industry field as tree column</field>
         <field name="model">crm.lead</field>
-        <field name="inherit_id" ref="crm.crm_case_tree_view_leads" />
+        <field name="inherit_id" ref="crm.crm_case_tree_view_oppor" />
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
+                <field name="tipo" optional="show"/>
+                <field name="tipo_seguro" optional="show"/>
+            </field>
+        </field>
+    </record>
+    <record id="crm_case_kanban_view_leads_inherit" model="ir.ui.view">
+        <field name="name">crm.lead.kanban.lead</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_kanban_view_leads" />
+        <field name="arch" type="xml">
+            <field name="name" position="after">
                 <field name="tipo" />
                 <field name="tipo_seguro" />
             </field>
         </field>
     </record>
-    <!-- <record model="ir.ui.view" id="view_crm_case_leads_filter">
-        <field name="name">Add industry field for searching and grouping</field>
-        <field name="model">crm.lead</field>
-        <field name="inherit_id" ref="crm.view_crm_case_leads_filter" />
-        <field name="arch" type="xml">
-            <field name="country_id" position="after">
-                <field name="industry_id" />
-            </field>
-            <filter name="assigned_to_me" position="after">
-                <filter
-                    name="industry"
-                    string="Industry"
-                    domain="[]"
-                    context="{'group_by': 'industry_id'}"
-                />
-            </filter>
-        </field>
-    </record> -->
-    <!-- <record model="ir.ui.view" id="view_crm_case_opportunities_filter">
-        <field name="name">Add industry field for searching and grouping</field>
-        <field name="model">crm.lead</field>
-        <field name="inherit_id" ref="crm.view_crm_case_opportunities_filter" />
-        <field name="arch" type="xml">
-            <field name="partner_id" position="after">
-                <field name="industry_id" />
-            </field>
-            <filter name="stage" position="after">
-                <filter
-                    name="industry"
-                    string="Industry"
-                    domain="[]"
-                    context="{'group_by': 'industry_id'}"
-                />
-            </filter>
-        </field>
-    </record> -->
 </odoo>

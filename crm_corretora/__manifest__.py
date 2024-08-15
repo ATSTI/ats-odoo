@@ -2,8 +2,8 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 
 {
-    "name": "CRM Industry",
-    "summary": "Link leads/opportunities to industries",
+    "name": "CRM Corretora",
+    "summary": "Adicionando campos de seguro no lead",
     "version": "14.0.1.0.0",
     "category": "Customer Relationship Management",
     "website": "https://github.com/OCA/crm",

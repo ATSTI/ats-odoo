@@ -12,14 +12,14 @@ STATE = {'edit': [('readonly', False)]}
 
 
 class BrOdooNfeItem(models.Model):
-    _name = 'br.odoo.nfe.item'
+    _name = 'br_odoo.nfe.item'
     _description = "Item da nota fiscal eletrônica"
 
     name = fields.Text(u'Nome', readonly=True, states=STATE)
     company_id = fields.Many2one(
         'res.company', u'Empresa', index=True, readonly=True, states=STATE)
     invoice_eletronic_id = fields.Many2one(
-        'invoice.eletronic', string=u'Documento', readonly=True, states=STATE)
+        'br_odoo.nfe', string=u'Documento', readonly=True, states=STATE)
     currency_id = fields.Many2one(
         'res.currency', related='company_id.currency_id',
         string="Company Currency")

@@ -9,7 +9,7 @@ _logger = logging.getLogger(__name__)
 STATE = {'edit': [('readonly', False)]}
 
 class BrOdooNfe(models.Model):
-    _name = 'br.odoo.nfe'
+    _name = 'br_odoo.nfe'
     _description = "Nota Fiscal"
     _order = 'id desc'
 
@@ -45,9 +45,7 @@ class BrOdooNfe(models.Model):
          ('010', u'NFS-e Imperial - Petrópolis'),
          ('012', u'NFS-e - Florianópolis')],
         string=u'Modelo', readonly=True, states=STATE)
-    serie = fields.Many2one(
-        'br_account.document.serie', string=u'Série',
-        readonly=True, states=STATE)
+    serie = fields.Integer(string=u'Série',)
     serie_documento = fields.Char(string=u'Série Documento', size=6)
     numero = fields.Integer(
         string=u'Número', readonly=True, states=STATE)
@@ -91,10 +89,10 @@ class BrOdooNfe(models.Model):
         'account.fiscal.position', string=u'Posição Fiscal',
         readonly=True, states=STATE)
     eletronic_item_ids = fields.One2many(
-        'br.odoo.nfe.item', 'invoice_eletronic_id', string=u"Linhas",
+        'br_odoo.nfe.item', 'invoice_eletronic_id', string=u"Linhas",
         readonly=True, states=STATE)
     eletronic_event_ids = fields.One2many(
-        'br.odoo.nfe.event', 'invoice_eletronic_id', string=u"Eventos",
+        'br_odoo.nfe.event', 'invoice_eletronic_id', string=u"Eventos",
         readonly=True, states=STATE)
     valor_bruto = fields.Monetary(
         string=u'Total Produtos', readonly=True, states=STATE)
@@ -352,14 +350,14 @@ class BrOdooNfe(models.Model):
         string=u"Cartas de Correção", readonly=True, states=STATE)
     
 class BrOdooNfeEvent(models.Model):
-    _name = 'br.odoo.nfe.event'
+    _name = 'br_odoo.nfe.event'
     _description = "Eventos de nota fiscal eletrônica"
     _order = 'id desc'
 
     code = fields.Char(string=u'Código', readonly=True, states=STATE)
     name = fields.Char(string=u'Mensagem', readonly=True, states=STATE)
     invoice_eletronic_id = fields.Many2one(
-        'br.odoo.nfe', string=u"Fatura Eletrônica",
+        'br_odoo.nfe', string=u"Fatura Eletrônica",
         readonly=True, states=STATE)
     state = fields.Selection(
         related='invoice_eletronic_id.state', string="State")

@@ -91,7 +91,7 @@ class BrOdooNfe(models.Model):
         'account.fiscal.position', string=u'Posição Fiscal',
         readonly=True, states=STATE)
     eletronic_item_ids = fields.One2many(
-        'invoice.eletronic.item', 'invoice_eletronic_id', string=u"Linhas",
+        'br.odoo.nfe.item', 'invoice_eletronic_id', string=u"Linhas",
         readonly=True, states=STATE)
     eletronic_event_ids = fields.One2many(
         'br.odoo.nfe.event', 'invoice_eletronic_id', string=u"Eventos",

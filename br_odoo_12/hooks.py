@@ -21,3 +21,15 @@ def post_init_hook(cr, registry):
         prt.legal_name_bkp = prt.legal_name
         prt.district_bkp = prt.district
         prt.number_bkp = prt.number
+
+    cr.execute(
+        """
+            INSERT INTO br_odoo_nfe
+            SELECT * FROM invoice_eletronic;"""
+    )
+
+    cr.execute(
+        """
+            INSERT INTO br_odoo_nfe_item
+            SELECT * FROM invoice_eletronic_item;"""
+    )

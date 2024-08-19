@@ -8,10 +8,9 @@ _logger = logging.getLogger(__name__)
 
 STATE = {'edit': [('readonly', False)]}
 
-class InvoiceEletronic(models.Model):
-    _name = 'invoice.eletronic'
+class BrOdooNfe(models.Model):
+    _name = 'br.odoo.nfe'
     _description = "Nota Fiscal"
-    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'id desc'
 
     code = fields.Char(
@@ -95,7 +94,7 @@ class InvoiceEletronic(models.Model):
         'invoice.eletronic.item', 'invoice_eletronic_id', string=u"Linhas",
         readonly=True, states=STATE)
     eletronic_event_ids = fields.One2many(
-        'invoice.eletronic.event', 'invoice_eletronic_id', string=u"Eventos",
+        'br.odoo.nfe.event', 'invoice_eletronic_id', string=u"Eventos",
         readonly=True, states=STATE)
     valor_bruto = fields.Monetary(
         string=u'Total Produtos', readonly=True, states=STATE)
@@ -352,15 +351,15 @@ class InvoiceEletronic(models.Model):
         'carta.correcao.eletronica.evento', 'eletronic_doc_id',
         string=u"Cartas de Correção", readonly=True, states=STATE)
     
-class InvoiceEletronicEvent(models.Model):
-    _name = 'invoice.eletronic.event'
+class BrOdooNfeEvent(models.Model):
+    _name = 'br.odoo.nfe.event'
     _description = "Eventos de nota fiscal eletrônica"
     _order = 'id desc'
 
     code = fields.Char(string=u'Código', readonly=True, states=STATE)
     name = fields.Char(string=u'Mensagem', readonly=True, states=STATE)
     invoice_eletronic_id = fields.Many2one(
-        'invoice.eletronic', string=u"Fatura Eletrônica",
+        'br.odoo.nfe', string=u"Fatura Eletrônica",
         readonly=True, states=STATE)
     state = fields.Selection(
         related='invoice_eletronic_id.state', string="State")

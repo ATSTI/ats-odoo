@@ -11,8 +11,8 @@ from .cst import ORIGEM_PROD
 STATE = {'edit': [('readonly', False)]}
 
 
-class InvoiceEletronicItem(models.Model):
-    _name = 'invoice.eletronic.item'
+class BrOdooNfeItem(models.Model):
+    _name = 'br.odoo.nfe.item'
     _description = "Item da nota fiscal eletrônica"
 
     name = fields.Text(u'Nome', readonly=True, states=STATE)

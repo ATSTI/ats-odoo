@@ -14,3 +14,10 @@ def post_init_hook(cr, registry):
     for prt in partner:
         prt.city_id_bkp = prt.city_id.id
         prt.cnpj_cpf_bkp = prt.cnpj_cpf
+        prt.inscr_est_bkp = prt.inscr_est
+        prt.rg_fisica_bkp = prt.rg_fisica
+        prt.inscr_mun_bkp = prt.inscr_mun
+        prt.suframa_bkp = prt.suframa
+        prt.legal_name_bkp = prt.legal_name
+        prt.district_bkp = prt.district
+        prt.number_bkp = prt.number

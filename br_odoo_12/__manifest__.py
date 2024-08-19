@@ -19,8 +19,8 @@
     'data': [
         'security/ir.model.access.csv',
         'views/account_fiscal_position.xml',
-        'views/invoice_eletronic.xml',
-        'views/invoice_eletronic_item.xml',
+        'views/br_odoo_nfe_view.xml',
+        'views/br_odoo_nfe_item_view.xml',
         'views/br_nfe.xml',
         'views/br_account_view.xml',
         'views/partner_view.xml',

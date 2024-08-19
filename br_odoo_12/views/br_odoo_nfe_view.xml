@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <record id="invoice_eletronic_item_form" model="ir.ui.view">
-            <field name="name">invoice.eletronic.item.form</field>
-            <field name="model">invoice.eletronic.item</field>
+        <record id="br_odoo_nfe_item_form" model="ir.ui.view">
+            <field name="name">br.odoo.nfe.item.form</field>
+            <field name="model">br.odoo.nfe.item</field>
             <field name="arch" type="xml">
                 <form string="Item Documento">
                     <notebook>
@@ -152,9 +152,9 @@
             </field>
         </record>
 
-        <record id="br_account_invoice_eletronic_form" model="ir.ui.view">
-            <field name="name">br.account.invoice.eletronic.form</field>
-            <field name="model">invoice.eletronic</field>
+        <record id="br_account_br_odoo_nfe_form" model="ir.ui.view">
+            <field name="name">br.account.br.odoo.nfe.form</field>
+            <field name="model">br.odoo.nfe</field>
             <field name="arch" type="xml">
                 <form string="Documento Eletrônico">
                     <!--<header>
@@ -408,7 +408,7 @@
 
         <record id="sped_base_eletronic_doc_tree" model="ir.ui.view">
             <field name="name">sped.eletronic.doc.form</field>
-            <field name="model">invoice.eletronic</field>
+            <field name="model">br.odoo.nfe</field>
             <field name="arch" type="xml">
                 <tree string="Documentos Eletrônicos">
                     <field name="partner_id"/>
@@ -425,7 +425,7 @@
 
         <record id="sped_base_eletronic_doc_search" model="ir.ui.view">
             <field name="name">sped.eletronic.doc.search</field>
-            <field name="model">invoice.eletronic</field>
+            <field name="model">br.odoo.nfe</field>
             <field name="arch" type="xml">
                 <search>
                     <filter string="Notas com problemas" domain="[('state','=', 'error')]" name="error"/>
@@ -441,10 +441,10 @@
                 </search>
             </field>
         </record>
-        <record id="action_invoice_eletronic_trust" model="ir.actions.act_window">
+        <record id="action_br_odoo_nfe_trust" model="ir.actions.act_window">
             <field name="name">NFe Trust</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">invoice.eletronic</field>
+            <field name="res_model">br.odoo.nfe</field>
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="sped_base_eletronic_doc_search"/>
             <field name="target">new</field>
@@ -452,7 +452,7 @@
         <!--Colocar em outra base e ver se funciona (locefaca nao tem nfe)-->
 
         <menuitem
-        id="menu_action_invoice_eletronic_trust"
+        id="menu_action_br_odoo_nfe_trust"
         name="NFe Trust"
         action="br_odoo_12.action_invoice_eletronic_trust"
         parent="account.menu_finance_configuration"

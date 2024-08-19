@@ -2,7 +2,7 @@
 <odoo>
     <record id="br_odoo_nfe_item_form" model="ir.ui.view">
         <field name="name">br.odoo.nfe.item.form</field>
-        <field name="model">br.odoo.nfe.item</field>
+        <field name="model">br_odoo.nfe.item</field>
         <field name="arch" type="xml">
             <form string="Item Documento">
                 <notebook>

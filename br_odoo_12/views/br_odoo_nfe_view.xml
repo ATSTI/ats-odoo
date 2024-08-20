@@ -157,8 +157,8 @@
             <field name="model">br_odoo.nfe</field>
             <field name="arch" type="xml">
                 <form string="Documento Eletrônico">
-                    <!--<header>
-                        <button name="action_send_eletronic_invoice" states="draft" string="Enviar Agora" type="object" class="oe_highlight"/>
+                    <header>
+                        <!-- <button name="action_send_eletronic_invoice" states="draft" string="Enviar Agora" type="object" class="oe_highlight"/>
                         <button name="action_back_to_draft" states="edit,error" string="Repetir" type="object"/>
                         <button name="action_edit_edoc" states="draft,error" string="Habilitar Edição" type="object" groups="br_account_einvoice.group_edit_edoc"/>
                         <button name="action_cancel_document" confirm="Confirma o cancelamento do documento?" states="done" string="Cancelar" type="object"/>
@@ -168,9 +168,9 @@
                         </button>
                         <button name="action_get_status" type="object" class="oe_highlight" icon="fa-envelope" string="Consultar Situação NFe" attrs="{'invisible': ['|', ('state', '!=', 'done'), ('model', 'not in', ('55', '65'))]}">
                         </button>
-                        <button name="send_email_nfe" string="Reenviar Email" type="object" attrs="{'invisible': [('state', '!=', 'done')]}" />
+                        <button name="send_email_nfe" string="Reenviar Email" type="object" attrs="{'invisible': [('state', '!=', 'done')]}" /> -->
                         <field name="state" widget="statusbar" statusbar_visible="draft,done" />
-                    </header>-->
+                    </header>
                     <field name="ambiente_nfe" invisible="1" />
                     <div class="alert alert-danger" role="alert" style="margin-bottom:0px;" attrs="{'invisible': ['|', ('ambiente_nfe', '==', '1'), ('model', 'not in', ('55', '65'))]}">
                         A NFe está em ambiente de homologação
@@ -323,12 +323,12 @@
                                         <field name="rntc" />
                                     </group>
                                 </group>
-                                <group string="Reboques">
-                                    <field name="reboque_ids" nolabel="1" context="{'default_invoice_eletronic_id': id}" />
+                                <!-- <group string="Reboques">
+                                    <field name="reboque_ids" nolabel="1" />
                                 </group>
                                 <group string="Volumes">
-                                    <field name="volume_ids" nolabel="1" context="{'default_invoice_eletronic_id': id}" />
-                                </group>
+                                    <field name="volume_ids" nolabel="1" />
+                                </group> -->
                             </page>
                             <page name="cobranca" string="Cobrança">
                                 <group>
@@ -337,9 +337,9 @@
                                     <field name="fatura_desconto" />
                                     <field name="fatura_liquido" />
                                 </group>
-                                <group string="Duplicatas">
-                                    <field name="duplicata_ids" nolabel="1" context="{'default_invoice_eletronic_id': id}" />
-                                </group>
+                                <!-- <group string="Duplicatas">
+                                    <field name="duplicata_ids" nolabel="1" />
+                                </group> -->
                             </page>
                             <page name="exportacao" string="Exportação/Compras" attrs="{'invisible': [('model', 'not in', ('55', '65'))]}">
                                 <group>
@@ -355,7 +355,7 @@
                                     </group>
                                 </group>
                             </page>
-                            <page name="documentos_relacionados" string="Doc. Relacionados" attrs="{'invisible': [('model', 'not in', ('55', '65'))]}">
+                            <!-- <page name="documentos_relacionados" string="Doc. Relacionados" attrs="{'invisible': [('model', 'not in', ('55', '65'))]}">
                                 <field name="fiscal_document_related_ids">
                                     <tree>
                                         <field name="invoice_related_id" />
@@ -365,8 +365,8 @@
                                         <field name="internal_number" />
                                     </tree>
                                 </field>
-                            </page>
-                            <page name="carta_correcao" string="Cartas de Correção" attrs="{'invisible': [('model', 'not in', ('55', '65'))]}">
+                            </page> -->
+                            <!-- <page name="carta_correcao" string="Cartas de Correção" attrs="{'invisible': [('model', 'not in', ('55', '65'))]}">
                                 <field name="cartas_correcao_ids">
                                     <tree>
                                         <field name="sequencial_evento" />
@@ -375,7 +375,7 @@
                                         <field name="datahora_evento" />
                                     </tree>
                                 </field>
-                            </page>
+                            </page> -->
                             <page string="Observações">
                                 <group>
                                     <field name="informacoes_legais" />
@@ -442,15 +442,15 @@
             <field name="res_model">br_odoo.nfe</field>
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="sped_base_eletronic_doc_search"/>
-            <field name="target">new</field>
+            <!-- <field name="target">new</field> -->
         </record>
         <!--Colocar em outra base e ver se funciona (locefaca nao tem nfe)-->
 
         <menuitem
         id="menu_action_br_odoo_nfe_trust"
-        name="NFe Trust"
-        action="br_odoo_12.action_invoice_eletronic_trust"
-        parent="account.menu_finance_configuration"
+        name="NFe Odoo-Brasil"
+        action="action_br_odoo_nfe_trust"
+        parent="account.menu_finance_entries"
         sequence="99"/>
 
     </data>

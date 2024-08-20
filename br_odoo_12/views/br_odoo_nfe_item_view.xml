@@ -166,7 +166,7 @@
                             <field name="ii_valor"/>
                         </group>
                         <group string="Declaração de Importação">
-                            <field name="import_declaration_ids" colspan="4" nolabel="1" />
+                            <!-- <field name="import_declaration_ids" colspan="4" nolabel="1" /> -->
                             <label for="informacao_adicional" />
                             <field name="informacao_adicional" />
                         </group>

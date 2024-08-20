@@ -8,7 +8,7 @@ class CartaCorrecaoEletronicaEvento(models.Model):
     _description = "Carta de correção eletrônica"
 
     eletronic_doc_id = fields.Many2one(
-        'invoice.eletronic', string=u"Documento Eletrônico")
+        'br_odoo.nfe', string=u"Documento Eletrônico")
 
     # Fields CCe
     id_cce = fields.Char(string=u"ID", size=60)

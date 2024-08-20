@@ -339,15 +339,15 @@ class BrOdooNfe(models.Model):
     valor_pago = fields.Monetary(string='Valor pago')
     troco = fields.Monetary(string='Troco')
 
-    # Documentos Relacionados
-    fiscal_document_related_ids = fields.One2many(
-        'br_account.document.related', 'invoice_eletronic_id',
-        'Documentos Fiscais Relacionados', readonly=True, states=STATE)
+    # # Documentos Relacionados
+    # fiscal_document_related_ids = fields.One2many(
+    #     'br_account.document.related', 'invoice_eletronic_id',
+    #     'Documentos Fiscais Relacionados', readonly=True, states=STATE)
 
     # CARTA DE CORRECAO
-    cartas_correcao_ids = fields.One2many(
-        'carta.correcao.eletronica.evento', 'eletronic_doc_id',
-        string=u"Cartas de Correção", readonly=True, states=STATE)
+    # cartas_correcao_ids = fields.One2many(
+    #     'carta.correcao.eletronica.evento', 'eletronic_doc_id',
+    #     string=u"Cartas de Correção", readonly=True, states=STATE)
     
 class BrOdooNfeEvent(models.Model):
     _name = 'br_odoo.nfe.event'

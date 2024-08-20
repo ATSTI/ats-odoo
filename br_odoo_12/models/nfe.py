@@ -6,7 +6,7 @@ class NfeReboque(models.Model):
     _name = 'nfe.reboque'
     _description = "NF-e Reboque"
 
-    invoice_eletronic_id = fields.Many2one('invoice.eletronic', string="NFe")
+    invoice_eletronic_id = fields.Many2one('br_odoo.nfe', string="NFe")
     placa_veiculo = fields.Char(string="Placa", size=7)
     uf_veiculo = fields.Char(string=u"UF Veículo", size=2)
     rntc = fields.Char(string="RNTC", size=20,
@@ -19,7 +19,7 @@ class NfeVolume(models.Model):
     _name = 'nfe.volume'
     _description = "NF-e Volume"
 
-    invoice_eletronic_id = fields.Many2one('invoice.eletronic', string="NFe")
+    invoice_eletronic_id = fields.Many2one('br_odoo.nfe', string="NFe")
     quantidade_volumes = fields.Integer(string="Qtde. Volumes")
     especie = fields.Char(string=u"Espécie", size=60)
     marca = fields.Char(string="Marca", size=60)
@@ -33,7 +33,7 @@ class NFeCobrancaDuplicata(models.Model):
     _description = "NF-e Duplicata"
     _order = 'data_vencimento'
 
-    invoice_eletronic_id = fields.Many2one('invoice.eletronic', string="NFe")
+    invoice_eletronic_id = fields.Many2one('br_odoo.nfe', string="NFe")
     currency_id = fields.Many2one(
         'res.currency', related='invoice_eletronic_id.currency_id',
         string="EDoc Currency", readonly=True)

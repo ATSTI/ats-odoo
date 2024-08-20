@@ -272,9 +272,9 @@ class BrOdooNfeItem(models.Model):
         string="Classe Enquadramento", size=3, default='999',
         readonly=True, states=STATE)
 
-    import_declaration_ids = fields.One2many(
-        'import.declaration' ,
-        'invoice_eletronic_line_id', string=u'Declaração de Importação')
+    # import_declaration_ids = fields.One2many(
+    #     'import.declaration' ,
+    #     'invoice_eletronic_line_id', string=u'Declaração de Importação')
 
     # ----------- ICMS INTERESTADUAL -----------
     tem_difal = fields.Boolean(string=u'Difal?', readonly=True, states=STATE)

@@ -134,7 +134,7 @@ class ImportDeclaration(models.Model):
         'br_account.import.declaration.line',
         'import_declaration_id', 'Linhas da DI')
     invoice_eletronic_line_id = fields.Many2one(
-        'invoice.eletronic.item', u'Linha de Documento Eletrônico',
+        'br_odoo.nfe.item', u'Linha de Documento Eletrônico',
         ondelete='cascade', index=True)
 
 
@@ -182,13 +182,8 @@ class AccountDocumentRelated(models.Model):
     fiscal_document_id = fields.Many2one(
         'br_account.fiscal.document', 'Documento')
     invoice_eletronic_id = fields.Many2one(
-        'invoice.eletronic', u'Documento Eletrônico', ondelete='cascade')
+        'br_odoo.nfe', u'Documento Eletrônico', ondelete='cascade')
 
-    @api.onchange('invoice_related_id')
-    def onchange_br_nfe_invoice_related_id(self):
-        if len(self.invoice_related_id.invoice_eletronic_ids) > 0:
-            self.access_key = \
-                self.invoice_related_id.invoice_eletronic_ids[0].chave_nfe
 
 class BrAccountFiscalObservation(models.Model):
     _name = 'br_account.fiscal.observation'

@@ -253,6 +253,7 @@
                                 <group>
                                     <field name="eletronic_item_ids" nolabel="1">
                                         <tree name="eletronic_items">
+                                            <field name="invoice_eletronic_id" />
                                             <field name="state" invisible="1" />
                                             <field name="product_id" />
                                             <field name="uom_id" />
@@ -382,7 +383,7 @@
                                     <field name="informacoes_complementares" />
                                 </group>
                             </page>
-                            <page name="eventos" string="Eventos">
+                            <!-- <page name="eventos" string="Eventos">
                                 <group>
                                     <field name="eletronic_event_ids" nolabel="1">
                                         <tree name="Eventos">
@@ -394,7 +395,7 @@
                                         </tree>
                                     </field>
                                 </group>
-                            </page>
+                            </page> -->
                         </notebook>
                     </sheet>
                 </form>

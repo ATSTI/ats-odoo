@@ -8,3 +8,4 @@ from . import cst
 from . import br_odoo_nfe
 from . import br_odoo_nfe_item
 from . import res_partner
+from . import product

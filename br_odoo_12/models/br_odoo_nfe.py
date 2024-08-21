@@ -91,9 +91,9 @@ class BrOdooNfe(models.Model):
     eletronic_item_ids = fields.One2many(
         'br_odoo.nfe.item', 'invoice_eletronic_id', string=u"Linhas",
         readonly=True, states=STATE)
-    eletronic_event_ids = fields.One2many(
-        'br_odoo.nfe.event', 'invoice_eletronic_id', string=u"Eventos",
-        readonly=True, states=STATE)
+    # eletronic_event_ids = fields.One2many(
+    #     'br_odoo.nfe.event', 'invoice_eletronic_id', string=u"Eventos",
+    #     readonly=True, states=STATE)
     valor_bruto = fields.Monetary(
         string=u'Total Produtos', readonly=True, states=STATE)
     valor_frete = fields.Monetary(
@@ -184,9 +184,11 @@ class BrOdooNfe(models.Model):
     email_sent = fields.Boolean(string=u"Email enviado", default=False,
                                 readonly=True, states=STATE)
     
-    payment_mode_id = fields.Many2one(
-        'l10n_br.payment.mode', string='Modo de Pagamento',
-        readonly=True, states=STATE)
+    payment_mode_id = fields.Integer(string='Modo de Pagamento')
+
+    # payment_mode_id = fields.Many2one(
+    #     'l10n_br.payment.mode', string='Modo de Pagamento',
+    #     readonly=True, states=STATE)
     iest = fields.Char(string="IE Subst. Tributário")
     ambiente_nfe = fields.Selection(
         [('producao', u'Produção'), ('homologacao', u'Homologação')],
@@ -255,12 +257,12 @@ class BrOdooNfe(models.Model):
         string="RNTC", size=20, readonly=True, states=STATE,
         help=u"Registro Nacional de Transportador de Carga")
 
-    reboque_ids = fields.One2many(
-        'nfe.reboque', 'invoice_eletronic_id',
-        string=u"Reboques", readonly=True, states=STATE)
-    volume_ids = fields.One2many(
-        'nfe.volume', 'invoice_eletronic_id',
-        string=u"Volumes", readonly=True, states=STATE)
+    # reboque_ids = fields.One2many(
+    #     'nfe.reboque', 'invoice_eletronic_id',
+    #     string=u"Reboques", readonly=True, states=STATE)
+    # volume_ids = fields.One2many(
+    #     'nfe.volume', 'invoice_eletronic_id',
+    #     string=u"Volumes", readonly=True, states=STATE)
 
     # Exportação
     uf_saida_pais_id = fields.Many2one(
@@ -281,9 +283,9 @@ class BrOdooNfe(models.Model):
     fatura_liquido = fields.Monetary(
         string=u"Valor Líquido", readonly=True, states=STATE)
 
-    duplicata_ids = fields.One2many(
-        'nfe.duplicata', 'invoice_eletronic_id',
-        string=u"Duplicatas", readonly=True, states=STATE)
+    # duplicata_ids = fields.One2many(
+    #     'nfe.duplicata', 'invoice_eletronic_id',
+    #     string=u"Duplicatas", readonly=True, states=STATE)
 
     # Compras
     nota_empenho = fields.Char(

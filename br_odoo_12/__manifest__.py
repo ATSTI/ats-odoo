@@ -24,6 +24,7 @@
         # 'views/br_nfe.xml',
         # 'views/br_account_view.xml',
         'views/partner_view.xml',
+        'views/product_view.xml',
     ],
     "post_init_hook": "post_init_hook",
     'installable': True,

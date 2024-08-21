@@ -29,9 +29,10 @@
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['l10n_br_sale', 'report_cabecalho',],
+    'depends': ['l10n_br_sale', 'report_cabecalho', 'l10n_br_purchase'],
     'data': [
         'report/report_delivery_document_asman.xml',
+        'report/report_purchase_asman.xml',
         'views/report_orcamento.xml'
     ],
     'installable': True,

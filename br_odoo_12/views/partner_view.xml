@@ -7,9 +7,10 @@
         <field name="inherit_id" ref="base.view_partner_form" />
         <field name="arch" type="xml">
             <field name="phone" position="after">
-                <field name="city_id_bkp" invisible="1" />
+                <field name="ibge_code" invisible="1" />
                 <field name="cnpj_cpf_bkp" invisible="1"/>
                 <field name="inscr_est_bkp" invisible="1"/>
+                <field name="indicador_ie_dest_bkp" invisible="1"/>
                 <field name="rg_fisica_bkp" invisible="1"/>
                 <field name="inscr_mun_bkp" invisible="1"/>
                 <field name="suframa_bkp" invisible="1"/>

@@ -12,7 +12,7 @@ def post_init_hook(cr, registry):
     partner = env["res.partner"].search([])
 
     for prt in partner:
-        prt.city_id_bkp = prt.city_id.id
+        prt.ibge_code = prt.city_id.ibge_code
         prt.cnpj_cpf_bkp = prt.cnpj_cpf
         prt.inscr_est_bkp = prt.inscr_est
         prt.rg_fisica_bkp = prt.rg_fisica
@@ -21,6 +21,7 @@ def post_init_hook(cr, registry):
         prt.legal_name_bkp = prt.legal_name
         prt.district_bkp = prt.district
         prt.number_bkp = prt.number
+        prt.indicador_ie_dest = prt.indicador_ie_dest_bkp
 
     product = env["product.template"].search([])
 

@@ -119,7 +119,7 @@ class IntegracaoPdv(http.Controller):
                 prod['promocao_txt'] = prd.description_sale
             prod['promocao_jpg'] = ''
             if prd.image_promocao_512:
-                prod['promocao_jpg'] = prd.image_promocao_512
+                prod['promocao_jpg'] = prd.image_promocao_512.decode('utf-8')
             lista.append(prod)
 
         # Itens inativos
@@ -138,6 +138,8 @@ class IntegracaoPdv(http.Controller):
                 ('active','=', False)])       
         for prd in prod_ids:
             prod = {}
+            prod['promocao_jpg'] = ''
+            prod['promocao_txt'] = ''
             prod['codproduto'] = prd.id
             data_alt = prd.write_date
             data_alterado = data_alt + timedelta(hours=+3)

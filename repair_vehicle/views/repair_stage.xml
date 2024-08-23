@@ -10,7 +10,7 @@
                 <field name="sequence" widget="handle" groups="base.group_no_one"/>
                 <field name="name"/>
                 <field name="stage_type"/>
-                <field name="origin"/>
+                <!-- <field name="origin"/> -->
                 <field name="is_closed"/>
                 <field name="custom_color"/>
             </tree>
@@ -28,7 +28,7 @@
                             <field name="name"/>
                             <field name="sequence"/>
                             <field name="stage_type"/>
-                            <field name="origin"/>
+                            <!-- <field name="origin"/> -->
                         </group>
                         <group>
                             <field name="custom_color"/>

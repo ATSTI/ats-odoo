@@ -18,7 +18,7 @@ class ProductTemplate (models.Model):
         ('6', '6 - Outros'),
         ('7', '7 - Quinta-feira do Chocolate'),
         ], 'Tipo de Venda', default='1')
-    image_promocao_512 = fields.Image("Promoção (*.jpg)", max_width=512, max_height=512, store=True)
+
 
     @api.onchange('margin')
     def onchange_margin(self):

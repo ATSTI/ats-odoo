@@ -29,7 +29,7 @@
         'Otávio Munhoz<otaviosilmunhoz@hotmail.com>',
     ],
     'depends': [
-        'product', 'point_of_sale', 'l10n_br_fiscal',
+        'product',
     ],
     'data': [
         'views/product_views.xml',

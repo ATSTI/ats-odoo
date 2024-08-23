@@ -1,0 +1,20 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+
+from odoo import fields, models
+
+
+class CartaCorrecaoEletronicaEvento(models.Model):
+    _name = 'carta.correcao.eletronica.evento'
+    _description = "Carta de correção eletrônica"
+
+    eletronic_doc_id = fields.Many2one(
+        'br_odoo.nfe', string=u"Documento Eletrônico")
+
+    # Fields CCe
+    id_cce = fields.Char(string=u"ID", size=60)
+    datahora_evento = fields.Datetime(string=u"Data do Evento")
+    tipo_evento = fields.Char(string=u"Código do Evento")
+    sequencial_evento = fields.Integer(string=u"Sequencial do Evento")
+    correcao = fields.Text(string=u"Correção", max_length=1000)
+    message = fields.Char(string=u"Mensagem", size=300)
+    protocolo = fields.Char(string=u"Protocolo", size=30)

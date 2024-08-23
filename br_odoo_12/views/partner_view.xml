@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_br_brasil_partner_form" model="ir.ui.view">
+        <field name="name">br.brasil.partner</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="arch" type="xml">
+            <field name="phone" position="after">
+                <field name="ibge_code" invisible="1" />
+                <field name="cnpj_cpf_bkp" invisible="1"/>
+                <field name="inscr_est_bkp" invisible="1"/>
+                <field name="indicador_ie_dest_bkp" invisible="1"/>
+                <field name="rg_fisica_bkp" invisible="1"/>
+                <field name="inscr_mun_bkp" invisible="1"/>
+                <field name="suframa_bkp" invisible="1"/>
+                <field name="legal_name_bkp" invisible="1"/>
+                <field name="district_bkp" invisible="1"/>
+                <field name="number_bkp" invisible="1"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

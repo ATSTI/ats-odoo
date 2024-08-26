@@ -9,16 +9,21 @@ _logger = logging.getLogger(__name__)
 def post_init_hook(cr, registry):
     """Copiar campos br_base Trust."""
     env = api.Environment(cr, SUPERUSER_ID, {})
+    import pudb;pu.db
     partner = env["res.partner"].search([], order="ibge_code")
     city = 0
+    city_id = 0
     for prt in partner:
         if prt.city_id or not prt.ibge_code:
             continue
-        if not prt.city_id and city != prt.city_id.id:
-            city_id = env["res.city"].search([("ibge_code", "=", prt.ibge_code)])
-            if city_id:
-                city = city_id.id
-        prt.city_id = city_id.id
+        if not prt.city_id and city != prt.ibge_code:
+            city_id = env["res.city"].search([("ibge_code", "like", prt.ibge_code)])
+            for ct in city_id:
+                if ct.state_id.code == prt.state_id.code:
+                    city = prt.ibge_code
+                    city_id = ct.id
+        if city_id:
+            prt.city_id = city_id
         # prt.ibge_code = prt.city_id.ibge_code
         prt.cnpj_cpf = prt.cnpj_cpf_bkp
         prt.inscr_est = prt.inscr_est_bkp
@@ -28,21 +33,25 @@ def post_init_hook(cr, registry):
         prt.legal_name = prt.legal_name_bkp
         prt.district = prt.district_bkp
         prt.street_number = prt.number_bkp
-        prt.ind_ie_dest = prt.indicador_ie_dest_bkp
-        if prt.indicador_ie_dest_bkp == "9":
-            prt.ind_final = "1"
+        if prt.indicador_ie_dest_bkp:
+            prt.ind_ie_dest = prt.indicador_ie_dest_bkp
+            if prt.indicador_ie_dest_bkp == "9":
+                prt.ind_final = "1"
 
+    import pudb;pu.db
     product = env["product.template"].search([], order = "ncm")
-    ncm = 0
+    ncm = '0'
+    ncm_id = 0
     for prd in product:
         if prd.ncm_id or not prd.ncm:
             continue
-        if prd.ncm_id.id != ncm:
+        if prd.ncm != ncm:
             ncm_id = env["l10n_br_fiscal.ncm"].search(["code", "=", prd.ncm])
-            if ncm_id:
-                ncm = ncm_id.code
-                prd.ncm_id = ncm_id.id
-        prd.type_product = prd.fiscal_type_bkp
+            ncm = prd.code
+        if ncm_id:
+            prd.ncm_id = ncm_id.id
+        prd.type_product = prd.type_bkp
+        prd.fiscal_type = prd.fiscal_type_bkp
         prd.origin = prd.origin_bkp
         if prd.code_servico:
             prd.type = "service"

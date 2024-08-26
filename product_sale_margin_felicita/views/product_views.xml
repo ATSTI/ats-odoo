@@ -8,7 +8,6 @@
             <field name="arch" type="xml">
                 <xpath expr="//group[@name='group_standard_price']" position="after">
                     <group>
-                        <field name="margin"/>
                         <field name="qtde_atacado"/>
                         <field name="preco_atacado"/>
                         <field name="image_promocao_512"/>

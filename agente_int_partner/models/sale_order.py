@@ -8,7 +8,7 @@ class SaleOrder(models.Model):
     
     intermediador = fields.Many2one('res.partner',string="Agente intermediador")
 
-    @api.depends('partner_id')
+    @api.onchange('partner_id')
     def onchange_partner_id(self):
         result = super().onchange_partner_id()
         if self.partner_id:

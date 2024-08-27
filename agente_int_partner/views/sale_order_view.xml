@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="view_sale_order_soloz_form" model="ir.ui.view">
+        <field name="name">sale.order.soloz</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="intermediador"/>
+            </field>
+        </field>
+    </record>
+    <record id="view_sale_order_soloz_tree" model="ir.ui.view">
+        <field name="name">sale.order.tree.soloz</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="intermediador"/>
+            </field>
+        </field>
+    </record>
+    <record id="view_sale_order_quotation_soloz_tree" model="ir.ui.view">
+        <field name="name">sale.order.quotation.tree.soloz</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="intermediador"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

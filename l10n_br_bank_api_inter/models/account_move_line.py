@@ -71,6 +71,8 @@ class AccountMoveLine(models.Model):
         copy=False,
     )
 
+    codigo_solicitacao = fields.Char(string="Código Solicitação")
+
     def generate_pdf_boleto(self):
         """
         Creates a new attachment with the Boleto PDF
@@ -78,6 +80,7 @@ class AccountMoveLine(models.Model):
         if self.own_number and self.pdf_boleto_id:
             return
         order_id = self.payment_line_ids[0].order_id
+        import pudb;pu.db
         with ArquivoCertificado(order_id.journal_id, "w") as (key, cert):
             api = ApiInter(
                 cert=(cert, key),
@@ -88,7 +91,13 @@ class AccountMoveLine(models.Model):
                 client_id=self.journal_payment_mode_id.bank_client_id,
                 client_secret=self.journal_payment_mode_id.bank_secret_id,
             )
-            datas = api.boleto_pdf(self.own_number)
+            if not self.own_number and self.codigo_solicitacao:
+                # buscar informacoes do boleto pegar nosso_numero
+                resposta = api.consulta_boleto_detalhado(self.codigo_solicitacao)
+                self.own_number = resposta["nossoNumero"]
+                self.payment_line_ids[0].own_number = resposta["nossoNumero"]
+
+            datas = api.boleto_pdf(self.codigo_solicitacao)
             datas_json = json.loads(datas.decode("utf-8"))
             self.pdf_boleto_id = self.env["ir.attachment"].create(
                 {

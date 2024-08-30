@@ -60,15 +60,16 @@ class AccountMove(models.Model):
         invoice
         :return: actions.act_window
         """
+        import pudb;pu.db
         for move in self:
             for move_line in move.financial_move_line_ids:
-                if not move_line.own_number:
+                if not move_line.codigo_solicitacao:
                     # gerar boleto
                     move.payment_order_id.open2generated()
                     break
         boleto_gerado = False
         for move_line in self.financial_move_line_ids:            
-            if move_line.own_number and not move_line.pdf_boleto_id:
+            if move_line.codigo_solicitacao and not move_line.pdf_boleto_id:
                 move_line.generate_pdf_boleto()
                 boleto_gerado = True
             else:
@@ -131,6 +132,7 @@ class AccountMove(models.Model):
     #     return res
 
     def load_cnab_info(self):
+        import pudb;pu.db
         res = super().load_cnab_info()
         if (
             self.partner_bank_id.bank_id

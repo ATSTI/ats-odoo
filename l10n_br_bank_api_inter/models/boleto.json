@@ -1,0 +1,68 @@
+{
+  "seuNumero": "0006/01",
+  "valorNominal": 4.9,
+  "valorAbatimento": 0,
+  "dataVencimento": "2024-08-27",
+  "numDiasAgenda": 30,
+  "atualizarPagador": "false",
+  "pagador": {
+    "cpfCnpj": "08382545000111",
+    "tipoPessoa": "JURIDICA",
+    "nome": "ATS COMERCIO DE MATERIAIS DE INFORMATICA E SERVICOS LTDA",
+    "endereco": "RUA EXPEDICIONARIOS, 1160",
+    "cidade": "Artur Nogueira",
+    "uf": "SP",
+    "cep": "13160082",
+    "email": "",
+    "ddd": "",
+    "telefone": "",
+    "numero": "1160",
+    "complemento": "",
+    "bairro": "CENTRO"
+  },
+  "desconto1": {
+    "codigoDesconto": "PERCENTUALDATAINFORMADA",
+    "taxa": 4,
+    "valor": {
+      "codigoDesconto": "NAOTEMDESCONTO",
+      "taxa": 0,
+      "valor": 0,
+      "data": ""
+    },
+    "data": "2024-08-27"
+  },
+  "desconto2": {
+    "codigoDesconto": "PERCENTUALDATAINFORMADA",
+    "taxa": 4,
+    "valor": {
+      "codigoDesconto": "NAOTEMDESCONTO",
+      "taxa": 0,
+      "valor": 0,
+      "data": ""
+    },
+    "data": "2024-08-27"
+  },
+  "desconto3": {
+    "codigoDesconto": "PERCENTUALDATAINFORMADA",
+    "taxa": 4,
+    "valor": {
+      "codigoDesconto": "NAOTEMDESCONTO",
+      "taxa": 0,
+      "valor": 0,
+      "data": ""
+    },
+    "data": "2024-08-27"
+  },
+  "multa": 0,
+  "mora": 0,
+  "beneficiarioFinal": {
+    "cpfCnpj": "41397343000119",
+    "tipoPessoa": "JURIDICA",
+    "nome": "SOLOZ INDUSTRIAL LTDA",
+    "endereco": "RUA ANTONIO DEGASPARI, 1789",
+    "bairro": "AGUA SANTA",
+    "cidade": "Piracicaba",
+    "uf": "SP",
+    "cep": "13413652"
+  }
+}

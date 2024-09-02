@@ -1,0 +1,183 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <!--  Partners inherited form -->
+    <record id="equipamento_partner_form_view" model="ir.ui.view">
+        <field name="name">equipamento_partner_form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="br_base.view_br_base_partner_form"/>
+        <field name="arch" type="xml">
+            <field name="vat" position="replace">
+                <field name="vat" string="Conta Bancaria" />
+            </field>    
+            <notebook position="inside">
+                 <page string="Informações Pessoais">
+                <group> 
+                    <group>
+                        <field name="peso" />
+                        <field name="altura" />
+                        <field name="calcado" />
+                        <field name="contatonome" />
+                        <field name="contatofone" />
+                        <field name="alergia" />
+                    </group>
+                    <group>
+                        <field name="medicacao" />
+                        <field name="restricaoalimentar" />
+                        <field name="segurodan" />
+                        <field name="passaporte" />
+                        <field name="birthdate_date" />
+                    </group>
+                 </group>
+                </page>
+                <page string="Equipamentos/Cursos/Viagens">
+                    <field name="historico_line">
+                       <tree string="Equipamento/Curso/Viagem">
+                          <field name="historico_id" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}" />
+                          <field name="data_aquisicao" />
+                          <field name="partner_id" invisible="1" />
+                       </tree>
+                    </field>   
+                </page>
+             </notebook>
+            
+        </field>
+    </record>
+    
+    <!--  Partners Historico form -->
+    <record id="historico_partner_form_view" model="ir.ui.view">
+        <field name="name">historico_partner_form</field>
+        <field name="model">partner.historico</field>
+        <field name="arch" type="xml">
+            <form string="Equipamento/Curso/Viagem">
+                <group>
+                    <field name="data_aquisicao" />
+                    <field name="partner_id" />
+                    <field name="venda_id" />
+                </group>    
+                <field name="historico_id" />
+            </form>
+        </field>
+    </record>    
+    
+    <record id="historico_partner_tree_view" model="ir.ui.view">
+        <field name="name">historico_partner_tree</field>
+        <field name="model">partner.historico</field>
+        <field name="arch" type="xml">
+            <tree string="Equipamento/Curso/Viagem">
+                <field name="partner_id" />
+                <field name="historico_id" widget="many2many_tags"/>
+                <field name="data_aquisicao" />
+            </tree>
+        </field>
+    </record>
+    
+    <record id="view_historico_partner_filter" model="ir.ui.view">
+            <field name="name">historico.partner.search</field>
+            <field name="model">partner.historico</field>
+            <field name="arch" type="xml">
+                <search string="Procurar Historicos">
+                    <field name="partner_id" string="Parceiro" filter_domain="[('partner_id','ilike',self)]"/>
+                    <field name="historico_id" string="Equip./Curso/Viagem" filter_domain="[('historico_id','ilike',self)]"/>
+                    <!--
+                    <separator/>
+                    <group expand="0" string="Group By" colspan="16">
+                        <filter string="Parceiros" context="{'group_by':'partner_id'}"/>
+                        <filter string="Equip./Curso/Viagem"  context="{'group_by':'historico_id'}"/>
+                    </group>-->
+                </search>
+            </field>
+        </record>    
+    
+    <record id="historico_partner_form_action" model="ir.actions.act_window">
+            <field name="name">Equipamento/Curso/Viagem</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">partner.historico</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="partner_captain.view_historico_partner_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create a quotation that will be converted into a purchase order. 
+              </p><p>
+                Use this menu to search within your purchase orders by
+                references, vendor, products, etc. For each purchase order,
+                you can track the related discussion with the vendor, control
+                the products received and control the vendor bills.
+              </p>
+            </field>
+    </record>
+         
+    <menuitem
+            id="menu_historico_partner_action"
+            name="Equipamento/Curso/Viagem"
+            parent="crm.menu_crm_config_lead"
+            sequence="9"
+            action="historico_partner_form_action"/>
+            
+    <!--  Lista de equipamentos -->
+    <record id="equip_partner_form_view" model="ir.ui.view">
+        <field name="name">equip_partner_form</field>
+        <field name="model">lista.equipamentos</field>
+        <field name="arch" type="xml">
+            <form string="Equipamento/Curso/Viagem">
+                <group>
+                    <field name="partner_id" />
+                    <field name="equipamento" />
+                </group>    
+            </form>
+        </field>
+    </record>    
+    
+    <record id="equip_partner_tree_view" model="ir.ui.view">
+        <field name="name">equip_partner_tree</field>
+        <field name="model">lista.equipamentos</field>
+        <field name="arch" type="xml">
+            <tree string="Equipamento/Curso/Viagem">
+                <field name="partner_id" />
+                <field name="equipamento" />
+            </tree>
+        </field>
+    </record>
+    
+    <record id="view_equip_partner_filter" model="ir.ui.view">
+            <field name="name">equip.partner.search</field>
+            <field name="model">lista.equipamentos</field>
+            <field name="arch" type="xml">
+                <search string="Procurar Historicos">
+                    <field name="partner_id" string="Parceiro" filter_domain="[('partner_id','ilike',self)]"/>
+                    <field name="equipamento" string="Equip./Curso/Viagem" filter_domain="[('equipamento','ilike',self)]"/>
+                    <!--
+                    <separator/>
+                    <group expand="0" string="Group By" colspan="16">
+                        <filter string="Parceiros" context="{'group_by':'partner_id'}"/>
+                        <filter string="Equip./Curso/Viagem"  context="{'group_by':'equipamento'}"/>
+                    </group>-->
+                </search>
+            </field>
+        </record>    
+    
+    <record id="equip_partner_form_action" model="ir.actions.act_window">
+            <field name="name">Equip./Curso/Viagem</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">lista.equipamentos</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="partner_captain.view_equip_partner_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create a quotation that will be converted into a purchase order. 
+              </p><p>
+                Use this menu to search within your purchase orders by
+                references, vendor, products, etc. For each purchase order,
+                you can track the related discussion with the vendor, control
+                the products received and control the vendor bills.
+              </p>
+            </field>
+    </record>
+         
+    <menuitem
+            id="menu_equip_partner_action"
+            name="Lista Equipamentos/Curso/Viagem"
+            parent="crm.menu_crm_config_lead"
+            sequence="9"
+            action="equip_partner_form_action"/>            
+</odoo>

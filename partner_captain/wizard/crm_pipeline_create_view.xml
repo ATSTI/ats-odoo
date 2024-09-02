@@ -1,0 +1,40 @@
+<odoo>
+    <data>
+
+        <record id="crm_pipeline_create_view" model="ir.ui.view">
+            <field name="name">crm.pipeline.create.form</field>
+            <field name="model">crm.pipeline.create</field>
+            <field name="arch" type="xml">
+                <form string="Criar Pipeline">
+                    <p class="oe_grey">
+                        Cria um pipeline para Cada Cliente Selecionado
+                    </p>
+                    <field name="titulo" />
+                    <footer>
+                        <button string="Criar Pipeline" name="pipeline_create" type="object" default_focus="1" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <act_window id="action_crm_pipeline_create"
+            multi="True"
+            key2="client_action_multi" name="Criar Leads"
+            res_model="crm.pipeline.create" src_model="res.partner"
+            view_mode="form" target="new" view_type="form" />
+            
+        <act_window id="action_crm_pipeline_create"
+            multi="True"
+            key2="client_action_multi" name="Criar Leads"
+            res_model="crm.pipeline.create" src_model="partner.historico"
+            view_mode="form" target="new" view_type="form" />            
+            
+        <act_window id="action_lista_pipeline_create"
+            multi="True"
+            key2="client_action_multi" name="Criar Leads"
+            res_model="crm.pipeline.create" src_model="lista.equipamentos"
+            view_mode="form" target="new" view_type="form" />                    
+
+    </data>
+</odoo>

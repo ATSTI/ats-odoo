@@ -223,7 +223,7 @@
                                 <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
                                     <t t-if="not line.display_type">
                                         <td name="td_name" style="border: solid 1px #000000; border-collapse: collapse; width: 44%; font-size: 11px; height:20px"><span t-field="line.name"/></td>
-                                        <td name="td_quantity" class="text-right" style="border: solid 1px #000000; border-collapse: collapse; width: 8%; font-size: 11px; text-align: right; height:20px">
+                                        <td name="td_quantity" class="text-right o_price_total" style="border: solid 1px #000000; border-collapse: collapse; width: 8%; font-size: 11px; text-align: right; height:20px">
                                             <span t-field="line.quantity"/>
                                             <span t-field="line.product_uom_id"/>
                                         </td>
@@ -286,10 +286,8 @@
                                     </td>
                                 </tr>
                             </table>
-                            <br/>
                             <span style="font-size:14px">Data da fatura: <span t-field="o.invoice_date"/></span>
                             <p t-field="o.partner_id.name" style="font-size:13px"/>
-                            <br/>
                             <br/>
                             <span style="font-size:14px">Ass.:___________________________________</span>
                         </div>

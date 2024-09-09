@@ -15,6 +15,6 @@
     ],
     'data': [
         'security/ir.model.access.csv',
-        'views/js_view.xml',
+        # 'views/js_view.xml',
     ],
 }

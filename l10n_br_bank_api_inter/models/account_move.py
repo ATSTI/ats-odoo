@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import tempfile
+import logging
 from base64 import b64decode, b64encode
 
 from PyPDF2 import PdfFileMerger
@@ -9,6 +10,7 @@ from PyPDF2 import PdfFileMerger
 from odoo import _, fields, models
 from odoo.exceptions import UserError
 
+_logger = logging.getLogger(__name__)
 
 class AccountMove(models.Model):
 
@@ -70,12 +72,15 @@ class AccountMove(models.Model):
         boleto_gerado = False
         for move_line in self.financial_move_line_ids:            
             if move_line.codigo_solicitacao and not move_line.pdf_boleto_id:
-                move_line.generate_pdf_boleto()
-                boleto_gerado = True
+                try:
+                    move_line.generate_pdf_boleto()
+                    boleto_gerado = True
+                except Exception as e:
+                    _logger.error("Erro impressão PDF, tente novamente. Erro: \n {}".format(e))
             else:
                 boleto_gerado = True
-            if not boleto_gerado:
-                raise UserError("Boleto não gerado. Verifique no menu Clientes/Debit Orders.")
+            # if not boleto_gerado:
+                # raise UserError("Boleto não gerado. Verifique no menu Clientes/Debit Orders.")
             # if not self.pdf_boletos_id:
                 # self._merge_pdf_boletos()
             # boleto_id = move_line.pdf_boleto_id

@@ -37,6 +37,8 @@
                 <field name="write_off_choice" string="Write Off" />
                 <field name="write_off_by_api" string="Write Off by API" />
                 <field name="codigo_solicitacao" />
+                <field name="pix_copiaecola" />
+                <field name="pix_txid" />
             </field>
         </field>
     </record>

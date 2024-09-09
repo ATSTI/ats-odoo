@@ -72,6 +72,8 @@ class AccountMoveLine(models.Model):
     )
 
     codigo_solicitacao = fields.Char(string="Código Solicitação")
+    pix_copiaecola = fields.Char(string="Pix cópia e cola")
+    pix_txid = fields.Char(string="Pix id")
 
     def generate_pdf_boleto(self):
         """
@@ -80,7 +82,6 @@ class AccountMoveLine(models.Model):
         if self.own_number and self.pdf_boleto_id:
             return
         order_id = self.payment_line_ids[0].order_id
-        import pudb;pu.db
         with ArquivoCertificado(order_id.journal_id, "w") as (key, cert):
             api = ApiInter(
                 cert=(cert, key),
@@ -94,8 +95,21 @@ class AccountMoveLine(models.Model):
             if not self.own_number and self.codigo_solicitacao:
                 # buscar informacoes do boleto pegar nosso_numero
                 resposta = api.consulta_boleto_detalhado(self.codigo_solicitacao)
-                self.own_number = resposta["nossoNumero"]
-                self.payment_line_ids[0].own_number = resposta["nossoNumero"]
+                # import pudb;pu.db
+                if 'cobrancas' in resposta:
+                    for cob in resposta['cobrancas']:
+                        boleto = cob['boleto']
+                        if boleto['seuNumero'] != self.document_number:
+                            continue
+                        titulo = cob['cobranca']
+                        pix = cob['pix']
+                        self.payment_line_ids[0].digitable_line = titulo["linhaDigitavel"]
+                        self.payment_line_ids[0].barcode = titulo["codigoBarras"]
+                        self.pix_copiaecola = pix['pixCopiaECola']
+                        self.pix_txid = pix['txid']
+                        if 'nossoNumero' in boleto:
+                            self.own_number = boleto["nossoNumero"]
+                            self.payment_line_ids[0].own_number = boleto["nossoNumero"]
 
             datas = api.boleto_pdf(self.codigo_solicitacao)
             datas_json = json.loads(datas.decode("utf-8"))
@@ -154,7 +168,7 @@ class AccountMoveLine(models.Model):
                 codigo_baixa = "APEDIDODOCLIENTE"
             order_id = self.payment_line_ids.order_id
             if self.bank_inter_state != "pago":
-                if self.own_number:
+                if self.codigo_solicitacao:
                     with ArquivoCertificado(order_id.journal_id, "w") as (key, cert):
                         api = ApiInter(
                             cert=(cert, key),
@@ -165,7 +179,7 @@ class AccountMoveLine(models.Model):
                             client_id=self.journal_payment_mode_id.bank_client_id,
                             client_secret=self.journal_payment_mode_id.bank_secret_id,
                         )
-                        resultado = api.boleto_baixa(self.own_number, codigo_baixa)
+                        resultado = api.boleto_baixa(self.codigo_solicitacao, codigo_baixa)
                         if resultado:
                             self.bank_inter_state = "baixado"
         except Exception as error:

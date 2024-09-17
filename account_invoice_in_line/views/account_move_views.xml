@@ -16,6 +16,7 @@
                     <field name="fiscal_operation_line_id" /> -->
                     <field name="ipi_cst_id" invisible="1"/>
                     <field name="ipi_guideline_id" invisible="1"/>
+                    <field name="icms_origin" invisible="1" />
                 </xpath>
             </field>
         </record>      

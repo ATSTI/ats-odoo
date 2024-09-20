@@ -95,16 +95,16 @@ class AccountMoveLine(models.Model):
             if not self.own_number and self.codigo_solicitacao:
                 # buscar informacoes do boleto pegar nosso_numero
                 resposta = api.consulta_boleto_detalhado(self.codigo_solicitacao)
-                # import pudb;pu.db
+                #import pudb;pu.db
                 if 'cobrancas' in resposta:
                     for cob in resposta['cobrancas']:
                         boleto = cob['boleto']
-                        if boleto['seuNumero'] != self.document_number:
-                            continue
                         titulo = cob['cobranca']
+                        if titulo['seuNumero'] != self.document_number:
+                            continue
                         pix = cob['pix']
-                        self.payment_line_ids[0].digitable_line = titulo["linhaDigitavel"]
-                        self.payment_line_ids[0].barcode = titulo["codigoBarras"]
+                        self.payment_line_ids[0].digitable_line = boleto["linhaDigitavel"]
+                        self.payment_line_ids[0].barcode = boleto["codigoBarras"]
                         self.pix_copiaecola = pix['pixCopiaECola']
                         self.pix_txid = pix['txid']
                         if 'nossoNumero' in boleto:

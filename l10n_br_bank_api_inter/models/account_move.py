@@ -68,6 +68,7 @@ class AccountMove(models.Model):
                 if not move_line.codigo_solicitacao:
                     # gerar boleto
                     move.payment_order_id.open2generated()
+                    sleep(5)
                     break
         boleto_gerado = False
         for move_line in self.financial_move_line_ids:            

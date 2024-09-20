@@ -47,6 +47,10 @@ def post_init_hook(cr, registry):
     ncm = '0'
     ncm_id = 0
     for prd in product:
+
+        # ATS nao precisa disto
+        continue
+
         values = {}
         if prd.ncm_id or not prd.ncm:
             continue

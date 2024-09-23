@@ -44,7 +44,7 @@ def post_init_hook(cr, registry):
 	# 					 valor_retencao_issqn, valor_retencao_pis, valor_retencao_cofins, valor_bc_irrf, valor_retencao_irrf, valor_bc_csll, 
 	# 					 valor_retencao_csll, valor_bc_inss, valor_retencao_inss, valor_final, informacoes_legais, informacoes_complementares,
 	# 					 codigo_retorno, mensagem_retorno, numero_nfe, xml_to_send, xml_to_send_name, email_sent, payment_mode_id, iest,
-	# 					 ambiente_nfe, ind_final, ind_pres, ind_dest, ind_ie_dest, tipo_emissao, data_entrada_saida, modalidade_frete,
+	# 					 ambiente, ind_final, ind_pres, ind_dest, ind_ie_dest, tipo_emissao, data_entrada_saida, modalidade_frete,
 	# 					 transportadora_id, placa_veiculo, uf_veiculo, rntc, uf_saida_pais_id, local_embarque, local_despacho, numero_fatura,
 	# 					 fatura_bruto, fatura_desconto, fatura_liquido, nota_empenho, pedido_compra, contrato_compra, sequencial_evento, recibo_nfe,
 	# 					 chave_nfe, protocolo_nfe, nfe_processada, nfe_processada_name, valor_icms_uf_remet, valor_icms_uf_dest, valor_icms_fcp_uf_dest,

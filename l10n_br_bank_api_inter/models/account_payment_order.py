@@ -86,6 +86,7 @@ class AccountPaymentOrder(models.Model):
                 ),
                 client_id=self.journal_id.bank_client_id,
                 client_secret=self.journal_id.bank_secret_id,
+                client_environment=self.journal_id.bank_environment,
             )
             data = self._generate_bank_inter_boleto_data()
             for item in data:

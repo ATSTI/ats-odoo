@@ -21,3 +21,9 @@ class AccountJournal(models.Model):
         string="Secret ID",
         help="Secret ID provided by the bank",
     )
+
+    bank_environment = fields.Selection(
+        selection=[("1", "Produção"), ("2", "Homologação")],
+        string="Ambiente",
+        default="2",
+    )

@@ -71,9 +71,9 @@ class AccountMoveLine(models.Model):
         copy=False,
     )
 
-    codigo_solicitacao = fields.Char(string="Código Solicitação")
-    pix_copiaecola = fields.Char(string="Pix cópia e cola")
-    pix_txid = fields.Char(string="Pix id")
+    codigo_solicitacao = fields.Char(string="Código Solicitação", copy=False,)
+    pix_copiaecola = fields.Char(string="Pix cópia e cola", copy=False,)
+    pix_txid = fields.Char(string="Pix id", copy=False,)
 
     def generate_pdf_boleto(self):
         """
@@ -95,7 +95,6 @@ class AccountMoveLine(models.Model):
             if not self.own_number and self.codigo_solicitacao:
                 # buscar informacoes do boleto pegar nosso_numero
                 resposta = api.consulta_boleto_detalhado(self.codigo_solicitacao)
-                #import pudb;pu.db
                 if 'cobrancas' in resposta:
                     for cob in resposta['cobrancas']:
                         boleto = cob['boleto']

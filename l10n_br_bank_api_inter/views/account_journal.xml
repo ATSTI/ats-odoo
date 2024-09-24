@@ -20,6 +20,7 @@
                     <field name="bank_inter_key" />
                     <field name="bank_client_id" />
                     <field name="bank_secret_id" />
+                    <field name="bank_environment" />
                 </group>
             </group>
         </field>

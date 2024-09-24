@@ -1,7 +1,7 @@
 # Copyright 2021 KMEE
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import tempfile
+import time
 import logging
 from base64 import b64decode, b64encode
 
@@ -13,48 +13,7 @@ from odoo.exceptions import UserError
 _logger = logging.getLogger(__name__)
 
 class AccountMove(models.Model):
-
     _inherit = "account.move"
-
-    # pdf_boletos_id = fields.Many2one(
-    #     comodel_name="ir.attachment", string="PDF Boletos", ondelete="cascade"
-    # )
-
-    # def _merge_pdf_boletos(self):
-    #     # pdf_merger = PdfFileMerger()
-
-    #     # temp_files = []
-    #     for move_line in self.financial_move_line_ids:
-    #         move_line.generate_pdf_boleto()
-
-        #     if move_line.pdf_boleto_id:
-        #         temp_pdf = tempfile.TemporaryFile()
-        #         decode_data = b64decode(move_line.pdf_boleto_id.datas, validate=True)
-        #         temp_pdf.write(decode_data)
-        #         temp_pdf.seek(0)
-        #         pdf_merger.append(temp_pdf)
-        #         temp_files.append(temp_pdf)
-
-        #         temp_merged = tempfile.TemporaryFile()
-        #         pdf_merger.write(temp_merged)
-        #         pdf_merger.close()
-
-        #         temp_merged.seek(0)
-        #         datas = b64encode(temp_merged.read())
-
-        # self.pdf_boletos_id = self.env["ir.attachment"].create(
-        #     {
-        #         "name": ("Boleto %s" % self.display_name.replace("/", "-")),
-        #         "res_model": self._name,
-        #         "res_id": self.id,
-        #         "datas": datas,
-        #         "mimetype": "application/pdf",
-        #         "type": "binary",
-        #     }
-        # )
-
-        # for file in temp_files:
-        #     file.close()
 
     def action_pdf_boleto(self):
         """
@@ -62,83 +21,21 @@ class AccountMove(models.Model):
         invoice
         :return: actions.act_window
         """
-        import pudb;pu.db
         for move in self:
             for move_line in move.financial_move_line_ids:
                 if not move_line.codigo_solicitacao:
                     # gerar boleto
                     move.payment_order_id.open2generated()
-                    sleep(5)
+                    time.sleep(5)
                     break
-        boleto_gerado = False
         for move_line in self.financial_move_line_ids:            
             if move_line.codigo_solicitacao and not move_line.pdf_boleto_id:
                 try:
                     move_line.generate_pdf_boleto()
-                    boleto_gerado = True
                 except Exception as e:
                     _logger.error("Erro impressão PDF, tente novamente. Erro: \n {}".format(e))
-            else:
-                boleto_gerado = True
-            # if not boleto_gerado:
-                # raise UserError("Boleto não gerado. Verifique no menu Clientes/Debit Orders.")
-            # if not self.pdf_boletos_id:
-                # self._merge_pdf_boletos()
-            # boleto_id = move_line.pdf_boleto_id
-            # base_url = self.env["ir.config_parameter"].get_param("web.base.url")
-            # download_url = "/web/content/%s/%s?download=True" % (
-            #     str(boleto_id.id),
-            #     boleto_id.name,
-            # )
-
-            # return {
-            #     "type": "ir.actions.act_url",
-            #     "url": str(base_url) + str(download_url),
-            #     "target": "new",
-            # }
-        # try:
-        #     if not self.pdf_boletos_id:
-        #         self._merge_pdf_boletos()
-
-        #     boleto_id = self.pdf_boletos_id
-        #     base_url = self.env["ir.config_parameter"].get_param("web.base.url")
-        #     download_url = "/web/content/%s/%s?download=True" % (
-        #         str(boleto_id.id),
-        #         boleto_id.name,
-        #     )
-
-        #     return {
-        #         "type": "ir.actions.act_url",
-        #         "url": str(base_url) + str(download_url),
-        #         "target": "new",
-        #     }
-        # except Exception as error:
-        #     raise UserError(error)
-
-    # def action_invoice_cancel(self):
-    #     try:
-    #         for financial_move_line in self.financial_move_line_ids:
-    #             financial_move_line.drop_bank_slip()
-    #             if financial_move_line.bank_inter_state == "baixado":
-    #                 return self.button_cancel()
-    #             else:
-    #                 raise UserError(
-    #                     _(
-    #                         "All Account Move Line related to Invoice must haver their "
-    #                         "status set to 'write off' to be able to cancel."
-    #                     )
-    #                 )
-    #     except Exception as error:
-    #         raise UserError(_(error))
-
-    # def _post(self, soft=True):
-    #     res = super()._post(soft=soft)
-    #     if not self.pdf_boletos_id:
-    #         self.action_pdf_boleto()
-    #     return res
 
     def load_cnab_info(self):
-        import pudb;pu.db
         res = super().load_cnab_info()
         if (
             self.partner_bank_id.bank_id
@@ -179,8 +76,6 @@ class AccountMove(models.Model):
                         s.payment_mode_id and s.payment_mode_id.auto_create_payment_order
                     )
                 )
-                # '{"seuNumero":"PAY0161","nossoNumero":"01345006506","codigoBarras":"07792974600000007800001112063827901345006506","linhaDigitavel":"0779000116     account_move.py:61 (0 hit
-                # 1206382790613450065068297460000000780"}'
                 if filtered_invoice_ids:
                     # Criação das Linha na Ordem de Pagamento
                     applicable_lines = False
@@ -205,5 +100,4 @@ class AccountMove(models.Model):
                             # nao sei pq este campo nao e gravado
                             self.payment_order_id = pay_order_id['res_id']
                         pay.draft2open()
-                        #     pay.open2generated()
         return res

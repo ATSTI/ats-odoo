@@ -14,7 +14,7 @@
         'Carlos Silveira <crsiveira@gmail.com>',
     ],
     'depends': [
-        'base', 'account',
+        'l10n_br_base', 'account',
     ],
     'data': [
     ],

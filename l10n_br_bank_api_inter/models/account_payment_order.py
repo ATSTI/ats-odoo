@@ -86,16 +86,21 @@ class AccountPaymentOrder(models.Model):
                 ),
                 client_id=self.journal_id.bank_client_id,
                 client_secret=self.journal_id.bank_secret_id,
+                client_environment=self.journal_id.bank_environment,
             )
             data = self._generate_bank_inter_boleto_data()
             for item in data:
+                import pudb;pu.db
+                print(item._emissao_data())
                 resposta = api.boleto_inclui(item._emissao_data())
+                print(resposta)
                 payment_line_id = self.payment_line_ids.filtered(
                     lambda line: line.document_number == item._identifier
                 )
                 if payment_line_id:
-                    payment_line_id.move_line_id.own_number = resposta["nossoNumero"]
-                    payment_line_id.own_number = resposta["nossoNumero"]
+                    payment_line_id.digitable_line = resposta["codigoSolicitacao"]
+                    payment_line_id.move_line_id.codigo_solicitacao = resposta["codigoSolicitacao"]
+                    #payment_line_id.own_number = resposta["nossoNumero"]
         return False, False
 
     def _gererate_bank_inter_api(self):

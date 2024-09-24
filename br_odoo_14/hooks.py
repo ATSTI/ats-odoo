@@ -4,16 +4,18 @@ import logging
 
 from odoo import SUPERUSER_ID, api
 
+from ..l10n_br_base.tools import check_ie
+
 _logger = logging.getLogger(__name__)
 
 def post_init_hook(cr, registry):
     """Copiar campos br_base Trust."""
     env = api.Environment(cr, SUPERUSER_ID, {})
-    import pudb;pu.db
     partner = env["res.partner"].search([], order="ibge_code")
     city = 0
     city_id = 0
     for prt in partner:
+        values = {}
         if prt.city_id or not prt.ibge_code:
             continue
         if not prt.city_id and city != prt.ibge_code:
@@ -23,41 +25,51 @@ def post_init_hook(cr, registry):
                     city = prt.ibge_code
                     city_id = ct.id
         if city_id:
-            prt.city_id = city_id
+            values['city_id'] = city_id
         # prt.ibge_code = prt.city_id.ibge_code
-        prt.cnpj_cpf = prt.cnpj_cpf_bkp
-        prt.inscr_est = prt.inscr_est_bkp
+        values['cnpj_cpf'] = prt.cnpj_cpf_bkp
+        # check_ie(prt.env, prt.inscr_est_bkp, prt.state_id, prt.country_id)
+        values['inscr_est'] = prt.inscr_est_bkp
         # prt.rg_fisica = prt.rg_fisica_bkp
-        prt.inscr_mun = prt.inscr_mun_bkp
-        prt.suframa = prt.suframa_bkp
-        prt.legal_name = prt.legal_name_bkp
-        prt.district = prt.district_bkp
-        prt.street_number = prt.number_bkp
+        values['inscr_mun'] = prt.inscr_mun_bkp
+        values['suframa'] = prt.suframa_bkp
+        values['legal_name'] = prt.legal_name_bkp
+        values['district'] = prt.district_bkp
+        values['street_number'] = prt.number_bkp
         if prt.indicador_ie_dest_bkp:
-            prt.ind_ie_dest = prt.indicador_ie_dest_bkp
+            values['ind_ie_dest'] = prt.indicador_ie_dest_bkp
             if prt.indicador_ie_dest_bkp == "9":
-                prt.ind_final = "1"
+                values['ind_final'] = "1"
+        
+        prt.with_context(disable_ie_validation=True).write(values)
 
-    import pudb;pu.db
     product = env["product.template"].search([], order = "ncm")
     ncm = '0'
     ncm_id = 0
     for prd in product:
+
+        # ATS nao precisa disto
+        continue
+
+        values = {}
         if prd.ncm_id or not prd.ncm:
             continue
         if prd.ncm != ncm:
-            ncm_id = env["l10n_br_fiscal.ncm"].search(["code", "=", prd.ncm])
-            ncm = prd.code
+            code_ncm = f"{prd.ncm[:4]}.{prd.ncm[4:6]}.{prd.ncm[6:8]}"
+            ncm_id = env["l10n_br_fiscal.ncm"].search([("code", "=", code_ncm)])
+            ncm = prd.ncm
         if ncm_id:
-            prd.ncm_id = ncm_id.id
-        prd.type_product = prd.type_bkp
-        prd.fiscal_type = prd.fiscal_type_bkp
-        prd.origin = prd.origin_bkp
+            values['ncm_id'] = ncm_id.id
+        #prd.type = prd.type_bkp
+        values['fiscal_type'] = prd.fiscal_type_bkp
+        values['icms_origin'] = prd.origin_bkp
         if prd.code_servico:
-            prd.type = "service"
-            service_id = env["l10n_br_fiscal.service.type"].search(["code", "=", prd.code_servico])
+            #prd.type = "service"
+            service_id = env["l10n_br_fiscal.service.type"].search([("code", "=", prd.code_servico)])
             if service_id:
-                prd.service_type_id = service_id.id
+                values['service_type_id'] = service_id.id
+
+        prd.with_context(inventory_mode=False).write(values)
 
     # cr.execute(
     #     """

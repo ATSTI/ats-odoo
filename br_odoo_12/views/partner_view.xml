@@ -7,16 +7,16 @@
         <field name="inherit_id" ref="base.view_partner_form" />
         <field name="arch" type="xml">
             <field name="phone" position="after">
-                <field name="ibge_code" invisible="1" />
-                <field name="cnpj_cpf_bkp" invisible="1"/>
-                <field name="inscr_est_bkp" invisible="1"/>
-                <field name="indicador_ie_dest_bkp" invisible="1"/>
-                <field name="rg_fisica_bkp" invisible="1"/>
-                <field name="inscr_mun_bkp" invisible="1"/>
-                <field name="suframa_bkp" invisible="1"/>
-                <field name="legal_name_bkp" invisible="1"/>
-                <field name="district_bkp" invisible="1"/>
-                <field name="number_bkp" invisible="1"/>
+                <field name="ibge_code" />
+                <field name="cnpj_cpf_bkp" />
+                <field name="inscr_est_bkp" />
+                <field name="indicador_ie_dest_bkp" />
+                <field name="rg_fisica_bkp" />
+                <field name="inscr_mun_bkp" />
+                <field name="suframa_bkp" />
+                <field name="legal_name_bkp" />
+                <field name="district_bkp"/>
+                <field name="number_bkp" />
             </field>
         </field>
     </record>

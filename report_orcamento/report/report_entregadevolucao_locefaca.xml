@@ -13,82 +13,157 @@
                             font-size: 15px;
                             }
                         </style>
-                        <t t-call="report_cabecalho.report_cabecalho_id" />
+                        <table style="border: 1px solid; width:100%; height:100px">
+                            <tr>
+                                <th colspan="3" bgcolor="#990000" style="border: 1px solid; text-align: center; font-size:14px;color: #ffffff; border: 0px solid">
+                                    TERMO DE ENTREGA / DEVOLUÇÃO
+                                </th>
+                            </tr>
+                            <tr>
+                                <td style="border: 0px solid; width:30% ; height:35px">
+                                    <div style="width: 100%;float: left;">
+                                        <img t-attf-src="data:image/*;base64,{{o.company_id.logo}}"
+                                            t-att-alt="o.company_id.name" style="width:100%; height:70px"/>
+                                    </div>
+                                </td>
+                                <td style="text-align: center; border: 0px solid; width:50%" >
+                                    <span style="font-size:10px" t-field="o.company_id.name"/>                                
+                                    <br/><span style="font-size:10px">CNPJ/CPF: </span><span style="font-size:10px" t-field="o.company_id.cnpj_cpf"/>
+                                    <br/><span style="font-size:10px" t-field="o.company_id.street_name"/><span style="font-size:10px"> , </span><span style="font-size:10px" t-field="o.company_id.street_number"/> <span style="font-size:10px"> - </span><span style="font-size:10px" t-field="o.company_id.district"/><span style="font-size:10px"> , CEP: </span><span style="font-size:10px" t-field="o.company_id.zip"/><span style="font-size:10px"> - </span><span style="font-size:10px" t-field="o.company_id.state_id.code"/> 
+                                    <br/><span style="font-size:10px" t-field="o.company_id.phone"/> <span style="font-size:10px"> | </span><span style="font-size:10px" t-field="o.company_id.email"/>
+                                </td>
+                                <td style="border: 0px solid; width:20% ; height:35px">
+                                    <table style="border: 1px solid; width:100%;font-size:8px">
+                                        <tr>
+                                            <td bgcolor="#666666" style="text-align: left;font-color: #ffffff; border: 1px solid; width:50%;font-size:8px ; height:35px" >
+                                                <font color="#ffffff"><span>NUMERO CONTRATO</span></font>                               
+                                            </td>
+                                            <td style="text-align: center; border: 1px solid; width:50%;font-size:8px ; height:35px" >
+                                                <span style="font-size:8px" t-field="o.name"/>                                
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td bgcolor="#666666" style="text-align: left;font-color: #ffffff; border: 1px solid; width:50%;font-size:8px ; height:35px" >
+                                                <font color="#ffffff"><span>NOTA FISCAL</span></font>                                
+                                            </td>
+                                            <td style="text-align: center; border: 1px solid; width:50%;font-size:8px ; height:35px" >
+                                                <span style="font-size:8px"/>                                
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td bgcolor="#666666" style="text-align: left; border: 1px solid; width:50%;font-size:8px ; height:35px" >
+                                                <font color="#ffffff"><span>DATA</span></font>                               
+                                            </td>
+                                            <td style="text-align: center; border: 1px solid; width:50%;font-size:8px ; height:35px" >
+                                                <span style="font-size:8px"/>                                
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
                         <table style="width:100%">
-                            <th colspan="3" style="text-align: center; font-size:18px; border: 0px solid">
-                                TERMO DE ENTREGA
+                            <th bgcolor="#990000" style="text-align: left;color: #ffffff; font-size:12px; height: 30px;" colspan="4">
+                                DADOS DO CLIENTE
                             </th>
                             <tr>
-                                <td style="text-align: left" colspan="3">
-                                    Cliente: <strong t-field="o.partner_id.name"/>
-                                    <p/>
+                                <td bgcolor="#666666" style="text-align: left;color: #ffffff; font-size:9px; height: 30px" colspan="1">
+                                    EMPRESA:
+                                </td>
+                                <td style="text-align: left; font-size:9px; height: 30px" colspan="1">
+                                    <span t-field="o.partner_id.name"/> 
+                                </td>
+                                <td bgcolor="#666666" style="text-align: left;color: #ffffff; font-size:9px; height: 30px" colspan="1">
+                                    CLIENTE NOME: 
+                                </td>
+                                <td style="text-align: left; font-size:9px; height: 30px" colspan="1">
+                                    <span t-field="o.partner_id.legal_name"/>
                                 </td>
                             </tr>
-                            <tr style="height:35px">
-                                <td style="text-align: left">
-                                    CNPJ: <strong t-field="o.partner_id.cnpj_cpf"/>
-                                    <p/>
+                            <tr>
+                                <td bgcolor="#666666" style="text-align: left;color: #ffffff; width:10%; font-size:9px; height: 30px">
+                                    CNPJ: 
                                 </td>
-                                <td style="text-align: left">
-                                    Nº DO CONTRATO: <strong t-field="o.name"/>
-                                    <p/> 
+                                <td style="text-align: left; width:40%; font-size:9px; height: 30px">
+                                    <span t-field="o.partner_id.cnpj_cpf"/>
+                                </td>
+                                <td bgcolor="#666666" style="text-align: left;color: #ffffff; width:10%; font-size:9px; height: 30px">
+                                    RG:  
+                                </td>
+                                <td style="text-align: left; width:40%; font-size:9px; height: 30px">
+                                    <span t-field="o.partner_id.rg"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td bgcolor="#666666" style="text-align: left;color: #ffffff; width:10%; font-size:9px; height: 30px">
+                                    ENDEREÇO:
+                                </td>
+                                <td style="text-align: left; width:40%; font-size:9px; height: 30px">
+                                    <span t-field="o.partner_id.street_name"/>
+                                </td>
+                                <td bgcolor="#666666" style="text-align: left;color: #ffffff; width:10%; font-size:9px; height: 30px">
+                                    FUNÇÃO:
+                                </td>
+                                <td style="text-align: left; width:40%; font-size:9px; height: 30px">
+                                    <span/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left;font-size:9px; height: 30px" colspan="2">
+                                    <span/>
+                                </td>
+                                <td bgcolor="#666666" style="text-align: left;color: #ffffff; font-size:9px; height: 30px" colspan="1" >
+                                    PLACA:
+                                </td>
+                                <td style="text-align: left; font-size:9px; height: 30px" colspan="1">
+                                    <span/>
                                 </td>
                             </tr>
                         </table>
                         <table style="width:100%">
-                            <th colspan="3" style="text-align: center; height: 30px">
-                                DADOS DO RESPONSÁVEL PELA RETIRADA
+                            <th bgcolor="#990000" style="font-size: 12px;text-align: left;color: #ffffff; height: 30px;" colspan="1">
+                                TRANSPORTADORA
                             </th>
                             <tr style="height:35px">
-                                <td colspan="3" style="text-align: left">
-                                    RECEBEDOR (NOME LEGÍVEL):
-                                    <p/>
-                                </td>
-                            </tr>
-                            <tr style="height:35px">
-                                <td style="text-align: left">
-                                    IDENTIDADE:
-                                    <p/>
-                                </td>
-                                <td style="text-align: left">
-                                    PLACA DO CARRO:
-                                    <p/>
-                                </td>
-                                <td style="text-align: left">
-                                    FUNÇÃO:
-                                    <p/>
-                                </td>
-                            </tr>
-                            <tr style="height:35px">
-                                <td style="text-align: left" colspan="3">
-                                    Entrega:
-                                    ▢ LALAMOVE  ▢ TRANSPORTADORA   ▢ RETIRADO PELO CLIENTE
+                                <td style="text-align: left" colspan="1">
+                                    <span style="font-size: 11px;">▢ LALAMOVE  ▢ TRANSPORTADORA   ▢ RETIRADO PELO CLIENTE </span>
                                 </td>
                             </tr>
                         </table>
                         <table style="width:100%">
-                            <tr style="height:25px">
-                            </tr>
-                            <tr style="height:25px">
-                                <td style="width:40% ; text-align:center">
-                                    EQUIPAMENTO
-                                    <p/>
-                                </td >
-                                <td style="width:5% ; text-align:center">
+                            <th bgcolor="#990000" style="text-align: left;color: #ffffff; height: 30px; " colspan="10">
+                                <span style="font-size: 12px;">MEDIDA DAS CAIXAS CM / PESO / VOLUME </span>
+                            </th>
+                            <tr>
+                                <td bgcolor="#666666" style="font-size: 8px;text-align: center;color: #ffffff; width:10%;height:20px">
                                     QTD
-                                    <p/>
                                 </td>
-                                <td style="width:35% ; text-align:center">
-                                    Nº DE SÉRIE
-                                    <p/>
+                                <td bgcolor="#666666" style="font-size: 8px;text-align: center;color: #ffffff; width:15%;height:20px">
+                                    LARGURA
                                 </td>
-                                <td style="width:10% ; text-align:center">
-                                    SEPARADO?
-                                    <p/>
+                                <td bgcolor="#666666" style="font-size: 8px;text-align: center;color: #ffffff; width:13%;height:20px">
+                                    COMPRIMENTO
                                 </td>
-                                <td style="width:10% ; text-align:center">
-                                    ENTREGUE?
-                                    <p/>
+                                <td bgcolor="#666666" style="font-size: 8px;text-align: center;color: #ffffff; width:23%;height:20px">
+                                    ALTURA
+                                </td>
+                                <td bgcolor="#666666" style="font-size: 8px;text-align: center;color: #ffffff; width:7%;height:20px">
+                                    PESO
+                                </td>
+                                <td bgcolor="#666666" style="font-size: 8px;text-align: center;color: #ffffff; width:5%;height:20px">
+                                    QTD
+                                </td>
+                                <td bgcolor="#666666" style="font-size: 8px;text-align: center;color: #ffffff; width:10%;height:20px">
+                                    LARGURA
+                                </td>
+                                <td bgcolor="#666666" style="font-size: 8px;text-align: center;color: #ffffff; width:10%;height:20px">
+                                    COMPRIMENTO
+                                </td>
+                                <td bgcolor="#666666" style="font-size: 8px;text-align: center;color: #ffffff; width:7%;height:20px">
+                                    ALTURA
+                                </td>
+                                <td bgcolor="#666666" style="font-size: 8px;text-align: center;color: #ffffff; width:5%;height:20px">
+                                    PESO
                                 </td>
                             </tr>
                             <t t-set="linhas" t-value="6" />
@@ -102,17 +177,87 @@
                                 </t>
                             </t>
                                 <t t-set="linhas" t-value="linhas - 1" />
+                                <tr style="height:20px">
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </t>
+                            <!-- <t t-foreach="range(linhas)" t-as="compl">
                                 <tr style="height:30px">
-                                    <td><b t-field="line.name" /></td> 
-                                    <td style="text-align:right"><b t-field="line.product_uom_qty" /></td>
-                                    <td style="text-indent: 30px;text-align:left"><b t-esc="lot" /></td>
+                                    <td></td> 
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </t> -->
+                        </table>
+                        <table style="width:100%">
+                            <th bgcolor="#990000" style="text-align: left;color: #ffffff; height: 30px; " colspan="8">
+                                <span style="font-size: 12px;">PRODUTOS</span>
+                            </th>
+                            <tr>
+                                <td bgcolor="#666666" style="font-size: 10px;text-align: center;color: #ffffff; width:6%;height:20px">
+                                    ITEM
+                                </td>
+                                <td bgcolor="#666666" style="font-size: 10px;text-align: center;color: #ffffff; width:19%;height:20px">
+                                    SKU
+                                </td>
+                                <td bgcolor="#666666" style="font-size: 10px;text-align: center;color: #ffffff; width:30%;height:20px">
+                                    DESCRIÇÃO
+                                </td>
+                                <td bgcolor="#666666" style="font-size: 10px;text-align: center;color: #ffffff; width:8%;height:20px">
+                                    QTD
+                                </td>
+                                <td bgcolor="#666666" style="font-size: 10px;text-align: center;color: #ffffff; width:18%;height:20px">
+                                    Nº DE SERIE
+                                </td>
+                                <td bgcolor="#666666" style="font-size: 10px;text-align: center;color: #ffffff; width:7%;height:20px">
+                                    ENTRADA
+                                </td>
+                                <td bgcolor="#666666" style="font-size: 10px;text-align: center;color: #ffffff; width:7%;height:20px">
+                                    SAÍDA
+                                </td>
+                                <td bgcolor="#666666" style="font-size: 10px;text-align: center;color: #ffffff; width:5%;height:20px">
+                                    OK
+                                </td>
+                            </tr>
+                            <t t-set="linhas" t-value="10" />
+                            <t t-set="item" t-value="0" />
+                            <t t-set="lot" t-value="" />
+                            <t t-foreach="o.order_line" t-as="line">
+                                <t t-set="item" t-value="item + 1" t-as="item"/>
+                                <t t-foreach="o.picking_ids" t-as="pick">
+                                    <t t-foreach="pick.move_line_ids_without_package" t-as="lp">
+                                        <t t-if="line.product_id == lp.product_id and pick.picking_type_id.code == 'outgoing'" >
+                                            <t t-set="lot" t-value="lp.lot_id.name" />
+                                        </t>
+                                    </t>
+                                </t>
+                                <t t-set="linhas" t-value="linhas - 1"/>
+                                <tr style="height:20px"> 
+                                    <td style="font-size: 10px; text-align:center"><span t-out="line.item" /></td>
+                                    <td style="font-size: 10px; text-align:left"><span t-field="line.product_id.default_code" /></td>
+                                    <td style="font-size: 10px; text-align:left"><span t-field="line.name" /></td>
+                                    <td style="font-size: 10px; text-align:right"><span t-field="line.product_uom_qty" /></td>
+                                    <td style="font-size: 10px; text-indent: 30px;text-align:left"><span t-esc="lot" /></td>
+                                    <td></td>
                                     <td></td>
                                     <td></td>
                                 </tr>
                             </t>
                             <t t-foreach="range(linhas)" t-as="compl">
-                                <tr style="height:30px">
+                                <tr style="height:20px">
                                     <td></td> 
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
@@ -121,15 +266,76 @@
                             </t>
                         </table>
                         <table style="width:100%">
+                            <th bgcolor="#990000" style="text-align: left;color: #ffffff; height: 30px; " colspan="1">
+                                <span style="font-size: 12px;">OBSERVAÇÕES GERAIS DE ENTREGA</span>
+                            </th>
                             <tr style="height:25px">
-                            </tr>
-                            <tr style="height:45px">
-                                <td style="text-align:center">
-                                    <b>RIO DE JANEIRO,_________________DE__________________________________2023 </b>
+                                <td style="font-size: 9px;text-align: center; width:100%;height:25px">
+                                    Recebi da empresa MAQSAFETY, os equipamentos descritos acima em perfeitas condições para uso de trabalho, estou ciente que devo entrega-los em estado para uso.
                                 </td>
                             </tr>
                         </table>
                         <table style="width:100%">
+                            <th bgcolor="#990000" style="text-align: left;color: #ffffff; height: 30px; " colspan="1">
+                                <span style="font-size: 12px;">DEVOLUÇÃO DOS EQUIPAMENTOS / OBSERVAÇÕES</span>
+                            </th>
+                            <tr style="height:25px">
+                                <td style="font-size: 10px;text-align: center; width:100%;height:25px">
+                                    Atestamos que na conferência dos equipamentos encontramos os mesmos no estado declarado abaixo, com toda ciencia atestada do Locatário que assina:
+                                </td>
+                            </tr>
+                            <tr style="height:25px">
+                                <td style="text-align: left" colspan="1">
+                                    <p style="font-size: 10px;">▢ Equipamentos em perfeito estado</p>  
+                                    <p style="font-size: 10px;">▢ Equipamentos Apresentando pontos de sujeira;</p>   
+                                    <p style="font-size: 10px;">▢ Equipamentos com falta de peças que comprometem para novo uso. (PODENDO SER ENVIADO ORÇAMENTO FUTURO) Descrever:</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left" colspan="1">
+                                    <br/>
+                                </td>
+                            </tr>
+                        </table>
+                        <table style="width:100%">
+                            <tr>
+                                <td bgcolor="#990000" style="text-align: center;color: #ffffff; height: 15px; " colspan="2">
+                                    <span style="font-size: 10px;">RESPONSÁVEL DA MAQTRUCK / ASSINATURA </span>
+                                </td>
+                                <td bgcolor="#990000" style="text-align: center;color: #ffffff; height: 15px; " colspan="2">
+                                    <span style="font-size: 10px;">RESPONSÁVEL DA EMPRESA LOCATÁRIA / ASSINATURA</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td bgcolor="#990000" style="text-align: center;color: #ffffff; width:25%;height: 20px; ">
+                                    <span style="font-size: 10px;">SAÍDA</span>
+                                </td>
+                                <td bgcolor="#990000" style="text-align: center;color: #ffffff; width:25%;height: 20px; " >
+                                    <span style="font-size: 10px;">RETORNO</span>
+                                </td>
+                                <td bgcolor="#990000" style="text-align: center;color: #ffffff; width:25%;height: 20px; " >
+                                    <span style="font-size: 10px;">SAÍDA</span>
+                                </td>
+                                <td bgcolor="#990000" style="text-align: center;color: #ffffff; width:25%;height: 20px; ">
+                                    <span style="font-size: 10px;">RETORNO</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left; width:25%;height: 50px; ">
+                                    <br/>
+                                </td>
+                                <td style="text-align: left; width:25%;height: 50px; ">
+                                    <br/>
+                                </td>
+                                <td style="text-align: left; width:25%;height: 50px; ">
+                                    <br/>
+                                </td>
+                                <td style="text-align: left; width:25%;height: 50px; ">
+                                    <br/>
+                                </td>
+                            </tr>
+                        </table>
+                        <!-- <table style="width:100%">
                             <tr style="height:35px">
                                 <td style="text-align: left">
                                     ASSINATURA DO RECEBEDOR:
@@ -270,7 +476,7 @@
                                 <p/>
                             </td>
                         </tr>
-                    </table>
+                    </table> -->
                 </div>
             </t>
         </t>

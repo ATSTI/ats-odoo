@@ -182,7 +182,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <span t-field="o.partner_id.street_name" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-field="o.partner_id.street_number" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-field="o.partner_id.city_id.name" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-fieldpa="o.partner_id.district" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-field="o.partner_id.state_id.name" style="font-size:14px"/>
+                                <span t-field="o.partner_id.street_name" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-field="o.partner_id.street_number" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-field="o.partner_id.city_id.name" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-fieldpa="o.partner_id.district" style="font-size:14px"/><span style="font-size:14px"> - </span><span t-field="o.partner_id.state_id.code" style="font-size:14px"/>
                             </td>
                         </tr>
                     </table>

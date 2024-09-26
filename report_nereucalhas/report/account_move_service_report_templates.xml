@@ -215,7 +215,7 @@
                     <t t-set="display_discount" t-value="any(l.discount for l in o.order_line)"/>
                     <table style="border: solid 1px #DDD; border-collapse: collapse; width: 100%;">
                         <tr>
-                            <th name="th_description" class="text-left" style="border: solid 1px #000000; border-collapse: collapse; width: 8%;; font-size: 16px; height:45px" >Data</th>
+                            <th name="th_data" class="text-left" style="border: solid 1px #000000; border-collapse: collapse; width: 8%;; font-size: 16px; height:45px" >Data</th>
                             <th name="th_description" class="text-left" style="border: solid 1px #000000; border-collapse: collapse; width: 44%;; font-size: 16px; height:45px" >Descrição</th>
                             <th name="th_quantity" class="text-right" style="border: solid 1px #000000; border-collapse: collapse; width: 8%;; font-size: 16px; height:45px">Qntd</th>
                             <th name="th_subtotal" class="text-right" style="border: solid 1px #000000; border-collapse: collapse; width: 20%;; font-size: 16px; height:45px">

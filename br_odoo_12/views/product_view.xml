@@ -8,11 +8,11 @@
         <field name="arch" type="xml">
             <group name="accounting" position="inside">
                 <group>
-                    <field name="fiscal_type_bkp" />
-                    <field name="type_bkp" />
-                    <field name="origin_bkp" />
-                    <field name="ncm" />
-                    <field name="code_servico" />
+                    <field name="fiscal_type_bkp" invisible="1" />
+                    <field name="type_bkp" invisible="1" />
+                    <field name="origin_bkp" invisible="1" />
+                    <field name="ncm" invisible="1" />
+                    <field name="code_servico" invisible="1" />
                 </group>
             </group>
         </field>

@@ -49,19 +49,22 @@ def post_init_hook(cr, registry):
     for prd in product:
 
         # ATS nao precisa disto
-        continue
+        # continue
 
         values = {}
         if prd.ncm_id or not prd.ncm:
             continue
         if prd.ncm != ncm:
             code_ncm = f"{prd.ncm[:4]}.{prd.ncm[4:6]}.{prd.ncm[6:8]}"
-            ncm_id = env["l10n_br_fiscal.ncm"].search([("code", "=", code_ncm)])
+            ncm_id = env["l10n_br_fiscal.ncm"].search([("code", "=", code_ncm)], limit=1)
             ncm = prd.ncm
         if ncm_id:
             values['ncm_id'] = ncm_id.id
         #prd.type = prd.type_bkp
-        values['fiscal_type'] = prd.fiscal_type_bkp
+        if prd.fiscal_type_bkp == 'product':
+            values['fiscal_type'] = '00'
+        if prd.fiscal_type_bkp == 'service':
+            values['fiscal_type'] = '09'
         values['icms_origin'] = prd.origin_bkp
         if prd.code_servico:
             #prd.type = "service"

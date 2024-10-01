@@ -36,7 +36,6 @@ class AccountMove(models.Model):
                     _logger.error("Erro impressão PDF, tente novamente. Erro: \n {}".format(e))
 
     def load_cnab_info(self):
-        res = super().load_cnab_info()
         if (
             self.partner_bank_id.bank_id
             == self.env.ref("l10n_br_base.res_bank_077")
@@ -71,10 +70,12 @@ class AccountMove(models.Model):
                     # interval.mov_instruction_code_id = (
                     #     self.payment_mode_id.cnab_sending_code_id.id
                     # )
+                # if self.payment_mode_id:
+                #     filtered_invoice_ids = self.payment_mode_id.auto_create_payment_order
                 filtered_invoice_ids = self.filtered(
-                    lambda s: (
-                        s.payment_mode_id and s.payment_mode_id.auto_create_payment_order
-                    )
+                   lambda s: (
+                       s.payment_mode_id and s.payment_mode_id.auto_create_payment_order
+                   )
                 )
                 if filtered_invoice_ids:
                     # Criação das Linha na Ordem de Pagamento
@@ -100,4 +101,5 @@ class AccountMove(models.Model):
                             # nao sei pq este campo nao e gravado
                             self.payment_order_id = pay_order_id['res_id']
                         pay.draft2open()
-        return res
+        else:
+            return super().load_cnab_info()

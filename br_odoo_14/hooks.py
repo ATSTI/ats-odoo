@@ -40,6 +40,9 @@ def post_init_hook(cr, registry):
             values['ind_ie_dest'] = prt.indicador_ie_dest_bkp
             if prt.indicador_ie_dest_bkp == "9":
                 values['ind_final'] = "1"
+        else:
+            values['ind_ie_dest'] = '9'
+            values['ind_final'] = '1'
         
         prt.with_context(disable_ie_validation=True).write(values)
 

@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_saleorder_locefaca" inherit_id="l10n_br_sale.report_saleorder_document_l10n_br_sale">
+        <xpath expr="//t[@t-call='web.external_layout']" position="replace">
+            <t t-call="web.basic_layout">
+                <t t-set="docs" t-value="docs.with_context({'lang':docs.partner_id.lang})"/>
+                <t t-foreach="docs" t-as="o">
+                    <div class="page">
+                        <table style="border: 0px solid; width:100%">
+                            <tr>
+                                <!-- <td style="border: 0px solid; width:40% ; height:35px">
+                                    <div style="width: 100%;float: left;">
+                                        <img t-attf-src="data:image/*;base64,{{o.company_id.logo}}"
+                                            t-att-alt="o.company_id.name" style="width:100%; height:70px"/>
+                                    </div>
+                                </td> -->
+                                <td style="text-align: left; border: 0px solid; width:70%; " >
+                                    <div style="width: 25%;float: left;">
+                                        <img t-attf-src="data:image/*;base64,{{o.company_id.logo}}" t-att-alt="o.company_id.name" style="width:100%; height:110px" />
+                                    </div>
+                                    <span/><b style="font-size:13px" t-field="o.company_id.name"/>
+                                    <br/><span style="font-size:11px" t-field="o.company_id.street_name"/>
+                                    <br/><span style="font-size:11px">Bairro: </span><span style="font-size:11px" t-field="o.company_id.district"/><span style="font-size:11px">          </span><span style="font-size:11px" t-field="o.company_id.city_id.name"/><span> / </span><span style="font-size:11px" t-field="o.company_id.state_id.code"/><span style="font-size:11px">   </span><span style="font-size:11px" t-field="o.company_id.zip"/>                                 
+                                    <br/><span style="font-size:11px">CNPJ/CPF: </span><span style="font-size:11px" t-field="o.company_id.cnpj_cpf"/>
+                                </td>
+                                <td style="text-align: left; border: 0px solid; width:30%; ">
+                                    <br/><span style="font-size:11px">Telefone: </span><span style="font-size:11px" t-field="o.company_id.phone"/>
+                                    <br/><span style="font-size:11px">Email:</span><span style="font-size:11px" t-field="o.company_id.email"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <table style="border: 0px solid; width:100%">
+                            <tr>
+                                <td style="font-size: 14px;text-align: center; width:75%;">
+                                    <b>PEDIDO DE VENDA Nº: </b><span t-field="o.name"/>
+                                </td>
+                                <td style="font-size: 11px;text-align: left; width:25%;">
+                                    <span>Data Emissão: </span><span t-field="o.date_order"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <span>__________________________________________________________________________________________________________________________________</span>
+                        <br/>
+                        <span style="font-size:12px">Cliente: </span><span style="font-size:11px" t-field="o.partner_id.name"/>
+                        <br/><span style="font-size:11px">End: </span>
+                        <span style="font-size:11px" t-field="o.partner_id.street_name"/>
+                        <span style="font-size:11px"> - </span>
+                        <span style="font-size:11px" t-field="o.partner_id.street_number"/>
+                        <span style="font-size:11px"> - </span>
+                        <span style="font-size:11px" t-field="o.partner_id.district"/>
+                        <span style="font-size:11px"> - </span>
+                        <span style="font-size:11px" t-field="o.partner_id.city_id.name"/>
+                        <span style="font-size:11px"> / </span>
+                        <span style="font-size:11px" t-field="o.partner_id.state_id.code"/>
+                        <span style="font-size:11px"> Cep: </span>
+                        <span style="font-size:11px" t-field="o.partner_id.zip"/>
+                        <span style="font-size:11px"> Fone: </span>
+                        <span style="font-size:11px" t-field="o.partner_id.phone"/>
+                        <table style="border: 1px solid; width:100%">
+                            <tr>
+                                <td style="font-size: 13px;text-align: center; width:10%;height:25px">
+                                    Cod.
+                                </td>
+                                <td style="font-size: 13px;text-align: center; width:55%;height:25px">
+                                    Descrição dos Produtos
+                                </td>
+                                <td style="font-size: 13px;text-align: center; width:15%;height:25px">
+                                    Qtde
+                                </td>
+                                <td style="font-size: 13px;text-align: center; width:10%;height:25px">
+                                    R$ Unitario
+                                </td>
+                                <td style="font-size: 13px;text-align: center; width:10%;height:25px">
+                                    R$ Total
+                                </td>
+                            </tr>
+                            <t t-set="linhas" t-value="8" />
+                            <t t-set="item" t-value="0" />
+                            <t t-set="lot" t-value="" />
+                            <t t-foreach="o.order_line" t-as="line">
+                                <t t-set="item" t-value="item + 1"/>
+                                <t t-foreach="o.picking_ids" t-as="pick">
+                                    <t t-foreach="pick.move_line_ids_without_package" t-as="lp">
+                                        <t t-if="line.product_id == lp.product_id and pick.picking_type_id.code == 'outgoing'" >
+                                            <t t-set="lot" t-value="lp.lot_id.name" />
+                                        </t>
+                                    </t>
+                                </t>
+                                <t t-set="linhas" t-value="linhas - 1"/>
+                                <tr style="height:25px"> 
+                                    <td style="border: 1px solid;font-size: 10px; text-align:center"><span t-field="line.product_id.default_code" /></td>
+                                    <td style="border: 1px solid;font-size: 10px; text-align:left"><span t-field="line.product_id.name" /></td>
+                                    <td style="border: 1px solid;font-size: 10px; text-align:center"><span t-field="line.product_uom_qty" /></td>
+                                    <td style="border: 1px solid;font-size: 10px; text-align:right"><span t-field="line.price_unit" /></td>
+                                    <td style="border: 1px solid;font-size: 10px; text-align:right"><span t-field="line.price_subtotal" /></td>
+                                </tr>
+                            </t>
+                            <t t-foreach="range(linhas)" t-as="compl">
+                                <t t-set="item" t-value="item + 1"/>
+                                <tr style="height:25px">
+                                    <td style="border: 1px solid;" ></td> 
+                                    <td style="border: 1px solid;" ></td>
+                                    <td style="border: 1px solid;" ></td>
+                                    <td style="border: 1px solid;" ></td>
+                                    <td style="border: 1px solid;"></td>
+                                </tr>
+                            </t>
+                        </table>
+                        <br/>
+                        <br/>
+                        <span>Obs.:</span>
+                        <br/>
+                        <table style="border: 1px solid; width:70% ; float: left">
+                            <tr>
+                                <td style="font-size: 12px;text-align: left; width:100%;height:50px">
+                                    Cond. Pagto. : <span t-field="o.payment_mode_id" />
+                                </td>
+                            </tr>
+                        </table>
+                        <table style="border: 1px solid; width:30% ; float: right">
+                            <tr>
+                                <td style="border: 1px solid;font-size: 13px; width:100%;height:50px;text-align: right">
+                                    Valor: <span style="font-size: 13px" t-field="o.amount_price_gross" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid;font-size: 13px; text-align: right;width:100%;height:50px">
+                                    Total: <span style="font-size: 13px" t-field="o.amount_total" />
+                                </td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <b>Reconheço o valor acima e comprometo-me a quitá-lo até a data do vencimento</b>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <span>Assinatura: __________________________________________</span>
+                        <div class="oe_structure"/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <table style="border: 0px solid; width:100%">
+                            <tr>
+                                <!-- <td style="border: 0px solid; width:40% ; height:35px">
+                                    <div style="width: 100%;float: left;">
+                                        <img t-attf-src="data:image/*;base64,{{o.company_id.logo}}"
+                                            t-att-alt="o.company_id.name" style="width:100%; height:70px"/>
+                                    </div>
+                                </td> -->
+                                <td style="text-align: left; border: 0px solid; width:70%; " >
+                                    <div style="width: 25%;float: left;">
+                                        <img t-attf-src="data:image/*;base64,{{o.company_id.logo}}" t-att-alt="o.company_id.name" style="width:100%; height:110px" />
+                                    </div>
+                                    <span/><b style="font-size:13px" t-field="o.company_id.name"/>
+                                    <br/><span style="font-size:11px" t-field="o.company_id.street_name"/>
+                                    <br/><span style="font-size:11px">Bairro: </span><span style="font-size:11px" t-field="o.company_id.district"/><span style="font-size:11px">          </span><span style="font-size:11px" t-field="o.company_id.city_id.name"/><span> / </span><span style="font-size:11px" t-field="o.company_id.state_id.code"/><span style="font-size:11px">   </span><span style="font-size:11px" t-field="o.company_id.zip"/>                                 
+                                    <br/><span style="font-size:11px">CNPJ/CPF: </span><span style="font-size:11px" t-field="o.company_id.cnpj_cpf"/>
+                                </td>
+                                <td style="text-align: left; border: 0px solid; width:30%; ">
+                                    <br/><span style="font-size:11px">Telefone: </span><span style="font-size:11px" t-field="o.company_id.phone"/>
+                                    <br/><span style="font-size:11px">Email:</span><span style="font-size:11px" t-field="o.company_id.email"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <table style="border: 0px solid; width:100%">
+                            <tr>
+                                <td style="font-size: 14px;text-align: center; width:75%;">
+                                    <b>PEDIDO DE VENDA Nº: </b><span t-field="o.name"/>
+                                </td>
+                                <td style="font-size: 11px;text-align: left; width:25%;">
+                                    <span>Data Emissão: </span><span t-field="o.date_order"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <span>__________________________________________________________________________________________________________________________________</span>
+                        <br/>
+                        <span style="font-size:12px">Cliente: </span><span style="font-size:11px" t-field="o.partner_id.name"/>
+                        <br/><span style="font-size:11px">End: </span>
+                        <span style="font-size:11px" t-field="o.partner_id.street_name"/>
+                        <span style="font-size:11px"> - </span>
+                        <span style="font-size:11px" t-field="o.partner_id.street_number"/>
+                        <span style="font-size:11px"> - </span>
+                        <span style="font-size:11px" t-field="o.partner_id.district"/>
+                        <span style="font-size:11px"> - </span>
+                        <span style="font-size:11px" t-field="o.partner_id.city_id.name"/>
+                        <span style="font-size:11px"> / </span>
+                        <span style="font-size:11px" t-field="o.partner_id.state_id.code"/>
+                        <span style="font-size:11px"> Cep: </span>
+                        <span style="font-size:11px" t-field="o.partner_id.zip"/>
+                        <span style="font-size:11px"> Fone: </span>
+                        <span style="font-size:11px" t-field="o.partner_id.phone"/>
+                        <table style="border: 1px solid; width:100%">
+                            <tr>
+                                <td style="font-size: 13px;text-align: center; width:10%;height:25px">
+                                    Cod.
+                                </td>
+                                <td style="font-size: 13px;text-align: center; width:55%;height:25px">
+                                    Descrição dos Produtos
+                                </td>
+                                <td style="font-size: 13px;text-align: center; width:15%;height:25px">
+                                    Qtde
+                                </td>
+                                <td style="font-size: 13px;text-align: center; width:10%;height:25px">
+                                    R$ Unitario
+                                </td>
+                                <td style="font-size: 13px;text-align: center; width:10%;height:25px">
+                                    R$ Total
+                                </td>
+                            </tr>
+                            <t t-set="linhas" t-value="8" />
+                            <t t-set="item" t-value="0" />
+                            <t t-set="lot" t-value="" />
+                            <t t-foreach="o.order_line" t-as="line">
+                                <t t-set="item" t-value="item + 1"/>
+                                <t t-foreach="o.picking_ids" t-as="pick">
+                                    <t t-foreach="pick.move_line_ids_without_package" t-as="lp">
+                                        <t t-if="line.product_id == lp.product_id and pick.picking_type_id.code == 'outgoing'" >
+                                            <t t-set="lot" t-value="lp.lot_id.name" />
+                                        </t>
+                                    </t>
+                                </t>
+                                <t t-set="linhas" t-value="linhas - 1"/>
+                                <tr style="height:25px"> 
+                                    <td style="border: 1px solid;font-size: 10px; text-align:center"><span t-field="line.product_id.default_code" /></td>
+                                    <td style="border: 1px solid;font-size: 10px; text-align:left"><span t-field="line.product_id.name" /></td>
+                                    <td style="border: 1px solid;font-size: 10px; text-align:center"><span t-field="line.product_uom_qty" /></td>
+                                    <td style="border: 1px solid;font-size: 10px; text-align:right"><span t-field="line.price_unit" /></td>
+                                    <td style="border: 1px solid;font-size: 10px; text-align:right"><span t-field="line.price_subtotal" /></td>
+                                </tr>
+                            </t>
+                            <t t-foreach="range(linhas)" t-as="compl">
+                                <t t-set="item" t-value="item + 1"/>
+                                <tr style="height:25px">
+                                    <td style="border: 1px solid;" ></td> 
+                                    <td style="border: 1px solid;" ></td>
+                                    <td style="border: 1px solid;" ></td>
+                                    <td style="border: 1px solid;" ></td>
+                                    <td style="border: 1px solid;"></td>
+                                </tr>
+                            </t>
+                        </table>
+                        <br/>
+                        <br/>
+                        <span>Obs.:</span>
+                        <br/>
+                        <table style="border: 1px solid; width:70% ; float: left">
+                            <tr>
+                                <td style="font-size: 12px;text-align: left; width:100%;height:50px">
+                                    Cond. Pagto. : <span t-field="o.payment_mode_id" />
+                                </td>
+                            </tr>
+                        </table>
+                        <table style="border: 1px solid; width:30% ; float: right">
+                            <tr>
+                                <td style="border: 1px solid;font-size: 13px; width:100%;height:50px;text-align: right">
+                                    Valor: <span style="font-size: 13px" t-field="o.amount_price_gross" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid;font-size: 13px; text-align: right;width:100%;height:50px">
+                                    Total: <span style="font-size: 13px" t-field="o.amount_total" />
+                                </td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <b>Reconheço o valor acima e comprometo-me a quitá-lo até a data do vencimento</b>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <span>Assinatura: __________________________________________</span>
+                    </div>
+                </t>
+            </t>
+        </xpath>
+    </template>
+</odoo>

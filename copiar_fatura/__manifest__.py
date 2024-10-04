@@ -14,7 +14,7 @@
     'website': '',
     'depends': ["l10n_br_fiscal", "l10n_br_account"],
     'data': [
-        'security/ir.model.access.csv',
+        # 'security/ir.model.access.csv',
         'views/copiar_view.xml',
     ],
     'installable': True,

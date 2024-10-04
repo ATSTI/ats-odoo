@@ -10,8 +10,6 @@
                 <button
                     name="action_copiar_fatura"
                     type="object"
-                    class="btn-success"
-                    attrs="{'invisible': [('document_type_id', '=', False)]}"
                     style="background-color:#ffffe9;"           
                 >
                     <span>Copiar Fatura</span>

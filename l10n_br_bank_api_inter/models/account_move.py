@@ -22,11 +22,24 @@ class AccountMove(models.Model):
         :return: actions.act_window
         """
         for move in self:
+            payment_order_id = False
+            if not move.payment_mode_id or not move.partner_bank_id:
+                raise UserError(_("Sem modo de pagamento ou Banco destinatário"))
+            for move_line in move.financial_move_line_ids:
+                if payment_order_id:
+                    break
+                for order in move_line.payment_line_ids:
+                    if order.order_id.state == "cancel":
+                        continue
+                    payment_order_id = order.order_id
+                    break
+            if not payment_order_id:
+                raise UserError(_("Ordem de débito cancelada, recrie a Ordem de débito (Botão: Add to debit order)."))
             for move_line in move.financial_move_line_ids:
                 # necessario se precisa refazer o boleto, tipo trocou a data vencimento
                 if not move_line.codigo_solicitacao:
                     # gerar boleto
-                    move.payment_order_id.open2generated()
+                    payment_order_id.open2generated()
                     time.sleep(5)
                     break
         for move_line in self.financial_move_line_ids:
@@ -59,6 +72,7 @@ class AccountMove(models.Model):
                     #     sequence if interval.payment_mode_id.generate_own_number else "0"
                     # )
                     interval.document_number = numero_documento
+                    interval.name = interval.name + '-' + numero_documento
                     interval.company_title_identification = hex(interval.id).upper()
                     instructions = ""
                     if self.eval_payment_mode_instructions:

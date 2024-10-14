@@ -12,7 +12,6 @@ class VisitanteAttendance(models.TransientModel):
     name = fields.Char("Nome")
 
     def action_create_attendance(self):
-        import pudb;pu.db
         hr = self.env['hr.employee']
         vals = {
             'name': self.name

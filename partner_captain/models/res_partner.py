@@ -52,7 +52,6 @@ class PartnerHistorico(models.Model):
     """
     @api.model
     def create(self, vals):
-        import pudb;pu.db
         hist = self.env['crm.historico'].browse(vals['historico_id'])
         vals['tipo'] = hist.tipo
         return super(PartnerHistorico, self).create(vals)

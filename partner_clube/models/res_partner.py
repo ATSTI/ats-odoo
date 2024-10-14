@@ -243,8 +243,6 @@ class ResPartner(models.Model):
             prt = self.env['res.partner'].search([
                     ('chave_acesso', '=', es[0])
                     ])
-            #if prt.id == 3914:
-                # import pudb;pu.db
             if not prt:
                 continue
             ent = entrada.search([
@@ -318,8 +316,6 @@ class ResPartner(models.Model):
             ('inadimplente', '=', True),
         ])
         for prt in prt_ids:
-            #if prt.id == 2551:
-            #    import pudb;pu.db
             if not prt.parent_id:
                 cnt_ids = conta.search([('reconciled', '=', False), 
                     ('date_maturity', '<', hj),
@@ -359,8 +355,6 @@ class ResPartner(models.Model):
                 socio = conta.partner_id.id
 
     def insere_cartao(self, partner_id, cartao, id_user=0):
-        #if cartao == '70C8BE':
-        #    import pudb;pu.db
         con = Conexao()
         if id_user == 0:
             sqlc = 'select id, idDevice, inativo, name from \
@@ -407,8 +401,6 @@ class ResPartner(models.Model):
         #con.close()
 
     def insere_novo_socio(self, partner_id, nome):
-        #if partner_id.id == 5007:
-        #    import pudb;pu.db
         msg_erro = ''
         con = Conexao()
         tipo = '0'
@@ -512,7 +504,6 @@ class ResPartner(models.Model):
             retorno = con.insert(insere)
             # INSERE REGRA ACESSO
             maior_18 = '2'
-            #import pudb;pu.db
             #dt = datetime.strptime('2003/06/01','%Y/%m/%d')
             #dt = datetime.strftime(datetime.today(),'%Y/%m/%d')
             dt = datetime.today() - relativedelta(years=18) # quem é menor de 18 anos
@@ -551,13 +542,11 @@ class ResPartner(models.Model):
             msg_erro += 'ERRO INSERINDO SOCIOS NO IDSECURE : %s<br>' %(retorno)
             #con.close()
         if retorno:
-            #import pudb;pu.db
             msg_erro += 'MSG : %s<br>' %(retorno)
         #con.close()
         return msg_erro
 
     def altera_socio(self, partner_id, nome):
-        #import pudb;pu.db
         con = Conexao()      
         inadimplente = 0
         if partner_id.inadimplente:
@@ -591,8 +580,6 @@ class ResPartner(models.Model):
                 # ve se precisa incluir o cartao
                 self.insere_cartao(partner_id.chave_acesso, partner_id.cartao)
         
-            #if partner_id.id == 5010:
-            #    import pudb;pu.db
             #select pra ver se ja existe na tabela useraccessrules
             idSqlite = 'SELECT id FROM useraccessrules WHERE idUser = %s' %(str(cli[0]))
             ja_existe = con.query(idSqlite)
@@ -612,8 +599,6 @@ class ResPartner(models.Model):
                 insere += ', %s, %s)' %(maior_18, str(cli[0]))
                 retorno = con.insert(insere)    
         """        
-                if partner_id.id == 5010:
-                    import pudb;pu.db
                 idSqlite = 'SELECT id FROM usergroups WHERE idUser = %s' %(str(cli[0]))
                 ja_existe = con.query(idSqlite)
                 if not ja_existe:
@@ -684,8 +669,6 @@ class ResPartner(models.Model):
             ('chave_acesso','!=', False),
             ])
         for partner_id in cli_ids:
-            #if partner_id.chave_acesso == '117766':       
-            #    import pudb;pu.db 
             sqlc = 'select u.id, u.idDevice, u.blackList, u.name, c.NumberStr from \
                 Users u left outer join Cards c on c.idUser = u.id where idDevice = %s \
                 and deleted = 0'  %(partner_id.chave_acesso)    
@@ -701,8 +684,6 @@ class ResPartner(models.Model):
             ('chave_acesso','!=', False),
             ])
         for partner_id in cli_ids:
-            #if partner_id.chave_acesso == '117766':       
-            #    import pudb;pu.db
             sqlc = 'select u.id, u.idDevice, u.blackList, u.name, c.NumberStr from \
                 Users u left outer join Cards c on c.idUser = u.id where idDevice = %s \
                 and deleted = 0'  %(partner_id.chave_acesso)    
@@ -723,10 +704,6 @@ class ResPartner(models.Model):
             ('chave_acesso','!=', False),
             ])
         for partner_id in cli_ids:
-            #if partner_id.chave_acesso == '117772':        
-            #    import pudb;pu.db
-            #if partner_id.id == 3729:
-            #    import pudb;pu.db
             nome = partner_id.name.strip()
             nome = nome.replace("'"," ")
             nome = unidecode(nome[:100])

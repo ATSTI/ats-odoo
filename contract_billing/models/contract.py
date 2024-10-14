@@ -3,7 +3,7 @@ from odoo import api, fields, models, _
 import time
 import base64
 #from sshtunnel import SSHTunnelForwarder
-import odoorpc
+# import odoorpc
 
 # from odoo.addons.br_boleto.boleto.document import Boleto
 
@@ -317,33 +317,33 @@ class AccountAnalyticAccount(models.Model):
         #)
         return True
         
-    def cron_tunel_ssh(self, remote_bind, port_remote, port_local, cnpj):
-        #model.cron_tunel_ssh('ats.atsti.com.br', 8900, 10500, '58.383.373/0001-79')
-        #import pudb;pu.db
-        odoo = odoorpc.ODOO('ats.atsti.com.br', port=49069)
-        odoo.login('ats_atsti_com_br', 'contato@atsti.com.br', 'ats2020')
-        odoo_part = odoo.env['res.partner']
-        cli_id = odoo_part.search([
-            ('cnpj_cpf', '=', cnpj),
-        ], limit=1)
-        clid = odoo_part.browse(cli_id)
+    # def cron_tunel_ssh(self, remote_bind, port_remote, port_local, cnpj):
+    #     #model.cron_tunel_ssh('ats.atsti.com.br', 8900, 10500, '58.383.373/0001-79')
+    #     #import pudb;pu.db
+    #     odoo = odoorpc.ODOO('ats.atsti.com.br', port=49069)
+    #     odoo.login('ats_atsti_com_br', 'contato@atsti.com.br', 'ats2020')
+    #     odoo_part = odoo.env['res.partner']
+    #     cli_id = odoo_part.search([
+    #         ('cnpj_cpf', '=', cnpj),
+    #     ], limit=1)
+    #     clid = odoo_part.browse(cli_id)
         
-        if (clid.vat == 'tunel'):
-            server = self._get_server(remote_bind, port_remote, port_local)
-            server.start()
-            #while True :
-            if (server.is_active):
-                odoo_part.write(cli_id,{'vat': 'tunelc'})
-                print("alive... " + (time.ctime()))
-            else:
-                print("reconnecting... " + time.ctime())
-                server.stop()
-                server = get_server()
-                server.start()
-            #    time.sleep(600)
-        #if (clid.suframa == 'tunelf'):
-        #    server.stop()
-        return True
+    #     if (clid.vat == 'tunel'):
+    #         server = self._get_server(remote_bind, port_remote, port_local)
+    #         server.start()
+    #         #while True :
+    #         if (server.is_active):
+    #             odoo_part.write(cli_id,{'vat': 'tunelc'})
+    #             print("alive... " + (time.ctime()))
+    #         else:
+    #             print("reconnecting... " + time.ctime())
+    #             server.stop()
+    #             server = get_server()
+    #             server.start()
+    #         #    time.sleep(600)
+    #     #if (clid.suframa == 'tunelf'):
+    #     #    server.stop()
+    #     return True
 
     def cron_recurring_create_invoice(self):
         contracts = self.search(

@@ -3,7 +3,7 @@
 
 import json
 import logging
-from datetime import date
+from datetime import date, datetime
 
 from odoo import _, fields, models
 from odoo.exceptions import UserError
@@ -32,6 +32,7 @@ BAIXAS = [
 
 ESTADO = [
     ("emaberto", "Em Aberto"),
+    ("a_receber", "A receber"),
     ("pago", "Pago"),
     ("expirado", "Expirado"),
     ("vencido", "Vencido"),
@@ -75,13 +76,42 @@ class AccountMoveLine(models.Model):
     pix_copiaecola = fields.Char(string="Pix cópia e cola", copy=False,)
     pix_txid = fields.Char(string="Pix id", copy=False,)
 
+    def send_new_boleto(self):
+        for order in self.payment_line_ids:
+            if order.order_id.state != "cancel":
+                raise UserError(_("Para refazer, cancele Ordem de débito."))    
+        if self.codigo_solicitacao and self.bank_inter_state in ('vencido', 'expirado', 'cancelado', 'baixado'):
+            user = str(self._uid) + '-' + self.env['res.users'].browse(self._uid).name
+            message = "Boleto Banco Inter refeito: %s-%s, código: %s, usuário: %s\n, em %s." % (
+                        self.name,
+                        self.date_maturity,
+                        self.codigo_solicitacao,
+                        user,
+                        datetime.now().strftime('%d-%m-%Y %H:%M')
+            )
+            self.move_id.message_post(body=message)
+            self.write({
+                "codigo_solicitacao": False,
+                "pix_copiaecola": False,
+                "pix_txid": False,
+                "pdf_boleto_id": False,
+                "bank_inter_state": "emaberto",
+                "write_off_choice": False,
+            })
+            # self.move_id.action_pdf_boleto()
+
     def generate_pdf_boleto(self):
         """
         Creates a new attachment with the Boleto PDF
         """
         if self.own_number and self.pdf_boleto_id:
             return
-        order_id = self.payment_line_ids[0].order_id
+        # order_id = self.payment_line_ids[0].order_id
+        for order in self.payment_line_ids:
+            if order.order_id.state != "cancel":
+                order_id = order.order_id
+                payment_line = order
+        token = order_id.generated_api_token("leitura")
         with ArquivoCertificado(order_id.journal_id, "w") as (key, cert):
             api = ApiInter(
                 cert=(cert, key),
@@ -92,24 +122,25 @@ class AccountMoveLine(models.Model):
                 client_id=self.journal_payment_mode_id.bank_client_id,
                 client_secret=self.journal_payment_mode_id.bank_secret_id,
                 client_environment=self.journal_payment_mode_id.bank_environment,
+                token=token,
             )
             if not self.own_number and self.codigo_solicitacao:
                 # buscar informacoes do boleto pegar nosso_numero
-                resposta = api.consulta_boleto_detalhado(self.codigo_solicitacao)
-                if 'cobrancas' in resposta:
-                    for cob in resposta['cobrancas']:
-                        boleto = cob['boleto']
-                        titulo = cob['cobranca']
-                        if titulo['seuNumero'] != self.document_number:
-                            continue
-                        pix = cob['pix']
-                        self.payment_line_ids[0].digitable_line = boleto["linhaDigitavel"]
-                        self.payment_line_ids[0].barcode = boleto["codigoBarras"]
-                        self.pix_copiaecola = pix['pixCopiaECola']
-                        self.pix_txid = pix['txid']
-                        if 'nossoNumero' in boleto:
-                            self.own_number = boleto["nossoNumero"]
-                            self.payment_line_ids[0].own_number = boleto["nossoNumero"]
+                resposta = api.consulta_boleto(self.codigo_solicitacao)
+                if 'cobranca' in resposta:
+                    # cob = resposta['cobranca']
+                    boleto = resposta['boleto']
+                    # titulo = cob['cobranca']
+                    # if titulo['seuNumero'] != self.document_number:
+                    #     continue
+                    pix = resposta['pix']
+                    payment_line.digitable_line = boleto["linhaDigitavel"]
+                    payment_line.barcode = boleto["codigoBarras"]
+                    self.pix_copiaecola = pix['pixCopiaECola']
+                    self.pix_txid = pix['txid']
+                    if 'nossoNumero' in boleto:
+                        self.own_number = boleto["nossoNumero"]
+                        payment_line.own_number = boleto["nossoNumero"]
 
             datas = api.boleto_pdf(self.codigo_solicitacao)
             datas_json = json.loads(datas.decode("utf-8"))
@@ -169,6 +200,9 @@ class AccountMoveLine(models.Model):
             order_id = self.payment_line_ids.order_id
             if self.bank_inter_state != "pago":
                 if self.codigo_solicitacao:
+                    token = order_id.generated_api_token("escrita")
+                    # with ArquivoCertificado(self.journal_id, "w") as (key, cert):
+                    #     api = order_id.api_inter(self.journal_id.bank_token, key, cert, "escrita")
                     with ArquivoCertificado(order_id.journal_id, "w") as (key, cert):
                         api = ApiInter(
                             cert=(cert, key),
@@ -179,10 +213,21 @@ class AccountMoveLine(models.Model):
                             client_id=self.journal_payment_mode_id.bank_client_id,
                             client_secret=self.journal_payment_mode_id.bank_secret_id,
                             client_environment=self.journal_payment_mode_id.bank_environment,
-                        )
+                            token=token,
+                        )                      
                         resultado = api.boleto_baixa(self.codigo_solicitacao, codigo_baixa)
                         if resultado:
                             self.bank_inter_state = "baixado"
+                            self.write_off_by_api = True
+                        user = str(self._uid) + '-' + self.env['res.users'].browse(self._uid).name
+                        message = "Boleto Banco Inter cancelado: %s-%s, código: %s, usuário: %s\n, em %s." % (
+                                    self.name,
+                                    self.date_maturity,
+                                    self.codigo_solicitacao,
+                                    user,
+                                    datetime.now().strftime('%d-%m-%Y %H:%M')
+                        )
+                        self.move_id.message_post(body=message)                            
         except Exception as error:
             raise UserError(_(error))
 
@@ -190,6 +235,9 @@ class AccountMoveLine(models.Model):
         try:
             parser = InterFileParser(self.journal_payment_mode_id)
             for order in self.payment_line_ids:
+                if order.order_id.state == "cancel":
+                    continue
+                token = order.order_id.generated_api_token("leitura")
                 with ArquivoCertificado(order.order_id.journal_id, "w") as (key, cert):
                     api = ApiInter(
                         cert=(cert, key),
@@ -200,67 +248,63 @@ class AccountMoveLine(models.Model):
                         client_id=self.journal_payment_mode_id.bank_client_id,
                         client_secret=self.journal_payment_mode_id.bank_secret_id,
                         client_environment=self.journal_payment_mode_id.bank_environment,
+                        token=token,
                     )
-                    if self.own_number:
-
-                        resposta = api.consulta_boleto_detalhado(
-                            nosso_numero=self.own_number
+                    if self.codigo_solicitacao:
+                        resposta = api.consulta_boleto(
+                            codigo_solicitacao=self.codigo_solicitacao
                         )
-
-                        parser.parse(resposta)
-
-                        if resposta["situacao"].lower() != self.bank_inter_state:
-                            if resposta["situacao"] == "pago":
-                                move_id = self.env["account.move"].create(
-                                    {
-                                        "date": date.today(),
-                                        "ref": self.ref,
-                                        "journal_id": self.journal_payment_mode_id.id,
-                                        "company_id": self.company_id.id,
-                                        "line_ids": [
-                                            (
-                                                0,
-                                                0,
-                                                {
-                                                    "account_id": self.account_id.id,
-                                                    "partner_id": self.partner_id.id,
-                                                    "debit": self.move_id.line_ids[
-                                                        0
-                                                    ].credit,
-                                                    "credit": self.move_id.line_ids[
-                                                        0
-                                                    ].debit,
-                                                    "date_maturity": self.date_maturity,
-                                                },
-                                            ),
-                                            (
-                                                0,
-                                                0,
-                                                {
-                                                    "account_id": self.account_id.id,
-                                                    "partner_id": self.company_id.id,
-                                                    "debit": self.move_id.line_ids[
-                                                        1
-                                                    ].credit,
-                                                    "credit": self.move_id.line_ids[
-                                                        1
-                                                    ].debit,
-                                                    "date_maturity": self.date_maturity,
-                                                },
-                                            ),
-                                        ],
-                                    }
-                                )
-                                move_id.post()
-                                (move_id.line_ids[0] + self).reconcile()
-
-                            if resposta["situacao"] == "cancelado":
-                                self.write_off_by_api = True
-                                self.write_off_choice = resposta[
-                                    "motivoCancelamento"
-                                ].lower()
-
-                        self.bank_inter_state = resposta["situacao"].lower()
+                    parser.parse(resposta)
+                    message = "Consulta Banco Inter boleto, retorno: %s\n, alterado em %s." % (
+                        resposta['cobranca']['situacao'],
+                        resposta['cobranca']['dataSituacao']
+                    )
+                    self.move_id.message_post(body=message)
+                    if resposta["cobranca"]["situacao"].lower() != self.bank_inter_state:
+                        if resposta["cobranca"]["situacao"] == "pago":
+                            move_id = self.env["account.move"].create(
+                                {
+                                    "date": date.today(),
+                                    "ref": self.ref,
+                                    "journal_id": self.journal_payment_mode_id.id,
+                                    "company_id": self.company_id.id,
+                                    "line_ids": [
+                                        (
+                                            0,
+                                            0,
+                                            {
+                                                "account_id": self.account_id.id,
+                                                "partner_id": self.partner_id.id,
+                                                "debit": self.move_id.line_ids[
+                                                    0
+                                                ].credit,
+                                                "credit": self.move_id.line_ids[
+                                                    0
+                                                ].debit,
+                                                "date_maturity": self.date_maturity,
+                                            },
+                                        ),
+                                        (
+                                            0,
+                                            0,
+                                            {
+                                                "account_id": self.account_id.id,
+                                                "partner_id": self.company_id.id,
+                                                "debit": self.move_id.line_ids[
+                                                    1
+                                                ].credit,
+                                                "credit": self.move_id.line_ids[
+                                                    1
+                                                ].debit,
+                                                "date_maturity": self.date_maturity,
+                                            },
+                                        ),
+                                    ],
+                                }
+                            )
+                            move_id.post()
+                            (move_id.line_ids[0] + self).reconcile()
+                    self.bank_inter_state = resposta["cobranca"]["situacao"].lower()
         except Exception as error:
             raise UserError(_(error))
 

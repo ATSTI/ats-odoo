@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import logging
+from datetime import datetime, timedelta
 
 from odoo import _, models, fields
 from odoo.exceptions import UserError
@@ -53,7 +54,7 @@ class AccountPaymentOrder(models.Model):
         )
         for line in self.payment_line_ids:
             payer = User(
-                name=line.partner_id.legal_name,
+                name=line.partner_id.legal_name or line.partner_id.name,
                 identifier=misc.punctuation_rm(line.partner_id.cnpj_cpf),
                 address=UserAddress(
                     streetLine1=line.partner_id.street or "",
@@ -78,6 +79,7 @@ class AccountPaymentOrder(models.Model):
 
     def _generate_bank_inter_boleto(self):
         with ArquivoCertificado(self.journal_id, "w") as (key, cert):
+            token = self.generated_api_token("escrita")
             api = ApiInter(
                 cert=(cert, key),
                 conta_corrente=(
@@ -87,20 +89,19 @@ class AccountPaymentOrder(models.Model):
                 client_id=self.journal_id.bank_client_id,
                 client_secret=self.journal_id.bank_secret_id,
                 client_environment=self.journal_id.bank_environment,
-            )
+                token=token,
+            )            
             data = self._generate_bank_inter_boleto_data()
             for item in data:
-                import pudb;pu.db
-                print(item._emissao_data())
+                # print(item._emissao_data())
                 resposta = api.boleto_inclui(item._emissao_data())
-                print(resposta)
+                # print(resposta)
                 payment_line_id = self.payment_line_ids.filtered(
                     lambda line: line.document_number == item._identifier
                 )
                 if payment_line_id:
                     payment_line_id.digitable_line = resposta["codigoSolicitacao"]
                     payment_line_id.move_line_id.codigo_solicitacao = resposta["codigoSolicitacao"]
-                    #payment_line_id.own_number = resposta["nossoNumero"]
         return False, False
 
     def _gererate_bank_inter_api(self):
@@ -109,6 +110,58 @@ class AccountPaymentOrder(models.Model):
             return self._generate_bank_inter_boleto()
         else:
             raise NotImplementedError
+
+    # não consegui usar
+    # 
+    # def api_inter(self, token, key, cert, tipo):
+    #     token = self.generated_api_token(tipo)
+    #     api = ApiInter(
+    #         cert=(cert, key),
+    #         conta_corrente=(
+    #             self.company_partner_bank_id.acc_number
+    #             + self.company_partner_bank_id.acc_number_dig
+    #         ),
+    #         client_id=self.journal_id.bank_client_id,
+    #         client_secret=self.journal_id.bank_secret_id,
+    #         client_environment=self.journal_id.bank_environment,
+    #         token=token,
+    #     )
+    #     return api
+
+    def generated_api_token(self, tipo):
+        if tipo == "escrita":
+            token_date = self.journal_id.bank_token_date
+            token = self.journal_id.bank_token
+            if not token_date or not self.journal_id.bank_token:
+                token_date = datetime.strptime('2024-01-01 01:00:00', '%Y-%m-%d %H:%M:%S')
+        else:
+            token_date = self.journal_id.bank_token_date_read
+            token = self.journal_id.bank_token_read
+            if not token_date or not self.journal_id.bank_token_read:
+                token_date = datetime.strptime('2024-01-01 01:00:00', '%Y-%m-%d %H:%M:%S')
+        tempo_token = (datetime.now() - token_date).total_seconds()
+        with ArquivoCertificado(self.journal_id, "w") as (key, cert):
+            # O tempo de vida de um token gerado é de uma hora
+            if tempo_token > 3600:
+                api = ApiInter(
+                    cert=(cert, key),
+                    conta_corrente=(
+                        self.company_partner_bank_id.acc_number
+                        + self.company_partner_bank_id.acc_number_dig
+                    ),
+                    client_id=self.journal_id.bank_client_id,
+                    client_secret=self.journal_id.bank_secret_id,
+                    client_environment=self.journal_id.bank_environment,
+                    token=None,
+                )
+                token = api.get_token(tipo)
+                if tipo == "escrita":
+                    self.journal_id.bank_token = token
+                    self.journal_id.bank_token_date = datetime.now()
+                else:
+                    self.journal_id.bank_token_read = token
+                    self.journal_id.bank_token_date_read = datetime.now()
+        return token
 
     def open2generated(self):
         self.ensure_one()

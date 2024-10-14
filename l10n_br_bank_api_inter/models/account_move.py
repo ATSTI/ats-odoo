@@ -23,12 +23,13 @@ class AccountMove(models.Model):
         """
         for move in self:
             for move_line in move.financial_move_line_ids:
+                # necessario se precisa refazer o boleto, tipo trocou a data vencimento
                 if not move_line.codigo_solicitacao:
                     # gerar boleto
                     move.payment_order_id.open2generated()
                     time.sleep(5)
                     break
-        for move_line in self.financial_move_line_ids:            
+        for move_line in self.financial_move_line_ids:
             if move_line.codigo_solicitacao and not move_line.pdf_boleto_id:
                 try:
                     move_line.generate_pdf_boleto()

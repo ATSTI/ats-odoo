@@ -21,6 +21,10 @@
                     <field name="bank_client_id" />
                     <field name="bank_secret_id" />
                     <field name="bank_environment" />
+                    <field name="bank_token" />
+                    <field name="bank_token_date" />
+                    <field name="bank_token_read" />
+                    <field name="bank_token_date_read" />
                 </group>
             </group>
         </field>

@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import fields, models
+from datetime import datetime
 
 
 class AccountJournal(models.Model):
@@ -27,3 +28,9 @@ class AccountJournal(models.Model):
         string="Ambiente",
         default="2",
     )
+
+    bank_token = fields.Char(string="Token escrita", readonly=True)
+    bank_token_date = fields.Datetime(string="Data token escrita", readonly=True, default=datetime.now())
+
+    bank_token_read = fields.Char(string="Token consulta", readonly=True)
+    bank_token_date_read = fields.Datetime(string="Data toke consulta", readonly=True, default=datetime.now())    

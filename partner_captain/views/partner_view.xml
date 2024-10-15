@@ -32,7 +32,7 @@
                     <page string="Equipamentos/Cursos/Viagens">
                         <field name="historico_line">
                         <tree string="Equipamento/Curso/Viagem">
-                            <field name="historico_id" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}" />
+                            <field name="historico_id" widget="many2many_tags" options="{'no_create_edit': True}" />
                             <field name="data_aquisicao" />
                             <field name="partner_id" invisible="1" />
                         </tree>

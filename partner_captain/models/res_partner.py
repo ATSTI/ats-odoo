@@ -36,8 +36,10 @@ class ResPartner(models.Model):
             res['partner_ids'] = active_ids                                                                                                                                
             res['dst_partner_id'] = self._get_ordered_partner(active_ids)[-1].id 
 
-
-
+    @api.onchange('name')
+    def _onchange_name(self):
+        if self.name and self.company_type == "person":
+            self.legal_name = self.name
 
 class PartnerHistorico(models.Model):
     _name = "partner.historico"

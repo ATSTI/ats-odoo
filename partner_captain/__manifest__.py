@@ -21,7 +21,7 @@ Lista de Equipamentos, Viagens e Cursos do Cliente:
         'Carlos Silveira<carlos@atsti.com.br>',
     ],
     'depends': [
-        'base',
+        'l10n_br_base',
         'product',
         'sale',
         'account',

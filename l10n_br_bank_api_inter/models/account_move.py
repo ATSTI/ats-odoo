@@ -7,7 +7,7 @@ from base64 import b64decode, b64encode
 
 from PyPDF2 import PdfFileMerger
 
-from odoo import _, fields, models
+from odoo import _, api, models
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -72,7 +72,7 @@ class AccountMove(models.Model):
                     #     sequence if interval.payment_mode_id.generate_own_number else "0"
                     # )
                     interval.document_number = numero_documento
-                    interval.name = interval.name + '-' + numero_documento
+                    interval.name = interval.move_id.name + '-' + numero_documento
                     interval.company_title_identification = hex(interval.id).upper()
                     instructions = ""
                     if self.eval_payment_mode_instructions:
@@ -118,3 +118,9 @@ class AccountMove(models.Model):
                         pay.draft2open()
         else:
             return super().load_cnab_info()
+    
+    @api.onchange("payment_mode_id")
+    def _onchange_payment_mode_id(self):
+        # res = super()._onchange_payment_mode_id()
+        if self.payment_mode_id:
+            self.partner_bank_id = self.payment_mode_id.fixed_journal_id.bank_account_id.id

@@ -82,9 +82,8 @@ class AccountMoveLine(models.Model):
                 raise UserError(_("Para refazer, cancele Ordem de débito."))    
         if self.codigo_solicitacao and self.bank_inter_state in ('vencido', 'expirado', 'cancelado', 'baixado'):
             user = str(self._uid) + '-' + self.env['res.users'].browse(self._uid).name
-            name_doc = f"{self.name}({self.document_number})"
             message = "Boleto Banco Inter refeito: %s-%s, código: %s, usuário: %s\n, em %s." % (
-                        name_doc,
+                        self.name,
                         self.date_maturity,
                         self.codigo_solicitacao,
                         user,
@@ -100,14 +99,12 @@ class AccountMoveLine(models.Model):
                 "write_off_choice": False,
             })
             # removendo os pdf
-            import pudb;pu.db
             pdf_boletos = self.env["ir.attachment"].search([
-                ("name", "ilike", "Boleto %s" % name_doc),
+                ("name", "ilike", "Boleto %s" % self.name),
                 ("res_id", "=", self.move_id.id),
             ])
             for bol in pdf_boletos:
                 bol.unlink()
-            # self.move_id.action_pdf_boleto()
 
     def generate_pdf_boleto(self):
         """
@@ -153,10 +150,9 @@ class AccountMoveLine(models.Model):
 
             datas = api.boleto_pdf(self.codigo_solicitacao)
             datas_json = json.loads(datas.decode("utf-8"))
-            name_doc = f"{self.name}({self.document_number})"
             self.pdf_boleto_id = self.env["ir.attachment"].create(
                 {
-                    "name": ("Boleto %s" % name_doc),
+                    "name": ("Boleto %s" % self.name),
                     "res_model": 'account.move',
                     "res_id": self.move_id.id,
                     "datas": datas_json["pdf"],
@@ -230,9 +226,8 @@ class AccountMoveLine(models.Model):
                             self.bank_inter_state = "baixado"
                             self.write_off_by_api = True
                         user = str(self._uid) + '-' + self.env['res.users'].browse(self._uid).name
-                        name_doc = f"{self.name}({self.document_number})"
                         message = "Boleto Banco Inter cancelado: %s-%s, código: %s, usuário: %s\n, em %s." % (
-                                    name_doc,
+                                    self.name,
                                     self.date_maturity,
                                     self.codigo_solicitacao,
                                     user,

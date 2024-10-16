@@ -24,6 +24,8 @@ class AccountMove(models.Model):
         different = False
         for prc in self.parcela_ids:
             fin = self.financial_move_line_ids.filtered(lambda l: l.date_maturity == prc.data_vencimento)
+            if len(fin) > 1:
+                raise UserError(_(f"Existe mais de uma parcela com o mesmo vencimento, faça a correção."))
             if self.move_type == "in_invoice":
                 if fin.credit != prc.valor:
                     different = True
@@ -33,7 +35,7 @@ class AccountMove(models.Model):
                     different = True
                     break
         if different:
-            raise UserError(_(f"Parcela não foi confirmada, favor confirmar na aba PARCELAS.")) 
+            raise UserError(_(f"Parcela não foi confirmada, favor confirmar na aba PARCELAS."))
         res = super().action_post()      
         return res
 

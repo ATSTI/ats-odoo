@@ -21,13 +21,14 @@ class FiscalDocumentTransp(models.Model):
                 obj_vol = self.env["nfe.40.vol"].search([('nfe40_vol_transp_id', '=', self.id)])
                 if obj_vol:
                     obj_vol.write(vals_vol)
-                vals_transp = {
-                    "nfe40_placa": tr.vehicle_id.plate,
-                    "nfe40_RNTC": tr.vehicle_id.rntc_code,
-                    "nfe40_UF": tr.vehicle_id.state_id.code,
-                }
-                obj_veic = self.env["nfe.40.tveiculo"].create(vals_transp).id
-                self.nfe40_veicTransp = obj_veic
+                if tr.vehicle_id and tr.vehicle_id.plate:
+                    vals_transp = {
+                        "nfe40_placa": tr.vehicle_id.plate,
+                        "nfe40_RNTC": tr.vehicle_id.rntc_code,
+                        "nfe40_UF": tr.vehicle_id.state_id.code,
+                    }
+                    obj_veic = self.env["nfe.40.tveiculo"].create(vals_transp).id
+                    self.nfe40_veicTransp = obj_veic
                 if not obj_vol:
                     self.env["nfe.40.vol"].create(vals_vol)
                     

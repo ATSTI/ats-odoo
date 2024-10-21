@@ -16,7 +16,7 @@ class AccountMove(models.Model):
     _inherit = "account.move"
 
     def action_copiar_fatura(self):
-        # import pudb;pu.db
+        import pudb;pu.db
         vals = {}
         vals["partner_id"] = self.partner_id
         document = self.env['l10n_br_fiscal.document.type'].search([
@@ -39,7 +39,9 @@ class AccountMove(models.Model):
         move._onchange_document_type_id()
         move.write({"fiscal_operation_id": operacao, "ind_final": '1', "document_serie_id": 1})
         move._onchange_fiscal_operation_id()
+        move.fiscal_document_id = self.fiscal_document_id
         move.fiscal_document_id.document_type_id = document.id
+        move.fiscal_document_id._onchange_document_type_id()
         lines = []
         for line in self.invoice_line_ids:
             item = {}

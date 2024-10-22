@@ -19,5 +19,5 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from . import invoice_report
+# from . import invoice_report
 from . import sale_report

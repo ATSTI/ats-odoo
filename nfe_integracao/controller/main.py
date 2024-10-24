@@ -114,7 +114,7 @@ class IntegracaoPdv(http.Controller):
                         vals_line = {
                             'name': emitente + ', Notas:' + emitente_notas,
                             'product_id': 60,
-                            'qty': 1,
+                            'product_uom_qty': 1,
                             'price_unit': 1,
                         }
                         order_line.append((0, 0,vals_line))

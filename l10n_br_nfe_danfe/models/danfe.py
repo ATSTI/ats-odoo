@@ -103,6 +103,7 @@ REGIME_TRIBUTACAO = {
     "1": "Simples Nacional",
     "2": "Simples Nacional, excesso sublimite de receita bruta",
     "3": "Regime Normal",
+    "4": "MEI",
 }
 
 

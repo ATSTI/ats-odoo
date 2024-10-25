@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <odoo>
-    <record id="account_copia_form" model="ir.ui.view">
-        <field name="name">l10n_br_account.copia.form</field>
+    <record id="account_create_nfe_form" model="ir.ui.view">
+        <field name="name">l10n_br_account.create.nfe.form</field>
         <field name="model">account.move</field>
         <field name="inherit_id" ref="l10n_br_account.invoice_form" />
         <field name="priority">399</field>
@@ -9,10 +9,9 @@
             <xpath expr="//button[@name='open_fiscal_document']" position="before">            
                 <button
                     name="action_copiar_fatura"
-                    type="object"
-                    style="background-color:#ffffe9;"           
+                    type="object"         
                 >
-                    <span>Copiar Fatura</span>
+                    <span>Criar NFe(produtos)</span>
                 </button>
             </xpath>
         </field>

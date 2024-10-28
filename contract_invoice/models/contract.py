@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models
+from odoo.osv import expression
 # import odoo.addons.decimal_precision as dp
 from datetime import date
 
@@ -53,7 +54,6 @@ class ContractContract(models.Model):
     
     @api.depends('date_start')
     def _compute_vencimento(self):
-        #import pudb;pu.db
         self.mes_contrato = self.date_start.month
         self.ano_contrato = self.date_start.year
     
@@ -63,7 +63,6 @@ class ContractContract(models.Model):
         store=True, readonly=True, compute='_compute_vencimento')    
 
     def tempo(self, mes, ano):
-        #import pudb;pu.db
         dt = date.today()
         mes_atual = dt.month
         ano_atual = dt.year
@@ -89,55 +88,66 @@ class ContractContract(models.Model):
     #            self.name = self.partner_id.name
 
     @api.model
-    def _prepare_invoice(self):
-        invoice_vals = super(ContractContract, self).\
-            _prepare_invoice()
-        if self.payment_mode_id:
-            invoice_vals['payment_mode_id'] = self.payment_mode_id.id
+    def _prepare_invoice(self, date_invoice, journal=None ):
+        #journal = self.env["account.journal"].browse([1])
+        vals = super(ContractContract, self).\
+            _prepare_invoice(date_invoice)
+        for invoice_vals in vals:
+            if not isinstance(invoice_vals, dict):
+                continue
+            if self.payment_mode_id:
+                invoice_vals['payment_mode_id'] = self.payment_mode_id.id
+                if self.payment_mode_id.payment_mode_domain:
+                    if self.payment_mode_id.payment_mode_domain == "boleto":
+                        if self.payment_mode_id.fixed_journal_id:
+                            if self.payment_mode_id.fixed_journal_id.bank_id.code_bc == "077":
+                                invoice_vals["partner_bank_id"] = self.payment_mode_id.fixed_journal_id.bank_account_id.id
             #invoice_vals['partner_bank_id'] = (
             #    contract.partner_id.bank_ids[:1].id or
             #    contract.payment_mode_id.bank_id.id)
-        if self.payment_term_id:
-            invoice_vals['payment_term_id'] = self.payment_term_id.id
-        if self.fiscal_position_id:
-            invoice_vals['fiscal_position_id'] = self.fiscal_position_id.id
-        today = date.today()
-        tempo = self.tempo(self.mes_contrato, self.ano_contrato)
-        invoice_vals['reference'] = '%s(%s)-%s-%s' %(
-            self.name, tempo, str(today.month).zfill(2), today.year)
-        invoice_vals['type'] = 'out_invoice'
-        return invoice_vals
-
-    """ nao preciso disso no cadastro do cliente
-    @api.multi
-    def write(self, values):
-        vals = {}
-        if 'payment_term_id' in values:
-            vals['property_payment_term_id'] = values.get('payment_term_id')
-        if 'payment_mode_id' in values:
-            vals['payment_mode_id'] = values.get('payment_mode_id')
-        if 'fiscal_position_id' in values:
-            vals['property_account_position_id'] = values.get('fiscal_position_id')
-        if vals:
-            partner = self.env['res.partner'].browse([self.partner_id.id])
-            partner.write(vals)
-        return super(AccountAnalyticAccount, self).write(values);
-
+            if self.payment_term_id:
+                invoice_vals['invoice_payment_term_id'] = self.payment_term_id.id
+            if self.fiscal_position_id:
+               invoice_vals['fiscal_position_id'] = self.fiscal_position_id.id
+            today = date.today()
+            tempo = self.tempo(self.mes_contrato, self.ano_contrato)
+            if tempo == "0":
+                tempo = str(self.id)
+            invoice_vals['ref'] = '%s(%s)-%s-%s' %(
+                self.name, tempo, str(today.month).zfill(2), today.year)
+            #invoice_vals['move_type'] = 'out_invoice'
+            if not invoice_vals['partner_id']:
+                invoice_vals['partner_id'] = self.partner_id.id 
+        return vals
 
     @api.model
-    def create(self, values):
-        vals = {}
-        if 'payment_term_id' in values:
-            vals['property_payment_term_id'] = values.get('payment_term_id')
-        if 'payment_mode_id' in values:
-            vals['payment_mode_id'] = values.get('payment_mode_id')
-        if 'fiscal_position_id' in values:
-            vals['property_account_position_id'] = values.get('fiscal_position_id')
-        if vals:
-            partner = self.env['res.partner'].browse([values.get('partner_id')])
-            partner.write(vals)
-        return super(AccountAnalyticAccount, self).create(values);
-    """
+    def _cron_recurring_create(self, date_ref=False, create_type="invoice"):
+        """
+        The cron function in order to create recurrent documents
+        from contracts.
+        """
+        _recurring_create_func = self._get_recurring_create_func(
+            create_type=create_type
+        )
+        if not date_ref:
+            date_ref = fields.Date.context_today(self)
+        domain = self._get_contracts_to_invoice_domain(date_ref)
+        domain = expression.AND(
+            [
+                domain,
+                [("generation_type", "=", create_type)],
+            ]
+        )
+        contracts = self.search(domain)
+        companies = set(contracts.mapped("company_id"))
+        # Invoice by companies, so assignation emails get correct context
+        for company in companies:
+            contracts_to_invoice = contracts.filtered(
+                lambda c: c.company_id == company
+                and (not c.date_end or c.recurring_next_date <= c.date_end)
+            ).with_company(company)
+            _recurring_create_func(contracts_to_invoice[:10], date_ref)
+        return True
 
 # class AccountAnalyticInvoiceLine(models.Model):
 #     _inherit = 'account.analytic.invoice.line'

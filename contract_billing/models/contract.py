@@ -7,8 +7,8 @@ import base64
 
 # from odoo.addons.br_boleto.boleto.document import Boleto
 
-class AccountAnalyticAccount(models.Model):
-    _inherit = 'account.analytic.account'
+class ContractContract(models.Model):
+    _inherit = 'contract.contract'
 
     email_fat = {}
 
@@ -215,20 +215,32 @@ class AccountAnalyticAccount(models.Model):
         #id = venda_ids.action_invoice_create()
         return id
 
-    def _create_invoice(self):
+    def _recurring_create_invoice(self, date_ref=False):
         #invoice_ids = []
-        invoice_vals = self._prepare_invoice()
+        #date_ref = fields.Date.context_today(self)
+        #invoice_vals = self._prepare_invoice(date_ref)
+        invoices = super()._recurring_create_invoice(date_ref)
         msg_erro = ''
-        try:
-            msg_erro = 'Erro para criar a fatura.'
+        for invoice in invoices:
+            #msg_erro = 'Erro para criar a fatura.'
             #invoice_ids.append(self.env['account.invoice'].create(invoice_vals))
-            invoice = self.env['account.invoice'].create(invoice_vals)
-            msg_erro = 'Erro para adicionar itens na fatura.'
+            #invoice = self.env['account.invoice'].create(invoice_vals)
+            #msg_erro = 'Erro para adicionar itens na fatura.'
             #self._prepare_order_lines(self, invoice_ids[0])
-            self._prepare_order_lines(self, invoice)
+            #self._prepare_order_lines(self, invoice)
             msg_erro = 'Erro pra confirmar a fatura.'
             #invoice.invoice_validate()
-            invoice.action_invoice_open()
+            if invoice.amount_total > 0.01:
+                #print(f"Contrato: {invoice.ref} - {invoice.partner_id.name}")
+                try:
+                    invoice.action_post()
+                    if invoice.payment_mode_id.payment_mode_domain == "boleto":
+                        if invoice.payment_mode_id.fixed_journal_id:
+                            if invoice.payment_mode_id.fixed_journal_id.bank_id.code_bc == "077":
+                                invoice.action_pdf_boleto()
+                except:
+                    #print("ERRO")
+                    x = 1
             #msg_erro = 'Erro para criar a Fatura.'
             #inv_id = self.faturar_invoice()
             #invoice = self.env['account.invoice'].browse(inv_id)
@@ -239,18 +251,17 @@ class AccountAnalyticAccount(models.Model):
             #        invoice.write(pay)
             #msg_erro = 'Erro para Confirmar a Fatura.'
             #invoice.action_invoice_open()
-            if invoice.payment_mode_id.boleto_type:
-                msg_erro = 'Erro para Gerar o Boleto.'
-                self.criar_boleto(invoice.id, invoice.receivable_move_line_ids[0])
+                #msg_erro = 'Erro para Gerar o Boleto.'
+                #self.criar_boleto(invoice.id, invoice.receivable_move_line_ids[0])
             msg_erro = ''
-            self.relatorio_faturamento('SIM', self.id, self.code, self.partner_id.name, '',
-                'NAO', self.company_id.name)
-            return invoice, msg_erro
-        except Exception:
-            self.env.cr.rollback()
-            return False, msg_erro
+            #self.relatorio_faturamento('SIM', self.id, self.code, self.partner_id.name, '',
+            #    'NAO', self.company_id.name)
+        return invoices
+        #except Exception:
+        #    self.env.cr.rollback()
+        #    return False, msg_erro
 
-    def recurring_create_invoice(self):
+    def xxxx_recurring_create_invoice(self):
         context = {}
         email_line = {}
         email_rel = {}
@@ -319,7 +330,6 @@ class AccountAnalyticAccount(models.Model):
         
     # def cron_tunel_ssh(self, remote_bind, port_remote, port_local, cnpj):
     #     #model.cron_tunel_ssh('ats.atsti.com.br', 8900, 10500, '58.383.373/0001-79')
-    #     #import pudb;pu.db
     #     odoo = odoorpc.ODOO('ats.atsti.com.br', port=49069)
     #     odoo.login('ats_atsti_com_br', 'contato@atsti.com.br', 'ats2020')
     #     odoo_part = odoo.env['res.partner']
@@ -345,14 +355,14 @@ class AccountAnalyticAccount(models.Model):
     #     #    server.stop()
     #     return True
 
-    def cron_recurring_create_invoice(self):
-        contracts = self.search(
-            [('recurring_next_date', '<=', fields.date.today()),
-             ('recurring_invoices', '=', True),
-             ('active','=',True)])
-        return contracts.recurring_create_invoice()
+    #def cron_recurring_create_invoice(self):
+    #    contracts = self.search(
+    #        [('recurring_next_date', '<=', fields.date.today()),
+    #         ('recurring_invoices', '=', True),
+    #         ('active','=',True)])
+    #    return contracts.recurring_create_invoice()
 
-    def _prepare_order_lines(self, contract, order_id):
+    def _xxxxx_prepare_order_lines(self, contract, order_id):
         invoice_lines = []
         for line in contract.recurring_invoice_line_ids:
             invoice_lines = []

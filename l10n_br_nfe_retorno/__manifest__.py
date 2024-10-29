@@ -2,11 +2,11 @@
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 {
-    "name": "NF-e",
+    "name": "NF-e - Obter situação da nota",
     "summary": "Brazilian Eletronic Invoice NF-e - Trata o retorno do envio.",
     "category": "Localisation",
     "license": "AGPL-3",
-    "author": "ATSTi",
+    "author": "ATSTi Soluções",
     "website": "https://github.com/OCA/l10n-brazil",
     "development_status": "Beta",
     "version": "14.0.1.0.0",

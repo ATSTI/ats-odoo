@@ -1,7 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import models, _
-from odoo.exceptions import UserError
+from odoo.exceptions import ValidationError
 
 
 class AccountMove(models.Model):
@@ -18,11 +18,19 @@ class AccountMove(models.Model):
         for line in move.invoice_line_ids:
             line.fiscal_operation_id = move.fiscal_operation_id
             line._onchange_fiscal_operation_id()
-            line._onchange_price_subtotal()       
+            # line._onchange_price_subtotal()       
         move._recompute_dynamic_lines(recompute_all_taxes=True)
         move._recompute_payment_terms_lines()
 
     def action_copiar_fatura(self):
+        name_move = f"Fatura-{self.name}"
+        move_created = self.env['account.move'].search([
+            ('ref', '=', name_move)
+        ])
+        if move_created:
+            raise ValidationError(
+                _("Documento NFe já criado para esta fatura.")
+            )
         vals = {}
         vals["partner_id"] = self.partner_id.id
         document = self.env['l10n_br_fiscal.document.type'].search([
@@ -36,18 +44,21 @@ class AccountMove(models.Model):
         vals["fiscal_operation_id"] = operacao.id
         vals["payment_mode_id"] = self.payment_mode_id.id
         vals["invoice_date_due"] = self.invoice_date_due
+        vals["ref"] = name_move
         # TODO fazer a busca do diario a utilizar
-        vals["journal_id"] = 18
+        vals["journal_id"] = 3
         vals["document_date"] = self.document_date
         vals["invoice_user_id"] = self.invoice_user_id.id
+        vals["currency_id"] = self.currency_id.id
         vals["issuer"] = "company"
-        vals["move_type"] = "out_invoice"
+        # vals["move_type"] = "out_invoice"
+        vals["move_type"] = "entry"
         tem_produtos = False
         for line in self.invoice_line_ids:
             if line.product_id.type in ("product", "consu"):
                 tem_produtos = True
         if not tem_produtos:
-            UserError(
+            raise ValidationError(
                 _("Fatura somente com serviços, sem produto para gerar NFe.")
             )
         move = super(AccountMove, self.with_context(create_from_move=True)).create(
@@ -64,10 +75,15 @@ class AccountMove(models.Model):
                 partner=line.partner_id,
                 product=line.product_id,
             )
-
+            discount = line.discount_value
+            if line.discount and not line.discount_value:
+                discount = (line.quantity * line.price_unit * line.discount) / 100
             item["partner_id"] = line.partner_id.id
             item["product_id"] = line.product_id.id
+            item["account_id"] = line.account_id.id
             item["quantity"] = line.quantity
+            item["discount"] = line.discount
+            item["discount_value"] = discount
             item["fiscal_quantity"] = line.quantity
             item["product_uom_id"] = line.product_uom_id.id
             item["uot_id"] = line.product_uom_id.id

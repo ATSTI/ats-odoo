@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report 
+            id="action_report_invoice_nereu"
+            string="Relatorio Comissão"
+            model="sale.order" 
+            report_type="qweb-pdf"
+            file="report_commission.report_commission_template" 
+            name="report_commission.report_commission_template" 
+        />
+    </data>
+</odoo>

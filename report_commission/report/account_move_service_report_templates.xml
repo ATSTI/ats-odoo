@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <template id="report_commission_template">
+    <t t-name="service_template">
+        <t t-call="web.html_container">            
+            <style>
+                *{
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                    text-transform: uppercase;
+                }
+                .company{
+                    width: 100%;
+                }
+                .logo{
+                    width: 20%;
+                    padding: 0 2px;
+                    border: thin solid black;
+                }
+                .address{
+                    width: 49,5%;
+                    border: thin solid black;
+                    padding: 10px;
+                }
+                .address span{
+                    font-size: 12px;
+                }
+                .shipping{
+                    width: 29,5%;
+                    border: thin solid black;
+                    padding: 10px;
+                }
+                .shipping &gt; span{
+                    font-size: 11px;
+                }
+                .data_receipt{
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 4px;
+                }
+                .data_receipt td{
+                    border: thin solid black;
+                    width: 19%;
+                    text-align: center;
+                    font-size: 12px;
+                    padding: 8px 0;
+                }
+                #receipt{
+                    width: 24%;
+                    font-size: 19px;
+                    text-align: center;
+                }
+                .extensive_value{
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 5px 0;
+                }
+                .extensive_value td:first-child{
+                    width: 8%;
+                    border: thin solid black;
+                    text-align: left; 
+                    font-size: 12px;
+                    padding: 8px 4px;
+                }
+                .extensive_value td:last-child{
+                    width: 92%;
+                    border: thin solid black;
+                    text-align: left; 
+                    padding: 8px 0 8px 85px;
+                    font-size: 12px;
+                }
+                .client{
+                    width: 100%;
+                    border: thin solid black;
+                    padding: 8px;
+                    margin-bottom: 5px;
+                }
+                .client td{
+                    font-size: 12px;
+                    padding: 12px 0;
+                    border: 0;
+                }
+                .service{
+                    width: 100%;
+                    height: 500px;
+                    border-collapse: collapse;
+                    font-size: 12px;
+                }
+                .service td{
+                    text-align: center;
+                    padding: 3px;
+                    border-left: thin solid black;
+                    border-right: thin solid black;
+                }
+                #items_head{
+                    height: 20px;
+                    border: thin solid black;
+                }
+                #items{
+                    height: 10px;
+                }
+                #total td{
+                    padding: 12px 0;
+                    border: thin solid black;
+                    height: 30px;
+                }
+                #total td:first-child{
+                    border: 0;
+                    text-align: right;
+                    vertical-align: middle;
+                    padding: 0 12px;
+                }
+                .message{
+                    width: 100%;
+                    border: thin solid black;
+                    font-size: 8px;
+                    padding: 5px;
+                    margin-top: 5px;
+                }
+                .dashed{
+                    width: 100%;
+                    border: 1px dashed;
+                    margin: 7px 0;
+                }
+                .signature{
+                    width: 100%;
+                    height: 80px;
+                    font-size: 8px;
+                    border-collapse: collapse;
+                }
+                .signature td{
+                    border: thin solid black;
+                    padding: 4px;
+                }
+                .signature p, span{
+                    text-align: left;
+                }
+            </style>
+            <div class="page">
+                <t t-set="o" t-value="docs" />
+                <div class="oe_structure"/>
+                <b style="font-size: 18px; text-align:center">Relatorio de comissão</b>
+                <p/>
+                <span style="font-size: 15px">Vendedor: </span><span t-esc="o.user_id.name" style="font-size: 13px" />
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <table style="border: solid 1px black; border-collapse: collapse; width: 100%; height: 40px">
+                    <tr>
+                        <td style="border: solid 1px black; border-collapse: collapse; width: 15%; font-size: 14px; text-align:center">
+                            <b> Nº Pedido</b>
+                        </td>
+                        <td style="border: solid 1px black; border-collapse: collapse; width: 15%; font-size: 14px; text-align:center">
+                            <b> Data de criação</b>
+                        </td>
+                        <td style="border: solid 1px black; border-collapse: collapse; width: 40%; font-size: 14px; text-align:center">
+                            <b> Cliente</b>
+                        </td>
+                        <td style="border: solid 1px black; border-collapse: collapse; width: 15%; font-size: 14px; text-align:center" >
+                            <b> Valor Total</b>
+                        </td>
+                        <td style="border: solid 1px black; border-collapse: collapse; width: 15%; font-size: 14px; text-align:center">
+                            <b> Valor Comissão</b>
+                        </td>
+                    </tr>
+                    <t t-set="total_comissao" t-value="0"/>
+                    <t t-set="total_valor" t-value="0"/>
+                    <t t-foreach="docs" t-as="o">
+                        <t t-set="commission" t-value="int(o.user_id.ref)" />
+                        <t t-set="commission_total" t-value="o.amount_total * commission / 100"/>
+                        <t t-set="total_comissao" t-value="commission_total + total_comissao"/>
+                        <t t-set="total_valor" t-value="o.amount_total + total_valor"/>
+                        <tr>
+                            <td style="border: solid 1px black; border-collapse: collapse; width: 15%; font-size: 13px; text-align:center">
+                                <span t-field="o.name"></span>
+                            </td>
+                            <td style="border: solid 1px black; border-collapse: collapse; width: 15%; font-size: 13px; text-align:center">
+                                <span t-field="o.date_order" t-options="{&quot;widget&quot;: &quot;date&quot;}"/>
+                            </td>
+                            <td style="border: solid 1px black; border-collapse: collapse; width: 40%; font-size: 13px; text-align:left">
+                                <span t-field="o.partner_id.name"></span>
+                            </td>
+                            <td style="border: solid 1px black; border-collapse: collapse; width: 15%; font-size: 13px; text-align:right">
+                                <span t-field="o.amount_total"></span>
+                            </td>
+                            <td style="border: solid 1px black; border-collapse: collapse; width: 15%; font-size: 13px; text-align:right">
+                                <span t-esc="commission_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.pricelist_id.currency_id}"/>
+                            </td>
+                        </tr>
+                    </t>
+                        <tr>
+                            <td style="border: solid 1px black; border-collapse: collapse; width: 10%; font-size: 13px; text-align:right"></td>
+                            <td style="border: solid 1px black; border-collapse: collapse; width: 10%; font-size: 13px; text-align:right"></td>
+                            <td style="border: solid 1px black; border-collapse: collapse; width: 10%; font-size: 13px; text-align:right"></td>
+                            <td style="border: solid 1px black; border-collapse: collapse; width: 50%; font-size: 13px; text-align:left" />
+                            <td style="border: solid 1px black; border-collapse: collapse; width: 20%; font-size: 13px; text-align:right" />
+                        </tr>
+                        <tr>
+                            <td style="border: solid 1px black; border-collapse: collapse; width: 10%; font-size: 13px; text-align:right">
+                                <b style="font-size:14px ; text-align:left">Valores Totais:</b>
+                            </td>
+                            <td style="border: solid 1px black; border-collapse: collapse; width: 10%; font-size: 13px; text-align:right"></td>
+                            <td style="border: solid 1px black; border-collapse: collapse; width: 10%; font-size: 13px; text-align:right"></td>
+                            <td style="border: solid 1px black; border-collapse: collapse; width: 20%; font-size: 13px; text-align:right">
+                                <span t-esc="total_valor" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.pricelist_id.currency_id}"/>
+                            </td>
+                            <td style="border: solid 1px black; border-collapse: collapse; width: 20%; font-size: 13px; text-align:right">
+                                <span t-esc="total_comissao" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.pricelist_id.currency_id}"/>
+                            </td>
+                        </tr>
+                </table>
+            </div>
+        </t>
+    </t>
+  </template>
+</odoo>

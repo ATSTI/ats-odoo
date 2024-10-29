@@ -9,7 +9,8 @@
             <xpath expr="//button[@name='open_fiscal_document']" position="before">            
                 <button
                     name="action_copiar_fatura"
-                    type="object"         
+                    type="object"
+                    attrs="{'invisible': [('document_type_id', '!=', False)]}"  
                 >
                     <span>Criar NFe(produtos)</span>
                 </button>

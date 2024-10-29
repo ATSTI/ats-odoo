@@ -6,13 +6,15 @@
     'version': '14.0.0.1.0',
     'category': 'Localisation',
     'sequence': 2,
-    'summary': 'ATSti Sistemas',
+    'summary': 'ATSti Soluções',
     'description': """
         Cria nova account.move somente com produtos, sem serviços
+        No diario diversos(general), somente para poder gerar a NFe,
+        pois, na fatura consta serviços tbém, que será gerado uma nota de serviço.
    """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ["l10n_br_fiscal", "l10n_br_account"],
+    'depends': ["l10n_br_fiscal", "l10n_br_account_nfe"],
     'data': [
         'views/account_move_view.xml',
         # 'wizard/account_move_other_nfe_view.xml',

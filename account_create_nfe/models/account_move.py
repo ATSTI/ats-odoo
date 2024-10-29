@@ -23,9 +23,15 @@ class AccountMove(models.Model):
         move._recompute_payment_terms_lines()
 
     def action_copiar_fatura(self):
-        name_move = f"Fatura-{self.name}"
-        move_created = self.env['account.move'].search([
-            ('ref', '=', name_move)
+        if not self.payment_mode_id:
+            raise ValidationError(
+                _("Fatura sem forma de pagamento, campo obrigatório")
+            )
+        name_move = f"NFe-{self.name}"
+        move_created = self.env["account.move"].search([
+            ("ref", "=", name_move),
+            ("invoice_origin", "=", self.name),
+            ("state", "in", ("draft", "posted")),
         ])
         if move_created:
             raise ValidationError(
@@ -36,6 +42,9 @@ class AccountMove(models.Model):
         document = self.env['l10n_br_fiscal.document.type'].search([
             ("code", "=", 55)
         ],limit=1)
+        journal = self.env['account.journal'].search([
+            ("type", "=", "general")
+        ],limit=1)
         vals["document_type_id"] = document.id
         vals["document_serie_id"] = document.document_serie_ids[0].id
         operacao = self.env['l10n_br_fiscal.operation'].search([
@@ -45,8 +54,9 @@ class AccountMove(models.Model):
         vals["payment_mode_id"] = self.payment_mode_id.id
         vals["invoice_date_due"] = self.invoice_date_due
         vals["ref"] = name_move
+        vals["invoice_origin"] = self.name
         # TODO fazer a busca do diario a utilizar
-        vals["journal_id"] = 3
+        vals["journal_id"] = journal.id
         vals["document_date"] = self.document_date
         vals["invoice_user_id"] = self.invoice_user_id.id
         vals["currency_id"] = self.currency_id.id
@@ -54,9 +64,12 @@ class AccountMove(models.Model):
         # vals["move_type"] = "out_invoice"
         vals["move_type"] = "entry"
         tem_produtos = False
+        total_produtos = 0.0
         for line in self.invoice_line_ids:
             if line.product_id.type in ("product", "consu"):
                 tem_produtos = True
+                total_produtos += line.price_subtotal
+        vals["amount_total_signed"] = total_produtos
         if not tem_produtos:
             raise ValidationError(
                 _("Fatura somente com serviços, sem produto para gerar NFe.")
@@ -64,7 +77,6 @@ class AccountMove(models.Model):
         move = super(AccountMove, self.with_context(create_from_move=True)).create(
             vals
         )
-
         for line in self.invoice_line_ids:
             if line.product_id.type == "service":
                 continue
@@ -103,7 +115,18 @@ class AccountMove(models.Model):
         for line in move.invoice_line_ids:
             line._onchange_product_id_fiscal()
             line._onchange_fiscal_operation_id()
-        self._recompute_fiscal_operation_id(move)        
+        self._recompute_fiscal_operation_id(move)
+        self.message_post(
+            body=_(
+                "<a href='#' data-oe-model='%s' data-oe-id='%s'>NFe criada diário: %s</a>"
+            ) % (move._name, move.id, journal.name)
+        )
+        self.write({"ref": "NFe"})
+        move.message_post(
+            body=_(
+                "<a href='#' data-oe-model='%s' data-oe-id='%s'>NFe da Fatura %s</a>"
+            ) % (self._name, self.id, self.name)
+        )        
         if move:
             return {
                 'res_id': move.id,

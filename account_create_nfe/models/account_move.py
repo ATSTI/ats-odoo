@@ -25,7 +25,7 @@ class AccountMove(models.Model):
     def action_copiar_fatura(self):
         if not self.payment_mode_id:
             raise ValidationError(
-                _("Fatura sem forma de pagamento, campo obrigatório")
+               _("Fatura sem forma de pagamento, campo obrigatório")
             )
         name_move = f"NFe-{self.name}"
         move_created = self.env["account.move"].search([
@@ -71,9 +71,18 @@ class AccountMove(models.Model):
                 total_produtos += line.price_subtotal
         vals["amount_total_signed"] = total_produtos
         if not tem_produtos:
-            raise ValidationError(
-                _("Fatura somente com serviços, sem produto para gerar NFe.")
-            )
+            self.write({"ref": "Serviço"})
+            title = _('Fatura/NFe'),
+            message = _("Fatura somente com serviço, sem produtos para gerar NFe"),       
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': title,
+                    'message': message,
+                    'sticky': False,
+                 }
+            }
         move = super(AccountMove, self.with_context(create_from_move=True)).create(
             vals
         )

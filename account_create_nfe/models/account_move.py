@@ -15,10 +15,10 @@ class AccountMove(models.Model):
 
     def _recompute_fiscal_operation_id(self, move):
         move._compute_amount()
-        for line in move.invoice_line_ids:
-            line.fiscal_operation_id = move.fiscal_operation_id
-            line._onchange_fiscal_operation_id()
-            # line._onchange_price_subtotal()       
+        # for line in move.invoice_line_ids:
+        #     line.fiscal_operation_id = move.fiscal_operation_id
+        #     line._onchange_fiscal_operation_id()
+        #    # line._onchange_price_subtotal()       
         move._recompute_dynamic_lines(recompute_all_taxes=True)
         move._recompute_payment_terms_lines()
 
@@ -111,10 +111,20 @@ class AccountMove(models.Model):
             item["ncm_id"] = line.product_id.ncm_id.id
             item["icms_origin"] = line.product_id.icms_origin
             item["fiscal_genre_id"] = line.product_id.fiscal_genre_id.id
-            move.write({'invoice_line_ids': [(0, 0, item)]})
-        for line in move.invoice_line_ids:
-            line._onchange_product_id_fiscal()
-            line._onchange_fiscal_operation_id()
+            # move.write({'invoice_line_ids': [(0, 0, item)]})
+            item["move_id"] = move.id
+            move_item = self.env["account.move.line"].create(item)
+            move_item.fiscal_operation_id = move.fiscal_operation_id
+            move_item._onchange_product_id_fiscal()
+            move_item._onchange_fiscal_operation_id()
+            move_item.price_unit = line.price_unit
+            move_item.fiscal_price = line.price_unit
+        # for line in move.invoice_line_ids:
+        #     line.fiscal_operation_id = move.fiscal_operation_id
+        #     line._onchange_product_id_fiscal()
+        #     line._onchange_fiscal_operation_id()
+        #     line.price_unit = line.price_unit
+        #     line.fiscal_price = line.price_unit
         self._recompute_fiscal_operation_id(move)
         self.message_post(
             body=_(

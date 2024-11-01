@@ -33,18 +33,18 @@ class SaleOrder(models.Model):
         Compute the total amounts of the SO.
         """
         res = super()._compute_amount()
-        for order in self:
-            amount_discount = 0.0
-            for line in order.order_line:
-                # amount_untaxed += line.price_subtotal
-                # amount_tax += line.price_tax
-                amount_discount += (line.product_uom_qty * line.price_unit * line.discount) / 100
-            order.update({
-                # 'amount_untaxed': amount_untaxed,
-                # 'amount_tax': amount_tax,
-                'amount_discount': amount_discount,
-                # 'amount_total': amount_untaxed + amount_tax,
-            })
+        # for order in self:
+        #     amount_discount = 0.0
+        #     for line in order.order_line:
+        #         # amount_untaxed += line.price_subtotal
+        #         # amount_tax += line.price_tax
+        #         amount_discount += (line.product_uom_qty * line.price_unit * line.discount) / 100
+        #     order.update({
+        #         # 'amount_untaxed': amount_untaxed,
+        #         # 'amount_tax': amount_tax,
+        #         'amount_discount': amount_discount,
+        #         # 'amount_total': amount_untaxed + amount_tax,
+        #     })
         return res
 
     discount_type = fields.Selection([('percent', 'Percentagem'), ('amount', 'Valor')], string='Tipo desconto',

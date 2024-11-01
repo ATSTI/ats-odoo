@@ -48,8 +48,8 @@
 
                         <group class="oe_subtotal_footer oe_right" colspan="2" name="sale_total">
                             <field name="amount_price_gross" />
-                            <field name="amount_discount" widget='monetary'
-                                   options="{'currency_field': 'currency_id'}"/>
+                            <!-- <field name="amount_discount" widget='monetary'
+                                   options="{'currency_field': 'currency_id'}"/> -->
                             <field name="amount_untaxed" widget='monetary' options="{'currency_field': 'currency_id'}"/>
                             <field name="amount_tax" widget='monetary' options="{'currency_field': 'currency_id'}"/>
                             <div class="oe_subtotal_footer_separator oe_inline o_td_label">
@@ -65,6 +65,13 @@
                     </group>
 
                 </xpath>
+                <field name="discount_value" position="replace">
+                    <field name="discount_value" readonly="False" />
+                </field>
+                <field name="discount" position="replace" >
+                    <field name="discount" readonly="False" />
+                </field>
+
                 <!-- Roundoff the discount field -->
                 <!-- <xpath expr="//field[@name='order_line']/tree/field[@name='discount']" position="attributes">
                     <attribute name="digits">[16, 2]</attribute>

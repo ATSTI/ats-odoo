@@ -59,17 +59,16 @@ class SaleOrder(models.Model):
     #                              track_visibility='always')
     # amount_total = fields.Monetary(string='Total', store=True, readonly=True, compute='_amount_all',
     #                                track_visibility='always')
-    amount_discount = fields.Monetary(string='Total desconto', store=True, readonly=True, compute='_amount_all',
-                                      digits=dp.get_precision('Account'), track_visibility='always')
+    # amount_discount = fields.Monetary(string='Total desconto', store=True, readonly=True, compute='_amount_all',
+    #                                   digits=dp.get_precision('Account'), track_visibility='always')
 
     @api.onchange('discount_type', 'discount_rate_t', 'order_line')
     def supply_rate(self):
-
         for order in self:
             if order.discount_type == 'percent':
                 order.discount_rate = order.discount_rate_t
-                # for line in order.order_line:
-                    # line.discount = order.discount_rate_t
+                for line in order.order_line:
+                    line.discount_value = (line.product_uom_qty * line.price_unit * order.discount_rate_t) / 100
             else:
                 total = discount = 0.0
                 for line in order.order_line:
@@ -81,6 +80,8 @@ class SaleOrder(models.Model):
                 # for line in order.order_line:
                     # line.discount = discount
                 order.discount_rate = discount
+                for line in order.order_line:                
+                    line.discount_value = (line.product_uom_qty * line.price_unit * discount) / 100
                 
 
     def _prepare_invoice(self, ):
@@ -105,11 +106,11 @@ class SaleOrderLine(models.Model):
     def _prepare_invoice_line(self, **optional_values):
         self.ensure_one()
         invoice_line_vals = super()._prepare_invoice_line(**optional_values)
-        if self.discount:
-            discount = (
-                        (self.product_uom_qty * self.price_unit) * (self.discount / 100.0)
-                    )
+        if self.discount_value:
+            # discount = (
+            #             (self.product_uom_qty * self.price_unit) * (self.discount / 100.0)
+            #         )
             invoice_line_vals.update({
-                'discount_value': discount
+                'discount_value': self.discount_value
             })
         return invoice_line_vals

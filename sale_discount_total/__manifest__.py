@@ -16,18 +16,17 @@ Sale Discount for Total Amount
 Module to manage discount on total amount in Sale.
         as an specific amount or percentage
 """,
-    'depends': ['l10n_br_sale',
-                'account_discount_total', 'l10n_br_delivery'
+    'depends': [
+        'l10n_br_sale',
+        'sale_discount_display_amount',
+        'account_discount_total',
+        'l10n_br_delivery'
                 ],
     'data': [
         'views/sale_view.xml',
-        # 'views/account_invoice_view.xml',
-        #'views/invoice_report.xml',
         'views/sale_order_report.xml',
         'views/res_config_view.xml',
-
     ],
-    'images': ['static/description/banner.png'],
     'license': 'AGPL-3',
     'application': True,
     'installable': True,

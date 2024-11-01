@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="report_delivery_document_lk" inherit_id="account.report_invoice_document">
+    <template id="report_delivery_document_claudio" inherit_id="account.report_invoice_document">
         <xpath expr="//t[@t-call='web.external_layout']" position="replace">
             <t t-call="web.basic_layout">
                 <t t-foreach="docs" t-as="o">

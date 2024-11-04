@@ -85,12 +85,13 @@
 
                 </xpath>
                 <field name="discount_value" position="replace">
-                    <field name="discount_value" readonly="False" />
+                    <field name="discount_value" string="Desconto valor" />
+                    <field name="discount_type" />
+                    <field name="discount_rate_t" />
+                    <button name="button_update_discount"
+                                            states="draft,sent" string="Atualizar" type="object"
+                                            class="oe_edit_only btn-primary"/>
                 </field>
-                <field name="discount" position="replace" >
-                    <field name="discount" readonly="False" />
-                </field>
-
                 <!-- Roundoff the discount field -->
                 <!-- <xpath expr="//field[@name='order_line']/tree/field[@name='discount']" position="attributes">
                     <attribute name="digits">[16, 2]</attribute>

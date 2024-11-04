@@ -260,57 +260,58 @@ class AccountMoveLine(models.Model):
                         resposta = api.consulta_boleto(
                             codigo_solicitacao=self.codigo_solicitacao
                         )
-                    parser.parse(resposta)
-                    message = "Consulta Banco Inter boleto, retorno: %s\n, alterado em %s." % (
-                        resposta['cobranca']['situacao'],
-                        resposta['cobranca']['dataSituacao']
-                    )
-                    self.move_id.message_post(body=message)
-                    if resposta["cobranca"]["situacao"].lower() != self.bank_inter_state:
-                        if resposta["cobranca"]["situacao"] == "pago":
-                            move_id = self.env["account.move"].create(
-                                {
-                                    "date": date.today(),
-                                    "ref": self.ref,
-                                    "journal_id": self.journal_payment_mode_id.id,
-                                    "company_id": self.company_id.id,
-                                    "line_ids": [
-                                        (
-                                            0,
-                                            0,
-                                            {
-                                                "account_id": self.account_id.id,
-                                                "partner_id": self.partner_id.id,
-                                                "debit": self.move_id.line_ids[
-                                                    0
-                                                ].credit,
-                                                "credit": self.move_id.line_ids[
-                                                    0
-                                                ].debit,
-                                                "date_maturity": self.date_maturity,
-                                            },
-                                        ),
-                                        (
-                                            0,
-                                            0,
-                                            {
-                                                "account_id": self.account_id.id,
-                                                "partner_id": self.company_id.id,
-                                                "debit": self.move_id.line_ids[
-                                                    1
-                                                ].credit,
-                                                "credit": self.move_id.line_ids[
-                                                    1
-                                                ].debit,
-                                                "date_maturity": self.date_maturity,
-                                            },
-                                        ),
-                                    ],
-                                }
+                        if resposta:
+                            parser.parse(resposta)
+                            message = "Consulta Banco Inter boleto, retorno: %s\n, alterado em %s." % (
+                                resposta['cobranca']['situacao'],
+                                resposta['cobranca']['dataSituacao']
                             )
-                            move_id.post()
-                            (move_id.line_ids[0] + self).reconcile()
-                    self.bank_inter_state = resposta["cobranca"]["situacao"].lower()
+                            self.move_id.message_post(body=message)
+                            if resposta["cobranca"]["situacao"].lower() != self.bank_inter_state:
+                                if resposta["cobranca"]["situacao"] == "pago":
+                                    move_id = self.env["account.move"].create(
+                                        {
+                                            "date": date.today(),
+                                            "ref": self.ref,
+                                            "journal_id": self.journal_payment_mode_id.id,
+                                            "company_id": self.company_id.id,
+                                            "line_ids": [
+                                                (
+                                                    0,
+                                                    0,
+                                                    {
+                                                        "account_id": self.account_id.id,
+                                                        "partner_id": self.partner_id.id,
+                                                        "debit": self.move_id.line_ids[
+                                                            0
+                                                        ].credit,
+                                                        "credit": self.move_id.line_ids[
+                                                            0
+                                                        ].debit,
+                                                        "date_maturity": self.date_maturity,
+                                                    },
+                                                ),
+                                                (
+                                                    0,
+                                                    0,
+                                                    {
+                                                        "account_id": self.account_id.id,
+                                                        "partner_id": self.company_id.id,
+                                                        "debit": self.move_id.line_ids[
+                                                            1
+                                                        ].credit,
+                                                        "credit": self.move_id.line_ids[
+                                                            1
+                                                        ].debit,
+                                                        "date_maturity": self.date_maturity,
+                                                    },
+                                                ),
+                                            ],
+                                        }
+                                    )
+                                    move_id.post()
+                                    (move_id.line_ids[0] + self).reconcile()
+                            self.bank_inter_state = resposta["cobranca"]["situacao"].lower()
         except Exception as error:
             raise UserError(_(error))
 

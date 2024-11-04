@@ -46,21 +46,22 @@ class EmailEinvoice(models.Model):
             self.pool.get('mail.mail').create(cr, uid, vals, context=context)
         return True
 
-    def cron_send_einvoice(self, dia_vcto=5):
+    def cron_send_einvoice(self, payment_term_id=2):
         remind = {}
-        invoice_obj = self.env['account.invoice']
+        invoice_obj = self.env['account.move']
         # envia errado se data ficar errada
         #if dia_vcto == 0:
         #    dia_vencimento = data_vcto[6:10]+'-'+data_vcto[3:5]+'-'+data_vcto[:2]
         #else:
-        dia_vencimento = (datetime.now() + timedelta(dia_vcto)).strftime("%Y-%m-%d")
+        #dia_vencimento = (datetime.now() + timedelta(dia_vcto)).strftime("%Y-%m-%d")
         #dia_vencimento = '2017-03-06'
         base_domain = [
-            ('date_due', '=', dia_vencimento), 
-            ('state','=','open'),
-            ('email_send','=',False)
+            ('invoice_payment_term_id', '=', payment_term_id), 
+            ('state','=','posted'),
+            ('email_send','=',False),
+            ('move_type', '=','out_invoice')
         ]
-        invoice_ids = invoice_obj.search(base_domain)
+        invoice_ids = invoice_obj.search(base_domain,limit=10)
         fatura = {}
         try:
             domain=[('name','like','Email_Envio_Boleto')]
@@ -71,7 +72,7 @@ class EmailEinvoice(models.Model):
         for inv in invoice_ids:
             if not inv.partner_id.active:
                 continue
-            attachment_ids = self.env['ir.attachment'].search([('res_model','=','account.invoice'),
+            attachment_ids = self.env['ir.attachment'].search([('res_model','=','account.move'),
                 ('res_id','=', inv.id )])
             atts_ids = []
             if attachment_ids:
@@ -79,7 +80,7 @@ class EmailEinvoice(models.Model):
                     atts_ids.append(atts.id)
                 mail.attachment_ids = [(6, 0, atts_ids)]
                 fatura_status = {'enviada':'SIM',
-                                 'fatura': inv.move_id.name,
+                                 'fatura': inv.name,
                                  'cliente': inv.partner_id.name,
                                  'ocorrencia': ''
                                 }
@@ -87,10 +88,10 @@ class EmailEinvoice(models.Model):
                 inv.message_post(body=_('Email enviado'))
                 inv.email_send = True
             else:
-                if inv.payment_mode_id.boleto_type:
+                if inv.payment_mode_id.payment_mode_domain == "boleto":
                     inv.message_post(body=_('Sem boleto anexo na Fatura, Email não enviado.'))
                 fatura_status = {'enviada':'NAO',
-                                 'fatura': inv.move_id.name,
+                                 'fatura': inv.name,
                                  'cliente': inv.partner_id.name,
                                  'ocorrencia': 'Sem Boleto anexo a Fatura.'
                                 }

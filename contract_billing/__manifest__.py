@@ -17,7 +17,7 @@
         #'views/contract_view.xml',
         'views/email_erro_fatura.xml',
         'views/email_einvoice_template.xml',
-        # 'views/account_invoice.xml'
+        'views/account_invoice.xml'
     ],
     'installable': True,
 }

@@ -59,8 +59,8 @@ class SaleOrder(models.Model):
     #                              track_visibility='always')
     # amount_total = fields.Monetary(string='Total', store=True, readonly=True, compute='_amount_all',
     #                                track_visibility='always')
-    # amount_discount = fields.Monetary(string='Total desconto', store=True, readonly=True, compute='_amount_all',
-    #                                   digits=dp.get_precision('Account'), track_visibility='always')
+    amount_discount = fields.Monetary(string='Total desconto', store=True, readonly=True, compute='_amount_all',
+                                    digits=dp.get_precision('Account'), track_visibility='always')
 
     @api.onchange('discount_type', 'discount_rate_t', 'order_line')
     def supply_rate(self):
@@ -124,8 +124,9 @@ class SaleOrderLine(models.Model):
 
     def button_update_discount(self):
         for line in self:
-            import pudb;pu.db
+            # import pudb;pu.db
             if line.discount_type == 'percent':
+                line.discount_fixed = True
                 # order.discount_rate = order.discount_rate_t
                 # for line in order.order_line:
                 #     line.discount_value = (line.product_uom_qty * line.price_unit * order.discount_rate_t) / 100                
@@ -137,6 +138,7 @@ class SaleOrderLine(models.Model):
                 else:
                     line.discount_value = 0.0
             else:
+                line.discount_fixed = True
                 if line.discount_rate_t:
                     line.discount_value = line.discount_rate_t
                     line.discount = (line.discount_rate_t * 100) / (

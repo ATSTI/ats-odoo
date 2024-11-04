@@ -23,7 +23,7 @@
 from odoo import api, fields, models
 
 
-class AccountInvoice(models.Model):
+class AccountMove(models.Model):
     _inherit = "account.move"
 
     @api.depends(
@@ -178,7 +178,22 @@ class AccountInvoice(models.Model):
         self.supply_rate()
         return True
 
-# class AccountInvoiceLine(models.Model):
-#     _inherit = "account.move.line"
+class AccountMoveLine(models.Model):
+    _inherit = "account.move.line"
 
-#     discount = fields.Float(string='Discount (%)', digits=(16, 20), default=0.0)
+    @api.model_create_multi
+    def create(self, vals_list):
+        result = super(
+                    AccountMoveLine, self.with_context(create_from_move_line=True)
+                ).create(vals_list)
+        for values in vals_list:
+            for line in result:
+                import pudb;pu.db
+                if line.product_id.id == values.get("product_id") and line.price_total == values.get("price_total"):
+                    discount = values.get("discount")
+                    if discount and values.get("discount_value") and not line.discount_value:
+                        price_unit_discount = (
+                            (values.get("price_unit") * values.get("quantity")) * (discount / 100.0)
+                        )
+                        line.update({"discount_value": price_unit_discount})
+        return result

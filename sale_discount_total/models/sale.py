@@ -33,18 +33,18 @@ class SaleOrder(models.Model):
         Compute the total amounts of the SO.
         """
         res = super()._compute_amount()
-        # for order in self:
-        #     amount_discount = 0.0
-        #     for line in order.order_line:
-        #         # amount_untaxed += line.price_subtotal
-        #         # amount_tax += line.price_tax
-        #         amount_discount += (line.product_uom_qty * line.price_unit * line.discount) / 100
-        #     order.update({
-        #         # 'amount_untaxed': amount_untaxed,
-        #         # 'amount_tax': amount_tax,
-        #         'amount_discount': amount_discount,
-        #         # 'amount_total': amount_untaxed + amount_tax,
-        #     })
+        for order in self:
+            amount_discount = 0.0
+            for line in order.order_line:
+                # amount_untaxed += line.price_subtotal
+                # amount_tax += line.price_tax
+                amount_discount += (line.product_uom_qty * line.price_unit * line.discount) / 100
+            order.update({
+                # 'amount_untaxed': amount_untaxed,
+                # 'amount_tax': amount_tax,
+                'amount_discount': amount_discount,
+                # 'amount_total': amount_untaxed + amount_tax,
+            })
         return res
 
     discount_type = fields.Selection([('percent', 'Percentagem'), ('amount', 'Valor')], string='Tipo desconto',
@@ -118,14 +118,15 @@ class SaleOrderLine(models.Model):
             #             (self.product_uom_qty * self.price_unit) * (self.discount / 100.0)
             #         )
             invoice_line_vals.update({
-                'discount_value': self.discount_value
+                'discount_value': self.discount_value,
+                'discount': self.discount
             })
         return invoice_line_vals
 
     def button_update_discount(self):
         for line in self:
-            # import pudb;pu.db
             if line.discount_type == 'percent':
+                line.discount_fixed = True
                 line.discount_fixed = True
                 # order.discount_rate = order.discount_rate_t
                 # for line in order.order_line:
@@ -140,6 +141,7 @@ class SaleOrderLine(models.Model):
             else:
                 line.discount_fixed = True
                 if line.discount_rate_t:
+                    line.discount_fixed = True
                     line.discount_value = line.discount_rate_t
                     line.discount = (line.discount_rate_t * 100) / (
                         line.product_uom_qty * line.price_unit or 1

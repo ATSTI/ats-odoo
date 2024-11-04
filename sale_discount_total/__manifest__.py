@@ -20,7 +20,7 @@ Module to manage discount on total amount in Sale.
         'l10n_br_sale',
         'sale_discount_display_amount',
         'account_discount_total',
-        'l10n_br_delivery'
+        'l10n_br_delivery',
                 ],
     'data': [
         'views/sale_view.xml',

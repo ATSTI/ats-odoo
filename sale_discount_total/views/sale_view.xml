@@ -26,7 +26,7 @@
                     expr="//field[@name='order_line']/form//label[@for='name']"
                     position="before"
                 >
-                    <notebook attrs="{'invisible': ['|', ('display_type', '!=', False), ('parent.fiscal_operation_id', '=', True)]}">
+                    <notebook>
                         <page name="amounts" string="Totais">
                             <group>
                                 <group>

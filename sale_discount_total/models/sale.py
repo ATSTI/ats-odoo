@@ -124,7 +124,7 @@ class SaleOrderLine(models.Model):
 
     def button_update_discount(self):
         for line in self:
-            # import pudb;pu.db
+            import pudb;pu.db
             if line.discount_type == 'percent':
                 # order.discount_rate = order.discount_rate_t
                 # for line in order.order_line:

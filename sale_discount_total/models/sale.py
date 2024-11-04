@@ -101,6 +101,10 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
+    discount_type = fields.Selection([('percent', 'Percentagem'), ('amount', 'Valor')], string='Tipo desconto',
+                                     readonly=True,
+                                     states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
+                                     default='percent')
     # discount = fields.Float(string='Discount (%)', digits=(16, 20), default=0.0)
 
     def _prepare_invoice_line(self, **optional_values):
@@ -114,3 +118,24 @@ class SaleOrderLine(models.Model):
                 'discount_value': self.discount_value
             })
         return invoice_line_vals
+
+    def button_update_discount(self):
+        for line in self:
+            import pudb;pu.db
+            if line.discount_type == 'percent':
+                # order.discount_rate = order.discount_rate_t
+                # for line in order.order_line:
+                #     line.discount_value = (line.product_uom_qty * line.price_unit * order.discount_rate_t) / 100                
+                if line.discount:
+                    line.discount_value = (line.discount / 100) * (
+                        line.product_uom_qty * line.price_unit or 1
+                    )
+                else:
+                    line.discount_value = 0.0
+            else:
+                if line.discount_value:
+                    line.discount = (line.discount_value * 100) / (
+                        line.product_uom_qty * line.price_unit or 1
+                    )
+                else:
+                    line.discount = 0.0

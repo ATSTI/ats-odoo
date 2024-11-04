@@ -75,7 +75,7 @@
                                     R$ Total
                                 </td>
                             </tr>
-                            <t t-set="linhas" t-value="8" />
+                            <t t-set="linhas" t-value="7" />
                             <t t-set="item" t-value="0" />
                             <t t-set="lot" t-value="" />
                             <t t-foreach="o.order_line" t-as="line">
@@ -206,7 +206,7 @@
                                     R$ Total
                                 </td>
                             </tr>
-                            <t t-set="linhas" t-value="8" />
+                            <t t-set="linhas" t-value="7" />
                             <t t-set="item" t-value="0" />
                             <t t-set="lot" t-value="" />
                             <t t-foreach="o.order_line" t-as="line">
@@ -262,6 +262,7 @@
                         </table>
                         <br/>
                         <b>Reconheço o valor acima e comprometo-me a quitá-lo até a data do vencimento</b>
+                        <br/>
                         <br/>
                         <span>Assinatura: __________________________________________</span>
                     </div>

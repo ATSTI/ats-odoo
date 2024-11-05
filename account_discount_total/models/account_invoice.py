@@ -188,7 +188,6 @@ class AccountMoveLine(models.Model):
                 ).create(vals_list)
         for values in vals_list:
             for line in result:
-                import pudb;pu.db
                 if line.product_id.id == values.get("product_id") and line.price_total == values.get("price_total"):
                     discount = values.get("discount")
                     if discount and values.get("discount_value") and not line.discount_value:

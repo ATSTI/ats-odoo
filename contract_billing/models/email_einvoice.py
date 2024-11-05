@@ -59,6 +59,7 @@ class EmailEinvoice(models.Model):
             ('invoice_payment_term_id', '=', payment_term_id), 
             ('state','=','posted'),
             ('email_send','=',False),
+            ('invoice_date', '>', '2024-11-10'),
             ('move_type', '=','out_invoice')
         ]
         invoice_ids = invoice_obj.search(base_domain,limit=10)

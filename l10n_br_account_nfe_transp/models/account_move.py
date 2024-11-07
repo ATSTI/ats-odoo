@@ -1,5 +1,6 @@
 
 from odoo import models, _, api, fields
+from odoo.exceptions import UserError
 
 class AccountMove(models.Model):
     _inherit = "account.move"
@@ -108,6 +109,23 @@ class TranspFrete(models.Model):
                 
             # if self.am_id:
             #     self.am_id.write({'invoice_incoterm_id': self.incoterm_id.id})
+
+    @api.onchange("nfe40_qVol")
+    def _onchange_nfe40_qVol(self):
+        if self.nfe40_qVol:
+            qtd = self.nfe40_qVol
+            qtd = qtd.replace(',','.')
+            try:
+                float(qtd)
+            except:
+                raise UserError(_("O campo QUANTIDADE só aceita números!"))
+
+    @api.onchange("nfe40_nVol")
+    def _onchange_nfe40_nVol(self):
+        if self.nfe40_nVol:
+            vol = self.nfe40_nVol
+            if not vol.isnumeric():
+                raise UserError(_("Preencher somente com números!"))
 
     @api.onchange("vehicle_id")
     def _onchange_vehicle_id(self):

@@ -38,6 +38,7 @@ ESTADO = [
     ("vencido", "Vencido"),
     ("baixado", "Baixado"),
     ("cancelado", "Cancelado"),
+    ("recebido", "Recebido"),
 ]
 
 

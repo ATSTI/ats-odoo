@@ -74,6 +74,8 @@ class ResPartner(models.Model):
         ('M', 'Masculino')], 'Sexo')
     chave_acesso = fields.Char(string="Carteirinha")
     cartao = fields.Char(string='Cartão acesso', size=10)
+    dia_niver = fields.Integer(string="Dia Aniversario", readonly=True, compute="_compute_dia_niver", store=True)
+    mes_niver = fields.Integer(string="Mes Aniversario", readonly=True, compute="_compute_mes_niver", store=True)    
 
     @api.depends("data_nascimento")
     def _compute_age(self):
@@ -82,6 +84,22 @@ class ResPartner(models.Model):
             if record.data_nascimento:
                 age = relativedelta(fields.Date.today(), record.data_nascimento).years
             record.age = age
+
+    @api.depends("data_nascimento")        
+    def _compute_dia_niver(self):
+        for record in self:
+            dia_niver = 0
+            if record.data_nascimento:
+                dia_niver = record.data_nascimento.day
+            record.dia_niver = dia_niver
+            
+    @api.depends("data_nascimento")        
+    def _compute_mes_niver(self):
+        for record in self:
+            mes_niver = 0
+            if record.data_nascimento:
+                mes_niver = record.data_nascimento.month
+            record.mes_niver = mes_niver 
 
     @api.model
     def create(self, vals):

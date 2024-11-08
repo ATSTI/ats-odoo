@@ -16,6 +16,8 @@
                 <div>
                     <field name="data_nascimento" />
                     <field name="age" attrs="{'invisible': [('data_nascimento', '=', False)]}" />
+					<field name="dia_niver" attrs="{'invisible': [('data_nascimento', '=', False)]}" />
+					<field name="mes_niver" attrs="{'invisible': [('data_nascimento', '=', False)]}" />					
                 </div>
             </xpath>
             <xpath expr='//page[@name="sales_purchases"]' position="attributes">
@@ -27,6 +29,8 @@
             <xpath expr='//div[@name="div_address"]' position="inside">
                 <field name="data_nascimento" />
                 <field name="age" attrs="{'invisible': [('data_nascimento', '=', False)]}" />
+				<field name="dia_niver" attrs="{'invisible': [('data_nascimento', '=', False)]}" />
+				<field name="mes_niver" attrs="{'invisible': [('data_nascimento', '=', False)]}" />				
                 <field name="sexo" />
                 <field name="estado_civil" />
                 <field name="parentesco" />
@@ -68,6 +72,8 @@
                         <group>
                             <field name="data_nascimento" />
                             <field name="age" attrs="{'invisible': [('data_nascimento', '=', False)]}" />
+							<field name="dia_niver" attrs="{'invisible': [('data_nascimento', '=', False)]}" />
+							<field name="mes_niver" attrs="{'invisible': [('data_nascimento', '=', False)]}" />							
                             <field name="sexo" />
                             <field name="estado_civil" />
                             <field name="parentesco" />
@@ -94,6 +100,8 @@
                 <group colspan="5">
                     <field name="data_nascimento" attrs="{'invisible' : [('type', '!=', 'contact')]}"/>
                     <field name="age" attrs="{'invisible': [('type', '!=', 'contact')]}"/>
+					<field name="dia_niver" attrs="{'invisible': [('type', '!=', 'contact')]}"/>
+					<field name="mes_niver" attrs="{'invisible': [('type', '!=', 'contact')]}"/>					
                     <field name="chave_acesso" attrs="{'invisible' : [('type', '!=', 'contact')]}"/>
                 </group>
                 <group colspan="5">
@@ -113,6 +121,8 @@
             <field name="mobile" position="after" >
                 <field name="data_nascimento" />
                 <field name="age" attrs="{'invisible': [('data_nascimento', '=', False)]}" />
+				<field name="dia_niver" attrs="{'invisible': [('data_nascimento', '=', False)]}" />
+				<field name="mes_niver" attrs="{'invisible': [('data_nascimento', '=', False)]}" />				
                 <field name="sexo" />
                 <field name="estado_civil" />
                 <field name="parentesco" />
@@ -130,6 +140,8 @@
                 <field name="parent_id" string="Titular" />
                 <field name="cartao" string="Cartão" />
                 <field name="age" />
+				<field name="dia_niver" />
+				<field name="mes_niver" />				
             </field>
             <field name="legal_name" position="attributes">
                 <attribute name="invisible">1</attribute>

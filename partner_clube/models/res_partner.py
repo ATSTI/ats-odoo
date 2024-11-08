@@ -88,18 +88,14 @@ class ResPartner(models.Model):
     @api.depends("data_nascimento")        
     def _compute_dia_niver(self):
         for record in self:
-            dia_niver = 0
             if record.data_nascimento:
-                dia_niver = record.data_nascimento.day
-            record.dia_niver = dia_niver
+                record.dia_niver = record.data_nascimento.day
             
     @api.depends("data_nascimento")        
     def _compute_mes_niver(self):
         for record in self:
-            mes_niver = 0
             if record.data_nascimento:
-                mes_niver = record.data_nascimento.month
-            record.mes_niver = mes_niver 
+                record.mes_niver = record.data_nascimento.month
 
     @api.model
     def create(self, vals):

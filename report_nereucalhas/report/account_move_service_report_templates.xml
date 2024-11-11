@@ -211,6 +211,7 @@
                     <br></br>
                     <br></br>
                     <br></br>
+                    <b style="font-size:14px">Referencia:</b><span t-field="o.client_order_ref"/>
                     <br></br>
                     <t t-set="display_discount" t-value="any(l.discount for l in o.order_line)"/>
                     <table style="border: solid 1px #DDD; border-collapse: collapse; width: 100%;">

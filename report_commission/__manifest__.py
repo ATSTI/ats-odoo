@@ -26,6 +26,9 @@
     'sequence': 2,
     'summary': 'Impressão de Nota de comissão',
     'description': """
+        Para que funcione é nescessario preencher no pedido de venda o campo VENDEDOR (aba, outras informações), 
+        e colocar a porcentagem de comissão no campo REFERENCIA (contatos, vendas e compras) do respectivo,
+        10 = 10%...
     """,
     'author': 'ATS Soluções',
     'website': '',

@@ -23,7 +23,7 @@ class AccountMove(models.Model):
         """
         for move in self:
             payment_order_id = False
-            if not move.payment_mode_id or not move.partner_bank_id:
+            if not move.payment_mode_id and not move.partner_bank_id:
                 raise UserError(_("Sem modo de pagamento ou Banco destinatário"))
             for move_line in move.financial_move_line_ids:
                 if payment_order_id:
@@ -50,6 +50,8 @@ class AccountMove(models.Model):
                     _logger.error("Erro impressão PDF, tente novamente. Erro: \n {}".format(e))
 
     def load_cnab_info(self):
+        if self.payment_mode_id and not self.partner_bank_id:
+            self.update({'partner_bank_id': self.payment_mode_id.fixed_journal_id.bank_account_id.id})
         if (
             self.partner_bank_id.bank_id
             == self.env.ref("l10n_br_base.res_bank_077")

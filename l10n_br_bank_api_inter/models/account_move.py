@@ -23,7 +23,7 @@ class AccountMove(models.Model):
         """
         for move in self:
             payment_order_id = False
-            if not move.payment_mode_id and not move.partner_bank_id:
+            if not move.payment_mode_id or not move.partner_bank_id:
                 raise UserError(_("Sem modo de pagamento ou Banco destinatário"))
             for move_line in move.financial_move_line_ids:
                 if payment_order_id:

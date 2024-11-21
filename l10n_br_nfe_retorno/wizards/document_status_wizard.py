@@ -34,8 +34,8 @@ class DocumentStatusWizard(models.TransientModel):
             ambiente=self.document_id.nfe_environment,
         )
 
-        if self.document_id.authorization_protocol:
-            raise UserError(_("Authorization Protocol Not Found!"))
+        # if self.document_id.authorization_protocol:
+        #     raise UserError(_("Authorization Protocol Not Found!"))
         # se deu erro de duplicidade entra nesta funcao altera o status e o xml
         if self.document_id.status_description and 'nRec' in self.document_id.status_description:
             msg = self.document_id.status_description

@@ -308,7 +308,7 @@ class ImportarWizard(models.TransientModel):
                 rowValues = first_sheet.row_values(rownum)
                 if rownum > self.inicio and rownum < self.fim:
                     if rowValues[c_codigo]:
-                        cod = str(rowValues[c_codigo])
+                        cod = str(int(rowValues[c_codigo]))
                         qt = float(rowValues[c_estoque])
                         prod = self.env['product.product'].search([('default_code', '=', cod)])
                         if prod and prod.qty_available != qt:
@@ -343,7 +343,7 @@ class ImportarWizard(models.TransientModel):
                 rowValues = first_sheet.row_values(rownum)
                 if rownum > self.inicio and rownum < self.fim:
                     if rowValues[c_codigo]:
-                        cod = str(rowValues[c_codigo])
+                        cod = str(int(rowValues[c_codigo]))
                         qt = float(rowValues[c_estoque])
                         if qt < 0.0:
                             qt = 0.0
@@ -414,7 +414,7 @@ class ImportarWizard(models.TransientModel):
                     vals = {}
                     if rowValues[c_codigo]:
                         cod = rowValues[c_codigo]
-                        vals['default_code'] = str(cod)
+                        vals['default_code'] = str(int(cod))
                     descricao = ''
                     if rowValues[c_nome]:
                         descricao = rowValues[c_nome]
@@ -461,14 +461,14 @@ class ImportarWizard(models.TransientModel):
                         vals['type'] = rowValues[c_tipo]
                     
                     # UNIDADE
-                    # if rowValues[c_unidade] and type(rowValues[c_unidade]) == str:
-                    #     d_uom = self.env['uom.uom']
-                    #     uni_id = d_uom.search([('code', 'ilike', rowValues[c_unidade])], limit=1)
-                    #     if not uni_id:
-                    #         uni_id = d_uom.create({'code': rowValues[c_unidade], 'name': rowValues[c_unidade], 'category_id': 1})     
-                    #     else:
-                    #         vals['uom_id'] = uni_id.id
-                    #         vals['uom_po_id'] = uni_id.id
+                    if rowValues[c_unidade] and type(rowValues[c_unidade]) == str:
+                        d_uom = self.env['uom.uom']
+                        uni_id = d_uom.search([('code', 'ilike', rowValues[c_unidade])], limit=1)
+                        if not uni_id:
+                            uni_id = d_uom.create({'code': rowValues[c_unidade], 'name': rowValues[c_unidade], 'category_id': 1})     
+                        else:
+                            vals['uom_id'] = uni_id.id
+                            vals['uom_po_id'] = uni_id.id
 
                     # NCM
                     # if vals['default_code'] == '2000000000275':

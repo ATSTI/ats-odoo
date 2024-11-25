@@ -46,21 +46,28 @@ class EmailEinvoice(models.Model):
             self.pool.get('mail.mail').create(cr, uid, vals, context=context)
         return True
 
-    def cron_send_einvoice(self, payment_term_id=2):
+    def cron_send_einvoice(self, dia_vcto=10):
         remind = {}
-        invoice_obj = self.env['account.move']
+        invoice_obj = self.env['account.move.line']
         # envia errado se data ficar errada
         #if dia_vcto == 0:
         #    dia_vencimento = data_vcto[6:10]+'-'+data_vcto[3:5]+'-'+data_vcto[:2]
         #else:
-        #dia_vencimento = (datetime.now() + timedelta(dia_vcto)).strftime("%Y-%m-%d")
+        dia_vencimento = (datetime.now() + timedelta(dia_vcto)).strftime("%Y-%m-%d")
         #dia_vencimento = '2017-03-06'
+        # base_domain = [
+        #     ('invoice_payment_term_id', '=', payment_term_id), 
+        #     ('state','=','posted'),
+        #     ('email_send','=',False),
+        #     ('create_date', '>', '2024-10-31'),
+        #     ('move_type', '=','out_invoice')
+        # ]
         base_domain = [
-            ('invoice_payment_term_id', '=', payment_term_id), 
-            ('state','=','posted'),
-            ('email_send','=',False),
-            ('create_date', '>', '2024-10-31'),
-            ('move_type', '=','out_invoice')
+            ('account_id.user_type_id.type', '=', 'receivable'),
+            ('date_maturity', '=', dia_vencimento),
+            ('move_id.email_send', '=', False),
+            ('move_id.state', '=', 'posted'),
+            ('move_id.journal_id.type', '=', 'sale'),
         ]
         invoice_ids = invoice_obj.search(base_domain,limit=10)
         fatura = {}
@@ -70,7 +77,8 @@ class EmailEinvoice(models.Model):
         except ValueError:
             mail = False
 
-        for inv in invoice_ids:
+        for line in invoice_ids:
+            inv = line.move_id
             if not inv.partner_id.active:
                 continue
             attachment_ids = self.env['ir.attachment'].search([('res_model','=','account.move'),

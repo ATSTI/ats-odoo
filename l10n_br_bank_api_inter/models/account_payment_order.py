@@ -74,7 +74,8 @@ class AccountPaymentOrder(models.Model):
                 identifier=line.document_number,
                 instructions=[],
             )
-            dados.append(slip)
+            if line.ml_maturity_date >= datetime.now().date() and not line.move_line_id.codigo_solicitacao:
+                dados.append(slip)
         return dados
 
     def _generate_bank_inter_boleto(self):

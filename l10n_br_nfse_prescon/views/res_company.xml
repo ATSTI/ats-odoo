@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2023 - TODAY, KMEE INFORMATICA LTDA
+     Copyright 2023 - TODAY, Marcel Savegnago <marcel.savegnago@escodoo.com.br>
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="prescon_nfse_res_company_form" model="ir.ui.view">
+        <field
+            name="name"
+        >l10n_br_fiscal.res.company.form (in l10n_br_nfse_prescon)</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="l10n_br_nfse.nfse_res_company_form" />
+        <field name="arch" type="xml">
+            <field name="provedor_nfse" position="after">
+                <field
+                    name="presconnfe_production_token"
+                    attrs="{'invisible': ['|',('provedor_nfse','!=', 'presconnfe'),('nfse_environment', '!=', '1')]}"
+                />
+                <field
+                    name="presconnfe_homologation_token"
+                    attrs="{'invisible': ['|',('provedor_nfse','!=', 'presconnfe'),('nfse_environment', '!=', '2')]}"
+                />
+                <field
+                    name="presconnfe_nfse_token_validate"
+                    attrs="{'invisible': [('provedor_nfse','!=', 'presconnfe')]}"
+                />                
+                <field
+                    name="presconnfe_nfse_service_type_value"
+                    attrs="{'invisible': [('provedor_nfse','!=', 'presconnfe')]}"
+                />
+                <field
+                    name="presconnfe_nfse_cnae_code_value"
+                    attrs="{'invisible': [('provedor_nfse','!=', 'presconnfe')]}"
+                />
+                <field
+                    name="presconnfe_nfse_wsdl"
+                    attrs="{'invisible': [('provedor_nfse','!=', 'presconnfe')]}"
+                />
+                <field
+                    name="presconnfe_nfse_password"
+                    attrs="{'invisible': [('provedor_nfse','!=', 'presconnfe')]}"
+                />
+            </field>
+            <xpath expr="//field[@name='nfse_ssl_verify']" position="attributes">
+                <attribute name="invisible">0</attribute>
+                <attribute
+                    name="attrs"
+                >{'invisible': [('provedor_nfse', '!=', 'presconnfe')]}</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

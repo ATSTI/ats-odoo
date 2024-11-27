@@ -503,7 +503,7 @@ class ImportarWizard(models.TransientModel):
                                 if len(bcod) > 7:
                                     if type(bcod) == float:
                                         bcod = str(int(bcod))
-                                    vals['barcode'] = str
+                                    vals['barcode'] = str(bcod)
                             except:
                                 pass
 

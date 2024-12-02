@@ -12,7 +12,7 @@
                     type="object"
                     attrs="{'invisible': [('document_type_id', '!=', False)]}"  
                 >
-                    <span>Criar NFe(produtos)</span>
+                    <span>Criar NFse(Serviços)</span>
                 </button>
             </xpath>
         </field>

@@ -40,7 +40,7 @@ class AccountMove(models.Model):
         vals = {}
         vals["partner_id"] = self.partner_id.id
         document = self.env['l10n_br_fiscal.document.type'].search([
-            ("code", "=", 55)
+            ("code", "=", "SE")
         ],limit=1)
         journal = self.env['account.journal'].search([
             ("type", "=", "general")
@@ -140,7 +140,7 @@ class AccountMove(models.Model):
                 "<a href='#' data-oe-model='%s' data-oe-id='%s'>NFse criada diário: %s</a>"
             ) % (move._name, move.id, journal.name)
         )
-        self.write({"ref": "NFse"})
+        # self.write({"ref": "NFse"})
         move.message_post(
             body=_(
                 "<a href='#' data-oe-model='%s' data-oe-id='%s'>NFse da Fatura %s</a>"

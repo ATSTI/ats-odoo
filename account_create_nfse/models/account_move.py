@@ -87,7 +87,7 @@ class AccountMove(models.Model):
             vals
         )
         for line in self.invoice_line_ids:
-            if not line.product_id.type == "service":
+            if line.product_id.type != "service":
                 continue
             item = {}
 

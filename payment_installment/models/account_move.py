@@ -10,14 +10,25 @@ class AccountMove(models.Model):
     
     parcela_ids = fields.One2many(
         'invoice.parcela', 'move_id',
-        string=u"Parcelas")
+        string=u"Parcelas", copy=False)
     num_parcela = fields.Integer('Núm. Parcela')
     dia_vcto = fields.Integer('Dia Vencimento', default=0)
     rateio_frete = fields.Boolean('Rateio do Frete', default=False)
     vlr_prim_prc = fields.Float('Valor Prim. Parcela', default=0.0)
-    payment_mode_id = fields.Many2one(
-       'account.payment.mode', string=u"Modo de pagamento")
+    # payment_mode_id = fields.Many2one(
+    #    'account.payment.mode', string=u"Modo de pagamento")
     
+    # @api.returns('self', lambda value: value.id)
+    # def copy(self, default=None):
+    #     if move.is_invoice(include_receipts=True):
+    #         # Make sure to recompute payment terms. This could be necessary if the date is different for example.
+    #         # Also, this is necessary when creating a credit note because the current invoice is copied.
+    #         if move.currency_id != self.company_id.currency_id:
+    #             move.with_context(check_move_validity=False)._onchange_currency()
+    #             move._check_balanced()
+    #         move._recompute_payment_terms_lines()
+    #     return super().copy(default)
+
     # TODO saindo o mesmo nome para todas as parcelas
 
     def action_post(self):
@@ -36,7 +47,19 @@ class AccountMove(models.Model):
                     break
         if different:
             raise UserError(_(f"Parcela não foi confirmada, favor confirmar na aba PARCELAS."))
-        res = super().action_post()      
+        res = super().action_post()
+        # TODO quando confirma a primeira vez esta excluindo as parcelas
+        # rotina abaixo pra evitar isso, rever
+        if len(self.financial_move_line_ids) < len(self.parcela_ids):
+            self.button_draft()
+            self.action_confirma_parcela()
+            res = super().action_post()
+        # correcao name parcela
+        for prc in self.parcela_ids:
+            fin = self.financial_move_line_ids.filtered(lambda l: l.date_maturity == prc.data_vencimento)
+            if fin.name.find('-') < 0:
+                fin.write({'name': f"{self.name}-{fin.name}"})
+
         return res
 
     def action_confirma_parcela(self): 
@@ -53,7 +76,7 @@ class AccountMove(models.Model):
                 if self.move_type == "out_invoice":
                     valor_deb = prc.valor
                 create_method({
-                        'name': f"{self.payment_reference}-{prc.numero_fatura}",
+                        'name': prc.numero_fatura,
                         'debit': valor_deb,
                         'balance': prc.valor,
                         'credit': valor_cre,
@@ -65,6 +88,7 @@ class AccountMove(models.Model):
                         'account_id': account.id,
                         'partner_id': self.commercial_partner_id.id,
                         'exclude_from_invoice_tab': True,
+                        'payment_mode_id': prc.payment_mode_id.id or self.payment_mode_id.id,
                 })
                 date_due = prc.data_vencimento
             if date_due:
@@ -173,142 +197,17 @@ class AccountMove(models.Model):
             if self.parcela_ids:
                 self.parcela_ids.unlink()
             self.parcela_ids = prcs
-                
-    
-    def action_move_create(self):
-        """ Creates invoice related analytics and financial move lines """
-        account_move = self.env['account.move']
-        for inv in self:
-            if not inv.journal_id.sequence_id:
-                raise UserError(_('Please define sequence on the journal related to this invoice.'))
-            if not inv.invoice_line_ids:
-                raise UserError(_('Please create some invoice lines.'))
-            if inv.move_id:
-                continue
 
-            ctx = dict(self._context, lang=inv.partner_id.lang)
 
-            if not inv.invoice_date:
-                inv.with_context(ctx).write({'invoice_date': fields.Date.context_today(self)})
-            date_due = inv.invoice_date
-            if inv.parcela_ids:
-                for prc in inv.parcela_ids:
-                     date_due= prc.data_vencimento
-                     break
-            if not inv.date_due:
-                inv.with_context(ctx).write({'date_due': date_due})
-            company_currency = inv.company_id.currency_id
+class AccountMoveLine(models.Model):
+    _inherit = "account.move.line"
 
-            # create move lines (one per invoice line + eventual taxes and analytic lines)
-            iml = inv.invoice_line_move_line_get()
-            iml += inv.tax_line_move_line_get()
-
-            diff_currency = inv.currency_id != company_currency
-            # create one move line for the total and possibly adjust the other lines amount
-            total, total_currency, iml = inv.with_context(ctx).compute_invoice_totals(company_currency, iml)
-
-            name = inv.name or '/'
-
-            if inv.parcela_ids:
-                for prc in inv.parcela_ids:
-                    if total < 0:
-                        prc.valor = prc.valor*(-1)
-                    iml.append({
-                        'type': 'dest',
-                        'name': name,
-                        'price': prc.valor,
-                        'account_id': inv.account_id.id,
-                        'payment_mode_id': prc.payment_mode_id.id,
-                        'date_maturity': prc.data_vencimento,
-                        'amount_currency': prc.valor,
-                        'currency_id': inv.currency_id.id,
-                        'move_id': inv.id
-                    })
-                    prc.valor = prc.valor*(-1)
-                    
-            elif inv.payment_term_id:
-                totlines = inv.with_context(ctx).payment_term_id.with_context(currency_id=company_currency.id).compute(total, inv.invoice_date)[0]
-                res_amount_currency = total_currency
-                ctx['date'] = inv.date or inv.invoice_date
-                for i, t in enumerate(totlines):
-                    if inv.currency_id != company_currency:
-                        amount_currency = company_currency.with_context(ctx).compute(t[1], inv.currency_id)
-                    else:
-                        amount_currency = False
-
-                    # last line: add the diff
-                    res_amount_currency -= amount_currency or 0
-                    if i + 1 == len(totlines):
-                        amount_currency += res_amount_currency
-
-                    iml.append({
-                        'type': 'dest',
-                        'name': name,
-                        'price': t[1],
-                        'account_id': inv.account_id.id,
-                        'date_maturity': t[0],
-                        'payment_mode_id': inv.payment_mode_id.id,
-                        'amount_currency': diff_currency and amount_currency,
-                        'currency_id': diff_currency and inv.currency_id.id,
-                        'move_id': inv.id
-                    })
-            else:
-                iml.append({
-                    'type': 'dest',
-                    'name': name,
-                    'price': total,
-                    'account_id': inv.account_id.id,
-                    'date_maturity': inv.date_due,
-                    'amount_currency': diff_currency and total_currency,
-                    'currency_id': diff_currency and inv.currency_id.id,
-                    'move_id': inv.id
-                })
-            part = self.env['res.partner']._find_accounting_partner(inv.partner_id)
-            line = [(0, 0, self.line_get_convert(l, part.id)) for l in iml]
-            line = inv.group_lines(iml, line)
-
-            journal = inv.journal_id.with_context(ctx)
-            line = inv.finalize_invoice_move_lines(line)
-
-            date = inv.date or inv.invoice_date
-            move_vals = {
-                'ref': inv.reference,
-                'line_ids': line,
-                'journal_id': journal.id,
-                'date': date,
-                'narration': inv.comment,
-            }
-            ctx['company_id'] = inv.company_id.id
-            ctx['invoice'] = inv
-            ctx_nolang = ctx.copy()
-            ctx_nolang.pop('lang', None)
-            move = account_move.with_context(ctx_nolang).create(move_vals)
-            # Pass invoice in context in method post: used if you want to get the same
-            # account move reference when creating the same invoice after a cancelled one:
-            move.post()
-            # make the invoice point to that move
-            vals = {
-                'move_id': move.id,
-                'date': date,
-                'move_name': move.name,
-            }
-            inv.with_context(ctx).write(vals)
-        return True    
-                                                                                                                                                              
-    def finalize_invoice_move_lines(self, move_lines):
-        res = super(AccountMove, self).\
-        finalize_invoice_move_lines(move_lines)
-        parcela = 1
-        for line in move_lines:
-            if 'name' in line[2]:
-                for inv in self:
-                    if inv.parcela_ids:
-                        pm = inv.parcela_ids[parcela-1].payment_mode_id.id
-                        parc = str(parcela).zfill(2)
-                        if line[2]['name'] == parc:
-                            line[2]['payment_mode_id'] = pm
-                            parcela += 1
-        return res
+    # substitui o metodo deste modulo bank-payment/account_payment_partner
+    # porque nao permite ao usuario mudar a forma de pagamento
+    # de uma unica parcela
+    @api.depends("move_id", "move_id.payment_mode_id")
+    def _compute_payment_mode(self):
+        return
 
 class InvoiceParcela(models.Model):
     _name = 'invoice.parcela'

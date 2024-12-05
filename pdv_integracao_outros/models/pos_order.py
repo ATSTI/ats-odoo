@@ -123,6 +123,8 @@ class PosSession(models.Model):
         # para cada arquivo na pasta
         num_arq = 1
         user_adic = []
+        ses = self.env['pos.session']
+        ses_conf = self.env['pos.config']
         for i in arquivos:
             # nome_arq = i[:i.index('.')]
             # if nome_arq[:4] != 'cai_POS_':
@@ -132,13 +134,19 @@ class PosSession(models.Model):
             num_arq += 1
 
             # buscar pedido ja existe
-            ses = self.env['pos.session']
             f = open(path_file + '/' + i, mode="r")
             arq = json.load(f)
 
             # caixa = f"-{nome_arq[:6]}"
             caixa = f"-{arq['caixa']}"
-            session = ses.search([('name', 'like', caixa)])
+            #session = ses.search([('name', 'like', caixa)])
+            #ses_config = ses_conf.search([('employee_ids', 'ilike', arq['user_id'])])
+            ses_config = ses_conf.search([])
+            for cn in ses_config:
+                for employee in cn.employee_ids:
+                    if employee.user_id.id == arq['user_id']:
+                        ses_config = cn
+            session = ses.search([('config_id', '=', ses_config.id), ('state', 'in', ('opened','closing_control'))], order='id desc', limit=3)
             state = arq["state"]
             if session:
                 sesd = []

@@ -115,6 +115,7 @@ class PurchaseOrderLine(models.Model):
         readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
     
     discount = fields.Float(string='Discount (%)', digits=(16, 20), default=0.0)
+    discount_fixed = fields.Boolean(string="Fixed Discount?")
 
     def _prepare_invoice_line(self, **optional_values):
         self.ensure_one()

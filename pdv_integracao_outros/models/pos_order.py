@@ -131,14 +131,14 @@ class PosSession(models.Model):
         user_adic = []
         ses = self.env['pos.session']       
         for i in arquivos:
+            f = open(path_file + '/' + i, mode="r")
+            arq = json.load(f)            
             ses_config = self.get_pos_config(arq['user_id'])
             if not ses_config:
                 # nao encontrou um pos_config para este usuario
                 continue
             num_arq += 1
             # buscar pedido ja existe
-            f = open(path_file + '/' + i, mode="r")
-            arq = json.load(f)
             caixa = f"-{arq['caixa']}"
             session = ses.search([('config_id', '=', ses_config.id), ('state', 'in', ('opened','closing_control'))], order='id desc', limit=3)
             state = arq["state"]

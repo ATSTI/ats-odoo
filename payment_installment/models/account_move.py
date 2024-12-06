@@ -18,19 +18,17 @@ class AccountMove(models.Model):
     # payment_mode_id = fields.Many2one(
     #    'account.payment.mode', string=u"Modo de pagamento")
     
+
     # @api.returns('self', lambda value: value.id)
     # def copy(self, default=None):
+    #     move = super().copy(default)
+    #     import pudb;pu.db
     #     if move.is_invoice(include_receipts=True):
-    #         # Make sure to recompute payment terms. This could be necessary if the date is different for example.
-    #         # Also, this is necessary when creating a credit note because the current invoice is copied.
-    #         if move.currency_id != self.company_id.currency_id:
-    #             move.with_context(check_move_validity=False)._onchange_currency()
-    #             move._check_balanced()
-    #         move._recompute_payment_terms_lines()
+    #         if move.parcela_ids:
+    #             move.action_confirma_parcela()
     #     return super().copy(default)
 
     # TODO saindo o mesmo nome para todas as parcelas
-
     def action_post(self):
         different = False
         for prc in self.parcela_ids:
@@ -208,6 +206,42 @@ class AccountMoveLine(models.Model):
     @api.depends("move_id", "move_id.payment_mode_id")
     def _compute_payment_mode(self):
         return
+
+    # @api.model_create_multi
+    # def create(self, vals_list):
+    #     for values in vals_list:
+    #         # "amount_currency"='560.00',"amount_residual_currency"='560.00',"price_subtotal"='-560.00',"price_total"='-560.00',"price_unit"='-560.000000'
+    #         print (values)
+    #         print(f"debit: {values['debit']}, \
+    #             credit: {values['credit']}, \
+    #             amount currency: {values['amount_currency']}, \
+    #             price_subtotal: {values['price_subtotal']}, \
+    #             price_unit: {values['price_unit']} \
+    #         ")
+    #         if 'debit' in values and not values['price_unit']:
+    #             values['amount_currency'] = values['debit']
+    #             values['amount_residual_currency'] = values['debit']
+    #             values['price_unit'] = -values['debit']
+    #             values['price_subtotal'] = -values['debit']
+    #             values['price_total'] = -values['debit']
+    #     # if 'parcela_ids' in values:
+    #     #     del vals_list['parcela_ids']
+    #     #     vals_list['payment_mode_id'] = 1  
+    #     print ("=========================================")
+    #     for values in vals_list:
+    #         # "amount_currency"='560.00',"amount_residual_currency"='560.00',"price_subtotal"='-560.00',"price_total"='-560.00',"price_unit"='-560.000000'
+    #         print (values)
+    #         print(f"debit: {values['debit']}, \
+    #             credit: {values['credit']}, \
+    #             amount currency: {values['amount_currency']}, \
+    #             price_subtotal: {values['price_subtotal']}, \
+    #             price_unit: {values['price_unit']} \
+    #         ")        
+    #     result = super(
+    #         AccountMoveLine, self.with_context(create_from_move_line=True)
+    #     ).create(vals_list)     
+    #     return result
+
 
 class InvoiceParcela(models.Model):
     _name = 'invoice.parcela'

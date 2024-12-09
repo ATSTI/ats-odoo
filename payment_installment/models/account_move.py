@@ -205,7 +205,10 @@ class AccountMoveLine(models.Model):
     # de uma unica parcela
     @api.depends("move_id", "move_id.payment_mode_id")
     def _compute_payment_mode(self):
-        return
+        if self.move_id.parcela_ids:
+            return
+        else:
+            return super()._compute_payment_mode()
 
     # @api.model_create_multi
     # def create(self, vals_list):

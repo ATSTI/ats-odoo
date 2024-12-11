@@ -33,4 +33,16 @@ class AccountJournal(models.Model):
     bank_token_date = fields.Datetime(string="Data token escrita", readonly=True, default=datetime.now())
 
     bank_token_read = fields.Char(string="Token consulta", readonly=True)
-    bank_token_date_read = fields.Datetime(string="Data toke consulta", readonly=True, default=datetime.now())    
+    bank_token_date_read = fields.Datetime(string="Data toke consulta", readonly=True, default=datetime.now())
+    bank_multa_type = fields.Selection(
+        selection=[("VALORFIXO", "Valor fixo"), ("PERCENTUAL", "Percentual")],
+        string="Tipo Multa",
+        default="PERCENTUAL",
+    )
+    bank_multa_value = fields.Float('Valor multa', digits=(16, 2))
+    bank_mora_type = fields.Selection(
+        selection=[("VALORDIA", "Valor dia"), ("TAXAMENSAL", "Taxa mensal")],
+        string="Tipo Juros",
+        default="VALORDIA",
+    )
+    bank_mora_value = fields.Float('Valor juros', digits=(16, 2))    

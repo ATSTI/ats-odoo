@@ -25,6 +25,10 @@
                     <field name="bank_token_date" />
                     <field name="bank_token_read" />
                     <field name="bank_token_date_read" />
+                    <field name="bank_multa_type" />
+                    <field name="bank_multa_value" />
+                    <field name="bank_mora_type" />
+                    <field name="bank_mora_value" />
                 </group>
             </group>
         </field>

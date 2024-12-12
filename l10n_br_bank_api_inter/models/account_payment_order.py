@@ -52,6 +52,15 @@ class AccountPaymentOrder(models.Model):
                 zipCode=misc.punctuation_rm(self.company_id.zip),
             ),
         )
+        multa = {}
+        if self.journal_id.bank_multa_type:
+            multa["taxa"] = self.journal_id.bank_multa_value
+            multa["codigo"] = self.journal_id.bank_multa_type
+        mora = {}
+        if self.journal_id.bank_mora_type:
+            mora["taxa"] = self.journal_id.bank_mora_value
+            mora["codigo"] = self.journal_id.bank_mora_type
+
         for line in self.payment_line_ids:
             payer = User(
                 name=line.partner_id.legal_name or line.partner_id.name,
@@ -73,6 +82,8 @@ class AccountPaymentOrder(models.Model):
                 due_date=line.ml_maturity_date,
                 identifier=line.document_number,
                 instructions=[],
+                multa=multa,
+                mora=mora,
             )
             if line.ml_maturity_date >= datetime.now().date() and not line.move_line_id.codigo_solicitacao:
                 dados.append(slip)

@@ -148,7 +148,8 @@ class AccountMoveLine(models.Model):
                     if 'nossoNumero' in boleto:
                         self.own_number = boleto["nossoNumero"]
                         payment_line.own_number = boleto["nossoNumero"]
-
+            if not self.codigo_solicitacao:
+                self.move_id.action_pdf_boleto()
             datas = api.boleto_pdf(self.codigo_solicitacao)
             datas_json = json.loads(datas.decode("utf-8"))
             self.pdf_boleto_id = self.env["ir.attachment"].create(

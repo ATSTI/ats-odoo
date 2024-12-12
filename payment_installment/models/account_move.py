@@ -55,7 +55,7 @@ class AccountMove(models.Model):
         # correcao name parcela
         for prc in self.parcela_ids:
             fin = self.financial_move_line_ids.filtered(lambda l: l.date_maturity == prc.data_vencimento)
-            if fin.name.find('-') < 0:
+            if fin.name and fin.name.find('-') < 0:
                 fin.write({'name': f"{self.name}-{fin.name}"})
 
         return res

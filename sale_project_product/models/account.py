@@ -6,5 +6,4 @@ class AccountMove(models.Model):
     _inherit = 'account.move'
 
     libera = fields.Boolean(string="Entrega Liberada pelo financeiro")
-
-    
+ 

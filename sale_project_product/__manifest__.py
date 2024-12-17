@@ -29,7 +29,7 @@
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['sale', 'sale_stock', 'sale_project', 'sale_project_service_tracking_copy_tasks', 'project', 'account'],
+    'depends': ['sale', 'sale_stock', 'sale_mrp', 'sale_project', 'sale_project_service_tracking_copy_tasks', 'project', 'account'],
     'data': [
         'views/sale_view.xml',
         'views/account_view.xml',

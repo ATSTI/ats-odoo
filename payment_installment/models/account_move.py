@@ -53,10 +53,10 @@ class AccountMove(models.Model):
             self.action_confirma_parcela()
             res = super().action_post()
         # correcao name parcela
-        for prc in self.parcela_ids:
-            fin = self.financial_move_line_ids.filtered(lambda l: l.date_maturity == prc.data_vencimento)
-            if fin.name and fin.name.find('-') < 0:
-                fin.write({'name': f"{self.name}-{fin.name}"})
+        # for prc in self.parcela_ids:
+        #     fin = self.financial_move_line_ids.filtered(lambda l: l.date_maturity == prc.data_vencimento)
+        #     if fin.name and fin.name.find('-') < 0:
+        #         fin.write({'name': f"{self.name}-{fin.name}"})
 
         return res
 
@@ -102,11 +102,14 @@ class AccountMove(models.Model):
         ano = hj.year
         if dia_preferencia:
             if dia >= dia_preferencia:
-                mes = mes + 1
-                if mes > 12:
-                    mes = 1
-                    ano = ano + 1            
+                # mes = mes + 1
+                # if mes > 12:
+                #     mes = 1
+                #     ano = ano + 1
+                parcela += 1
             dia = dia_preferencia
+        else:
+            parcela += 1
         mes = mes + parcela
 
         if mes > 12 and mes < 25:

@@ -4,7 +4,7 @@
     "name": "Brazilian Localization Accounts Patch",
     "category": "Localisation",
     "description": """
-        Quando tem icms de desoneração e com código 03, desconta o ICMS do total
+        Quando tem icms de desoneração e com código 03-Alívio do ICMS, desconta o valor do ICMS do total da nota.
     """,
     "license": "AGPL-3",
     "author": "ATSTi, ",

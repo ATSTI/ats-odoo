@@ -141,6 +141,16 @@ class PresconnfeNfse(models.AbstractModel):
         if recipient.get("cpf"):
             tipoTomador = "F"
             documento = recipient.get("cpf")
+        # TODO - neste caso o local do servico e o enderco do emitente
+            # "logradouroServico": recipient.get("endereco"),
+            # "numeroServico": recipient.get("numero"),
+            # "complementoServico": "",
+            # "bairroServico": recipient.get("bairro"),
+            # "cidadeServico": recipient.get("municipio"),
+            # "ufServico": recipient.get("uf"),
+        # import pudb;pu.db
+        valor_iss = service.get("valor_iss", 0)
+        aliquota = service.get("aliquota") * 100
         str_invoice = [{
             "im": company.inscr_mun,
             "NumeroNota": rps_info.get("numero"),
@@ -157,13 +167,13 @@ class PresconnfeNfse(models.AbstractModel):
             "ufTomador": recipient.get("uf"),
             "PAISTomador": "BRASIL",
             "emailTomador": recipient.get("email"),
-            "logradouroServico": recipient.get("endereco"),
             "CEPTomador": recipient.get("cep"),
-            "numeroServico": recipient.get("numero"),
+            "logradouroServico": company.street_name,
+            "numeroServico": company.street_number,
             "complementoServico": "",
-            "bairroServico": recipient.get("bairro"),
-            "cidadeServico": recipient.get("municipio"),
-            "ufServico": recipient.get("uf"),
+            "bairroServico": company.district,
+            "cidadeServico": company.city_id.name,
+            "ufServico": company.state_id.code,
             "issRetido": service.get("iss_retido"),
             "devidoNoLocal": 0,
             "observacao": "",
@@ -177,7 +187,7 @@ class PresconnfeNfse(models.AbstractModel):
             "descricao": service.get("discriminacao"),
             "atividade": service.get(company.presconnfe_nfse_service_type_value),
             "valor": round(service.get("valor_servicos", 0), 2),
-            "aliquota": service.get("aliquota"),
+            "aliquota": aliquota,
             "deducaoMaterial": round(service.get("valor_deducoes", 0), 2),
             "descontoCondicional": round(service.get("desconto_condicionado", 0), 2),
             "descontoIncondicional": round(
@@ -185,7 +195,7 @@ class PresconnfeNfse(models.AbstractModel):
             ),
             "valorDeducao": round(service.get("valor_deducoes", 0), 2),
             "baseCalculo": round(service.get("base_calculo", 0), 2),
-            "valorIss": round(service.get("valor_iss", 0), 2),
+            "valorIss": 0,
             "valorTotalNota": round(service.get("valor_liquido_nfse", 0), 2),
             "tipoEnquadramento": "N",
             "tipoIss": "M",
@@ -595,7 +605,6 @@ class Document(models.Model):
             None. Updates the document's status based on the response.
         """
         res = super()._eletronic_document_send()
-
         for record in self.filtered(filter_processador_edoc_nfse).filtered(
             filter_presconnfe
         ):

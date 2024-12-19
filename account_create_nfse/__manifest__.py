@@ -14,7 +14,7 @@
    """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ["l10n_br_fiscal", "l10n_br_nfse"],
+    'depends': ["l10n_br_fiscal", "l10n_br_nfse", "l10n_br_account"],
     'data': [
         'views/account_move_view.xml',
     ],

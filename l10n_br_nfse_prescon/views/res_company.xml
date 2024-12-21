@@ -39,6 +39,10 @@
                     name="presconnfe_nfse_password"
                     attrs="{'invisible': [('provedor_nfse','!=', 'presconnfe')]}"
                 />
+                <field
+                    name="presconnfe_nfse_aliquota_iss"
+                    attrs="{'invisible': [('provedor_nfse','!=', 'presconnfe')]}"
+                />
             </field>
             <xpath expr="//field[@name='nfse_ssl_verify']" position="attributes">
                 <attribute name="invisible">0</attribute>

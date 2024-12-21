@@ -3,13 +3,13 @@
     <record model="ir.cron" id="l10n_br_nfse_prescon_cron">
         <field
             name="name"
-        >NFSe PresconNFe: Check status and update status of submitted documents.</field>
+        >NFSe PresconNFe: Envia NFSe prefeitura.</field>
         <field name="model_id" ref="model_l10n_br_fiscal_document" />
         <field name="state">code</field>
         <field name="code">model._cron_document_status_prescon()</field>
         <field name="user_id" ref="base.user_root" />
-        <field name="interval_number">15</field>
-        <field name="interval_type">minutes</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">months</field>
         <field name="numbercall">-1</field>
         <field eval="False" name="doall" />
     </record>

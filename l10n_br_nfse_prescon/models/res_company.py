@@ -52,6 +52,10 @@ class ResCompany(models.Model):
         string="Prescon - Token validade"
     )
 
+    presconnfe_nfse_aliquota_iss = fields.Float(
+        string="Prescon - aliquota ISS"
+    )
+
     def get_presconnfe_token(self):
         """
         Retrieve the appropriate FocusNFe API token based on the current NFSe

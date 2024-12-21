@@ -150,7 +150,9 @@ class PresconnfeNfse(models.AbstractModel):
             # "ufServico": recipient.get("uf"),
         # import pudb;pu.db
         valor_iss = service.get("valor_iss", 0)
-        aliquota = service.get("aliquota") * 100
+        # aliquota = service.get("aliquota") * 100
+        # a prefeitura define a aliquota no inicio do mes
+        aliquota = company.presconnfe_nfse_aliquota_iss
         str_invoice = [{
             "im": company.inscr_mun,
             "NumeroNota": rps_info.get("numero"),
@@ -651,9 +653,9 @@ class Document(models.Model):
             response.
         """
         records = (
-            self.search([("state", "in", ["enviada"])], limit=25)
+            self.search([("state", "in", ["a_enviar"])], limit=25)
             .filtered(filter_processador_edoc_nfse)
             .filtered(filter_presconnfe)
         )
         if records:
-            records._document_status()
+            records._eletronic_document_send()

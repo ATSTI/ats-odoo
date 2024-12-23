@@ -21,7 +21,7 @@
 ###############################################################################
 
 {
-    'name': 'Contract Invoice',
+    'name': 'Contract Invoice - NAO USAR , substituido por contract_other_controls',
     'summary': 'Finance information to contracts and their invoices',
     'version': '14.0.0.0.0',
     'category': 'Contract Management',

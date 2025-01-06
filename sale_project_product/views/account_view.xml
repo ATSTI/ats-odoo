@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <record id="account_form_view_finaceiro" model="ir.ui.view">
+        <field name="name">account.form.view.finaceiro</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="priority">999</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_date']" position="after">
+                <field name="libera"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

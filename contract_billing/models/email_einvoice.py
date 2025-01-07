@@ -46,13 +46,15 @@ class EmailEinvoice(models.Model):
             self.pool.get('mail.mail').create(cr, uid, vals, context=context)
         return True
 
-    def cron_send_einvoice(self, dia_vcto=10):
+    def cron_send_einvoice(self, dia_vcto=8):
         remind = {}
         invoice_obj = self.env['account.move.line']
         # envia errado se data ficar errada
         #if dia_vcto == 0:
         #    dia_vencimento = data_vcto[6:10]+'-'+data_vcto[3:5]+'-'+data_vcto[:2]
         #else:
+        #dia_vencimento = datetime.now()
+        #dia_vencimento = dia_vencimento.replace(day=dia_vcto).strftime("%Y-%m-%d")
         dia_vencimento = (datetime.now() + timedelta(dia_vcto)).strftime("%Y-%m-%d")
         #dia_vencimento = '2017-03-06'
         # base_domain = [
@@ -162,7 +164,6 @@ class EmailEinvoice(models.Model):
     #def cron_lembrete_einvoice(self, dias_vencimento=13):
     def cron_lembrete_einvoice(self, dia_vcto=0):
         remind = {}
-        import pudb;pu.db
         hoje = datetime.now()
         # Sabado ou domingo nao envia
         if hoje.weekday == 6 or hoje.weekday == 7:

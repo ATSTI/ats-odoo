@@ -139,8 +139,9 @@ class PosSession(models.Model):
                 continue
             num_arq += 1
             # buscar pedido ja existe
-            caixa = f"-{arq['caixa']}"
-            session = ses.search([('config_id', '=', ses_config.id), ('state', 'in', ('opened','closing_control'))], order='id desc', limit=3)
+            caixa = "-%s" % (arq['caixa'])
+            #session = ses.search([('config_id', '=', ses_config.id), ('state', 'in', ('opened','closing_control'))], order='id desc', limit=3)
+            session = ses.search([('config_id', '=', ses_config.id), ('name', 'like', caixa)], order='id desc', limit=3)
             state = arq["state"]
             if session:
                 sesd = []
@@ -149,6 +150,8 @@ class PosSession(models.Model):
                         px.action_pos_session_closing_control()
                     if px.state == "closing_control" and state == "closed":
                         px._validate_session()
+                    if px.state == "closed" and state == "closed":
+                        continue
                     else:    
                         px_ids = {}
                         px_ids['tipo'] = 'sessao'
@@ -199,7 +202,7 @@ class PosSession(models.Model):
         gera um arquivo com todos os pedidos da sessao
         pra ser enviado para o pdv evitando o envio dos 
         arquivos que ja estao neste retorno"""
-        arquivos = fnmatch.filter(os.listdir(path_file), "ped_*.json")
+        arquivos = sorted(fnmatch.filter(os.listdir(path_file), "ped_*.json"))
         num_arq = 1
         ses = 0
         for i in arquivos:
@@ -246,6 +249,8 @@ class PosSession(models.Model):
             # vals['date_order'] = datetime.strftime(ped['date_order'],'%Y-%m-%d %H:%M:%S')
             vals['date_order'] = ped['date_order'][:19]
             cli_n = ped['nomecliente']
+            #if vals['name'] == '23-351':
+            #    import pudb;pu.db
             if ped['nomecliente'] == 'Cliente do Sistema':
                 cli_n = 'Consumidor'
             prt = prt_obj.search([('name', 'ilike', cli_n)], limit=1)
@@ -254,7 +259,7 @@ class PosSession(models.Model):
             if prt:
                 vals['partner_id'] = prt.id
             else:
-                print(f"############# - Cliente nao encontrado : {ped['nomecliente']}")
+                #print(f"############# - Cliente nao encontrado : {ped['nomecliente']}")
                 continue
 
             if user_id:
@@ -291,6 +296,7 @@ class PosSession(models.Model):
             vals['company_id'] = 1
             vals['pricelist_id'] = 1
             try:
+                #print(f"arquivo : {i}")
                 ped_id = pos.create(vals)
             except Error as e:
                 ses.message_post(
@@ -378,6 +384,7 @@ class PosSession(models.Model):
             if metodo_pag and metodo_pag.name[:2] == '4-':
                 ped_id.write({'to_invoice': True})
                 move_vals = ped_id._prepare_invoice_vals()
+                move_vals['invoice_origin'] = 'POS/' + move_vals['invoice_origin']
                 new_move = ped_id._create_invoice(move_vals)
                 ped_id.write({'account_move': new_move.id, 'state': 'invoiced'})
                 new_move.sudo().with_company(ped_id.company_id)._post()
@@ -476,7 +483,13 @@ class PosSession(models.Model):
             sg_obj = self.env['account.bank.statement.line']
         
             # vejo os diarios usados no PDV do Caixa aberto       
-            session = self.env['pos.session'].sudo().search([('name', 'ilike', caixa)])
+            #session = self.env['pos.session'].sudo().search([('name', 'ilike', caixa)])
+            # TODO incluir no arquivo o user_id
+            ses_config = self.get_pos_config(lt['user_id'])
+            session = self.env['pos.session'].search([
+                ('name', 'like', caixa),
+                ('config_id', '=', ses_config.id),
+            ])
             if not session:
                 continue
             

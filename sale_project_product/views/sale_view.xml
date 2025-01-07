@@ -21,9 +21,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='state']" position="before">
                 <field name="task_stage"/>
-            </xpath>
-            <xpath expr="//field[@name='user_id']" position="before">
-                <field name="entrega_liberada" widget="boolean_toggle"/>
+                <field name="libera" widget="boolean_toggle" string="Entrega Liberada"/>
             </xpath>
         </field>
     </record>
@@ -36,7 +34,9 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="before">
                 <field name="task_stage" invisible="1"/>
-                <field name="entrega_liberada" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='ind_pres']" position="after">
+                <field name="libera"/>
             </xpath>
         </field>
     </record>

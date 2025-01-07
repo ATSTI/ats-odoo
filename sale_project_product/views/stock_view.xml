@@ -10,6 +10,9 @@
             <xpath expr="//field[@name='origin']" position="after">
                 <field name="entrega_liberada_stock" widget="boolean_toggle"/>
             </xpath>
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="status_tarefa" />
+            </xpath>
         </field>
     </record>
     
@@ -19,8 +22,9 @@
         <field name="inherit_id" ref="stock.view_picking_form"/>
         <field name="priority">999</field>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='name']" position="before">
+            <xpath expr="//field[@name='location_id']" position="before">
                 <field name="entrega_liberada_stock" invisible="1"/>
+                <field name="status_tarefa" invisible="1"/>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button type="object" name="action_chama_taks" class="oe_stat_button" icon="fa-tasks" attrs="{'invisible': [('tasks_count_stock', '=', 0)]}" groups="project.group_project_user">

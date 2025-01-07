@@ -14,7 +14,8 @@ class StockPicking(models.Model):
     #                 order.entrega_liberada = fat.libera
     #         # self.entrega_liberada = False 
     
-    entrega_liberada_stock = fields.Boolean(string='Entrega Liberada', related='sale_id.entrega_liberada', readonly=True)
+    entrega_liberada_stock = fields.Boolean(string='Entrega Liberada', related='sale_id.libera', readonly=True)
+    status_tarefa = fields.Char(string='ESTAGIO DA TAREFA ENGENHARIA', related='sale_id.task_stage', readonly=True)
     tasks_count_stock = fields.Integer(string='Tarefas', related='sale_id.tasks_count')
     mrp_production_count_stock = fields.Integer(string='Tarefas', related='sale_id.mrp_production_count')
 

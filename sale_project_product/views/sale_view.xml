@@ -20,8 +20,8 @@
         <field name="priority">999</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='state']" position="before">
-                <field name="task_stage"/>
-                <field name="libera" widget="boolean_toggle" string="Entrega Liberada"/>
+                <field name="task_stage" optional="show"/>
+                <field name="libera" widget="boolean_toggle" string="Entrega Liberada" optional="show"/>
             </xpath>
         </field>
     </record>

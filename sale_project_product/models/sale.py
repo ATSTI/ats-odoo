@@ -12,8 +12,8 @@ class SaleOrder(models.Model):
             else:
                 order.task_stage = ''
     
-    task_stage = fields.Char(string='Estagio da tarefa engenharia', compute='_get_stage_id', readonly=True)
-    libera = fields.Boolean(string="Entrega Liberada pelo financeiro")
+    task_stage = fields.Char(string='Estagio da Tarefa Engenharia', compute='_get_stage_id', readonly=True)
+    libera = fields.Boolean(string="Entrega Liberada pelo Financeiro")
 
     # def _get_entrega_liberada(self):
     #     for order in self:

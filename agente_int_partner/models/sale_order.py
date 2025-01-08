@@ -6,7 +6,7 @@ from odoo import api, fields, models, _
 class SaleOrder(models.Model):
     _inherit = "sale.order"
     
-    intermediador = fields.Many2one('res.partner',string="Agente intermediador")
+    intermediador = fields.Many2one('res.partner',string="Agente Intermediador")
 
     @api.onchange('partner_id')
     def onchange_partner_id(self):

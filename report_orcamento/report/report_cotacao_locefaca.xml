@@ -202,8 +202,23 @@
                 <!--<p t-field="doc.note"/>-->
                 <br></br>
                 <p t-if="doc.payment_term_id.note">
-                    <span t-field="doc.payment_term_id.note"/>
+                    
                 </p>
+                <div t-if="doc.note" class="mt32 ml64 mr4">
+                    <div class="offset-8">
+                        <strong>Termos e Condiçções</strong>
+                        <br/>
+                        <span t-field="doc.note"/>
+                    </div>
+                </div>
+                <br/>
+                <div t-if="doc.manual_customer_additional_data" class="mt32 ml64 mr4">
+                    <div class="offset-8">
+                        <strong>Dado Adicional do Cliente Manual</strong>
+                        <br/>
+                        <span t-field="doc.manual_customer_additional_data"/>
+                    </div>
+                </div>
                 <div class="text-left">
                     <P>________________________________________</P>
                     <div t-field="doc.partner_id.name"/>

@@ -192,9 +192,14 @@
                     </div>
                 </div>
                 <div class="oe_structure"/>
+                <br/><br/>
+                <strong>Data do Retorno:</strong><br/><span t-field="doc.commitment_date" t-options="{&quot;widget&quot;: &quot;date&quot;}"/><p/>
+                <strong>Condição de Pagamento:</strong><br/><span t-field="doc.payment_term_id"/>
+                <br/><br/>
                 <strong>RETIRADA/DEVOLUÇÃO:</strong>
-                <br></br> 
-                - SEGUNDA A SEXTA 0:00 AS 17:00 HRS;<br></br> 
+                <br/>
+                - SEGUNDA A QUINTA 08:00 AS 17:00 HRS;<br></br> 
+                - SEXTA 08:00 AS 16:30 HRS;<br></br> 
                 - O TRANSPORTE PARA ENVIO E RETORNO DO (S) EQUIPAMENTO (S) SÃO DE RESPONSABILIDADE DO CLIENTE;<br></br>
                 - A MAQSAFETY NÃO SE RESPONSABILIZA POR QUALQUER DANO OCORRIDO DURANTE O DESLOCAMENTO;<br></br>
                 - FRETE A COMBINAR;<br></br>

@@ -17,7 +17,7 @@
         <field name="inherit_id" ref="sale.view_order_tree"/>
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
-                <field name="intermediador"/>
+                <field name="intermediador" optional="show"/>
             </field>
         </field>
     </record>

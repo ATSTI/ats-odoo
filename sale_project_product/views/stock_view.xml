@@ -8,7 +8,7 @@
         <field name="priority">999</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='origin']" position="after">
-                <field name="entrega_liberada_stock" widget="boolean_toggle" optional="show"/>
+                <field name="entrega_liberada_stock" widget="boolean_toggle" optional="show" readonly="1"/>
             </xpath>
             <xpath expr="//field[@name='state']" position="after">
                 <field name="status_tarefa" optional="show" />

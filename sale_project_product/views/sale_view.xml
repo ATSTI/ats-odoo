@@ -21,7 +21,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='state']" position="before">
                 <field name="task_stage" optional="show"/>
-                <field name="libera" widget="boolean_toggle" string="Entrega Liberada" optional="show"/>
+                <field name="libera" widget="boolean_toggle" string="Entrega Liberada" optional="show" readonly="1"/>
             </xpath>
         </field>
     </record>

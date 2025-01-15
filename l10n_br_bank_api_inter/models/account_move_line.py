@@ -135,16 +135,14 @@ class AccountMoveLine(models.Model):
                 # buscar informacoes do boleto pegar nosso_numero
                 resposta = api.consulta_boleto(self.codigo_solicitacao)
                 if 'cobranca' in resposta:
-                    # cob = resposta['cobranca']
                     boleto = resposta['boleto']
-                    # titulo = cob['cobranca']
-                    # if titulo['seuNumero'] != self.document_number:
-                    #     continue
-                    pix = resposta['pix']
+                    if 'pix' in resposta:
+                        pix = resposta['pix']
+                        self.pix_copiaecola = pix['pixCopiaECola']
+                        self.pix_txid = pix['txid']
+
                     payment_line.digitable_line = boleto["linhaDigitavel"]
                     payment_line.barcode = boleto["codigoBarras"]
-                    self.pix_copiaecola = pix['pixCopiaECola']
-                    self.pix_txid = pix['txid']
                     if 'nossoNumero' in boleto:
                         self.own_number = boleto["nossoNumero"]
                         payment_line.own_number = boleto["nossoNumero"]

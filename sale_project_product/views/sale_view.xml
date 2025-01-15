@@ -36,7 +36,7 @@
                 <field name="task_stage" invisible="1"/>
             </xpath>
             <xpath expr="//field[@name='ind_pres']" position="after">
-                <field name="libera"/>
+                <field name="libera" groups="account.group_account_manager"/>
             </xpath>
         </field>
     </record>

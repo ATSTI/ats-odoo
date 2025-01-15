@@ -115,4 +115,4 @@ class PaymentAccountMoveLine(models.TransientModel):
             lambda l: l.account_id == move_line.account_id
         )
         lines_to_reconcile.reconcile()
-        self.move_line_id.payment_date = self.payment_date
+        # self.move_line_id.payment_date = self.payment_date

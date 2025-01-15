@@ -13,9 +13,10 @@ class AccountMoveLine(models.Model):
         store=True
     )
 
-    payment_date = fields.Date(
-        string="Data do Pagamento"
-    )
+    # tirei pq qdo recebe parcial nao mostra a data correta
+    # payment_date = fields.Date(
+    #     string="Data do Pagamento"
+    # )
 
     number_nfe = fields.Char(
         related="move_id.document_number",

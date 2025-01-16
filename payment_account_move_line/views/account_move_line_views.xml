@@ -23,7 +23,7 @@
                 <field name="amount_currency" sum="Total das parcelas" />
                 <field name="amount_residual" readonly="1" sum="Total"/>
                 <field name="date_maturity"/>
-				<field name="payment_date"/>
+				<!-- <field name="payment_date"/> -->
                 <field name="move_id" readonly="1"/>
                 <field name="reconciled" string="Pago" />
 

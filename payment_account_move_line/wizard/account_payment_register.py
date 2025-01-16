@@ -10,8 +10,8 @@ class AccountPaymentRegister(models.TransientModel):
 
     def _create_payment_vals_from_wizard(self):
         payment_vals = super()._create_payment_vals_from_wizard()
-        for line in self.line_ids:
-            line.write({'payment_date': fields.Date.context_today(self)})
+        # for line in self.line_ids:
+        #     line.write({'payment_date': fields.Date.context_today(self)})
         if not self.currency_id.is_zero(self.payment_difference) and self.payment_difference_handling == 'reconcile':
             name = payment_vals['ref']
             payment_vals['write_off_line_vals'] = {

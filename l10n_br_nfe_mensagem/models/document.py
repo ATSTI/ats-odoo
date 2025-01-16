@@ -5,13 +5,38 @@ from nfelib.nfe.bindings.v4_0.nfe_v4_00 import Nfe
 from erpbrasil.base.fiscal.edoc import ChaveEdoc
 import re
 
+from odoo.addons.l10n_br_fiscal.constants.fiscal import (
+    MODELO_FISCAL_NFCE,
+    MODELO_FISCAL_NFE,
+    PROCESSADOR_OCA,
+)
+
+
+def filter_processador_edoc_nfe(record):
+    if record.processador_edoc == PROCESSADOR_OCA and record.document_type_id.code in [
+        MODELO_FISCAL_NFE,
+        MODELO_FISCAL_NFCE,
+    ]:
+        return True
+    return False
 
 class FiscalDocument(models.Model):
     _inherit = "l10n_br_fiscal.document"
 
+    def action_document_send(self):
+        result = super().action_document_send()
+        self._action_document_send()
+        for event in self.event_ids:
+            if event.status_code == 100:
+                continue
+            if event.status_code:
+                self.write({"xml_error_message": event.response})
+        return result 
 
-    def _valida_xml(self, xml_file):
+    def _validate_xml(self, xml_file):
         self.ensure_one()
+        if not self.filtered(filter_processador_edoc_nfe):
+            return super()._validate_xml(xml_file)
         erros = Nfe.schema_validation(xml_file)
         erros = "\n".join(erros)
         lista_erros = erros.splitlines()
@@ -58,3 +83,4 @@ class FiscalDocument(models.Model):
                 mensagem += m
             erros = m
         self.write({"xml_error_message": erros or False})
+

@@ -14,7 +14,7 @@
                                 <b>Orçamento Nº <span t-field="o.name"/></b>
                             </td>
                             <td style="text-align: right; width: 50%; height:40px; font-size:13px;">
-                                <b>DAta vencimento:<span t-field="o.invoice_date_due"/></b>
+                                <b>Data vencimento:<span t-field="o.invoice_date_due"/></b>
                             </td>
                         </tr>
                     </table>

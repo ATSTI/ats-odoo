@@ -81,16 +81,16 @@
                 <table style="width:100%">
                     <tr>
                         <td style="width: 35%; font-size:22px">
-                            <b>Descrição dos Produtos</b>
+                            Descrição dos Produtos
                         </td>
                         <td style=" text-align:right ;width: 15%; font-size:22px ">
-                            <b>Qtde</b>
+                            Qtde
                         </td >
                         <td style=" text-align:right ;width: 25%; font-size:22px">
-                            <b>R$ Unit</b>
+                            R$ Unit
                         </td>
                         <td style=" width: 25% ; text-align: right; font-size:22px">
-                            <b>R$ Total</b>
+                            R$ Total
                         </td> 
                     </tr>
                     <t t-foreach="receipt.orderlines" t-as="line" t-key="line.id">

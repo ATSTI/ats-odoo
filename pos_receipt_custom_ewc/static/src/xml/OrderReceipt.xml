@@ -80,48 +80,48 @@
 
                 <table style="width:100%">
                     <tr>
-                        <td style="width: 35%; font-size:20px">
+                        <td style="width: 35%; font-size:22px">
                             <b>Descrição dos Produtos</b>
                         </td>
-                        <td style=" text-align:right ;width: 15%; font-size:20px ">
+                        <td style=" text-align:right ;width: 15%; font-size:22px ">
                             <b>Qtde</b>
                         </td >
-                        <td style=" text-align:right ;width: 25%; font-size:20px">
+                        <td style=" text-align:right ;width: 25%; font-size:22px">
                             <b>R$ Unit</b>
                         </td>
-                        <td style=" width: 25% ; text-align: right; font-size:20px">
+                        <td style=" width: 25% ; text-align: right; font-size:22px">
                             <b>R$ Total</b>
                         </td> 
                     </tr>
                     <t t-foreach="receipt.orderlines" t-as="line" t-key="line.id">
                         <tr>
                             <t t-if="isSimple(line)">
-                                <td style="width: 25% ;font-size:20px">
+                                <td style="width: 25% ;font-size:22px">
                                     <div t-esc="line.product_name_wrapped[0]" />
                                 </td>
-                                <td style="width: 25% ;text-align: right;font-size:20px">
+                                <td style="width: 25% ;text-align: right;font-size:22px">
                                     <t t-esc="env.pos.format_currency_no_symbol(Math.round(line.quantity * Math.pow(10, env.pos.dp['Product Unit of Measure'])) / Math.pow(10, env.pos.dp['Product Unit of Measure']))"/>
                                 </td>
-                                <td style="width: 25% ;text-align: right;font-size:20px">
+                                <td style="width: 25% ;text-align: right;font-size:22px">
                                     <t t-esc="env.pos.format_currency_no_symbol(line.price)" />
                                 </td>
-                                <td style="width: 25% ;text-align: right;font-size:20px">
+                                <td style="width: 25% ;text-align: right;font-size:22px">
                                     <span class="price_display">
                                         <t t-esc="env.pos.format_currency_no_symbol(line.price_display)" />
                                     </span>
                                 </td>
                             </t>
                             <t t-else="">
-                                <td style="width: 25% ;font-size:20px">
+                                <td style="width: 25% ;font-size:22px">
                                     <div t-esc="line.product_name_wrapped[0]" />
                                 </td>
-                                <td style="width: 25% ;text-align: right;font-size:20px">
+                                <td style="width: 25% ;text-align: right;font-size:22px">
                                     <t t-esc="env.pos.format_currency_no_symbol(Math.round(line.quantity * Math.pow(10, env.pos.dp['Product Unit of Measure'])) / Math.pow(10, env.pos.dp['Product Unit of Measure']))"/>
                                 </td>
-                                <td style="width: 25% ;text-align: right;font-size:20px">
+                                <td style="width: 25% ;text-align: right;font-size:22px">
                                     <t t-esc="env.pos.format_currency_no_symbol(line.price)" />
                                 </td>
-                                <td style="width: 25% ;text-align: right;font-size:20px">
+                                <td style="width: 25% ;text-align: right;font-size:22px">
                                     <span class="price_display">
                                         <t t-esc="env.pos.format_currency_no_symbol(line.price_display)" />
                                     </span>
@@ -207,10 +207,10 @@
                 <br/>
                 <table style="text-align: right; width: 100%; font-size: 80%; padding-left: 10em;">
                     <tr>
-                        <td style="text-align: right ; width: 75%">
+                        <td style="text-align: right ; width: 75%;font-size:22px">
                             TOTAL
                         </td>
-                        <td style="text-align: right ; width: 25%">
+                        <td style="text-align: right ; width: 25%;font-size:22px">
                             <span t-esc="env.pos.format_currency(receipt.total_with_tax)"/>
                         </td>
                     </tr>

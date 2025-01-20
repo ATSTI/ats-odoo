@@ -25,9 +25,9 @@ class FiscalDocument(models.Model):
 
     def action_document_send(self):
         result = super().action_document_send()
-        self._action_document_send()
+        # self._action_document_send()
         for event in self.event_ids:
-            if event.status_code == 100:
+            if event.status_code == "100":
                 continue
             if event.status_code:
                 self.write({"xml_error_message": event.response})

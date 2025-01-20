@@ -48,17 +48,28 @@ def filter_processador_edoc_nfe(record):
 
 
 class NFe(spec_models.StackedModel):
-    _inherit = "l10n_br_fiscal.document"
+    _name = "l10n_br_fiscal.document"
+    _inherit = ["l10n_br_fiscal.document", "nfe.40.infnfe"]
+
+    _nfe40_odoo_module = "odoo.addons.l10n_br_nfe_spec.models.v4_0.leiaute_nfe_v4_00"
+    _nfe40_stacking_mixin = "nfe.40.infnfe"
 
     def _document_export(self, pretty_print=True):
         # result = super()._document_export()
         for record in self.filtered(filter_processador_edoc_nfe):
             edoc = record.serialize()[0]
-            processador = record._processador()
+            # processador = record._processador()
+            processador = record._edoc_processor()
             xml_file = processador.render_edoc_xsdata(edoc, pretty_print=pretty_print)[
                 0
             ]
-            _logger.debug(xml_file)
+            # Delete previous authorization events in draft
+            if (
+                record.authorization_event_id
+                and record.authorization_event_id.state == "draft"
+            ):
+                record.sudo().authorization_event_id.unlink()
+
             event_id = self.event_ids.create_event_save_xml(
                 company_id=self.company_id,
                 environment=(
@@ -73,5 +84,4 @@ class NFe(spec_models.StackedModel):
                 xml_assinado = processador.assina_raiz(edoc, edoc.infNFe.Id)
             else:
                 xml_assinado = xml_file
-            self._valida_xml(xml_assinado)
-        # return result
+            self._validate_xml(xml_assinado)

@@ -2,3 +2,6 @@
 
 from . import res_company
 from . import document
+
+spec_schema = "nfe"
+spec_version = "40"

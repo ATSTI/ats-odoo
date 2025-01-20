@@ -10,8 +10,6 @@
     "maintainers": ["Carlos , Mauricio"],
     "depends": [
         "l10n_br_nfe",
-        "spec_driven_model",
-        "l10n_br_fiscal_certificate",
     ],
     "data": [
     ],

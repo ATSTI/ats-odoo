@@ -82,5 +82,9 @@ class FiscalDocument(models.Model):
             for m in list(msg):
                 mensagem += m
             erros = m
+        # usa certificado A3, entao remove o erro de assinatura
+        if not (self.company_id.sudo().certificate_nfe_id or self.company_id.sudo().certificate_ecnpj_id):
+            if 'Signature' in erros:
+                erros = ''
         self.write({"xml_error_message": erros or False})
 

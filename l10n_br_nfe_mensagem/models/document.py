@@ -29,7 +29,7 @@ class FiscalDocument(models.Model):
         for event in self.event_ids:
             if event.status_code == "100":
                 self.write({"xml_error_message": False})
-                continue
+                break
             if event.status_code:
                 self.write({"xml_error_message": event.response})
         return result 

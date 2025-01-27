@@ -29,6 +29,8 @@ class FiscalDocumentTransp(models.Model):
                     }
                     obj_veic = self.env["nfe.40.tveiculo"].create(vals_transp).id
                     self.nfe40_veicTransp = obj_veic
+                else:
+                    self.nfe40_veicTransp = False
                 if not obj_vol:
                     self.env["nfe.40.vol"].create(vals_vol)
                     

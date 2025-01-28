@@ -151,6 +151,9 @@ class ContractContract(models.Model):
                 _recurring_create_func(ctr, date_ref)
         return True
 
+    def _compute_recurring_next_date(self):
+        pass
+
 # class AccountAnalyticInvoiceLine(models.Model):
 #     _inherit = 'account.analytic.invoice.line'
 

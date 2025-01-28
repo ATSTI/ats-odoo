@@ -221,6 +221,7 @@ class ContractContract(models.Model):
         #invoice_vals = self._prepare_invoice(date_ref)
         invoices = super()._recurring_create_invoice(date_ref)
         msg_erro = ''
+        # contract_billing
         for invoice in invoices:
             #msg_erro = 'Erro para criar a fatura.'
             #invoice_ids.append(self.env['account.invoice'].create(invoice_vals))

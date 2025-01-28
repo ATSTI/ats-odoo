@@ -140,13 +140,15 @@ class ContractContract(models.Model):
         )
         contracts = self.search(domain)
         companies = set(contracts.mapped("company_id"))
+        # contract_invoice
         # Invoice by companies, so assignation emails get correct context
         for company in companies:
             contracts_to_invoice = contracts.filtered(
                 lambda c: c.company_id == company
                 and (not c.date_end or c.recurring_next_date <= c.date_end)
             ).with_company(company)
-            _recurring_create_func(contracts_to_invoice[:10], date_ref)
+            for ctr in contracts_to_invoice[:10]:
+                _recurring_create_func(ctr, date_ref)
         return True
 
 # class AccountAnalyticInvoiceLine(models.Model):

@@ -9,6 +9,7 @@
     "version": "14.0.0.0.0",
     "maintainers": ["Carlos , Mauricio"],
     "depends": [
+        "l10n_br_fiscal_edi",
         "l10n_br_nfe",
     ],
     "data": [

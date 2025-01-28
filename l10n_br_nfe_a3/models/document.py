@@ -1,17 +1,10 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import base64
 import logging
-import re
-import string
 from datetime import datetime
+from odoo import _, models
 
-from erpbrasil.base.fiscal import cnpj_cpf
-from erpbrasil.base.fiscal.edoc import ChaveEdoc
-from erpbrasil.edoc.pdf import base
-from erpbrasil.transmissao import TransmissaoSOAP
 from lxml import etree
-from nfelib.nfe.bindings.v4_0.nfe_v4_00 import Nfe
 from nfelib.nfe.ws.edoc_legacy import NFCeAdapter as edoc_nfce, NFeAdapter as edoc_nfe
 from requests import Session
 
@@ -23,15 +16,6 @@ from odoo.addons.l10n_br_fiscal.constants.fiscal import (
     MODELO_FISCAL_NFE,
     PROCESSADOR_OCA,
 )
-from odoo.addons.spec_driven_model.models import spec_models
-
-# from ..constants.nfe import (
-#     NFCE_DANFE_LAYOUTS,
-#     NFE_DANFE_LAYOUTS,
-#     NFE_ENVIRONMENTS,
-#     NFE_TRANSMISSIONS,
-#     NFE_VERSIONS,
-# )
 
 PRODUCT_CODE_FISCAL_DOCUMENT_TYPES = ["55", "01"]
 
@@ -46,13 +30,8 @@ def filter_processador_edoc_nfe(record):
         return True
     return False
 
-
-class NFe(spec_models.StackedModel):
-    _name = "l10n_br_fiscal.document"
-    _inherit = ["l10n_br_fiscal.document", "nfe.40.infnfe"]
-
-    _nfe40_odoo_module = "odoo.addons.l10n_br_nfe_spec.models.v4_0.leiaute_nfe_v4_00"
-    _nfe40_stacking_mixin = "nfe.40.infnfe"
+class DocumentNfe(models.Model):
+    _inherit = "l10n_br_fiscal.document"
 
     def _document_export(self, pretty_print=True):
         # result = super()._document_export()

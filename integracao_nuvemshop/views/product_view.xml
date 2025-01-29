@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+       
+    <record id="product_integracao_tmpl_form_view" model="ir.ui.view">
+        <field name="name">product.integracao.tmpl.form.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="stock.view_template_property_form"/>
+        <field name="arch" type="xml">
+                <field name="pricelist_id" position="before">
+                    <field name="item_id"/>
+                    <field name="variant_id"/>
+                    <field name="online_vendas"/>
+                    <field name="online_preco"/>
+                    <field name="online_estoque"/>
+                </field> 
+        </field>
+    </record>        
+        
+        
+</odoo>

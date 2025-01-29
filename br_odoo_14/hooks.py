@@ -14,6 +14,7 @@ def post_init_hook(cr, registry):
     partner = env["res.partner"].search([], order="ibge_code")
     city = 0
     city_id = 0
+    
     for prt in partner:
         values = {}
         if prt.city_id or not prt.ibge_code:
@@ -45,10 +46,12 @@ def post_init_hook(cr, registry):
             values['ind_final'] = '1'
         
         prt.with_context(disable_ie_validation=True).write(values)
+        print(f"Corrigindo partner {prt.name}")
 
     product = env["product.template"].search([], order = "ncm")
     ncm = '0'
     ncm_id = 0
+    
     for prd in product:
 
         # ATS nao precisa disto
@@ -57,9 +60,14 @@ def post_init_hook(cr, registry):
         values = {}
         if prd.ncm_id or not prd.ncm:
             continue
+        code_ncm = ''
         if prd.ncm != ncm:
-            code_ncm = f"{prd.ncm[:4]}.{prd.ncm[4:6]}.{prd.ncm[6:8]}"
-            ncm_id = env["l10n_br_fiscal.ncm"].search([("code", "=", code_ncm)], limit=1)
+            if prd.ncm.find('.') > 0:
+                if len(prd.ncm) == 10:
+                    code_ncm = prd.ncm[:10]
+            else:
+                code_ncm = f"{prd.ncm[:4]}.{prd.ncm[4:6]}.{prd.ncm[6:8]}"
+            ncm_id = env["l10n_br_fiscal.ncm"].search([("code", "like", code_ncm)], limit=1)
             ncm = prd.ncm
         if ncm_id:
             values['ncm_id'] = ncm_id.id
@@ -74,8 +82,9 @@ def post_init_hook(cr, registry):
             service_id = env["l10n_br_fiscal.service.type"].search([("code", "=", prd.code_servico)])
             if service_id:
                 values['service_type_id'] = service_id.id
-
+        print(f"Corrigindo item {prd.name}")
         prd.with_context(inventory_mode=False).write(values)
+        prd._onchange_ncm_id()
 
     # cr.execute(
     #     """

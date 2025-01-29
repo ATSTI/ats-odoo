@@ -73,8 +73,10 @@ class BrOdooNfe(models.Model):
          ('4', u'4 - Devolução')],
         string=u'Finalidade', help=u"Finalidade da emissão de NFe",
         readonly=True, states=STATE)
-    invoice_id = fields.Many2one(
-        'account.move', string=u'Fatura', readonly=True, states=STATE)
+    #invoice_id = fields.Many2one(
+    #    'account.move', string=u'Fatura', readonly=True, states=STATE)
+    invoice_id = fields.Integer(
+        string=u'Fatura', readonly=True)
     partner_id = fields.Many2one(
         'res.partner', string=u'Parceiro', readonly=True, states=STATE)
     commercial_partner_id = fields.Many2one(

@@ -257,10 +257,13 @@ class BrOdooNfeItem(models.Model):
         string=u'Valor Retenção', digits=dp.get_precision('Account'),
         readonly=True, states=STATE)
 
-    account_invoice_line_id = fields.Many2one(
+    account_invoice_line_id = fields.Integer(
         string="Account Invoice Line",
-        comodel_name="account.invoice.line",
         )
+    #account_invoice_line_id = fields.Many2one(
+    #    string="Account Invoice Line",
+    #    comodel_name="account.invoice.line",
+    #    )
 
     cst_danfe = fields.Char(string="CST Danfe", compute="_compute_cst_danfe")
 

@@ -206,59 +206,99 @@
                             </t>
                         </table>
                         <table style="width:100%">
-                            <th bgcolor="#990000" style="text-align: left;color: #ffffff; height: 40px; " colspan="8">
+                            <th bgcolor="#990000" style="text-align: left;color: #ffffff; height: 50px; " colspan="8">
                                 <span style="font-size: 14px;">PRODUTOS</span>
                             </th>
                             <tr>
-                                <td bgcolor="#666666" style="font-size: 12px;text-align: center;color: #ffffff; width:6%;height:25px">
+                                <td bgcolor="#666666" style="font-size: 12px;text-align: center;color: #ffffff; width:6%;height:35px">
                                     ITEM
                                 </td>
-                                <td bgcolor="#666666" style="font-size: 12px;text-align: center;color: #ffffff; width:19%;height:25px">
+                                <td bgcolor="#666666" style="font-size: 12px;text-align: center;color: #ffffff; width:19%;height:35px">
                                     SKU
                                 </td>
-                                <td bgcolor="#666666" style="font-size: 12px;text-align: center;color: #ffffff; width:30%;height:25px">
+                                <td bgcolor="#666666" style="font-size: 12px;text-align: center;color: #ffffff; width:30%;height:35px">
                                     DESCRIÇÃO
                                 </td>
-                                <td bgcolor="#666666" style="font-size: 12px;text-align: center;color: #ffffff; width:8%;height:25px">
+                                <td bgcolor="#666666" style="font-size: 12px;text-align: center;color: #ffffff; width:8%;height:35px">
                                     QTD
                                 </td>
-                                <td bgcolor="#666666" style="font-size: 12px;text-align: center;color: #ffffff; width:18%;height:25px">
+                                <td bgcolor="#666666" style="font-size: 12px;text-align: center;color: #ffffff; width:18%;height:35px">
                                     Nº DE SERIE
                                 </td>
-                                <td bgcolor="#666666" style="font-size: 12px;text-align: center;color: #ffffff; width:7%;height:25px">
+                                <td bgcolor="#666666" style="font-size: 12px;text-align: center;color: #ffffff; width:7%;height:35px">
                                     ENTRADA
                                 </td>
-                                <td bgcolor="#666666" style="font-size: 12px;text-align: center;color: #ffffff; width:7%;height:25px">
+                                <td bgcolor="#666666" style="font-size: 12px;text-align: center;color: #ffffff; width:7%;height:35px">
                                     SAÍDA
                                 </td>
-                                <td bgcolor="#666666" style="font-size: 12px;text-align: center;color: #ffffff; width:5%;height:25px">
+                                <td bgcolor="#666666" style="font-size: 12px;text-align: center;color: #ffffff; width:5%;height:35px">
                                     OK
                                 </td>
                             </tr>
                             <t t-set="linhas" t-value="10" />
                             <t t-set="item" t-value="0" />
                             <t t-set="lot" t-value="" />
-                            <t t-foreach="o.order_line" t-as="line">
-                                <t t-set="item" t-value="item + 1"/>
-                                <t t-foreach="o.picking_ids" t-as="pick">
-                                    <t t-foreach="pick.move_line_ids_without_package" t-as="lp">
-                                        <t t-if="line.product_id == lp.product_id and pick.picking_type_id.code == 'outgoing'" >
-                                            <t t-set="lot" t-value="lp.lot_id.name" />
+                                <t t-foreach="o.order_line" t-as="line">
+                                    <t t-set="item" t-value="item + 1"/>
+                                    <t t-foreach="o.picking_ids" t-as="pick">
+                                        <t t-foreach="pick.move_line_ids_without_package" t-as="lp">
+                                            <t t-if="line.product_id == lp.product_id and pick.picking_type_id.code == 'outgoing'" >
+                                                <t t-set="lot" t-value="lp.lot_id.name" />
+                                            </t>
+                                        </t>
+                                    </t>
+                                    <t t-set="linhas" t-value="linhas - 1"/>
+                                    <tr style="height:25px"> 
+                                        <td style="font-size: 10px; text-align:center"><span t-esc="item" /></td>
+                                        <td style="font-size: 10px; text-align:left"><span t-field="line.product_id.default_code" /></td>
+                                        <td style="font-size: 10px; text-align:left"><span t-field="line.name" /></td>
+                                        <td style="font-size: 10px; text-align:right"><span t-field="line.product_uom_qty" /></td>
+                                        <td style="font-size: 10px; text-indent: 30px;text-align:left"><span t-esc="lot" /></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <t t-if="line.product_id.kit == True" >
+                                        <tr>
+                                            <td style="border: 0px solid; width:6%;height:13px"></td>
+                                            <td style="border: 0px solid; width:6%;height:13px"></td> 
+                                            <td style="font-size: 11px;text-align: center; width:46%;height:13px">
+                                                <b>ITENS DO KIT</b>
+                                            </td>
+                                            <td style="border: 1px solid; width:6%;height:13px"></td> 
+                                            <td style="border: 1px solid; width:6%;height:13px"></td>
+                                            <td style="border: 0px solid; width:6%;height:13px"></td>
+                                            <td style="border: 0px solid; width:6%;height:13px"></td> 
+                                            <td style="border: 0px solid; width:6%;height:13px"></td>
+                                        </tr>
+                                        <t t-set="linha" t-value="10" />
+                                        <t t-set="lot" t-value="" />
+                                        <t t-foreach="line.product_id.product_tmpl_id.bom_ids" t-as="mrp">
+                                            <t t-foreach="mrp.bom_line_ids" t-as="bom">
+                                                <t t-set="name_p" t-value="bom.product_id.name" />
+                                                <t t-set="qty_p" t-value="bom.product_qty" />  
+                                                <t t-foreach="o.picking_ids" t-as="pick">
+                                                    <t t-foreach="pick.move_line_ids_without_package" t-as="lp">
+                                                        <t t-if="bom.product_id.default_code == lp.product_id.default_code" >
+                                                            <t t-set="lot" t-value="lp.lot_id.name" />
+                                                        </t>
+                                                    </t>
+                                                </t>  
+                                                <t t-set="linha" t-value="linha - 1"/>
+                                                <tr style="height:25px"> 
+                                                    <td style="border: 0px solid;"></td>
+                                                    <td style="border: 0px solid;"></td>
+                                                    <td style="font-size: 8px; text-align:left;height:13px"><span t-esc="name_p" /></td>
+                                                    <td style="font-size: 10px; text-align:right;height:13px"><span t-esc="qty_p" /></td>
+                                                    <td style="font-size: 10px; text-indent: 30px;text-align:left"><span t-esc="lot" /></td>
+                                                    <td style="border: 0px solid;"></td>
+                                                    <td style="border: 0px solid;"></td>
+                                                    <td style="border: 0px solid;"></td>
+                                                </tr>
+                                            </t>
                                         </t>
                                     </t>
                                 </t>
-                                <t t-set="linhas" t-value="linhas - 1"/>
-                                <tr style="height:25px"> 
-                                    <td style="font-size: 10px; text-align:center"><span t-esc="item" /></td>
-                                    <td style="font-size: 10px; text-align:left"><span t-field="line.product_id.default_code" /></td>
-                                    <td style="font-size: 10px; text-align:left"><span t-field="line.name" /></td>
-                                    <td style="font-size: 10px; text-align:right"><span t-field="line.product_uom_qty" /></td>
-                                    <td style="font-size: 10px; text-indent: 30px;text-align:left"><span t-esc="lot" /></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                            </t>
                             <t t-foreach="range(linhas)" t-as="compl">
                                 <t t-set="item" t-value="item + 1"/>
                                 <tr style="height:25px">

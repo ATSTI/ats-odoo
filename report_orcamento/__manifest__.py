@@ -29,9 +29,10 @@
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['account', 'sale_order_tag', 'mrp', 'report_cabecalho'],
+    'depends': ['account', 'sale_order_tag', 'mrp', 'report_cabecalho', 'product'],
     'data': [
         'views/sale_order_view.xml',
+        'views/product_view.xml',
         'report/report_cotacao_locefaca.xml',
         'report/report_entregadevolucao_locefaca.xml',
         'report/report_servico_locefaca.xml',

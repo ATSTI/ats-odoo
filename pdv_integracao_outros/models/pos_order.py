@@ -293,7 +293,7 @@ class PosSession(models.Model):
                     desconto = 0.0
 
             vals['amount_paid'] = t_paid
-            vals['company_id'] = 1
+            vals['company_id'] = ses.company_id.id
             vals['pricelist_id'] = 1
             try:
                 #print(f"arquivo : {i}")
@@ -315,7 +315,7 @@ class PosSession(models.Model):
                 #if len(prod):
                 #    print (f"ITEM : {line.product_id.default_code}")
                 codpro = str(line['product_id'])
-                prd = prod_obj.search([('default_code', '=', codpro)])
+                prd = prod_obj.search([('default_code', '=', codpro)], limit=1)
                 descricao  = line['name']
                 if not prd:
                     prd = prod_obj.search([('name', 'ilike', line['name'])], limit=1)
@@ -359,7 +359,10 @@ class PosSession(models.Model):
                 pag = pag_ids[2]
                 if pag['journal'] in ('R-', 'S-','U-'):
                     continue
-                jrn = self.env['account.journal'].search([('name', 'like', pag['journal'])])
+                jrn = self.env['account.journal'].search([
+                        ('name', 'like', pag['journal']),
+                        ('company_id','=', ses.company_id.id)
+                    ])
                 if not jrn:
                     ses.message_post(
                         body=_(
@@ -368,7 +371,10 @@ class PosSession(models.Model):
                     )
                     falha_pag = False
                     continue 
-                metodo_pag = self.env['pos.payment.method'].search([('name', 'ilike', jrn.name[:2])])
+                metodo_pag = self.env['pos.payment.method'].search([
+                    ('name', 'ilike', jrn.name[:2]),
+                    ('company_id','=', ses.company_id.id)
+                ])
                 # print('Total PAGO: %s' %(str(pag['amount'])))
                 vals_pag = {
                     "name": pag['name'],                
@@ -394,7 +400,7 @@ class PosSession(models.Model):
             # crio um arquivo com todos os pedidos desta sessao
             pedido_ses = self.env['pos.order'].search([
                 ('session_id', '=', ses.id),
-                ('config_id', '=', ses_config.id),
+                ('config_id', '=', ses.config_id.id),
             ])
             pd = []
             for px in pedido_ses:

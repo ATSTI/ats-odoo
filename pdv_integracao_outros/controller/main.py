@@ -193,8 +193,8 @@ class IntegracaoPdv(http.Controller):
             cliente['tipofirma'] = 0
             cliente['segmento'] = 1
             cliente['regiao'] = 1
-            if partner_id.curso:
-                cliente['regiao'] = partner_id.curso
+            #if partner_id.curso:
+            #    cliente['regiao'] = partner_id.curso
             cliente['codusuario'] = 1
             cliente['status'] = 1
             cliente['cnpj'] = ''

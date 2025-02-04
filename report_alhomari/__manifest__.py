@@ -32,6 +32,7 @@
     'depends': ['account', 'l10n_br_sale'],
     'data': [
         'report/report_saleorder_document.xml',
+        'report/account_move_alhomari_report_templates.xml',
     ],
     'installable': True,
     'application': False,

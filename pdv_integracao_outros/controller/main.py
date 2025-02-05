@@ -235,17 +235,17 @@ class IntegracaoPdv(http.Controller):
             ('name', 'ilike', 'Cliente Padrao'),
             ('company_id', '=', user_id.company_id.id),
         ])
-        # cj = http.request.env['account.journal'].search([
-        #     ('name', 'ilike', 'Cliente'),
-        #     ('company_id', '=', user_id.company_id.id),
-        # ])        
+        cj = http.request.env['account.journal'].search([
+            ('name', 'ilike', 'Faturas de Cliente'),
+            ('company_id', '=', user_id.company_id.id),
+        ], limit=1)
         conta_obj = http.request.env['account.move.line']
         conta_ids = conta_obj.sudo().search([('partner_id', '=',int(cod_cliente)), 
             ('full_reconcile_id', '=', False),
             ('company_id', '=', user_id.company_id.id),
             ('account_id.reconcile','=',True),
             ('account_id', '=', cc.id),
-            ('journal_id', '=', 1),
+            ('journal_id', '=', cj.id),
                 ('debit', '>', 0),
         ], order='date_maturity')
         vlr = float(valor_pago)
@@ -288,7 +288,7 @@ class IntegracaoPdv(http.Controller):
                 ('company_id', '=', user_id.company_id.id),
                 ('account_id.reconcile','=',True),
                 ('account_id', '=', cc.id),
-                ('journal_id', '=', 1),
+                ('journal_id', '=', cj.id),
                 ('debit', '>', 0),
             ], order='date_maturity')        
         lista = []

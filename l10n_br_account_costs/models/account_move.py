@@ -189,7 +189,6 @@ class AccountMove(models.Model):
     """
     @api.depends('amount_icms_relief_value')
     def _inverse_amount_icms_relief(self):
-        import pudb;pu.db
         if len(self) > 1:
             return
         if self.move_type not in ('in_invoice','out_invoice'):

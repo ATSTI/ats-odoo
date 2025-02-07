@@ -491,7 +491,7 @@ class PosSession(models.Model):
             # vejo os diarios usados no PDV do Caixa aberto       
             #session = self.env['pos.session'].sudo().search([('name', 'ilike', caixa)])
             # TODO incluir no arquivo o user_id
-            ses_config = self.get_pos_config(lt['user_id'])
+            ses_config = self.get_pos_config(int(lt['user_id']))
             session = self.env['pos.session'].search([
                 ('name', 'like', caixa),
                 ('config_id', '=', ses_config.id),

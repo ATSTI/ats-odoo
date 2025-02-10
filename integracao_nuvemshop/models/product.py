@@ -11,7 +11,7 @@ class ProductTemplate(models.Model):
    
     def write(self, vals):
         res = super(ProductTemplate, self).write(vals)
-        url =  '%s%s/products/'  %(self.company_id.nuvem_shop_link, self.company_id.nuvem_shop_id)
+        url =  '%s%s/products/'  %(self.env.company.nuvem_shop_link, self.env.company.nuvem_shop_id)
         if vals.get('online_venda') or vals.get('list_price') or vals.get('name') or vals.get('description') or vals.get('complemento') or vals.get('online_preco') or vals.get('online_estoque') or vals.get('default_code') or (vals.get('online_estoque') == 0):
             peso = self.peso or '0.0'
             altura = self.altura or '0.0'
@@ -26,7 +26,7 @@ class ProductTemplate(models.Model):
             headers = {
                  'Content-Type': 'application/json; charset=utf-8',
                  'User-Agent': 'Awesome app (awesome@app.com)',
-                 'Authentication': '%s' %(self.company_id.nuvem_shop_authentication) 
+                 'Authentication': '%s' %(self.env.company.nuvem_shop_authentication) 
                  }
             if self.online_venda:
                 variant_ids = self.env['product.product'].sudo().search([('product_tmpl_id','=',self.id)])
@@ -60,7 +60,7 @@ class ProductTemplate(models.Model):
                         estoque = variant.qty_available or variant.online_estoque or 0.0
                         if variant.online_preco:
                             preco = variant.online_preco
-                        for item in variant.attribute_value_ids:
+                        for item in variant.product_template_attribute_value_ids:
                             if 'Tamanho' in item.attribute_id.name:
                                 tamanho = item.name
                             if 'Cor' in item.attribute_id.name:
@@ -99,7 +99,7 @@ class ProductTemplate(models.Model):
                                     'variant_id': z['id']})
                                 fez = 'S'
                             for variant in variant_ids:
-                                for vr in variant.attribute_value_ids:
+                                for vr in variant.product_template_attribute_value_ids:
                                     if z['values'] and z['values'][0]['pt'] == vr.name:
                                         variant.write({'item_id': x['id'],
                                             'variant_id': z['id']})
@@ -134,7 +134,7 @@ class ProductTemplate(models.Model):
                             else:
                                 preco = variant.lst_price
                             variant_id = variant.variant_id
-                            for item in variant.attribute_value_ids:
+                            for item in variant.product_template_attribute_value_ids:
                                 if 'Tamanho' in item.attribute_id.name:
                                     tamanho = item.name
                                 if 'Cor' in item.attribute_id.name:
@@ -201,14 +201,14 @@ class ProductProduct(models.Model):
                         self.product_tmpl_id.company_id.nuvem_shop_link, 
                         self.product_tmpl_id.company_id.nuvem_shop_id)
                 if not self.item_id:
-                    if len(self.attribute_line_ids) == 2:
+                    if len(self.product_tmpl_id.attribute_line_ids) == 2:
                         values = """{"name": {"en": "%s","es": "%s","pt": "%s"},\
                             "description": {"en": "%s", "es": "%s", "pt": "%s"},\
                             "attributes": [{"pt": "Tamanho"}, {"pt": "Cor"}], "variants": [""" %(
                             prod_name, prod_name, prod_name, 
                             descricao,descricao,descricao
                         )
-                    if len(self.attribute_line_ids) == 1:
+                    if len(self.product_tmpl_id.attribute_line_ids) == 1:
                         values = """{"name": {"en": "%s","es": "%s","pt": "%s"},\
                             "description": {"en": "%s", "es": "%s", "pt": "%s"},\
                             "attributes": [{"pt": "Tamanho"}], "variants": [""" %(
@@ -224,14 +224,14 @@ class ProductProduct(models.Model):
                             preco = variant.online_preco
                         tamanho = ''
                         cor = ''
-                        for item in variant.attribute_value_ids:
+                        for item in variant.product_template_attribute_value_ids:
                             if 'Tamanho' in item.attribute_id.name:
                                 tamanho = item.name
                             if 'Cor' in item.attribute_id.name:
                                 cor = item.name
                         if var_prod != '':
                             var_prod += ', '
-                        if len(self.attribute_line_ids) == 1:
+                        if len(self.product_tmpl_id.attribute_line_ids) == 1:
                             var_prod += '{"price": "%s","stock_management": true,"stock": %s,"weight": "%s","sku": "%s"\
                                 ,"width": %s, "height": %s, "depth": %s, "values": [{"pt": "%s"}]}' %(
                                 preco, str(int(estoque)), peso, self.default_code,
@@ -262,7 +262,7 @@ class ProductProduct(models.Model):
                                     'variant_id': z['id']})
                                 fez = 'S'
                             for variant in variant_ids:
-                                if z['values'][0]['pt'] == variant.attribute_value_ids.name:
+                                if z['values'][0]['pt'] == variant.product_template_attribute_value_ids.name:
                                     variant.write({'item_id': x['id'],
                                         'variant_id': z['id']})
                 else:

@@ -42,7 +42,13 @@ class AccountPaymentRegister(models.TransientModel):
                     vals['statement_id'] = cx.id
                     vals['journal_id'] = jrn.id
                     vals['payment_ref'] = motivo # corrigi 06/07/23
-                    self.env['account.bank.statement.line'].sudo().create(vals)
+                    # self.env['account.bank.statement.line'].sudo().create(vals)
+                    # se ja fechou o caixa nao permite criar
+                    try:
+                        self.env['account.bank.statement.line'].sudo().create(vals)
+                    except:
+                        # criar uma account.move.line pra registrar isso
+                        x = 1
 
     def baixa_pagamentos(self, move_line_id, journal_id, caixa, valor, cod_forma, juros):
         invoices = move_line_id.move_id

@@ -1,0 +1,29 @@
+<odoo>
+    <data>
+
+        <record id="account_invoice_print_view" model="ir.ui.view">
+            <field name="name">account.invoice.print.form</field>
+            <field name="model">account.invoice.print</field>
+            <field name="arch" type="xml">
+                <form string="Imprime todos os boletos">
+                    <group>
+                        <field name="arq_file_name" invisible="1"/>
+			<field widget="binary" height="64" name="arq_file" filename="arq_file_name" />
+                    </group>
+                    <footer>
+                        <button string="Imprimir" name="gera_um_pdf" type="object" default_focus="1" class="oe_highlight"/>
+			ou
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <act_window id="action_account_invoice_print"
+            multi="True"
+            key2="client_action_multi" name="Imprimir Todos os Selecionados"
+            res_model="account.invoice.print" src_model="account.invoice"
+            view_mode="form" target="new" view_type="form" />
+
+    </data>
+</odoo>

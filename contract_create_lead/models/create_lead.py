@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from odoo import models, _
+from odoo import api, fields, models, _
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
 
@@ -40,13 +40,15 @@ class ContractContractLead(models.Model):
             crm_lead = self.env["crm.lead"].search([
                 ('name', '=', ctr.name),
                 ('partner_id', '=', ctr.partner_id.id),
-                ('stage_id', '=', 1)
+                ('stage_id', '=', 1),
+                ('contract_id', '=', ctr.id)
             ])
             if crm_lead:
                 continue 
             vals={
                 "name": ctr.name,
                 "partner_id": ctr.partner_id.id,
+                "contract_id": ctr.id,
             }
             lead = self.env["crm.lead"].create(vals)
             self.message_post(
@@ -54,4 +56,37 @@ class ContractContractLead(models.Model):
                 subject=_("Criado uma oportunidade"),
                 message_type="notification"
             )
+
+class Lead(models.Model):
+    _inherit = 'crm.lead'
         
+    contract_id = fields.Many2one('contract.contract' , string="Contrato", readonly=True)
+
+    def add_one_year_next_date(self):
+        for rec in self.contract_id.contract_line_ids:
+            rnd = rec.date_end + relativedelta(years=1)
+            rec.write({
+                "date_end": rnd,
+            })
+
+    @api.model
+    def action_set_lost(self):
+        # """ Lost semantic: probability = 0, active = False """
+        # return self.write({'probability': 0, 'active': False})
+        contract_lost = super(Lead, self).\
+            action_set_lost()
+        self.add_one_year_next_date()
+        
+        return contract_lost
+
+    @api.model
+    def action_set_won(self):
+        # """ Won semantic: probability = 100 (active untouched) """
+        # for lead in self:
+        #     stage_id = lead._stage_find(domain=[('probability', '=', 100.0), ('on_change', '=', True)])
+        #     lead.write({'stage_id': stage_id.id, 'probability': 100})
+        contract_won = super(Lead, self).\
+            action_set_won()
+        self.add_one_year_next_date()
+        
+        return contract_won

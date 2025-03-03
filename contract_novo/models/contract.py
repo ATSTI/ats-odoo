@@ -134,9 +134,9 @@ class ContractContract(models.Model):
 
     def get_formview_id(self, access_uid=None):
         if self.contract_type == "sale":
-            return self.env.ref("contract.contract_contract_customer_form_view").id
+            return self.env.ref("contract_novo.contract_contract_customer_form_view").id
         else:
-            return self.env.ref("contract.contract_contract_supplier_form_view").id
+            return self.env.ref("contract_novo.contract_contract_supplier_form_view").id
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -218,7 +218,7 @@ class ContractContract(models.Model):
             .mapped('invoice_id')
         )
         invoices |= self.env['account.invoice'].search(
-            [('old_contract_id', '=', self.id)]
+            [('contract_id', '=', self.id)]
         )
         return invoices
 

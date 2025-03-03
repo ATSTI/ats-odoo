@@ -126,10 +126,10 @@
         </calendar>
     </field>
 </record> -->
-<record id="view_contract_contract_stage_kanban" model="ir.ui.view">
+<!-- <record id="view_contract_contract_stage_kanban" model="ir.ui.view">
     <field name="name">contract.contract.stage.kanban</field>
     <field name="model">contract.contract</field>
-    <field name="inherit_id" ref="contract.view_contract_contract_kanban"/>
+    <field name="inherit_id" ref="contract_novo.view_contract_contract_kanban"/>
     <field name="arch" type="xml">
         <field name="name" position="after">
             <field name="stage_id"/>
@@ -138,7 +138,7 @@
             <attribute name="default_group_by">stage_id</attribute>
         </xpath>
     </field>
-</record>
+</record> -->
 
 <record id="contract_novo.action_customer_contract" model="ir.actions.act_window">
     <field name="name">Apólices e Contratos</field>

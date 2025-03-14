@@ -141,7 +141,8 @@ class PosSession(models.Model):
             # buscar pedido ja existe
             caixa = "-%s" % (arq['caixa'])
             #session = ses.search([('config_id', '=', ses_config.id), ('state', 'in', ('opened','closing_control'))], order='id desc', limit=3)
-            session = ses.search([('config_id', '=', ses_config.id), ('name', 'like', caixa)], order='id desc', limit=3)
+            #session = ses.search([('config_id', '=', ses_config.id), ('name', 'like', caixa)], order='id desc', limit=3)
+            session = ses.search([('config_id', '=', ses_config.id), ('name', '=like', '%'+caixa)], order='id desc', limit=3)
             state = arq["state"]
             if session:
                 sesd = []

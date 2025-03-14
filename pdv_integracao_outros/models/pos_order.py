@@ -236,7 +236,7 @@ class PosSession(models.Model):
             prod_obj = self.env['product.product']
             session_name = f"-{str(ped['pos_session_id'])}"
             ses = session.search([
-                ('name', 'like', session_name),
+                ('name', '=like', '%' + session_name),
                 ('config_id', '=', ses_config.id),
             ])
             if not ses:

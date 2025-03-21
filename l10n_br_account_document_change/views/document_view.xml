@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="fiscal_patch_document_form_inherit" model="ir.ui.view">
+      <field name="name">fiscal_patch.document.form.inherit</field>
+      <field name="model">l10n_br_fiscal.document</field>
+      <field name="priority">999</field>
+      <field name="inherit_id" ref="l10n_br_fiscal.document_form" />
+      <field name="arch" type="xml">
+        <xpath expr="//button[@name='action_document_back2draft']" position="replace">
+          <button
+            name="action_back_account"
+            type="object"
+            string="Voltar p/ Fatura"
+            groups="l10n_br_fiscal.group_user"
+            class="btn-secondary"
+          />
+        </xpath>
+        <xpath expr="//field[@name='fiscal_operation_id']" position="replace">
+          <field name="fiscal_operation_id" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <xpath expr="//field[@name='edoc_purpose']" position="replace">
+          <field name="edoc_purpose" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <xpath expr="//field[@name='ind_final']" position="replace">
+          <field name="ind_final" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <xpath expr="//field[@name='ind_pres']" position="replace">
+          <field name="ind_pres" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <xpath expr="//field[@name='issuer']" position="replace">
+          <field name="issuer" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <xpath expr="//field[@name='document_type_id']" position="replace">
+          <field name="document_type_id" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <!-- <xpath expr="//field[@name='document_type_id']" position="attributes">
+          <attribute name="readonly">Z</attribute>
+        </xpath> -->
+        <xpath expr="//field[@name='document_key']" position="replace">
+          <field name="document_key" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <xpath expr="//field[@name='document_serie_id']" position="replace">
+          <field name="document_serie_id" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <xpath expr="//field[@name='document_number']" position="replace">
+          <field name="document_number" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <xpath expr="//field[@name='state_fiscal']" position="replace">
+          <field name="state_fiscal" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <xpath expr="//field[@name='transport_modal']" position="replace">
+          <field name="transport_modal" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <xpath expr="//field[@name='service_provider']" position="replace">
+          <field name="service_provider" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <xpath expr="//field[@name='document_date']" position="replace">
+          <field name="document_date" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <xpath expr="//field[@name='date_in_out']" position="replace">
+          <field name="date_in_out" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <xpath expr="//field[@name='user_id']" position="replace">
+          <field name="user_id" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <xpath expr="//field[@name='company_id']" position="replace">
+          <field name="company_id" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <xpath expr="//field[@name='partner_id']" position="replace">
+          <field name="partner_id" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <xpath expr="//field[@name='partner_shipping_id']" position="replace">
+          <field name="partner_shipping_id" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <xpath expr="//field[@name='fiscal_line_ids']" position="replace">
+          <field name="fiscal_line_ids" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <!-- TODO arrumar o fiscal_line_ids -->
+        <xpath expr="//field[@name='document_related_ids']" position="replace">
+          <field name="document_related_ids" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <xpath expr="//field[@name='document_subsequent_ids']" position="replace">
+          <field name="document_subsequent_ids" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <xpath expr="//field[@name='force_compute_delivery_costs_by_total']" position="replace">
+          <field name="force_compute_delivery_costs_by_total" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+        <xpath expr="//field[@name='total_weight']" position="replace">
+          <field name="total_weight" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
+        </xpath>
+      </field>
+  </record>
+
+</odoo>

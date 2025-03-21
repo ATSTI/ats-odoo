@@ -1,6 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import fields, models
+from datetime import datetime, timedelta
 
 
 class FiscalDocumentTransp(models.Model):
@@ -25,6 +26,9 @@ class FiscalDocumentTransp(models.Model):
         return lines_list
 
     def _prepare_nfce_danfe_values(self):
+        date = self.document_date.astimezone().strftime(
+                "%d/%m/%y %H:%M:%S"
+            ) - timedelta(hours=3)
         return {
             "company_ie": self.company_id.inscr_est,
             "company_cnpj": self.company_id.cnpj_cpf,
@@ -49,9 +53,7 @@ class FiscalDocumentTransp(models.Model):
             "document_key": self.document_key,
             "document_number": self.document_number,
             "document_serie": self.document_serie,
-            "document_date": self.document_date.astimezone().strftime(
-                "%d/%m/%y %H:%M:%S"
-            ),
+            "document_date": date,
             "authorization_protocol": self.authorization_protocol,
             "document_qrcode": self.get_nfce_qrcode(),
             "system_env": self.nfe40_tpAmb,

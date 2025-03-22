@@ -1,13 +1,15 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import logging
-from datetime import datetime
-from odoo import _, models
+from odoo import _, fields, models
 
 from lxml import etree
 from nfelib.nfe.ws.edoc_legacy import NFCeAdapter as edoc_nfce, NFeAdapter as edoc_nfe
 from requests import Session
 
+from datetime import datetime, time, timedelta
+
+from pytz import UTC, timezone
 
 from odoo.addons.l10n_br_fiscal.constants.fiscal import (
     EVENT_ENV_HML,
@@ -64,3 +66,18 @@ class DocumentNfe(models.Model):
             else:
                 xml_assinado = xml_file
             self._validate_xml(xml_assinado)
+
+    def action_document_confirm(self):
+        # corrigindo hora da NFCe
+        if self.document_type_id.code in [
+            MODELO_FISCAL_NFCE,
+        ]:
+            original_date = fields.Datetime.now()
+            self.document_date = original_date
+            self.date_in_out = original_date
+ 
+        result = super().action_document_confirm()
+        if not self._context.get("skip_post"):
+            move_ids = self.move_ids.filtered(lambda move: move.state == "draft")
+            move_ids._post()
+        return result

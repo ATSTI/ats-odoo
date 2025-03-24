@@ -49,12 +49,12 @@
         <xpath expr="//field[@name='state_fiscal']" position="replace">
           <field name="state_fiscal" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
         </xpath>
-        <xpath expr="//field[@name='transport_modal']" position="replace">
+        <!-- <xpath expr="//field[@name='transport_modal']" position="replace">
           <field name="transport_modal" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
         </xpath>
         <xpath expr="//field[@name='service_provider']" position="replace">
           <field name="service_provider" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
-        </xpath>
+        </xpath> -->
         <xpath expr="//field[@name='document_date']" position="replace">
           <field name="document_date" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
         </xpath>

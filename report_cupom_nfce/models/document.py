@@ -26,9 +26,8 @@ class FiscalDocumentTransp(models.Model):
         return lines_list
 
     def _prepare_nfce_danfe_values(self):
-        date = self.document_date.astimezone().strftime(
-                "%d/%m/%y %H:%M:%S"
-            ) - timedelta(hours=3)
+        data = self.document_date.astimezone() - timedelta(hours=3)
+        date = data.strftime("%d/%m/%y %H:%M:%S")
         return {
             "company_ie": self.company_id.inscr_est,
             "company_cnpj": self.company_id.cnpj_cpf,

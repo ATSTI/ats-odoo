@@ -147,7 +147,7 @@ class ContractContract(models.Model):
                 lambda c: c.company_id == company
                 and (not c.date_end or c.recurring_next_date <= c.date_end)
             ).with_company(company)
-            for ctr in contracts_to_invoice[:10]:
+            for ctr in contracts_to_invoice[:30]:
                 _recurring_create_func(ctr, date_ref)
         return True
 

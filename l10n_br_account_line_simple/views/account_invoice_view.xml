@@ -17,9 +17,9 @@
             <field name="uot_id" position="replace" />
             <label for="fiscal_quantity" position="replace">
                 <notebook colspan="4">
-                    <page>
+                    <page string="Geral">
                     </page>
-                    <page name="geral_info" string="Inf Fiscal">
+                    <page string="Inf Fiscal">
                         <group>
                             <group>
                                 <label

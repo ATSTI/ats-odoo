@@ -21,7 +21,7 @@
                     </page>
                     <page string="Inf Fiscal">
                         <group>
-                            <group>
+                            <group style="width: 100%">
                                 <label
                                     for="fiscal_quantity"
                                     string="Quantidade Fiscal"
@@ -30,7 +30,6 @@
                                 <div>
                                     <field
                                         name="fiscal_quantity"
-                                        class="oe_inline"
                                         attrs="{'invisible': [('document_type_id', '=', False)]}"
                                         context="{'partner_id':parent.partner_id, 'quantity':fiscal_quantity, 'uom':uot_id, 'uom_qty_change':True, 'company_id': parent.company_id}"
                                     />
@@ -38,7 +37,6 @@
                                         name="uot_id"
                                         force_save="1"
                                         groups="uom.group_uom"
-                                        class="oe_inline oe_no_button"
                                         attrs="{'required': [('display_type', '=', False),('document_type_id', '!=', False)], 'invisible': [('document_type_id', '=', False)]}"
                                     />
                                 </div>
@@ -83,7 +81,7 @@
             expr="//field[@name='invoice_line_ids']/form/sheet/group/field[@name='product_id']"
             position="replace"
         >
-            <group>
+            <group style="width: 100%">
                 <label for="product_id" string="Produto" />
                 <div>
                     <field name="product_id"/>
@@ -100,8 +98,6 @@
                 <div>
                     <field name="price_unit"/>
                 </div>
-            </group>
-            <group>
             </group>
         </xpath>
     </field>

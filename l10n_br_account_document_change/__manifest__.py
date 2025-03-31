@@ -15,6 +15,7 @@
     ],
     "data": [
         "views/document_view.xml",
+        "views/account_invoice_view.xml",
     ],
     "demo": [
     ],

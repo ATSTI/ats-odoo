@@ -13,7 +13,6 @@ class AccountMove(models.Model):
 
     @api.onchange("invoice_line_ids")
     def onchange_invoice_line_ids(self):
-        import pudb;pu.db
         for line in self.invoice_line_ids:
             if line.cfop_id.finance_move == True:
                 self.write({"fatura_duplicata": True})

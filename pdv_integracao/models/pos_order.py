@@ -551,6 +551,9 @@ class PosSession(models.Model):
             session = self.env['pos.session'].sudo().search([('name', 'ilike', caixa)])
             if not session:
                 continue
+
+            if session.state not in ('opened'):
+                continue
             
             lista_st = []
             for lt_st in session.statement_ids:

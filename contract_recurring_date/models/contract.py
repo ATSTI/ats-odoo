@@ -8,7 +8,6 @@ from dateutil.relativedelta import relativedelta
 class ContractLine(models.Model):
     _inherit = "contract.line"
 
-<<<<<<< HEAD
     def _update_recurring_next_date(self):
         # isso modifica a recurring_next_date de forma q nao queremos
         pass

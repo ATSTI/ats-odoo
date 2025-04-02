@@ -11,6 +11,7 @@
     "depends": ["l10n_br_account", "contract"],
     "development_status": "Production/Stable",
     "data": [
+        "views/account.xml",
     ],
     # "installable": True,
 }

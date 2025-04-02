@@ -40,7 +40,7 @@ class ContractContract(models.Model):
             ctr._invoice_followers(moves)
             # mv = moves[-1]
             # self._compute_recurring_next_date()
-            ctr._change_recurring_next_date()            
+            # ctr._change_recurring_next_date()            
         return moves
     
     def contract_responsability(self, resp):

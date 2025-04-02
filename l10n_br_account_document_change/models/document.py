@@ -15,4 +15,17 @@ class FiscalDocumentTransp(models.Model):
             "res_id": self.move_ids.id,
             "context": {},
         }
+    
+    def action_document_confirm(self):
+        if self.move_ids.fatura_duplicata == False:
+            if self.nfe40_dup:
+                self.nfe40_dup.unlink()
+        result = super().action_document_confirm()
+        return result
         
+    def action_document_send(self):
+        if self.move_ids.fatura_duplicata == False:
+            if self.nfe40_dup:
+                self.nfe40_dup.unlink()
+        result = super().action_document_send()
+        return result

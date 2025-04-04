@@ -22,8 +22,8 @@
                                 </td>
                                 <td style="text-align: left; border: 0px solid; width:30%; ">
                                     <br/><span style="font-size:18px">Telefone: </span><span style="font-size:14px" t-field="o.company_id.phone"/>
-                                    <br/><span style="font-size:18px">Email:</span><span style="font-size:14px" t-field="o.company_id.email"/>
-                                    <br/><span style="font-size:18px">Data Emissão:</span><span style="font-size:14px" t-field="o.date_order"/>
+                                    <br/><span style="font-size:18px">Email: </span><span style="font-size:14px" t-field="o.company_id.email"/>
+                                    <br/><span style="font-size:18px">Data Emissão: </span><span style="font-size:14px" t-field="o.date_order"/>
                                 </td>
                             </tr>
                         </table>
@@ -151,8 +151,8 @@
                                 </td>
                                 <td style="text-align: left; border: 0px solid; width:30%; ">
                                     <br/><span style="font-size:18px">Telefone: </span><span style="font-size:14px" t-field="o.company_id.phone"/>
-                                    <br/><span style="font-size:18px">Email:</span><span style="font-size:14px" t-field="o.company_id.email"/>
-                                    <br/><span style="font-size:18px">Data Emissão:</span><span style="font-size:14px" t-field="o.date_order"/>
+                                    <br/><span style="font-size:18px">Email: </span><span style="font-size:14px" t-field="o.company_id.email"/>
+                                    <br/><span style="font-size:18px">Data Emissão: </span><span style="font-size:14px" t-field="o.date_order"/>
                                 </td>
                             </tr>
                         </table>

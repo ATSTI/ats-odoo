@@ -18,9 +18,12 @@
                         <label for="discount_type" string="Tipo desconto :"/>
                         <field name="discount_type" class="oe_inline"/>
                     </div>
-                    <div>
+                    <div class="o_row">
                         <label for="discount_rate" string="Total desconto :"/>
                         <field name="discount_rate" class="oe_inline"/>
+                        <button name="button_dummy"
+                            states="draft,sent" string="Atualizar" type="object"
+                            class="oe_edit_only btn-primary"/>
                     </div>
                 </xpath>
             </field>

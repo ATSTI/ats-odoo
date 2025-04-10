@@ -16,7 +16,7 @@ Invoice Discount for Total Amount
 Module to manage discount on total amount in Invoice.
         as an specific amount or percentage
 """,
-    'depends': ['l10n_br_account'],
+    'depends': ['l10n_br_account', "l10n_br_account_discount"],
     'data': [
         'views/account_invoice_view.xml',
         #'views/invoice_report.xml',

@@ -479,13 +479,14 @@ class AccountAnalyticAccount(models.Model):
             [('recurring_next_date', '<', data_next),
              ('recurring_invoices', '=', True),
              ('active','=',True),
-             ('id', '>', id_ini),
-             ('id', '<', id_ini+650),
              ('date_end', '>', venc_ini),
              ], order = 'name')
+        #     ('id', '>', id_ini),
+        #     ('id', '<', id_ini+3),
         contratos = []
         for ctr in contracts:
             contratos.append(ctr.name)
+        #import pudb;pu.db
         inv = self.env['account.invoice'].search([
                     ('date_due', '>=', venc_ini),
                     ('date_due', '<=', venc_fim),
@@ -500,7 +501,7 @@ class AccountAnalyticAccount(models.Model):
        
         contracts = self.search([
             ('name', 'in', nao_faturado)])
-        for ctr in contracts:
+        for ctr in contracts[:50]:
             for prop in ctr.imovel_id.owner_ids:
                 if prop.partner_id:
                     tempo = str(self.tempo(ctr.mes_contrato, ctr.ano_contrato))

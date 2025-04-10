@@ -9,10 +9,12 @@
     'author': 'crsilveira@gmail.com',
     'website': 'http://www.atsti.com.br',
     'depends': [
-        'contract',
+        'contract_novo', 'contract_corretora',
         'crm',
         ],
     'license': 'AGPL-3',
-    'data': [],
+    'data': [
+        'views/crm_lead_view.xml',
+    ],
     'installable': True,
 }

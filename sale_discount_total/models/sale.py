@@ -33,6 +33,7 @@ class SaleOrder(models.Model):
         Compute the total amounts of the SO.
         """
         res = super()._compute_amount()
+        """
         for order in self:
             amount_discount = 0.0
             for line in order.order_line:
@@ -45,6 +46,7 @@ class SaleOrder(models.Model):
                 'amount_discount': amount_discount,
                 # 'amount_total': amount_untaxed + amount_tax,
             })
+        """
         return res
 
     discount_type = fields.Selection([('percent', 'Percentagem'), ('amount', 'Valor')], string='Tipo desconto',

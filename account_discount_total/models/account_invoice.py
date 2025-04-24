@@ -26,6 +26,7 @@ from odoo import api, fields, models
 class AccountMove(models.Model):
     _inherit = "account.move"
 
+    """"
     @api.depends(
         'line_ids.matched_debit_ids.debit_move_id.move_id.line_ids.amount_residual',
         'line_ids.matched_debit_ids.debit_move_id.move_id.line_ids.amount_residual_currency',
@@ -140,6 +141,7 @@ class AccountMove(models.Model):
 
             move.payment_state = new_pmt_state
         return result
+    """
 
     discount_type = fields.Selection([('percent', 'Percentagem'), ('amount', 'Valor')], string='Tipo desconto',
                                      readonly=True, states={'draft': [('readonly', False)]}, default='percent')
@@ -152,7 +154,7 @@ class AccountMove(models.Model):
     def supply_rate(self):
         for inv in self:
             if inv.discount_type == 'percent':
-                for line in inv.line_ids:
+                for line in inv.invoice_line_ids:
                     price_unit_discount = (
                         line.price_unit * line.quantity * (inv.discount_rate / 100.0)
                     )                    
@@ -166,7 +168,7 @@ class AccountMove(models.Model):
                     discount = (inv.discount_rate / total) * 100
                 else:
                     discount = inv.discount_rate
-                for line in inv.line_ids:
+                for line in inv.invoice_line_ids:
                     price_unit_discount = (
                         line.price_unit * line.quantity * (discount / 100.0)
                     )

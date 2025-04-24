@@ -66,6 +66,7 @@
                             <th name="th_quantity" class="text-right">Quant</th>
                             <th name="th_priceunit" class="text-right">Vlr Unit</th>
                             <th name="th_subtotal" class="text-right">Subtotal</th>
+                            <th t-if="display_discount" name="th_discount" class="text-right">Vlr Disc</th>
                         </tr>
                     </thead>
                     <tbody class="sale_tbody">
@@ -92,7 +93,7 @@
                                         <span t-field="line.price_subtotal" class="text-right"/>
                                     </td>
                                     <td t-if="display_discount" class="text-right" groups="product.group_discount_per_so_line">
-                                        <span t-field="line.discount"/>
+                                        <span t-field="line.discount_value"/>
                                     </td>
                                     <td name="td_subtotal" class="text-right">
                                         <span t-field="line.price_subtotal" class="text-right"/>
@@ -168,6 +169,14 @@
                                         </t>
                                     </tr>
                                 </t>
+                                <tr>
+                                    <td name="td_amount_dsicount_label">
+                                        <strong>Desconto Total</strong>
+                                    </td>
+                                    <td name="td_amount_discount" class="text-right">
+                                        <span t-field="doc.amount_discount_value"/>
+                                    </td>
+                                </tr>
                                 <tr class="border-black o_total">
                                     <td name="td_amount_total_label">
                                         <strong>Total</strong>

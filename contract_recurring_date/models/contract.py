@@ -23,7 +23,8 @@ class ContractContract(models.Model):
         # Compute the recurring_next_date on the contract based on the one
         # defined on line level.
         for contract in self:
-            contract.recurring_next_date = contract.recurring_next_date + relativedelta(months=1)
+            if contract.recurring_next_date:
+                contract.recurring_next_date = contract.recurring_next_date + relativedelta(months=1)
 
     def _prepare_invoice(self, date_invoice, journal=None):
         self.ensure_one()

@@ -86,9 +86,9 @@
         <xpath expr="//field[@name='force_compute_delivery_costs_by_total']" position="replace">
           <field name="force_compute_delivery_costs_by_total" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
         </xpath>
-        <xpath expr="//field[@name='total_weight']" position="replace">
+        <!-- <xpath expr="//field[@name='total_weight']" position="replace">
           <field name="total_weight" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
-        </xpath>
+        </xpath> -->
       </field>
   </record>
 

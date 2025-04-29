@@ -168,7 +168,6 @@ class AccountAnalyticAccount(models.Model):
 
     """ 5 - Gerando o boleto """
     def criar_boleto(self, invoice, move):
-        #import pudb;pu.db
         invoice_ids = self.env['account.invoice'].browse([invoice])
         self.env['payment.order.line'].action_register_boleto(
             invoice_ids.receivable_move_line_ids)
@@ -312,13 +311,7 @@ class AccountAnalyticAccount(models.Model):
             except ValueError:
                 template_id = False
             context['data'] = email_rel
-            #self.env['mail.template'].browse(template_id).send_mail(contract.id, force_send=True)
         return True
-
-    #@api.model
-    #def cron_create_tunel(self):
-    #    self.ssh = SSHClient()
-    #    self.ssh.connect(hostname='127.0.0.1',username='root',password='SENHA_DE_ROOT') 
 
 
     @api.model

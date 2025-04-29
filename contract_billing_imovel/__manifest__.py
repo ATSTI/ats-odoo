@@ -15,7 +15,7 @@
               "ATS,"
               "",
     'website': '',
-    'depends': ['contract','contract_invoice', 'br_boleto', 'br_account'],
+    'depends': ['contract','contract_invoice', 'contract_billing', 'br_boleto', 'br_account'],
     'data': [
         'views/contract_view.xml',
         'views/email_erro_fatura.xml',

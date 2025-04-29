@@ -74,11 +74,12 @@ class IntegracaoPdv(http.Controller):
             data_pedido = datetime.strptime(data_nota, "%Y-%m-%d %H:%M:%S")
             data_pedido = data_pedido + relativedelta(months=1)
             data_pedido = data_pedido.replace(day=1, hour=3, minute=59, second=0, microsecond=0)
-
+            
+            #('state', '=', 'draft'),
+            mes_ano = f"{str(data_pedido.month).zfill(2)}-{data_pedido.year}"
             order_id = order.sudo().search([
                 ('partner_id', '=', cli_ids.financeiro.id),
-                ('date_order', '=', data_pedido),
-                ('state', '=', 'draft'),
+                ('client_order_ref', '=', mes_ano),
                 ], limit=1)
             if not order_id:
                 print ("criando pedido")
@@ -87,6 +88,7 @@ class IntegracaoPdv(http.Controller):
                     'partner_id': cli_ids.financeiro.id,
                     'date_order': data_pedido,
                     'origin': 'produtor',
+                    'client_order_ref': mes_ano,
                 }
                 order_id = order.sudo().create(vals)
                 # cnpj = '%s.%s.%s/%s-%s' %(cnpj[:2],cnpj[2:5],cnpj[5:8],cnpj[8:12],cnpj[12:14])

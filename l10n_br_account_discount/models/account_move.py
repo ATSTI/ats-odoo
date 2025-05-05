@@ -80,5 +80,5 @@ class AccountMoveLine(models.Model):
     @api.onchange('quantity', 'discount', 'price_unit', 'tax_ids', 'freight_value', 'other_value', 'insurance_value', 'discount_value')
     def _onchange_price_subtotal(self):
         result = super()._onchange_price_subtotal()
-        self.move_id._recompute_dynamic_lines(recompute_all_taxes=True)
+        #self.move_id._recompute_dynamic_lines(recompute_all_taxes=True)
         return result

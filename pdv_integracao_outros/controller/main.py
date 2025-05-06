@@ -311,7 +311,7 @@ class IntegracaoPdv(http.Controller):
             contas['fatura'] = conta.move_id.ref
             contas['codigo'] = conta.id
             # contas['cod_cliente'] = 1           
-            if conta.amount_residual > 0.01 and 'POS' not in  conta.move_id.ref:
+            if conta.move_id.ref and conta.amount_residual > 0.01 and 'POS' not in conta.move_id.ref:
                 lista.append(contas)
         return json.dumps(lista)
 

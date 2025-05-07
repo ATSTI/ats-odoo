@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <record id="product_shopee_form" model="ir.ui.view">
+            <field name="name">product_shopee.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view" />
+            <field name="priority">999</field>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='purchase']" position="after">
+                    <page name="shopee_page" string="Shopee">
+                        <group>
+                            <field name="shopee" />
+                            <field name="shopee_item_id" attrs="{'invisible': [('shopee', '=', False)]}"/>
+                            <field name="margin_shopee" attrs="{'invisible': [('shopee', '=', False)]}"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

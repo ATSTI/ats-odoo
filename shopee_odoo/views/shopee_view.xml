@@ -7,20 +7,24 @@
             <field name="mode">primary</field>
             <field name="arch" type="xml">
                 <form string="Shopee Configurações">
+                    <header>
+                        <button name="action_pega_faturas_shopee" string="Sincronizar Faturas Shopee" type="object" class="btn btn-primary"/>
+                        <button name="action_gera_acess_token" string="Gerar Access Token" type="object" class="btn btn-primary"/>
+                    </header>
                     <sheet>
                         <group>
                             <group>
                                 <field name="shopee_id"/>
                                 <field name="shopee_partner_id"/>
                                 <field name="shopee_partner_key"/>
-                                <button name="action_pega_faturas_shopee" string="Sincronizar Faturas Shopee" type="object" class="btn btn-primary"/>
+                                <!-- <button name="action_pega_faturas_shopee" string="Sincronizar Faturas Shopee" type="object" class="btn btn-primary"/> -->
                             </group>
                             <group>
                                 <div class="o_row">
                                     <group>
                                         <field name="refresh_token_security" invisible='1'/>
                                         <field name="refresh_token"/>
-                                        <button name="action_gera_acess_token" string="Gerar Access Token" type="object" class="btn btn-primary"/>
+                                        <!-- <button name="action_gera_acess_token" string="Gerar Access Token" type="object" class="btn btn-primary"/> -->
                                         <field name="access_token"/>
                                         <field name="expire_date_token" />
                                     </group>

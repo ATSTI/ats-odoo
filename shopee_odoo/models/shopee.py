@@ -70,7 +70,6 @@ class ShopeeConfig(models.Model):
         path_cat = "/api/v2/auth/access_token/get?partner_id=%s&sign=%s&timestamp=%s" %(self.shopee_partner_id, sign, timest)
         url = url_ini + path_cat
         response = requests.request("POST",url,headers=headers, data=payload, allow_redirects=False)
-        print(response.text)
         res = response.json()
         expire_in = res['expire_in']
         validade = datetime.now() + timedelta(seconds=expire_in)
@@ -106,12 +105,13 @@ class ShopeeConfig(models.Model):
         url = self.url_ini + path + path_cat
         response = requests.request("GET",url,headers=headers, data=payload, allow_redirects=False)
         od_list = response.json()
-        import pudb;pu.db
         for od in od_list['response']['order_list']:
             order_sn = str(od['order_sn'])
             sale_exists = self.env['sale.order'].search([
                 ('name', '=', str(od['order_sn'])),
             ])
+            if od['order_status'] == "UNPAID":
+                continue
             if sale_exists:
                 continue
             # PARTE QUE TRAS AS FATURAS CRIADAS E AS RESPECTIVAS INFORMACOES
@@ -162,6 +162,10 @@ class ShopeeConfig(models.Model):
                         print("Endereço : ===========================================")
                         for key, value in z["recipient_address"].items():
                             print(f"ENDERECO : {key}-{value}")
+                            if key == "full_address":
+                                street = value
+                                st_n = value
+                                street_n = st_n[:st_n.find(",")]
                     else:
                         print(f"{key}--{value}")
                         order_name = str(z['order_sn'])
@@ -170,6 +174,18 @@ class ShopeeConfig(models.Model):
                 pr = self.env["res.partner"].search([
                     ('ref', '=', id_buyer),
                 ])
+                if not pr:
+                    vals_pr = {
+                        'name': name_buyer,
+                        'ref': id_buyer,
+                        'street_name': street[:street.find(",")],
+                        'street_number': street_n[:street_n.find(",")],
+                        'district': z['recipient_address']['district'],
+                        'city': z['recipient_address']['city'],
+                        'state_id': self.env['res.country.state'].search([('name', '=', z['recipient_address']['state'])], limit=1).id,
+                        'zip': z['recipient_address']['zipcode']
+                    }
+                    pr = self.env['res.partner'].create(vals_pr)
                 
                 vals={
                     "name": order_name,

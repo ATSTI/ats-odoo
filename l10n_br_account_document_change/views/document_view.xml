@@ -8,6 +8,7 @@
       <field name="inherit_id" ref="l10n_br_fiscal.document_form" />
       <field name="arch" type="xml">
         <xpath expr="//button[@name='action_document_back2draft']" position="replace">
+          <button name="action_document_back2draft" type="object" string="Voltar p/ Em Digitação" groups="l10n_br_fiscal.group_user" class="btn-secondary" invisible="1"/>
           <button
             name="action_back_account"
             type="object"

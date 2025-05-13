@@ -157,6 +157,101 @@ class IntegracaoPdv(http.Controller):
             lista.append(prod)
         return json.dumps(lista)      
 
+    @http.route('/produtoconsultax', type='json', auth="user", csrf=False)
+    def website_produtoconsultax(self, **kwargs):
+        data = request.jsonrequest
+        hj = datetime.now()
+        hj = hj - timedelta(days=20)
+        hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
+        limite = 11999
+        prod_ids = []
+        #import pudb;pu.db
+        prod_ids = http.request.env['product.product'].sudo().search([
+            ('id', '>', limite)], limit=1000, order='id')
+        #print ('Qtde de Produtos %s\n' %(str(len(prod_ids))))
+        lista = []
+        for prd in prod_ids:
+            prod = {}
+            # ncm = ''
+            ncm = '00000000'
+            if prd.ncm_id:
+                ncm = prd.ncm_id.code
+                if ncm:
+                    ncm = re.sub('[^0-9]', '', ncm)
+            if ncm and len(ncm) > 8:
+                ncm = '00000000'
+            prod['codproduto'] = prd.id
+            prod['unidademedida'] = prd.uom_id.name.strip()[:2]
+            produto = prd.name.strip()
+            produto = produto.replace("'"," ")
+            produto = unidecode(produto)
+            prod['produto'] = produto
+            prod['valor_prazo'] = prd.list_price
+            prod['custo'] = prd.standard_price or 0.0
+            #prod['tipo_venda'] = prd.tipo_venda
+            # prod['rateio'] = prd.rateio
+            #prod['qtdeatacado'] = prd.qtde_atacado
+            #prod['precoatacado'] = prd.preco_atacado
+            data_alt = prd.write_date
+            data_alterado = data_alt + timedelta(hours=+3)
+            prod['datacadastro'] = datetime.strftime(data_alterado,'%m/%d/%Y %H:%M:%S')
+            if prd.default_code:
+                codpro = prd.default_code.strip()
+            else:
+                codpro = str(prd.id)
+            prod['codpro'] = codpro[:15]
+            #if prd.icms_origin:
+            prod['origem'] = prd.icms_origin or 0
+            if ncm:
+                prod['ncm'] = ncm
+            else:
+                prod['ncm'] = '00000000'
+            prod['usa'] = 'S'
+            if prd.barcode and len(prd.barcode) < 14:
+                prod['cod_barra'] = prd.barcode.strip()
+            #prod['promocao_txt'] = ''
+            #if prd.description_sale:
+            #    prod['promocao_txt'] = prd.description_sale
+            #prod['promocao_jpg'] = ''
+            #if prd.image_promocao_512:
+            #    prod['promocao_jpg'] = prd.image_promocao_512.decode('utf-8')
+            lista.append(prod)
+
+        # Itens inativos
+        prod_tmpl = http.request.env['product.template'].sudo().search([
+            ('sale_ok', '=', True),
+            ('active' ,'=', False)], limit=limite+50)
+        prd_ids = set()
+        prod_ids = []
+        for pr in prod_tmpl:
+            prd_ids.add(pr.id)
+
+        if prod_tmpl:
+            prod_ids = http.request.env['product.product'].sudo().search([
+                ('product_tmpl_id','in',list(prd_ids)),
+                ('active','=', False)])       
+        for prd in prod_ids:
+            prod = {}
+            #prod['promocao_jpg'] = ''
+            #prod['promocao_txt'] = ''
+            prod['codproduto'] = prd.id
+            data_alt = prd.write_date
+            data_alterado = data_alt + timedelta(hours=+3)
+            prod['datacadastro'] = datetime.strftime(data_alterado,'%m/%d/%Y %H:%M:%S')
+            prod['usa'] = 'N'
+            produto = prd.name.strip()
+            produto = produto.replace("'"," ")
+            produto = unidecode(produto)
+            prod['produto'] = produto
+            if prd.default_code:
+                codpro = prd.default_code.strip()
+            else:
+                codpro = str(prd.id)
+            prod['codpro'] = codpro[:15]
+
+            lista.append(prod)
+        return json.dumps(lista)      
+
     @http.route('/cliente_cnpj', type='json', auth="public", csrf=False)
     def website_cliente_cnpj(self, **kwargs):
         data = request.jsonrequest
@@ -181,6 +276,42 @@ class IntegracaoPdv(http.Controller):
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
         cliente = http.request.env['res.partner']
         cli_ids = cliente.sudo().search([('write_date', '>=', hj)])
+        lista = []
+        for partner_id in cli_ids:
+            cliente = {}
+            nome = partner_id.name.strip()
+            nome = nome.replace("'"," ")
+            nome = unidecode(nome)
+            cliente['codcliente'] = partner_id.id
+            cliente['nomecliente'] = nome
+            cliente['razaosocial'] = nome
+            cliente['tipofirma'] = 0
+            cliente['segmento'] = 1
+            cliente['regiao'] = 1
+            #if partner_id.curso:
+            #    cliente['regiao'] = partner_id.curso
+            cliente['codusuario'] = 1
+            cliente['status'] = 1
+            cliente['cnpj'] = ''
+            if partner_id.cnpj_cpf:
+                cliente['cnpj'] = partner_id.cnpj_cpf
+            data_alt = partner_id.write_date
+            data_alterado = data_alt + timedelta(hours=+3)
+            cliente['data_matricula'] = datetime.strftime(data_alterado,'%m/%d/%Y %H:%M:%S')
+            cliente['datacadastro'] = datetime.strftime(data_alterado,'%m/%d/%Y')            
+            lista.append(cliente)
+        lista_j = json.dumps(lista)
+        return lista_j
+    
+    @http.route('/clienteconsultax', type='json', auth="user", csrf=False)
+    def website_clienteconsultax(self, **kwargs):
+        data = request.jsonrequest
+        # TODO testar aqui se e a empresa mesmo
+        hj = datetime.now()
+        hj = hj - timedelta(days=10)
+        hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
+        cliente = http.request.env['res.partner']
+        cli_ids = cliente.sudo().search([])
         lista = []
         for partner_id in cli_ids:
             cliente = {}
@@ -239,15 +370,23 @@ class IntegracaoPdv(http.Controller):
             ('name', 'ilike', 'Faturas de Cliente'),
             ('company_id', '=', user_id.company_id.id),
         ], limit=1)
+        cj_p = http.request.env['account.journal'].search([
+            ('name', 'ilike', '4-Prazo'),
+            ('company_id', '=', user_id.company_id.id),
+        ], limit=1)
         conta_obj = http.request.env['account.move.line']
-        conta_ids = conta_obj.sudo().search([('partner_id', '=',int(cod_cliente)), 
+        # adicionei o receivable abaixo acho q nao precisa deste
+        #    ('account_id.reconcile','=',True),
+        conta_ids = conta_obj.sudo().search([
+            ('move_id.partner_id', '=',int(cod_cliente)), 
             ('full_reconcile_id', '=', False),
             ('company_id', '=', user_id.company_id.id),
-            ('account_id.reconcile','=',True),
+            ('account_internal_type', '=', 'receivable'),
             ('account_id', '=', cc.id),
-            ('journal_id', '=', cj.id),
+            ('journal_id', 'in', (cj.id,cj_p.id)),
                 ('debit', '>', 0),
         ], order='date_maturity')
+        #print('Diarios :' + cj.name + ',' + cj_p.name)
         vlr = float(valor_pago)
         juros = float(juro)
         vlr = vlr - juros
@@ -283,12 +422,16 @@ class IntegracaoPdv(http.Controller):
                     # passo duas vezes o cod_forma, na segunda vai como cod_venda
                     arp.baixa_pagamentos(conta, diario_id, caixa, vlr, cod_forma, juros)
                     vlr = 0.0
-            conta_ids = conta_obj.sudo().search([('partner_id', '=',int(cod_cliente)), 
+
+            # adicionei o receivable abaixo acho q nao precisa deste
+            #    ('account_id.reconcile','=',True),
+            conta_ids = conta_obj.sudo().search([
+                ('move_id.partner_id', '=',int(cod_cliente)), 
                 ('full_reconcile_id', '=', False), 
                 ('company_id', '=', user_id.company_id.id),
-                ('account_id.reconcile','=',True),
+                ('account_internal_type', '=', 'receivable'),
                 ('account_id', '=', cc.id),
-                ('journal_id', '=', cj.id),
+                ('journal_id', 'in', (cj.id,cj_p.id)),
                 ('debit', '>', 0),
             ], order='date_maturity')        
         lista = []
@@ -304,14 +447,15 @@ class IntegracaoPdv(http.Controller):
             data_fatura = datetime.strftime(conta.date,'%d/%m/%Y')
             contas['valor'] = conta.amount_residual
             contas['data_fatura'] = data_fatura
-            print (' DATA ' + str(conta.date_maturity))
-            print (' nome ' + conta.name + ' - ' + conta.move_id.name)
+            #print (' DATA ' + str(conta.date_maturity))
+            #print (' nome ' + conta.name + ' - ' + conta.move_id.name + ' aml.id : ' + str(conta.id))
             data_vencimento = datetime.strftime(conta.date_maturity or conta.date,'%d/%m/%Y')
             contas['data_vencimento'] = data_vencimento
             contas['fatura'] = conta.move_id.ref
             contas['codigo'] = conta.id
             # contas['cod_cliente'] = 1           
-            if conta.move_id.ref and conta.amount_residual > 0.01 and 'POS' not in conta.move_id.ref:
+            #print (' ref ' + conta.move_id.ref + ' ,Amount : ' + str(conta.amount_residual))
+            if conta.move_id.ref and conta.amount_residual > 0.01 and 'POS' not in  conta.move_id.ref:
                 lista.append(contas)
         return json.dumps(lista)
 

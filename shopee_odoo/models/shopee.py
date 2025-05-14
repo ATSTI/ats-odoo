@@ -146,9 +146,13 @@ class ShopeeConfig(models.Model):
                                 ope = self.env['l10n_br_fiscal.operation.line'].search([
                                     ('id', '=', 4),
                                 ])
+                                uom = self.env['uom.uom'].search([
+                                    ('id', '=', 1),
+                                ])
                                 vals_line = {
                                     'product_id': prod.id,
                                     'product_uom_qty': prd_qtd,
+                                    'product_uom': uom.id,
                                     'price_unit': prd_price,
                                     'name': prd_name,
                                     'fiscal_operation_line_id': ope.id,

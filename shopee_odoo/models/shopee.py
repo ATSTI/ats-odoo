@@ -23,7 +23,8 @@ class ShopeeConfig(models.Model):
     shopee_partner_key = fields.Char('Partner Key', required=True)
     
     #nao é campo
-    url_ini = "https://partner.shopeemobile.com" 
+    url_ini = "https://openplatform.shopee.com.br"
+    # url_ini = "https://partner.shopeemobile.com" 
     # url_ini = "https://partner.test-stable.shopeemobile.com"
 
     def action_gera_acess_token(self):
@@ -61,7 +62,6 @@ class ShopeeConfig(models.Model):
             loja.action_pega_faturas_shopee()
 
     def action_pega_faturas_shopee(self):
-        # import pudb;pu.db
         if self.expire_date_token and self.expire_date_token < datetime.now():
             self.action_gera_acess_token()
             print("TOKEN GERADO")
@@ -74,10 +74,10 @@ class ShopeeConfig(models.Model):
         headers = {
         }
         # 1607235072&time_range_field=create_time&time_to=1608271872
-        data_i = datetime.now() - timedelta(days=1)
+        data_i = datetime.now() - timedelta(hours=6)
         data_inicio = int(data_i.timestamp())
         data_fim = int(time.time())
-        data_f = datetime.now()
+        data_f = datetime.now() + timedelta(hours=1)
         data_fim = int(data_f.timestamp())
         # data_fim = 1608271872
         # order_status=READY_TO_SHIP&  tirei do link abaixo pq nao trazia
@@ -90,13 +90,13 @@ class ShopeeConfig(models.Model):
             sale_exists = self.env['sale.order'].search([
                 ('name', '=', str(od['order_sn'])),
             ])
+            if sale_exists:
+                continue
             if od['order_status'] == "UNPAID" or od['order_status'] == "CANCELLED":
                 print("PEDIDO CANCELADO OU NAO PAGO")
                 continue
             if od['order_status'] == "PROCESSED":
                 print("PEDIDO JÁ ENVIADO")
-                continue
-            if sale_exists:
                 continue
             # PARTE QUE TRAS AS FATURAS CRIADAS E AS RESPECTIVAS INFORMACOES
             if od['order_status'] == "READY_TO_SHIP":
@@ -186,9 +186,13 @@ class ShopeeConfig(models.Model):
                         pr = self.env['res.partner'].create(vals_pr)
                         if pr.cnpj_cpf:
                             pr._onchange_cnpj_cpf()
+                    tag = self.env['crm.tag'].search([
+                        ('name', '=', "Shopee"),
+                    ])
                     vals={
                         "name": order_name,
                         "partner_id": pr.id,
+                        "tag_ids": [(6, 0, tag.ids)],
                     }
                     
                     sale = self.env['sale.order'].create(vals)

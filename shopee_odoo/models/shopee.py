@@ -143,11 +143,15 @@ class ShopeeConfig(models.Model):
                                     prod.title_shopee = prd_name
                                     prod.shopee_config_id = self.id
                                     prod.shopee_item_id = prd_id
+                                ope = self.env['l10n_br_fiscal.operation.line'].search([
+                                    ('id', '=', 4),
+                                ])
                                 vals_line = {
                                     'product_id': prod.id,
                                     'product_uom_qty': prd_qtd,
                                     'price_unit': prd_price,
                                     'name': prd_name,
+                                    'fiscal_operation_line_id': ope.id,
                                 }
                                 order_line.append((0, 0,vals_line))
                         elif key == "recipient_address":

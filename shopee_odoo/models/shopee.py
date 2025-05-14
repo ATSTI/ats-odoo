@@ -171,6 +171,9 @@ class ShopeeConfig(models.Model):
                     pr = self.env["res.partner"].search([
                         ('cnpj_cpf', '=', cpf),
                     ])
+                    tag_pr = self.env['res.partner.category'].search([
+                        ('name', '=', "Shopee"),
+                    ])
                     if not pr:
                         vals_pr = {
                             'name': name_buyer,
@@ -182,6 +185,7 @@ class ShopeeConfig(models.Model):
                             # 'city': z['recipient_address']['city'],
                             'state_id': self.env['res.country.state'].search([('name', '=', z['recipient_address']['state'])], limit=1).id,
                             # 'zip': z['recipient_address']['zipcode']
+                            'category_id': [(6, 0, tag_pr.ids)],
                         }
                         pr = self.env['res.partner'].create(vals_pr)
                         if pr.cnpj_cpf:

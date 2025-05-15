@@ -181,8 +181,10 @@ class ShopeeConfig(models.Model):
                     tag_pr = self.env['res.partner.category'].search([
                         ('name', '=', "Shopee"),
                     ])
-                    ctb = self.env['res.city'].search([
+                    state = self.env['res.country.state'].search([('name', '=', z['recipient_address']['state'])], limit=1)
+                    cty = self.env['res.city'].search([
                         ('name', '=', city_buyer),
+                        ('state_id', '=', state.id)
                     ])
                     if not pr:
                         vals_pr = {
@@ -193,8 +195,8 @@ class ShopeeConfig(models.Model):
                             'street_name':  street[:street.find(",")],
                             'street_number': street_n[:street_n.find(",")],
                             'district': z['recipient_address']['district'],
-                            'city_id': ctb.id,
-                            'state_id': self.env['res.country.state'].search([('name', '=', z['recipient_address']['state'])], limit=1).id,
+                            'city_id': cty.id,
+                            'state_id': state.id,
                             'zip': z['recipient_address']['zipcode'],
                             'category_id': [(6, 0, tag_pr.ids)],
                             'ind_final': '1',

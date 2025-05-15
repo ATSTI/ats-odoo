@@ -184,6 +184,14 @@ class ShopeeConfig(models.Model):
                         ('name', '=', "Shopee"),
                     ])
                     state = self.env['res.country.state'].search([('name', '=', z['recipient_address']['state'])], limit=1)
+                    if state.code == 'SP':
+                        venda_final = self.env['res.city'].search([
+                            ('name', '=', 'Venda Consumidor Final - SP'),
+                        ])
+                    else:
+                        venda_final = self.env['res.city'].search([
+                            ('name', '=', 'Venda Consumidor Final - Outros Estados'),
+                        ])
                     cty = self.env['res.city'].search([
                         ('name', '=', city_buyer),
                         ('state_id', '=', state.id)
@@ -202,6 +210,7 @@ class ShopeeConfig(models.Model):
                             'zip': z['recipient_address']['zipcode'],
                             'category_id': [(6, 0, tag_pr.ids)],
                             'ind_final': '1',
+                            'property_account_position_id': venda_final.id,
                             # 'is_customer': True,
                         }
                         pr = self.env['res.partner'].create(vals_pr)

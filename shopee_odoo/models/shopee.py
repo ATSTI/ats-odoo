@@ -143,9 +143,6 @@ class ShopeeConfig(models.Model):
                                     prod.title_shopee = prd_name
                                     prod.shopee_config_id = self.id
                                     prod.shopee_item_id = prd_id
-                                ope = self.env['l10n_br_fiscal.operation.line'].search([
-                                    ('id', '=', 4),
-                                ])
                                 uom = self.env['uom.uom'].search([
                                     ('id', '=', 1),
                                 ])
@@ -155,22 +152,24 @@ class ShopeeConfig(models.Model):
                                     'product_uom': uom.id,
                                     'price_unit': prd_price,
                                     'name': prd_name,
-                                    'fiscal_operation_line_id': ope.id,
                                 }
                                 order_line.append((0, 0,vals_line))
                         elif key == "recipient_address":
                             print("Endereço : ===========================================")
                             for key, value in z["recipient_address"].items():
                                 print(f"ENDERECO : {key}-{value}")
+                                if key == "name":
+                                    name_buyer = value
+                                if key == "city":
+                                    city_buyer = value
                                 if key == "full_address":
                                     street = value
                                     st_n = value
-                                    street_n = st_n[:st_n.find(",")]
+                                    street_n = st_n[st_n.find(",")+2:]
                         else:
                             print(f"{key}--{value}")
                             order_name = str(z['order_sn'])
                             id_buyer = str(z['buyer_user_id'])
-                            name_buyer = str(z['buyer_username'])
                             cpf_b = str(z['buyer_cpf_id'])
                             if len(cpf_b) < 11:
                                 cpf_b = cpf_b.zfill(11)
@@ -182,18 +181,24 @@ class ShopeeConfig(models.Model):
                     tag_pr = self.env['res.partner.category'].search([
                         ('name', '=', "Shopee"),
                     ])
+                    ctb = self.env['res.city'].search([
+                        ('name', '=', city_buyer),
+                    ])
                     if not pr:
                         vals_pr = {
                             'name': name_buyer,
+                            'legal_name': name_buyer,
                             'cnpj_cpf': cpf,
                             'ref': id_buyer,
-                            'street_name':  "Endereço Bloqueado (Cadastrar)", #street[:street.find(",")],
-                            # 'street_number': street_n[:street_n.find(",")],
-                            # 'district': z['recipient_address']['district'],
-                            # 'city': z['recipient_address']['city'],
+                            'street_name':  street[:street.find(",")],
+                            'street_number': street_n[:street_n.find(",")],
+                            'district': z['recipient_address']['district'],
+                            'city_id': ctb.id,
                             'state_id': self.env['res.country.state'].search([('name', '=', z['recipient_address']['state'])], limit=1).id,
-                            # 'zip': z['recipient_address']['zipcode']
+                            'zip': z['recipient_address']['zipcode'],
                             'category_id': [(6, 0, tag_pr.ids)],
+                            'ind_final': '1',
+                            'is_customer': True,
                         }
                         pr = self.env['res.partner'].create(vals_pr)
                         if pr.cnpj_cpf:
@@ -208,8 +213,13 @@ class ShopeeConfig(models.Model):
                     }
                     
                     sale = self.env['sale.order'].create(vals)
-                    
+                    sale.onchange_partner_id()
                     if len(order_line):
                         sale['order_line'] = order_line
+                        for line in sale.order_line:
+                            line._onchange_product_id_fiscal()
+                            sale['order_line'].write(
+                                {'price_unit': prd_price,'name': prd_name,}
+                            )
         return True
 

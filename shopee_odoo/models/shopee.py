@@ -217,8 +217,11 @@ class ShopeeConfig(models.Model):
                     if len(order_line):
                         sale['order_line'] = order_line
                         for line in sale.order_line:
+                            # preco unitario alterado no onchange
+                            prd_price = line.price_unit
+                            prd_name = line.name
                             line._onchange_product_id_fiscal()
-                            sale['order_line'].write(
+                            line.write(
                                 {'price_unit': prd_price,'name': prd_name,}
                             )
         return True

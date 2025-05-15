@@ -93,7 +93,7 @@
                                         <span t-field="line.price_subtotal" class="text-right"/>
                                     </td>
                                     <td t-if="display_discount" class="text-right" groups="product.group_discount_per_so_line">
-                                        <span t-field="line.discount_value"/>
+                                        <span t-field="line.discount"/>
                                     </td>
                                     <td name="td_subtotal" class="text-right">
                                         <span t-field="line.price_subtotal" class="text-right"/>

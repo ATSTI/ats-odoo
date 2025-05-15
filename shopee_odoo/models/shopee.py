@@ -64,7 +64,7 @@ class ShopeeConfig(models.Model):
     def action_pega_faturas_shopee(self):
         if self.expire_date_token and self.expire_date_token < datetime.now():
             self.action_gera_acess_token()
-            # print("TOKEN GERADO")
+            print("TOKEN GERADO")
         timest = str(int(time.time()))
         path = "/api/v2/order/get_order_list"
         tmp_base_string = "%s%s%s%s%s" % (self.shopee_partner_id, path, timest, self.access_token, self.shopee_id)
@@ -93,10 +93,10 @@ class ShopeeConfig(models.Model):
             if sale_exists:
                 continue
             if od['order_status'] == "UNPAID" or od['order_status'] == "CANCELLED":
-                # print("PEDIDO CANCELADO OU NAO PAGO")
+                print("PEDIDO CANCELADO OU NAO PAGO")
                 continue
             if od['order_status'] == "PROCESSED":
-                # print("PEDIDO JÁ ENVIADO")
+                print("PEDIDO JÁ ENVIADO")
                 continue
             # PARTE QUE TRAS AS FATURAS CRIADAS E AS RESPECTIVAS INFORMACOES
             if od['order_status'] == "READY_TO_SHIP":
@@ -120,15 +120,17 @@ class ShopeeConfig(models.Model):
                     order_line = []
                     for key, value in z.items():
                         if key == "item_list":
-                            # print("ITEMS : ----------------------")
+                            print("ITEMS : ----------------------")
                             for itens in z["item_list"]:
                                 for key, value in itens.items():
-                                    # print(f"---------------ITEM : {key}--{value}")
+                                    print(f"---------------ITEM : {key}--{value}")
                                     prd_sku = itens['item_sku']
                                     prd_id = itens['item_id']
                                     prd_qtd = itens['model_quantity_purchased']
                                     prd_price = itens['model_original_price']
                                     prd_name = itens['item_name']
+                                    if itens['model_sku'] != "":
+                                        prd_sku = itens['model_sku']
                                     prod = self.env["product.product"].search([
                                         ('default_code', '=', prd_sku),
                                     ])
@@ -155,9 +157,9 @@ class ShopeeConfig(models.Model):
                                 }
                                 order_line.append((0, 0,vals_line))
                         elif key == "recipient_address":
-                            # print("Endereço : ===========================================")
+                            print("Endereço : ===========================================")
                             for key, value in z["recipient_address"].items():
-                                # print(f"ENDERECO : {key}-{value}")
+                                print(f"ENDERECO : {key}-{value}")
                                 if key == "name":
                                     name_buyer = value
                                 if key == "city":
@@ -167,14 +169,14 @@ class ShopeeConfig(models.Model):
                                     st_n = value
                                     street_n = st_n[st_n.find(",")+2:]
                         else:
-                            # print(f"{key}--{value}")
+                            print(f"{key}--{value}")
                             order_name = str(z['order_sn'])
                             id_buyer = str(z['buyer_user_id'])
                             cpf_b = str(z['buyer_cpf_id'])
                             if len(cpf_b) < 11:
                                 cpf_b = cpf_b.zfill(11)
                             cpf = '{}.{}.{}-{}'.format(cpf_b[:3], cpf_b[3:6], cpf_b[6:9], cpf_b[9:])
-                    # print("PEDIDO CRIADO")
+                    print("PEDIDO CRIADO")
                     pr = self.env["res.partner"].search([
                         ('cnpj_cpf', '=', cpf),
                     ])
@@ -200,7 +202,7 @@ class ShopeeConfig(models.Model):
                             'zip': z['recipient_address']['zipcode'],
                             'category_id': [(6, 0, tag_pr.ids)],
                             'ind_final': '1',
-                            'is_customer': True,
+                            # 'is_customer': True,
                         }
                         pr = self.env['res.partner'].create(vals_pr)
                         if pr.cnpj_cpf:

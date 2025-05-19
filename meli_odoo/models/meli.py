@@ -133,7 +133,7 @@ class MeliConfig(models.Model):
             order_line.append((0, 0,vals_line))
             buyer_id = order['buyer']['id']
             pr = self.env["res.partner"].search([
-                ('ref', '=', buyer_id),
+                ('cnpj_cpf', '=' , cpf_buyer) or ('ref', '=', buyer_id),
             ])
             tag_pr = self.env['res.partner.category'].search([
                 ('name', '=', "Mercado Livre"),

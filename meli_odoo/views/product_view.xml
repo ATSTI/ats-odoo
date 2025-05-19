@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <record id="product_meli_form" model="ir.ui.view">
+            <field name="name">product_meli.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view" />
+            <field name="priority">999</field>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='purchase']" position="after">
+                    <page name="meli_page" string="Mercado Livre">
+                        <group>
+                            <group>
+                                <field name="meli" />
+                                <field name="meli_config_id" attrs="{'invisible': [('meli', '=', False)]}"/>
+                                <field name="margin_meli" attrs="{'invisible': [('meli', '=', False)]}"/>
+                            </group>
+                            <group>
+                                <field name="title_meli" attrs="{'invisible': [('meli', '=', False)]}"/>
+                                <field name="price_meli" attrs="{'invisible': [('meli', '=', False)]}"/>
+                                <field name="qtd_meli" attrs="{'invisible': [('meli', '=', False)]}"/>
+                                <field name="guarantee_meli" attrs="{'invisible': [('meli', '=', False)]}"/>
+                                <!-- <field name="image_meli" attrs="{'invisible': [('meli', '=', False)]}"/> -->
+                            </group>
+                            <group>
+                                <button name="action_envia_produto" string="Enviar Produto Para o Mercado Livre" type="object" class="btn btn-primary" attrs="{'invisible': [('meli', '=', False)]}"/>
+                                <field name="meli_item_id" attrs="{'invisible': [('meli', '=', False)]}" readonly="1"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

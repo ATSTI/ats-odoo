@@ -74,7 +74,7 @@ class ShopeeConfig(models.Model):
         headers = {
         }
         # 1607235072&time_range_field=create_time&time_to=1608271872
-        data_i = datetime.now() - timedelta(hours=6)
+        data_i = datetime.now() - timedelta(days=1)
         data_inicio = int(data_i.timestamp())
         data_fim = int(time.time())
         data_f = datetime.now() + timedelta(hours=1)
@@ -185,11 +185,11 @@ class ShopeeConfig(models.Model):
                     ])
                     state = self.env['res.country.state'].search([('name', '=', z['recipient_address']['state'])], limit=1)
                     if state.code == 'SP':
-                        venda_final = self.env['res.city'].search([
+                        venda_final = self.env['account.fiscal.position'].search([
                             ('name', '=', 'Venda Consumidor Final - SP'),
                         ])
-                    else:
-                        venda_final = self.env['res.city'].search([
+                    if state.code != 'SP':
+                        venda_final = self.env['account.fiscal.position'].search([
                             ('name', '=', 'Venda Consumidor Final - Outros Estados'),
                         ])
                     cty = self.env['res.city'].search([

@@ -29,7 +29,7 @@ class ProducTemplate(models.Model):
     ], string='Garantia do Comprador', default='0')
     image_meli = fields.Boolean('Usar mesma imagem do Odoo?')
     image_meli_url = fields.Char('URL da Imagem Mercado Livre')
-    meli_config_id = fields.Many2one('meli.config', 'Mercado Livre', required=True)
+    meli_config_id = fields.Many2one('meli.config', 'Mercado Livre')
 
 
     def action_envia_produto(self):

@@ -79,6 +79,11 @@ class MeliConfig(models.Model):
             ship_address = requests.get(url, headers=headers)
             if ship_address.status_code == 200:
                 data = ship_address.json()
+                # CASOS DE ENVIO FULL SÃO DIFERENTES; TODO
+                full = False
+                if data.get('logistic_type') == 'fulfillment':
+                    full = True
+                print(f'Full: {full}')
                 address = data.get('receiver_address', {})
                 bairro = address.get('neighborhood')
                 rua = address.get('street_name')
@@ -91,7 +96,7 @@ class MeliConfig(models.Model):
             order_name = order['id']
             url = f'https://api.mercadolibre.com/orders/{order_name}/billing_info'
             hd = {
-                'Authorization': f'Bearer APP_USR-7103092091034476-051909-282eaf0539a8fbfc671e9117e8b5cb87-540196762',
+                'Authorization': f'Bearer {self.access_token}',
                 'x-version': '2'
             }
             address_buyer = requests.get(url, headers=hd)
@@ -142,6 +147,14 @@ class MeliConfig(models.Model):
                 ('name', '=', "Mercado Livre"),
             ])
             state = self.env['res.country.state'].search([('name', '=', state_buyer)], limit=1)
+            if state.code == 'SP':
+                venda_final = self.env['account.fiscal.position'].search([
+                    ('name', '=', 'Venda Consumidor Final - SP'),
+                ])
+            if state.code != 'SP':
+                venda_final = self.env['account.fiscal.position'].search([
+                    ('name', '=', 'Venda Consumidor Final - Outros Estados'),
+                ])
             cty = self.env['res.city'].search([
                 ('name', '=', city_buyer),
                 ('state_id', '=', state.id)
@@ -161,6 +174,7 @@ class MeliConfig(models.Model):
                     'category_id': [(6, 0, tag_pr.ids)],
                     'ind_final': '1',
                     'is_customer': True,
+                    'property_account_position_id': venda_final.id,
                 }
                 pr = self.env['res.partner'].create(vals_pr)
                 if pr.cnpj_cpf:

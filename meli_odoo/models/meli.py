@@ -96,6 +96,9 @@ class MeliConfig(models.Model):
             }
             address_buyer = requests.get(url, headers=hd)
             cpf_buyer = address_buyer.json()['buyer']['billing_info']['identification']['number']
+            if len(cpf_buyer) < 11:
+                cpf_buyer = cpf_buyer.zfill(11)
+            cpf = '{}.{}.{}-{}'.format(cpf_buyer[:3], cpf_buyer[3:6], cpf_buyer[6:9], cpf_buyer[9:])
             order_amount = order['total_amount']
             order_date = order['date_created']
             for itens in order['order_items']:
@@ -133,7 +136,7 @@ class MeliConfig(models.Model):
             order_line.append((0, 0,vals_line))
             buyer_id = order['buyer']['id']
             pr = self.env["res.partner"].search([
-                ('cnpj_cpf', '=' , cpf_buyer) or ('ref', '=', buyer_id),
+                ('cnpj_cpf', '=' , cpf) or ('ref', '=', buyer_id),
             ])
             tag_pr = self.env['res.partner.category'].search([
                 ('name', '=', "Mercado Livre"),
@@ -147,7 +150,7 @@ class MeliConfig(models.Model):
                 vals_pr = {
                     'name': name_buyer,
                     'legal_name': name_buyer,
-                    'cnpj_cpf': cpf_buyer,
+                    'cnpj_cpf': cpf,
                     'ref': buyer_id,
                     'street_name':  rua,
                     'street_number': numero,

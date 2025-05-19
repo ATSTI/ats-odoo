@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <record id="meli_config_form_view" model="ir.ui.view">
+            <field name="name">meli.config.form</field>
+            <field name="model">meli.config</field>
+            <field name="mode">primary</field>
+            <field name="arch" type="xml">
+                <form string="Mercado Livre Configurações">
+                    <header>
+                        <button name="action_pega_faturas_meli" string="Sincronizar Faturas Mercado Livre" type="object" class="btn btn-primary"/>
+                        <button name="action_gera_acess_token" string="Gerar Access Token" type="object" class="btn btn-primary"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name" string="Nome Mercado Livre" required="1"/>
+                                <field name="meli_id"/>
+                                <field name="user_id"/>
+                                <field name="client_meli_key"/>
+                            </group>
+                            <group>
+                                <div class="o_row">
+                                    <group>
+                                        <field name="refresh_token_security" invisible='1'/>
+                                        <field name="refresh_token"/>
+                                        <field name="access_token"/>
+                                        <field name="expire_date_token" />
+                                    </group>
+                                </div>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="meli_config_tree_view" model="ir.ui.view">
+            <field name="name">meli.config.tree</field>
+            <field name="model">meli.config</field>
+            <field eval="7" name="priority"/>
+            <field name="arch" type="xml">
+                <tree string="Contas Mercado Livre">
+                    <field name="name" string="Nome da Loja Mercado Livre" />
+                    <field name="meli_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_config_meli" model="ir.actions.act_window">
+            <field name="name">Config Mercado Livre</field>
+            <field name="res_model">meli.config</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+            id="meli_config_menu"
+            name="Configurações Mercado Livre"
+            parent="sale.menu_sale_config"
+            groups="meli_group_user,meli_group_manager"
+            sequence="20"
+            action="action_config_meli"
+        />
+    </data>
+</odoo>

@@ -42,12 +42,16 @@ class MeliConfig(models.Model):
         self.refresh_token = tk_new['refresh_token']
         self.refresh_token_security = tk_new['refresh_token']
         self.user_id = tk_new['user_id']
-        
+
+    def cron_execute_pega_faturas(self):
+        lj = self.search([])
+        for loja in lj:
+            loja.action_pega_faturas_meli()
+       
     def action_pega_faturas_meli(self):
-        import pudb;pu.db
         if self.expire_date_token and self.expire_date_token < datetime.now():
             self.action_gera_acess_token()
-            print("TOKEN GERADO")
+            # print("TOKEN GERADO")
         headers = {
             'Authorization': 'Bearer %s' %(self.access_token),
         }
@@ -76,27 +80,13 @@ class MeliConfig(models.Model):
             if ship_address.status_code == 200:
                 data = ship_address.json()
                 address = data.get('receiver_address', {})
-                print("Endereço de entrega:")
-                print(f"Bairro: {address.get('neighborhood')}")
                 bairro = address.get('neighborhood')
-                print(f"Rua: {address.get('street_name')}")
                 rua = address.get('street_name')
-                print(f"Número: {address.get('street_number')}")
                 numero = address.get('street_number')
-                print(f"Cidade: {address.get('city', {}).get('name')}")
                 city_buyer = address.get('city', {}).get('name')
-                print(f"Estado: {address.get('state', {}).get('name')}")
                 state_buyer = address.get('state', {}).get('name')
-                print(f"CEP: {address.get('zip_code')}")
                 zip_buyer = address.get('zip_code')
-                print(f"País: {address.get('country', {}).get('name')}")
-            else:
-                print("Erro ao buscar envio:", ship_address.status_code)
-                print(ship_address.json())
-            if first_name:
-                print("🧑 Nome:", first_name, order.get('buyer', {}).get('last_name'))
-                name_buyer = f"{first_name} {order.get('buyer', {}).get('last_name')}"
-                print("❗ Nome do comprador não disponível (verifique permissões ou token)")
+            name_buyer = f"{first_name} {order.get('buyer', {}).get('last_name')}"
             order_line = []
             order_name = order['id']
             url = f'https://api.mercadolibre.com/orders/{order_name}/billing_info'
@@ -106,11 +96,10 @@ class MeliConfig(models.Model):
             }
             address_buyer = requests.get(url, headers=hd)
             cpf_buyer = address_buyer.json()['buyer']['billing_info']['identification']['number']
-            print(f"CPF: {cpf_buyer}")
             order_amount = order['total_amount']
             order_date = order['date_created']
             for itens in order['order_items']:
-                print("ITEMS : ----------------------") 
+                # print("ITEMS : ----------------------") 
                 id_item = itens['item']['id']
                 prd_name = itens['item']['title']
                 categ_item = itens['item']['category_id']
@@ -142,7 +131,6 @@ class MeliConfig(models.Model):
                 'name': prd_name,
             }
             order_line.append((0, 0,vals_line))
-            print(f"Pedido: {order['id']} - Comprador: {order['buyer']['nickname']}")
             buyer_id = order['buyer']['id']
             pr = self.env["res.partner"].search([
                 ('ref', '=', buyer_id),

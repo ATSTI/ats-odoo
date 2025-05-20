@@ -145,13 +145,10 @@ class ShopeeConfig(models.Model):
                                     prod.title_shopee = prd_name
                                     prod.shopee_config_id = self.id
                                     prod.shopee_item_id = prd_id
-                                uom = self.env['uom.uom'].search([
-                                    ('id', '=', 1),
-                                ])
                                 vals_line = {
                                     'product_id': prod.id,
                                     'product_uom_qty': prd_qtd,
-                                    'product_uom': uom.id,
+                                    'product_uom': prod.uom_id.id,
                                     'price_unit': prd_price,
                                     'name': prd_name,
                                 }

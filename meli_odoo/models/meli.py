@@ -80,10 +80,14 @@ class MeliConfig(models.Model):
             if ship_address.status_code == 200:
                 data = ship_address.json()
                 # CASOS DE ENVIO FULL SÃO DIFERENTES; TODO
-                full = False
+                full = self.env["operating.unit"].search([
+                        ('code', '=', 'OU1'),
+                    ])
                 if data.get('logistic_type') == 'fulfillment':
-                    full = True
-                print(f'Full: {full}')
+                    full = self.env["operating.unit"].search([
+                        ('code', '=', 'MF'),
+                    ])
+                # print(f'Full: {full.name}')
                 address = data.get('receiver_address', {})
                 bairro = address.get('neighborhood')
                 rua = address.get('street_name')
@@ -140,26 +144,26 @@ class MeliConfig(models.Model):
             pr = self.env["res.partner"].search([
                 ('cnpj_cpf', '=' , cpf) or ('ref', '=', buyer_id),
             ])
-            tag_pr = self.env['res.partner.category'].search([
-                ('name', '=', "Mercado Livre"),
-            ])
-            state = self.env['res.country.state'].search([
-                ('name', '=', state_buyer), 
-                ('country_id', '=', 32)
-            ], limit=1)
-            if state.code == 'SP':
-                venda_final = self.env['account.fiscal.position'].search([
-                    ('name', '=', 'Venda Consumidor Final - SP'),
-                ])
-            if state.code != 'SP':
-                venda_final = self.env['account.fiscal.position'].search([
-                    ('name', '=', 'Venda Consumidor Final - Outros Estados'),
-                ])
-            cty = self.env['res.city'].search([
-                ('name', '=', city_buyer),
-                ('state_id', '=', state.id)
-            ])
             if not pr:
+                tag_pr = self.env['res.partner.category'].search([
+                    ('name', '=', "Mercado Livre"),
+                ])
+                state = self.env['res.country.state'].search([
+                    ('name', '=', state_buyer), 
+                    ('country_id', '=', 32)
+                ], limit=1)
+                if state.code == 'SP':
+                    venda_final = self.env['account.fiscal.position'].search([
+                        ('name', '=', 'Venda Consumidor Final - SP'),
+                    ])
+                if state.code != 'SP':
+                    venda_final = self.env['account.fiscal.position'].search([
+                        ('name', '=', 'Venda Consumidor Final - Outros Estados'),
+                    ])
+                cty = self.env['res.city'].search([
+                    ('name', '=', city_buyer),
+                    ('state_id', '=', state.id)
+                ])
                 vals_pr = {
                     'name': name_buyer,
                     'legal_name': name_buyer,
@@ -182,14 +186,28 @@ class MeliConfig(models.Model):
             tag = self.env['crm.tag'].search([
                 ('name', '=', "Mercado Livre"),
             ])
+            team = self.env['crm.team'].search([
+                ('operating_unit_id','=', full.id),
+            ], limit=1)
+            wh = self.env["stock.warehouse"].search(
+                [("operating_unit_id", "=", full.id)]
+            )
             vals={
                 "name": order_name,
                 "partner_id": pr.id,
                 "tag_ids": [(6, 0, tag.ids)],
+                "operating_unit_id": full.id,
+                "team_id": team.id,
+                "warehouse_id": wh.id,
             }
-            
             sale = self.env['sale.order'].create(vals)
-            sale.onchange_partner_id()
+            if sale.operating_unit_id.id == full.id:
+                sale.write({"fiscal_operation_id": False})
+                sale.onchange_team_id()
+                sale.onchange_operating_unit_id()
+                sale._check_wh_operating_unit()
+            else:
+                sale.onchange_partner_id()
             if len(order_line):
                 sale['order_line'] = order_line
                 for line in sale.order_line:

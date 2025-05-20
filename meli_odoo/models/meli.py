@@ -123,22 +123,19 @@ class MeliConfig(models.Model):
                     prod = self.env["product.product"].search([
                         ('default_code', '=', sku_item),
                     ])
-            if not prod:
-                prod = self.env["product.product"].search([
-                    ('default_code', '=', 999999),
-                ])
-                prd_name = f"[{sku_item}] {prd_name}"
-            uom = self.env['uom.uom'].search([
-                ('id', '=', 1),
-            ])
-            vals_line = {
-                'product_id': prod.id,
-                'product_uom_qty': prd_qtd,
-                'product_uom': uom.id,
-                'price_unit': prd_price,
-                'name': prd_name,
-            }
-            order_line.append((0, 0,vals_line))
+                if not prod:
+                    prod = self.env["product.product"].search([
+                        ('default_code', '=', 999999),
+                    ])
+                    prd_name = f"[{sku_item}] {prd_name}"
+                vals_line = {
+                    'product_id': prod.id,
+                    'product_uom_qty': prd_qtd,
+                    'product_uom': prod.uom_id.id,
+                    'price_unit': prd_price,
+                    'name': prd_name,
+                }
+                order_line.append((0, 0,vals_line))
             buyer_id = order['buyer']['id']
             pr = self.env["res.partner"].search([
                 ('cnpj_cpf', '=' , cpf) or ('ref', '=', buyer_id),
@@ -146,7 +143,10 @@ class MeliConfig(models.Model):
             tag_pr = self.env['res.partner.category'].search([
                 ('name', '=', "Mercado Livre"),
             ])
-            state = self.env['res.country.state'].search([('name', '=', state_buyer)], limit=1)
+            state = self.env['res.country.state'].search([
+                ('name', '=', state_buyer), 
+                ('country_id', '=', 32)
+            ], limit=1)
             if state.code == 'SP':
                 venda_final = self.env['account.fiscal.position'].search([
                     ('name', '=', 'Venda Consumidor Final - SP'),

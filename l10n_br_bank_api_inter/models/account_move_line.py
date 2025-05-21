@@ -100,8 +100,10 @@ class AccountMoveLine(models.Model):
                 "write_off_choice": False,
             })
             # removendo os pdf
+            boleto_nome = self.move_id.partner_id.name
+            boleto_nome = '_'.join(boleto_nome.split())
             pdf_boletos = self.env["ir.attachment"].search([
-                ("name", "ilike", "Boleto %s" % self.name),
+                ("name", "ilike", boleto_nome),
                 ("res_id", "=", self.move_id.id),
             ])
             for bol in pdf_boletos:
@@ -150,9 +152,11 @@ class AccountMoveLine(models.Model):
                 self.move_id.action_pdf_boleto()
             datas = api.boleto_pdf(self.codigo_solicitacao)
             datas_json = json.loads(datas.decode("utf-8"))
+            boleto_nome = self.move_id.partner_id.name
+            boleto_nome = '_'.join(boleto_nome.split())
             self.pdf_boleto_id = self.env["ir.attachment"].create(
                 {
-                    "name": ("Boleto %s" % self.name),
+                    "name": (boleto_nome),
                     "res_model": 'account.move',
                     "res_id": self.move_id.id,
                     "datas": datas_json["pdf"],

@@ -98,7 +98,7 @@ class MeliConfig(models.Model):
             'Authorization': 'Bearer %s' %(self.access_token),
         }
         hoje = str(datetime.today().date())
-        url = f"https://api.mercadolibre.com/orders/search?seller={self.user_id}&order.date_created.from=2025-05-20T15:18:00Z&order.date_created.to=2025-05-20T23:59:59Z"
+        url = f"https://api.mercadolibre.com/orders/search?seller={self.user_id}&order.date_created.from={hoje}T00:00:00Z&order.date_created.to={hoje}T23:59:59Z"
         response = requests.get(url, headers=headers)
         order_list = response.json()
         for orders in order_list.get("results", []):
@@ -223,4 +223,4 @@ class MeliConfig(models.Model):
                 sale._check_wh_operating_unit()
             else:
                 sale.onchange_partner_id()
-            self._inserir_linhas(order, sale)
+            self._inserir_linhas(order, sale)   

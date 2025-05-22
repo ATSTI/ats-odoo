@@ -43,6 +43,48 @@ class MeliConfig(models.Model):
         self.refresh_token_security = tk_new['refresh_token']
         self.user_id = tk_new['user_id']
 
+    def _inserir_linhas(self, order, pedido):
+        import pudb;pu.db
+        order_line = []
+        for itens in order['order_items']: 
+            id_item = itens['item']['id']
+            prd_name = itens['item']['title']
+            categ_item = itens['item']['category_id']
+            sku_item = itens['item']['seller_sku']
+            prd_price = itens['unit_price']
+            prd_qtd = itens['quantity']
+            if not sku_item:
+                prod = self.env["product.product"].search([
+                    ('default_code', '=', 999999),
+                ])
+                prd_name = f"[SEM SKU NO MELI] {prd_name}"
+            else:
+                prod = self.env["product.product"].search([
+                    ('default_code', '=', sku_item),
+                ])
+            if not prod:
+                prod = self.env["product.product"].search([
+                    ('default_code', '=', 999999),
+                ])
+                prd_name = f"[{sku_item}] {prd_name}"
+            vals_line = {
+                'product_id': prod.id,
+                'product_uom_qty': prd_qtd,
+                'product_uom': prod.uom_id.id,
+                'price_unit': prd_price,
+                'name': prd_name,
+            }
+            order_line.append((0, 0,vals_line))
+            if len(order_line):
+                pedido['order_line'] = order_line
+                for line in pedido.order_line:
+                    prd_price = line.price_unit
+                    prd_name = line.name
+                    line._onchange_product_id_fiscal()
+                    line.write(
+                        {'price_unit': prd_price,'name': prd_name,}
+                    )
+    
     def cron_execute_pega_faturas(self):
         lj = self.search([])
         for loja in lj:
@@ -59,8 +101,6 @@ class MeliConfig(models.Model):
         url = f"https://api.mercadolibre.com/orders/search?seller={self.user_id}&order.date_created.from={hoje}T00:00:00Z&order.date_created.to={hoje}T23:59:59Z"
         response = requests.get(url, headers=headers)
         order_list = response.json()
-        # Mostrar IDs dos pedidos
-        # Vazio por enquanto
         for orders in order_list.get("results", []):
             order_id = orders['id']
             sale_exists = self.env['sale.order'].search([
@@ -73,13 +113,18 @@ class MeliConfig(models.Model):
             order = response.json()
             first_name = order.get('buyer', {}).get('first_name')
             email = order.get('buyer', {}).get('email')
-            # PEGANDO O ENDEREÇO DE ENTREGA
             shipping_id = order["shipping"]["id"]
+            same_sale = self.env['sale.order'].search([
+                ('origin', '=', shipping_id),
+                ('state', 'in', ['draft']),
+            ])
+            if same_sale:
+                self._inserir_linhas(order, same_sale)
+                continue
             url = f'https://api.mercadolibre.com/shipments/{shipping_id}'
             ship_address = requests.get(url, headers=headers)
             if ship_address.status_code == 200:
                 data = ship_address.json()
-                # CASOS DE ENVIO FULL SÃO DIFERENTES; TODO
                 full = self.env["operating.unit"].search([
                         ('code', '=', 'OU1'),
                     ])
@@ -96,7 +141,6 @@ class MeliConfig(models.Model):
                 state_buyer = address.get('state', {}).get('name')
                 zip_buyer = address.get('zip_code')
             name_buyer = f"{first_name} {order.get('buyer', {}).get('last_name')}"
-            order_line = []
             order_name = order['id']
             url = f'https://api.mercadolibre.com/orders/{order_name}/billing_info'
             hd = {
@@ -110,36 +154,6 @@ class MeliConfig(models.Model):
             cpf = '{}.{}.{}-{}'.format(cpf_buyer[:3], cpf_buyer[3:6], cpf_buyer[6:9], cpf_buyer[9:])
             order_amount = order['total_amount']
             order_date = order['date_created']
-            for itens in order['order_items']:
-                # print("ITEMS : ----------------------") 
-                id_item = itens['item']['id']
-                prd_name = itens['item']['title']
-                categ_item = itens['item']['category_id']
-                sku_item = itens['item']['seller_sku']
-                prd_price = itens['unit_price']
-                prd_qtd = itens['quantity']
-                if not sku_item:
-                    prod = self.env["product.product"].search([
-                        ('default_code', '=', 999999),
-                    ])
-                    prd_name = f"[SEM SKU NO MELI] {prd_name}"
-                else:
-                    prod = self.env["product.product"].search([
-                        ('default_code', '=', sku_item),
-                    ])
-                if not prod:
-                    prod = self.env["product.product"].search([
-                        ('default_code', '=', 999999),
-                    ])
-                    prd_name = f"[{sku_item}] {prd_name}"
-                vals_line = {
-                    'product_id': prod.id,
-                    'product_uom_qty': prd_qtd,
-                    'product_uom': prod.uom_id.id,
-                    'price_unit': prd_price,
-                    'name': prd_name,
-                }
-                order_line.append((0, 0,vals_line))
             buyer_id = order['buyer']['id']
             pr = self.env["res.partner"].search([
                 ('cnpj_cpf', '=' , cpf) or ('ref', '=', buyer_id),
@@ -199,6 +213,7 @@ class MeliConfig(models.Model):
                 "operating_unit_id": full.id,
                 "team_id": team.id,
                 "warehouse_id": wh.id,
+                "origin": shipping_id,
             }
             sale = self.env['sale.order'].create(vals)
             if sale.operating_unit_id.id == full.id:
@@ -208,13 +223,4 @@ class MeliConfig(models.Model):
                 sale._check_wh_operating_unit()
             else:
                 sale.onchange_partner_id()
-            if len(order_line):
-                sale['order_line'] = order_line
-                for line in sale.order_line:
-                    # preco unitario alterado no onchange
-                    prd_price = line.price_unit
-                    prd_name = line.name
-                    line._onchange_product_id_fiscal()
-                    line.write(
-                        {'price_unit': prd_price,'name': prd_name,}
-                    )
+            self._inserir_linhas(order, sale)   

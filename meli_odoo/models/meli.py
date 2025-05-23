@@ -44,7 +44,6 @@ class MeliConfig(models.Model):
         self.user_id = tk_new['user_id']
 
     def _inserir_linhas(self, order, pedido):
-        import pudb;pu.db
         order_line = []
         for itens in order['order_items']: 
             id_item = itens['item']['id']

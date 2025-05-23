@@ -65,7 +65,7 @@ class IntegracaoPdv(http.Controller):
             for line in pr.line_ids:
                 if line.field_name in (
                     'default_code', 'barcode', 'standard_price', 'list_price', 'tipo_venda',
-                    'qtde_atacado', 'preco_atacado', 'name'
+                    'qtde_atacado', 'preco_atacado', 'name', 'complemento'
                 ):
                     prd_ids.add(pr.res_id)
         # import pudb;pu.db

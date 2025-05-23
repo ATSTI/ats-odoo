@@ -96,7 +96,6 @@ class MeliConfig(models.Model):
             loja.action_pega_faturas_meli()
        
     def action_pega_faturas_meli(self):
-        import pudb;pu.db
         if self.expire_date_token and self.expire_date_token < datetime.now():
             self.action_gera_acess_token()
             # print("TOKEN GERADO")
@@ -109,7 +108,6 @@ class MeliConfig(models.Model):
         order_list = response.json()
         for orders in order_list.get("results", []):
             order_id = orders['id']
-            print(orders)
             sale_exists = self.env['sale.order'].search([
                 ('name', '=', str(order_id)),
             ])
@@ -169,10 +167,10 @@ class MeliConfig(models.Model):
             }
             address_buyer = requests.get(url, headers=hd)
             cpfj_buyer = address_buyer.json()['buyer']['billing_info']['identification']['number']
-            if len(cpfj_buyer) < 11:
+            if len(cpfj_buyer) == 11:
                 cpfj_buyer = cpfj_buyer.zfill(11)
                 cpfj = '{}.{}.{}-{}'.format(cpfj_buyer[:3], cpfj_buyer[3:6], cpfj_buyer[6:9], cpfj_buyer[9:])
-            if len(cpfj_buyer) <= 14:
+            if len(cpfj_buyer) == 14:
                 cpfj_buyer = cpfj_buyer.zfill(14)
                 cpfj = '{}.{}.{}/{}-{}'.format(cpfj_buyer[:2], cpfj_buyer[2:5], cpfj_buyer[5:8], cpfj_buyer[8:12], cpfj_buyer[12:])    
             order_amount = order['total_amount']

@@ -15,6 +15,7 @@
         'security/ir.model.access.csv',
         'views/meli_view.xml',
         'views/product_view.xml',
+        'views/sale_order_line_view.xml',
         ],
     'installable': True,
     'images': [],

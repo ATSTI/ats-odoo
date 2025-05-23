@@ -79,10 +79,16 @@ class MeliConfig(models.Model):
                 for line in pedido.order_line:
                     prd_price = line.price_unit
                     prd_name = line.name
-                    line._onchange_product_id_fiscal()
-                    line.write(
-                        {'price_unit': prd_price,'name': prd_name,}
-                    )
+                    if pedido.name == str(order['id']):
+                        line.write(
+                            {'price_unit': prd_price,'name': prd_name}
+                        )
+                    else:
+                        order_id_meli = order['id']
+                        line._onchange_product_id_fiscal()
+                        line.write(
+                            {'price_unit': prd_price,'name': prd_name, 'order_id_meli': order_id_meli}
+                        )
     
     def cron_execute_pega_faturas(self):
         lj = self.search([])
@@ -90,6 +96,7 @@ class MeliConfig(models.Model):
             loja.action_pega_faturas_meli()
        
     def action_pega_faturas_meli(self):
+        import pudb;pu.db
         if self.expire_date_token and self.expire_date_token < datetime.now():
             self.action_gera_acess_token()
             # print("TOKEN GERADO")
@@ -102,6 +109,7 @@ class MeliConfig(models.Model):
         order_list = response.json()
         for orders in order_list.get("results", []):
             order_id = orders['id']
+            print(orders)
             sale_exists = self.env['sale.order'].search([
                 ('name', '=', str(order_id)),
             ])
@@ -118,8 +126,21 @@ class MeliConfig(models.Model):
                 ('state', 'in', ['draft']),
             ])
             if same_sale:
-                self._inserir_linhas(order, same_sale)
-                continue
+                sale_line_exist = False
+                for ol in same_sale.order_line:
+                    if ol.order_id_meli:
+                        for y in ol.order_id_meli.split():
+                            sale_line_exist = self.env['sale.order.line'].search([
+                                ('order_id_meli', '=', y),
+                            ])
+                            if sale_line_exist:
+                                sale_line_exist = True
+                                break
+                if sale_line_exist == False:
+                    self._inserir_linhas(order, same_sale)
+                    continue
+                if sale_line_exist == True:
+                    continue
             url = f'https://api.mercadolibre.com/shipments/{shipping_id}'
             ship_address = requests.get(url, headers=headers)
             if ship_address.status_code == 200:
@@ -147,15 +168,18 @@ class MeliConfig(models.Model):
                 'x-version': '2'
             }
             address_buyer = requests.get(url, headers=hd)
-            cpf_buyer = address_buyer.json()['buyer']['billing_info']['identification']['number']
-            if len(cpf_buyer) < 11:
-                cpf_buyer = cpf_buyer.zfill(11)
-            cpf = '{}.{}.{}-{}'.format(cpf_buyer[:3], cpf_buyer[3:6], cpf_buyer[6:9], cpf_buyer[9:])
+            cpfj_buyer = address_buyer.json()['buyer']['billing_info']['identification']['number']
+            if len(cpfj_buyer) < 11:
+                cpfj_buyer = cpfj_buyer.zfill(11)
+                cpfj = '{}.{}.{}-{}'.format(cpfj_buyer[:3], cpfj_buyer[3:6], cpfj_buyer[6:9], cpfj_buyer[9:])
+            if len(cpfj_buyer) <= 14:
+                cpfj_buyer = cpfj_buyer.zfill(14)
+                cpfj = '{}.{}.{}/{}-{}'.format(cpfj_buyer[:2], cpfj_buyer[2:5], cpfj_buyer[5:8], cpfj_buyer[8:12], cpfj_buyer[12:])    
             order_amount = order['total_amount']
             order_date = order['date_created']
             buyer_id = order['buyer']['id']
             pr = self.env["res.partner"].search([
-                ('cnpj_cpf', '=' , cpf) or ('ref', '=', buyer_id),
+                ('cnpj_cpf', '=' , cpfj) or ('ref', '=', buyer_id),
             ])
             if not pr:
                 tag_pr = self.env['res.partner.category'].search([
@@ -180,7 +204,7 @@ class MeliConfig(models.Model):
                 vals_pr = {
                     'name': name_buyer,
                     'legal_name': name_buyer,
-                    'cnpj_cpf': cpf,
+                    'cnpj_cpf': cpfj,
                     'ref': buyer_id,
                     'street_name':  rua,
                     'street_number': numero,

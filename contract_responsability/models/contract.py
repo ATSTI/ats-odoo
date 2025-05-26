@@ -39,7 +39,7 @@ class ContractContract(models.Model):
             ctr._add_contract_origin(moves)
             ctr._invoice_followers(moves)
             # mv = moves[-1]
-            # self._compute_recurring_next_date()
+            self._compute_recurring_next_date()
             # ctr._change_recurring_next_date()            
         return moves
     

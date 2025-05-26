@@ -143,13 +143,15 @@ class MeliConfig(models.Model):
             ship_address = requests.get(url, headers=headers)
             if ship_address.status_code == 200:
                 data = ship_address.json()
-                full = self.env["operating.unit"].search([
+                ou1 = self.env["operating.unit"].search([
                         ('code', '=', 'OU1'),
                     ])
-                if data.get('logistic_type') == 'fulfillment':
-                    full = self.env["operating.unit"].search([
+                full = ou1
+                mf = self.env["operating.unit"].search([
                         ('code', '=', 'MF'),
                     ])
+                if data.get('logistic_type') == 'fulfillment':
+                    full = mf
                 # print(f'Full: {full.name}')
                 address = data.get('receiver_address', {})
                 bairro = address.get('neighborhood')
@@ -231,14 +233,11 @@ class MeliConfig(models.Model):
                 "name": order_name,
                 "partner_id": pr.id,
                 "tag_ids": [(6, 0, tag.ids)],
-                "operating_unit_id": full.id,
-                "team_id": team.id,
-                "warehouse_id": wh.id,
                 "origin": shipping_id,
             }
             sale = self.env['sale.order'].create(vals)
-            if sale.operating_unit_id.id == full.id:
-                sale.write({"fiscal_operation_id": False})
+            if full.id == mf.id:
+                sale.write({"operating_unit_id": full.id, "team_id": team.id, "warehouse_id": wh.id, "fiscal_operation_id": False})
                 sale.onchange_team_id()
                 sale.onchange_operating_unit_id()
                 sale._check_wh_operating_unit()

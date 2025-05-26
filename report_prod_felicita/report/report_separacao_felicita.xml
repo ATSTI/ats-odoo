@@ -19,7 +19,7 @@
                             <b>Demanda</b>
                         </td>
                         <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 30%">
-                            <b>SKU</b>
+                            <b>Cod Barras</b>
                         </td>
                     </tr>
                     <t t-foreach="product" t-as="p" >
@@ -35,7 +35,7 @@
                             <span t-esc="qtd"/>
                         </td>
                         <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 30%;">
-                            <span t-esc="p.default_code"/>
+                            <span t-esc="p.barcode"/>
                         </td>
                     </tr>
                     </t>
@@ -47,47 +47,60 @@
                         <tr>
                             <td style="border: 1px solid #dcdcdc; height:27px;  border-collapse: collapse; font-size:12px;text-align: center; width: 20%">
                                 <t t-foreach="o.tag_ids" t-as="tag">
-                                    <b>Plataforma: <span><t t-esc="tag.name"/></span></b>
+                                    <span>Plataforma: <b><t t-esc="tag.name"/></b></span>
                                 </t>
                             </td>
                             <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 60%">
-                                <b>Pedido: <span t-field="o.name"/></b>
+                                <span>Pedido: <b style="font-size:15px;" t-field="o.name"/></span>
                             </td>
                             <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; width: 10%"></td>
-                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; width: 10%"></td>
+                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; width: 5%"></td>
+                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; width: 5%"></td>
                         </tr>
+                    </table>
+                    <table style="border: 1px solid #dcdcdc; border-collapse: collapse; font-size:14px;width: 100%;">
                         <tr>
                             <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 5%">
                                 <b>Item</b>
                             </td>
-                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 50%">
+                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 45%">
                                 <b>Produto</b>
                             </td>
-                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 10%">
-                                <b>Quantidade</b>
+                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 5%">
+                                <b>Qtd</b>
                             </td>
-                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 35%">
-                                <b>SKU</b>
+                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 25%">
+                                <b>Componentes (KIT)</b>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 30%">
+                                <b>Cod Barras</b>
                             </td>
                         </tr>
                         <t t-set="linhas" t-value="2" />
                         <t t-set="item" t-value="0" />
-                            <t t-foreach="o.order_line" t-as="prd">
+                            <t t-foreach="o.order_line" t-as="line">
                                 <t t-set="item" t-value="item + 1" />
                                 <t t-set="linhas" t-value="linhas - 1" />
-                                <t t-set="total_produtos" t-value="total_produtos + prd.product_uom_qty"/>
+                                <t t-set="total_produtos" t-value="total_produtos + line.product_uom_qty"/>
                                 <tr>
                                     <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 5%;">
                                         <t t-esc="item" ></t>
                                     </td>
                                     <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: left; width: 50%;">
-                                        <span t-field="prd.product_id.name"/>
+                                        <span t-field="line.product_id.name"/>
                                     </td>
-                                    <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 10%;">
-                                        <span t-field="prd.product_uom_qty"/>
+                                    <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 5%;">
+                                        <span t-field="line.product_uom_qty"/>
                                     </td>
-                                    <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 35%;">
-                                        <span t-field="prd.product_id.default_code"/>
+                                    <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:10px;text-align: left; width: 20%;">
+                                    <t t-foreach="line.product_id.product_tmpl_id.bom_ids" t-as="mrp">
+                                        <t t-foreach="mrp.bom_line_ids" t-as="bom">
+                                            <span t-field="bom.product_id.name"/><br/>
+                                        </t>
+                                    </t>
+                                    </td>
+                                    <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 30%;">
+                                        <span t-field="line.product_id.barcode"/>
                                     </td>
                                 </tr>
                             </t>

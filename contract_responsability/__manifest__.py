@@ -7,7 +7,7 @@
     "version": "14.0.1.0.0",
     "author": "ATSti",
     "website": "",
-    "depends": ["contract", "l10n_br_fiscal", "l10n_br_account_payment_brcobranca"],
+    "depends": ["contract", "l10n_br_fiscal", "l10n_br_account_payment_brcobranca", "contract_recurring_date"],
     "category": "Contract Management",
     "license": "AGPL-3",
     "data": ["views/contract_view.xml"],

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="all_note_report_view_graph" model="ir.ui.view">
+            <field name="name">all.note.report.graph</field>
+            <field name="model">all.note.report</field>
+            <field name="arch" type="xml">
+                <graph string="Analysis" type="bar" stacked="True">
+                    <field name="x_company_id" type="row" />
+                    <field name="x_total_nota" type="measure" />
+                    <field name="x_valor_nota" type="measure" />
+                </graph>
+            </field>
+        </record>
+
+        <record id="all_note_report_view_pivot" model="ir.ui.view">
+            <field name="name">all.note.report.pivot</field>
+            <field name="model">all.note.report</field>
+            <field name="arch" type="xml">
+                <pivot string="Analysis" stacked="True">
+                    <field name="x_company_id" type="row" />
+                    <field name="x_total_nota" type="measure" />
+                    <field name="x_valor_nota" type="measure" />
+                </pivot>
+            </field>
+        </record>
+
+        <template id="report_all_note_template">
+            <t t-call="web.external_layout">
+                <t t-set="company" t-value="docs and docs[0].x_company_id or user.company_id"/>
+                <main>
+                <h2>Relatório Notas Empresas</h2>
+
+                <table class="table table-sm" style="width:100%;">
+                    <thead>
+                    <tr>
+                        <th>Empresa</th>
+                        <th>Total Nota</th>
+                        <th>Valor Nota</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Assumindo que os docs estão ordenados por empresa -->
+                    <t t-set="empresas_processadas" t-value="[]" />
+                    <t t-foreach="docs" t-as="doc">
+                        <t t-if="not doc.x_company_id.id in empresas_processadas">
+                            <t t-set="empresa" t-value="doc.x_company_id" />
+                            <t t-set="qtd" t-value="0" />
+                            <t t-set="vlr" t-value="0" />
+                            <t t-foreach="docs" t-as="d">
+                                <t t-if="d.x_company_id.id == empresa.id">
+                                <t t-set="qtd" t-value="qtd + d.x_total_nota" />
+                                <t t-set="vlr" t-value="vlr + d.x_valor_nota" />
+                                </t>
+                            </t>
+                            <tr>
+                                <td><t t-esc="empresa.name" /></td>
+                                <td style="text-align: right"><t t-esc="qtd" /></td>
+                                <td style="text-align: right">
+                                    <t t-esc="vlr" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: empresa.currency_id}"/>
+                                </td>
+                            </tr>
+                            <t t-set="empresas_processadas" t-value="empresas_processadas + [empresa.id]" />
+                        </t>
+                    </t>
+                    </tbody>
+                </table>
+                </main>
+            </t>
+        </template>
+    
+        <report
+            id="action_report_all_note"
+            model="all.note.report"
+            string="Relatório Notas Empresas"
+            report_type="qweb-pdf"
+            name="get_all_notes.report_all_note_template"
+            file="get_all_notes.report_all_note_template"
+            print_report_name="'Notas Empresas'"
+        />
+
+        <record id="all_note_report_view_tree" model="ir.ui.view">
+            <field name="name">all.note.report.tree</field>
+            <field name="model">all.note.report</field>
+            <field name="arch" type="xml">
+                <tree name="Analysis">
+                    <header>
+                        <button name="%(action_report_all_note)d" string="Imprimir" type="action" class="btn-primary"/>
+                    </header>
+                    <field name="x_company_id" />
+                    <field name="x_numero_nota" />
+                    <field name="x_status_nota" />
+                    <field name="x_total_nota"  invisible="1"/>
+                    <field name="x_valor_nota" />
+                    <field name="x_data_nota" />
+                </tree>
+            </field>
+        </record>
+
+        <!-- <record id="crm_activity_report_view_search" model="ir.ui.view">
+            <field name="name">crm.activity.report.search</field>
+            <field name="model">crm.activity.report</field>
+            <field name="arch" type="xml">
+                <search string="Activities Analysis">
+                    <field name="mail_activity_type_id" string="Activity Type"/>
+                    <field name="lead_id" string="Opportunity"/>
+                    <field name="user_id" string="Salesperson"/>
+                    <field name="team_id" context="{'invisible_team': False}"/>
+                    <field name="author_id" string="Assigned To"/>
+                    <separator groups="crm.group_use_lead"/>
+                    <filter string="Leads" name="lead" domain="[('lead_type', '=', 'lead')]" help="Show only lead" groups="crm.group_use_lead"/>
+                    <filter string="Opportunities" name="opportunity" domain="[('lead_type', '=', 'opportunity')]" help="Show only opportunity" groups="crm.group_use_lead"/>
+                    <separator/>
+                    <filter string="Won" name="won" domain="[('stage_id.is_won', '=', True)]"/>
+                    <separator/>
+                    <filter string="Trailing 12 months" name="completion_date" domain="[
+                        ('date', '>=', (datetime.datetime.combine(context_today() + relativedelta(days=-365), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                        ('date', '&lt;=', (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                    <separator/>
+                    <filter name="filter_date" date="date"/>
+                    <separator/>
+                    <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                    <group expand="1" string="Group By">
+                        <filter string="Activity" name="group_by_activity_type" context="{'group_by': 'mail_activity_type_id'}"/>
+                        <filter string="Type" name="group_by_subtype" context="{'group_by': 'subtype_id'}"/>
+                        <filter string="Assigned To" name="group_by_author_id" context="{'group_by': 'author_id'}"/>
+                        <filter string="Completion Date" name="group_by_completion_date" context="{'group_by': 'date:month'}"/>
+                        <separator/>
+                        <filter string="Salesperson" name="group_by_user_id" context="{'group_by': 'user_id'}"/>
+                        <filter string="Sales Team" name="saleschannel" context="{'group_by': 'team_id'}"/>
+                        <filter string="Stage" name="stage" context="{'group_by': 'stage_id'}"/>
+                        <filter string="Company" name="company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                        <filter string="Creation Date" name="group_by_lead_date_creation" context="{'group_by': 'lead_create_date'}"/>
+                        <filter string="Expected Closing" name="group_by_date_deadline" context="{'group_by': 'date_deadline'}"/>
+                        <filter string="Closed Date" name="group_by_date_closed" context="{'group_by': 'date_closed'}"/>
+                    </group>
+                </search>
+            </field>
+        </record> -->
+
+       <record id="all_note_report_action" model="ir.actions.act_window">
+           <field name="name">Notas Empresas</field>
+           <field name="res_model">all.note.report</field>
+           <field name="view_mode">pivot,tree,graph</field>
+           <field name="context">{
+            'pivot_row_groupby': ['x_company_id'],
+            'pivot_column_groupby': []
+        }</field>
+
+            <field name="domain">[]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No data yet!
+                </p><p>
+                    Start scheduling activities on your opportunities
+                </p>
+            </field>
+       </record>
+
+       <menuitem
+            id="all_note_report_menu"
+            name="Notas Empresas"
+            groups="l10n_br_fiscal.group_manager"
+            parent="l10n_br_fiscal.accountant_menu"
+            action="all_note_report_action"
+            sequence="999"/>
+
+        <!-- <record id="crm_activity_report_action_team" model="ir.actions.act_window">
+            <field name="name">Pipeline Activities</field>
+            <field name="res_model">crm.activity.report</field>
+            <field name="view_mode">graph,pivot,tree</field>
+            <field name="context">{'search_default_team_id': active_id}</field>
+            <field name="domain">[]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No data yet!
+                </p><p>
+                    Start scheduling activities on your opportunities
+                </p>
+            </field>
+        </record> -->
+
+</odoo>

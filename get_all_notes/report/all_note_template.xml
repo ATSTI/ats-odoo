@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<template id="report_all_note_template">
+  <t t-call="web.external_layout">
+    <div class="page">
+      <h2>Relatório Notas Empresas</h2>
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>Empresa</th>
+            <th>Total Nota</th>
+            <th>Valor Nota</th>
+          </tr>
+        </thead>
+        <tbody>
+          <t t-foreach="docs" t-as="doc">
+            <tr>
+              <td><t t-esc="doc.x_company_id.name"/></td>
+              <td><t t-esc="doc.x_total_nota"/></td>
+              <td><t t-esc="doc.x_valor_nota"/></td>
+            </tr>
+          </t>
+        </tbody>
+      </table>
+    </div>
+  </t>
+</template>

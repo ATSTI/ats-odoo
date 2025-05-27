@@ -12,7 +12,7 @@
     """,
     'author': 'otaviosilmunhoz@hotmail.com/ATS Soluções',
     'website': '',
-    'depends': ['event_sale'],
+    'depends': ['event_sale', 'point_of_sale'],
     'data': [
             'views/chair_view.xml',
             'views/event_view.xml',

@@ -39,8 +39,13 @@
         <field name="inherit_id" ref="event.view_event_registration_form"/>
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
-                <field name="chair_id" />
+                <field name="chair_id" attrs="{'readonly': [('readonly', '=', True)]}"/>
                 <field name="chair" invisible="1"/>
+            </field>
+            <field name="sale_order_id" position="replace">
+                <field name="readonly" invisible="1"/>
+                <field name="pos_order_id" />
+                <field name="sale_order_id" invisible="1"/>
             </field>
         </field>
     </record>             

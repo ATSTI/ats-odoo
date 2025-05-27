@@ -26,7 +26,7 @@
         </record>
 
         <template id="report_all_note_template">
-            <t t-call="web.external_layout">
+            <t t-call="web.basic_layout">
                 <t t-set="company" t-value="docs and docs[0].x_company_id or user.company_id"/>
                 <main>
                 <h2>Relatório Notas Empresas</h2>

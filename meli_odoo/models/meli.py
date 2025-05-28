@@ -49,6 +49,13 @@ class MeliConfig(models.Model):
             id_item = itens['item']['id']
             prd_name = itens['item']['title']
             categ_item = itens['item']['category_id']
+            headers = {
+                'Authorization': 'Bearer %s' % (self.access_token),
+            }
+            url = f'https://api.mercadolibre.com/categories/{categ_item}'
+            response = requests.get(url, headers=headers)
+            categ = response.json()
+            categ = categ['name']
             sku_item = itens['item']['seller_sku']
             prd_price = itens['unit_price']
             prd_qtd = itens['quantity']
@@ -66,6 +73,14 @@ class MeliConfig(models.Model):
                     ('default_code', '=', 999999),
                 ])
                 prd_name = f"[{sku_item}] {prd_name}"
+            else:
+                prod.meli = True
+                prod.meli_sku = sku_item
+                prod.title_meli = prd_name
+                prod.category_meli = categ
+                prod.categ_meli_id = categ_item
+                prod.meli_config_id = self.id
+                prod.meli_item_id = id_item
             vals_line = {
                 'product_id': prod.id,
                 'product_uom_qty': prd_qtd,
@@ -234,6 +249,7 @@ class MeliConfig(models.Model):
                 "partner_id": pr.id,
                 "tag_ids": [(6, 0, tag.ids)],
                 "origin": shipping_id,
+                "fiscal_operation_id": 1,
             }
             sale = self.env['sale.order'].create(vals)
             if full.id == mf.id:

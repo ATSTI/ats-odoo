@@ -15,7 +15,9 @@ class ProducTemplate(models.Model):
     meli_item_id = fields.Char('Id do Item')
     margin_meli = fields.Char('Margem Mercado Livre')
     title_meli = fields.Char('Titulo do Produto')
-    # FIXA POR ENQUANTO category_meli = fields.Char('Categoria Mercado Livre')
+    meli_sku = fields.Char('SKU Mercado Livre')
+    category_meli = fields.Char('Categoria Mercado Livre')
+    categ_meli_id = fields.Char('Categoria')
     price_meli = fields.Float('Preço Mercado Livre')
     qtd_meli = fields.Float('Quantidade Disponivel Mercado Livre')
     guarantee_meli = fields.Selection([

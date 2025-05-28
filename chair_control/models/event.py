@@ -81,14 +81,11 @@ class EventRegistration(models.Model):
 
     @api.onchange('pos_order_id')
     def _onchange_pos_order_id(self):
-        if self.event_id:
-            event = self.event_id.event_ticket_ids
-            lines = self.pos_order_id.lines
+        if self.event_id and self.pos_order_id:
             self.readonly = True
-            for lines in lines:
-                name = lines.full_product_name
-                for ev in event:
-                    if name == ev.product_id.name:
+            for lines in self.pos_order_id.lines:
+                for ev in self.event_id.event_ticket_ids:
+                    if lines.product_id.id == ev.product_id.id:
                         self.readonly = False
 
 

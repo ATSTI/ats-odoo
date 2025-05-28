@@ -44,9 +44,13 @@
             </field>
             <field name="sale_order_id" position="replace">
                 <field name="readonly" invisible="1"/>
-                <field name="pos_order_id" />
                 <field name="sale_order_id" invisible="1"/>
             </field>
+            <xpath expr="//group[@name='utm_link']" position="before">
+                <group string="Pedidos de Venda">
+                    <field name="pos_order_id"/>
+                </group>
+            </xpath>
         </field>
     </record>             
 

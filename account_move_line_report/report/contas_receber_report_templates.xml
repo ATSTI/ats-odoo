@@ -24,7 +24,7 @@
                           <td style="font-size:10px;" width="18%"><span t-field="o.move_id"/></td>
                           <td style="font-size:10px;" width="7%"><span t-field="o.date"/></td>
                           <td style="font-size:10px;" width="7%"><span t-field="o.date_maturity"/></td>
-                          <td style="font-size:10px;" width="15%" class="text-right"><span t-esc="o.debit" t-options='{"widget": "float", "precision": 2}'/></td>
+                          <td style="font-size:10px;" width="15%" class="text-right"><span t-esc="o.amount_residual" t-options='{"widget": "float", "precision": 2}'/></td>
                         </tr>
                           <t t-set="tot" t-value="tot + o.amount_residual"/>
                           <t t-set="tot_fat" t-value="tot_fat + o.debit"/>

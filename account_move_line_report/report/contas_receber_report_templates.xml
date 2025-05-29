@@ -12,6 +12,7 @@
                       <tr>
                           <th><strong>Cliente</strong></th>
                           <th><strong>Titulo</strong></th>
+                          <th><strong>Emissão</strong></th>
                           <th><strong>Vencimento</strong></th>
                           <th class="text-right"><strong>Valor Titulo</strong></th>                        
                       </tr>
@@ -19,8 +20,9 @@
                     <tbody>                        
                        <t t-foreach="docs" t-as="o">                           
                         <tr style="border:1px solid lightgray">
-                          <td style="font-size:10px;" width="60%"><span t-field="o.partner_id"/></td>
+                          <td style="font-size:10px;" width="53%"><span t-field="o.partner_id"/></td>
                           <td style="font-size:10px;" width="18%"><span t-field="o.move_id"/></td>
+                          <td style="font-size:10px;" width="7%"><span t-field="o.date"/></td>
                           <td style="font-size:10px;" width="7%"><span t-field="o.date_maturity"/></td>
                           <td style="font-size:10px;" width="15%" class="text-right"><span t-esc="o.debit" t-options='{"widget": "float", "precision": 2}'/></td>
                         </tr>
@@ -30,9 +32,10 @@
                        <tr>
                         <td></td>
                         <td></td>
+                        <td></td>
                         <td>Total </td>
                         <td  class="text-right">
-                            <span t-esc="tot_fat" t-options='{"widget": "float", "precision": 2}'/>
+                            <span t-esc="tot" t-options='{"widget": "float", "precision": 2}'/>
                         </td>
                     </tr>  
                     </tbody>

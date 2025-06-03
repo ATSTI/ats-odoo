@@ -15,15 +15,19 @@
                                 <field name="shopee_config_id" attrs="{'invisible': [('shopee', '=', False)]}"/>
                                 <field name="margin_shopee" attrs="{'invisible': [('shopee', '=', False)]}"/>
                             </group>
+                            <div>
+                                <group>
+                                    <field name="title_shopee" attrs="{'invisible': [('shopee', '=', False)]}"/>
+                                    <field name="price_shopee" attrs="{'invisible': [('shopee', '=', False)]}"/>
+                                    <button name="atualiza_preco_shopee" string="Atualizar Preço" type="object" class="btn btn-primary" attrs="{'invisible': [('shopee_item_id', '=', False)]}"/>
+                                    <field name="qtd_shopee" attrs="{'invisible': [('shopee', '=', False)]}"/>
+                                    <button name="atualiza_stock_shopee" string="Atualizar Quantidade" type="object" class="btn btn-primary" attrs="{'invisible': [('shopee_item_id', '=', False)]}"/>
+                                    <!-- <field name="guarantee_shopee" attrs="{'invisible': [('shopee', '=', False)]}"/> -->
+                                    <field name="shopee_sku" attrs="{'invisible': [('shopee', '=', False)]}"/>
+                                </group>
+                            </div>
                             <group>
-                                <field name="title_shopee" attrs="{'invisible': [('shopee', '=', False)]}"/>
-                                <field name="price_shopee" attrs="{'invisible': [('shopee', '=', False)]}"/>
-                                <field name="qtd_shopee" attrs="{'invisible': [('shopee', '=', False)]}"/>
-                                <!-- <field name="guarantee_shopee" attrs="{'invisible': [('shopee', '=', False)]}"/> -->
-                                <field name="shopee_sku" attrs="{'invisible': [('shopee', '=', False)]}"/>
-                            </group>
-                            <group>
-                                <button name="action_envia_produto" string="Enviar Produto Para Shopee" type="object" class="btn btn-primary" attrs="{'invisible': [('shopee', '=', False)]}"/>
+                                <button name="action_envia_produto_shopee" string="Enviar Produto Para Shopee" type="object" class="btn btn-primary" attrs="{'invisible': [('shopee', '=', False)]}"/>
                                 <field name="shopee_item_id" attrs="{'invisible': [('shopee', '=', False)]}" readonly="1"/>
                             </group>
                         </group>

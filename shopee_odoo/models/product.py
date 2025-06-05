@@ -72,6 +72,8 @@ class ProducTemplate(models.Model):
                 raise UserError(_(f"(Atualize a Pagina e Tente Novamente) Erro ao atualizar preço: {data['debug_message']}"))
             else:
                 raise UserError(_(f"Preço Atualizado Com Sucesso!"))
+        else:
+            self.procura_item_existente()
 
     def atualiza_stock_shopee(self):
         if self.shopee_config_id.shop_real == True:
@@ -113,9 +115,53 @@ class ProducTemplate(models.Model):
                 raise UserError(_(f"(Atualize a Pagina e Tente Novamente) Erro ao atualizar estoque: {data['debug_message']}"))
             else:
                 raise UserError(_(f"Quantidade Atualizada Com Sucesso!"))
+        else:
+            self.procura_item_existente()
+            
+    def procura_item_existente(self):
+        if self.shopee_config_id.shop_real == True:
+            url_ini = "https://openplatform.shopee.com.br"
+        if self.shopee_config_id.shop_real == False:
+            url_ini = "https://partner.test-stable.shopeemobile.com"
+        timest = str(int(time.time()))
+        sp = self.shopee_config_id
+        path = '/api/v2/product/get_item_list'
+        tmp_base_string = "%s%s%s%s%s" % (sp.shopee_partner_id, path, timest, sp.access_token, sp.shopee_id)
+        base_string = tmp_base_string.encode()
+        sign = hmac.new(sp.shopee_partner_key.encode(), base_string, hashlib.sha256).hexdigest()
+        data_i = int((datetime(2025, 1, 1, 15, 30)).timestamp())
+        data_f = int((datetime.now() + timedelta(hours=1)).timestamp())
+        path_attr = "/api/v2/product/get_item_list?access_token=%s&offset=0&page_size=10&item_status=NORMAL&partner_id=%s&shop_id=%s&sign=%s&timestamp=%s&update_time_from=%s&update_time_to=%s" %(sp.access_token, sp.shopee_partner_id,sp.shopee_id, sign, timest, data_i, data_f)
+        payload={}
+        headers = {}
+        url = url_ini + path_attr
+        response = requests.request("GET",url,headers=headers, data=payload, allow_redirects=False)
+        data = response.json()
+        for rs in data['response']['item']:
+            item = rs['item_id']
+            path = '/api/v2/product/get_item_base_info'
+            tmp_base_string = "%s%s%s%s%s" % (sp.shopee_partner_id, path, timest, sp.access_token, sp.shopee_id)
+            base_string = tmp_base_string.encode()
+            sign = hmac.new(sp.shopee_partner_key.encode(), base_string, hashlib.sha256).hexdigest()
+            path_attr = "/api/v2/product/get_item_base_info?access_token=%s&need_complaint_policy=true&need_tax_info=true&item_id_list=%s&partner_id=%s&shop_id=%s&sign=%s&timestamp=%s" %(sp.access_token, item, sp.shopee_partner_id, sp.shopee_id, sign, timest)
+            payload = {}
+            headers = {}
+            url = url_ini + path_attr
+            response = requests.get(url,headers=headers, data=payload, allow_redirects=False)
+            data = response.json()
+            for it in data['response']['item_list']:
+                sku = it['item_sku']
+                if sku == self.shopee_sku:
+                    self.shopee_item_id = it['item_id']
+                    break
+            if self.shopee_item_id:
+                break
+
 
     def action_envia_produto_shopee(self):
         return True
+        # FUNÇÃO DE ADICIONAR PEDIDO VIA ODOO REMOVIDO ( PEDIDO DA FELICITA)
+        # FUNCIONA CORRETAMENTE
         timest = str(int(time.time()))
         if self.shopee_config_id.expire_date_token and self.shopee_config_id.expire_date_token < datetime.now():
             self.shopee_config_id.action_gera_acess_token()

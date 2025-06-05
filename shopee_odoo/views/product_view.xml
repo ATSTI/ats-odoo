@@ -19,9 +19,9 @@
                                 <group>
                                     <field name="title_shopee" attrs="{'invisible': [('shopee', '=', False)]}"/>
                                     <field name="price_shopee" attrs="{'invisible': [('shopee', '=', False)]}"/>
-                                    <button name="atualiza_preco_shopee" string="Atualizar Preço" type="object" class="btn btn-primary" attrs="{'invisible': [('shopee_item_id', '=', False)]}"/>
+                                    <button name="atualiza_preco_shopee" string="Atualizar Preço" type="object" class="btn btn-primary" attrs="{'invisible': [('shopee', '=', False)]}"/>
                                     <field name="qtd_shopee" attrs="{'invisible': [('shopee', '=', False)]}"/>
-                                    <button name="atualiza_stock_shopee" string="Atualizar Quantidade" type="object" class="btn btn-primary" attrs="{'invisible': [('shopee_item_id', '=', False)]}"/>
+                                    <button name="atualiza_stock_shopee" string="Atualizar Quantidade" type="object" class="btn btn-primary" attrs="{'invisible': [('shopee', '=', False)]}"/>
                                     <!-- <field name="guarantee_shopee" attrs="{'invisible': [('shopee', '=', False)]}"/> -->
                                     <field name="shopee_sku" attrs="{'invisible': [('shopee', '=', False)]}"/>
                                 </group>

@@ -25,7 +25,7 @@ class ProducTemplate(models.Model):
     image_shopee_url = fields.Char('URL da Imagem Shopee')
     shopee_config_id = fields.Many2one('shopee.config', 'Shopee')
 
-    url_ini = "https://openplatform.shopee.com.br" 
+    #url_ini = "https://openplatform.shopee.com.br" 
     # url_ini = "https://partner.test-stable.shopeemobile.com"
 
     @api.onchange('shopee')
@@ -37,6 +37,10 @@ class ProducTemplate(models.Model):
             self.qtd_shopee = 1
 
     def atualiza_preco_shopee(self):
+        if self.shopee_config_id.shop_real == True:
+            url_ini = "https://openplatform.shopee.com.br"
+        if self.shopee_config_id.shop_real == False:
+            url_ini = "https://partner.test-stable.shopeemobile.com"
         if self.shopee_config_id.expire_date_token and self.shopee_config_id.expire_date_token < datetime.now():
             self.shopee_config_id.action_gera_acess_token()
             print("TOKEN GERADO")
@@ -48,7 +52,7 @@ class ProducTemplate(models.Model):
             base_string = tmp_base_string.encode()
             sign = hmac.new(sp.shopee_partner_key.encode(), base_string, hashlib.sha256).hexdigest()
             path_attr = "/api/v2/product/update_price?access_token=%s&partner_id=%s&shop_id=%s&sign=%s&timestamp=%s" %(sp.access_token, sp.shopee_partner_id, sp.shopee_id, sign, timest)
-            url = self.url_ini + path_attr
+            url = url_ini + path_attr
             payload = json.dumps({
                 "item_id": int(self.shopee_item_id),
                 "price_list": [
@@ -70,6 +74,10 @@ class ProducTemplate(models.Model):
                 raise UserError(_(f"Preço Atualizado Com Sucesso!"))
 
     def atualiza_stock_shopee(self):
+        if self.shopee_config_id.shop_real == True:
+            url_ini = "https://openplatform.shopee.com.br"
+        if self.shopee_config_id.shop_real == False:
+            url_ini = "https://partner.test-stable.shopeemobile.com"
         if self.shopee_config_id.expire_date_token and self.shopee_config_id.expire_date_token < datetime.now():
             self.shopee_config_id.action_gera_acess_token()
             print("TOKEN GERADO")
@@ -81,7 +89,7 @@ class ProducTemplate(models.Model):
             base_string = tmp_base_string.encode()
             sign = hmac.new(sp.shopee_partner_key.encode(), base_string, hashlib.sha256).hexdigest()
             path_attr = "/api/v2/product/update_stock?access_token=%s&partner_id=%s&shop_id=%s&sign=%s&timestamp=%s" %(sp.access_token, sp.shopee_partner_id, sp.shopee_id, sign, timest)
-            url = self.url_ini + path_attr 
+            url = url_ini + path_attr 
             payload = json.dumps({
                 "item_id": int(self.shopee_item_id),
                 "stock_list": [
@@ -107,6 +115,7 @@ class ProducTemplate(models.Model):
                 raise UserError(_(f"Quantidade Atualizada Com Sucesso!"))
 
     def action_envia_produto_shopee(self):
+        return True
         timest = str(int(time.time()))
         if self.shopee_config_id.expire_date_token and self.shopee_config_id.expire_date_token < datetime.now():
             self.shopee_config_id.action_gera_acess_token()

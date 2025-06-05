@@ -15,6 +15,7 @@
                         <group>
                             <group>
                                 <field name="name"/>
+                                <field name="shop_real" />
                                 <field name="shopee_id"/>
                                 <field name="shopee_partner_id"/>
                                 <field name="shopee_partner_key"/>

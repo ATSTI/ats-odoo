@@ -27,7 +27,7 @@
                                 </group>
                             </div>
                             <group>
-                                <button name="action_envia_produto_shopee" string="Enviar Produto Para Shopee" type="object" class="btn btn-primary" attrs="{'invisible': [('shopee', '=', False)]}"/>
+                                <!-- <button name="action_envia_produto_shopee" string="Enviar Produto Para Shopee" type="object" class="btn btn-primary" attrs="{'invisible': [('shopee', '=', False)]}"/> -->
                                 <field name="shopee_item_id" attrs="{'invisible': [('shopee', '=', False)]}" readonly="1"/>
                             </group>
                         </group>

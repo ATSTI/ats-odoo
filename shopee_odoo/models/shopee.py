@@ -21,13 +21,15 @@ class ShopeeConfig(models.Model):
     refresh_token_security = fields.Char('Refresh Token security', invisible=True, readonly=True)
     shopee_partner_id = fields.Char('Partner ID', required=True)
     shopee_partner_key = fields.Char('Partner Key', required=True)
+    shop_real = fields.Boolean('Loja Real?', default=True)
     
-    #nao é campo
-    url_ini = "https://openplatform.shopee.com.br"
     # url_ini = "https://partner.shopeemobile.com" 
-    # url_ini = "https://partner.test-stable.shopeemobile.com"
 
     def action_gera_acess_token(self):
+        if self.shop_real == True:
+            url_ini = "https://openplatform.shopee.com.br"
+        if self.shop_real == False:
+            url_ini = "https://partner.test-stable.shopeemobile.com"
         timest = str(int(time.time()))
         path = "/api/v2/auth/access_token/get"
         tmp_base_string = "%s%s%s" % (self.shopee_partner_id, path, timest)
@@ -43,7 +45,7 @@ class ShopeeConfig(models.Model):
         'Content-Type': 'application/json'
         }
         path_cat = "/api/v2/auth/access_token/get?partner_id=%s&sign=%s&timestamp=%s" %(self.shopee_partner_id, sign, timest)
-        url = self.url_ini + path_cat
+        url = url_ini + path_cat
         response = requests.request("POST",url,headers=headers, data=payload, allow_redirects=False)
         res = response.json()
         expire_in = res['expire_in']
@@ -62,6 +64,10 @@ class ShopeeConfig(models.Model):
             loja.action_pega_faturas_shopee()
 
     def action_pega_faturas_shopee(self):
+        if self.shop_real == True:
+            url_ini = "https://openplatform.shopee.com.br"
+        if self.shop_real == False:
+            url_ini = "https://partner.test-stable.shopeemobile.com"
         if self.expire_date_token and self.expire_date_token < datetime.now():
             self.action_gera_acess_token()
             # print("TOKEN GERADO")
@@ -82,7 +88,7 @@ class ShopeeConfig(models.Model):
         # data_fim = 1608271872
         # order_status=READY_TO_SHIP&  tirei do link abaixo pq nao trazia
         path_cat = "?access_token=%s&cursor=&page_size=20&partner_id=%s&request_order_status_pending=true&response_optional_fields=order_status&shop_id=%s&sign=%s&time_from=%s&time_range_field=create_time&time_to=%s&timestamp=%s" %(self.access_token,self.shopee_partner_id,self.shopee_id,sign,data_inicio,data_fim,timest)
-        url = self.url_ini + path + path_cat
+        url = url_ini + path + path_cat
         response = requests.request("GET",url,headers=headers, data=payload, allow_redirects=False)
         od_list = response.json()
         for od in od_list['response']['order_list']:
@@ -109,7 +115,7 @@ class ShopeeConfig(models.Model):
                 }
                 optional = "total_amount,buyer_user_id,buyer_username,recipient_address,buyer_cpf_id,item_list"
                 path_cat = "?access_token=%s&order_sn_list=%s&partner_id=%s&request_order_status_pending=true&response_optional_fields=%s&shop_id=%s&sign=%s&timestamp=%s" %(self.access_token,order_sn, self.shopee_partner_id,optional,self.shopee_id,sign,timest)
-                url = self.url_ini + path + path_cat
+                url = url_ini + path + path_cat
                 response = requests.request("GET",url,headers=headers, data=payload, allow_redirects=False)
                 od_detail = response.json()
                 order_name = ''

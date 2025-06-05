@@ -64,10 +64,9 @@ class MeliConfig(models.Model):
                     ('default_code', '=', 999999),
                 ])
                 prd_name = f"[SEM SKU NO MELI] {prd_name}"
-            else:
-                prod = self.env["product.product"].search([
-                    ('default_code', '=', sku_item),
-                ])
+            prod = self.env["product.product"].search([
+                ('default_code', '=', sku_item),
+            ])
             if not prod:
                 prod = self.env["product.product"].search([
                     ('default_code', '=', 999999),

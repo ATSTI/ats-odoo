@@ -7,10 +7,11 @@ class SaleOrder(models.Model):
     
     def _get_stage_id(self):
         for order in self:
-            if order.tasks_ids:
-                order.task_stage = order.tasks_ids.stage_id.name
-            else:
+            if not order.tasks_ids:
                 order.task_stage = ''
+            for tk in order.tasks_ids:
+                order.task_stage = tk.stage_id.name
+                
     
     task_stage = fields.Char(string='Estagio da Tarefa Engenharia', compute='_get_stage_id', readonly=True)
     libera = fields.Boolean(string="Entrega Liberada pelo Financeiro")

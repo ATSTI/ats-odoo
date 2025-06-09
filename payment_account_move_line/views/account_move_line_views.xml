@@ -151,6 +151,7 @@
         <field name="search_view_id" ref="receivable_view_search"/>
 		<field name="context">{'search_default_open': 1}</field>
 		<field name="domain">[
+			('move_id.financial_move_line_ids', '!=', 'False'),
 			('account_id.internal_type', '=', 'receivable'),
 			('partner_id', '!=', False),
 			('debit', '&gt;', 0),('move_id.state', '=', 'posted'),
@@ -170,6 +171,7 @@
         <field name="search_view_id" ref="payable_view_search"/>
 		<field name="context">{'search_default_open': 1}</field>
 		<field name="domain">[
+			('move_id.financial_move_line_ids', '!=', 'False'),
 			('account_id.internal_type', '=', 'payable'),
 			('partner_id', '!=', False),
 			('credit', '&gt;', 0),('move_id.state', '=', 'posted'),

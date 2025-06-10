@@ -109,49 +109,50 @@ class ProducTemplate(models.Model):
                     print("Produto INATIVO", item_id)
         return True
         # ESSA PARTE FOI REMOVIDA POR PEDIDO DA PROPRIA FELICITA
-        # ESSA É A FUNÇÃO QUE MANDA O PRODUTO PARA O MERCADO LIVRE       
-        headers = {
-            'Authorization': 'Bearer %s' %(self.meli_config_id.access_token),
-            'Content-Type': 'application/x-www-form-urlencoded',
-        }
-        data = '{  \
-            "title":%s,\
-            "category_id":%s,\
-            "price":%s,\
-            "currency_id":"BRL",\
-            "available_quantity":%s,\
-            "buying_mode":"buy_it_now",\
-            "condition":"new",\
-            "listing_type_id":"gold_special",\
-            "sale_terms":[\
-                {\
-                    "id":"WARRANTY_TYPE",\
-                    "value_name":"Garantia do vendedor"\
+        # ESSA É A FUNÇÃO QUE MANDA O PRODUTO PARA O MERCADO LIVRE   
+        if not self.meli_item_id:    
+            headers = {
+                'Authorization': 'Bearer %s' %(self.meli_config_id.access_token),
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+            data = '{  \
+                "title":%s,\
+                "category_id":%s,\
+                "price":%s,\
+                "currency_id":"BRL",\
+                "available_quantity":%s,\
+                "buying_mode":"buy_it_now",\
+                "condition":"new",\
+                "listing_type_id":"gold_special",\
+                "sale_terms":[\
+                    {\
+                        "id":"WARRANTY_TYPE",\
+                        "value_name":"Garantia do vendedor"\
+                    },\
+                    {\
+                        "id":"WARRANTY_TIME",\
+                        "value_name":"%s Dias"   \
+                    }\
+                ],\
+                "pictures":[{\
+                    "source":"https://example.com/imagem.jpg"\
+                    }\
+                ], \
+                "attributes":[\
+                    {\
+                        "id":"BRAND",\
+                        "value_name":"Sem Marca"\
+                    },\
+                ],\
+                "shipping": {\
+                    "mode": "me2",\
+                    "local_pick_up": false,\
+                    "free_shipping": false\
                 },\
-                {\
-                    "id":"WARRANTY_TIME",\
-                    "value_name":"%s Dias"   \
-                }\
-            ],\
-            "pictures":[{\
-                "source":"https://example.com/imagem.jpg"\
-                }\
-            ], \
-            "attributes":[\
-                {\
-                    "id":"BRAND",\
-                    "value_name":"Sem Marca"\
-                },\
-            ],\
-            "shipping": {\
-                "mode": "me2",\
-                "local_pick_up": false,\
-                "free_shipping": false\
-            },\
-            "seller_custom_field": "%s"\
-        }' %(self.title_meli, self.category_meli ,self.price_meli, self.qtd_meli, self.guarantee_meli, self.meli_sku)
-        data = data.encode() 
-        response = requests.post('https://api.mercadolibre.com/items', headers=headers, data=data)
-        item = response.json()
-        print (response.text)
-        self.meli_item_id = item['id']
+                "seller_custom_field": "%s"\
+            }' %(self.title_meli, self.category_meli ,self.price_meli, self.qtd_meli, self.guarantee_meli, self.meli_sku)
+            data = data.encode() 
+            response = requests.post('https://api.mercadolibre.com/items', headers=headers, data=data)
+            item = response.json()
+            print (response.text)
+            self.meli_item_id = item['id']

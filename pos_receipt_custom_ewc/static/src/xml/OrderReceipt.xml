@@ -10,7 +10,7 @@
                 <h2 class="pos-receipt-center-align">
                     EWC COMERCIO DE FLORES E PLANTAS
                 </h2>
-                <p>EWC COMERCIO DE FLORES E PLANTAS</p>
+                <p style="font-size:22px"> <t t-esc="receipt.date.localestring" /></p>
                 <p>CNPJ/CPF: 55.286.946/0001-58</p>
                 <div style="text-align: Left;font-size: 125%;">
                     <t t-if="receipt.company.contact_address">

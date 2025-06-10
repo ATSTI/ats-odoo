@@ -78,7 +78,7 @@ class PosSession(models.Model):
     #     arqx.close()
     
     def baixa_pagamentos(self, move_line_id, journal_id, caixa, valor, cod_forma, juros):
-        if journal_id:
+        if journal_id and journal_id.type in ('cash','bank'):
             invoices = move_line_id
             # amount = self._compute_payment_amount(invoices=invoices) if self.multi else self.amount
             if move_line_id.amount_residual > valor or ((move_line_id.amount_residual - valor) > 0.01):
@@ -315,9 +315,12 @@ class PosSession(models.Model):
                 line = line_ids[2]
                 #if len(prod):
                 #    print (f"ITEM : {line.product_id.default_code}")
-                codpro = str(line['product_id'])
-                prd = prod_obj.search([('default_code', '=', codpro)], limit=1)
+                codpro = line['product_id']
+                prd = prod_obj.search([('id', '=', codpro)], limit=1)
                 descricao  = line['name']
+                if not prd:
+                    if 'Troca' in descricao:
+                        prd = prod_obj.search([('default_code', '=', 'troca')])
                 if not prd:
                     prd = prod_obj.search([('name', 'ilike', line['name'])], limit=1)
                     if len(line['product_id']) < 10 and not prd:
@@ -386,7 +389,8 @@ class PosSession(models.Model):
                 }
                 ped_id.write({'payment_ids': [(0, 0, vals_pag)]})
             if metodo_pag and metodo_pag.name[:2] != '4-' and falha_pag:
-                ped_id.action_pos_order_paid()
+                if jrn and jrn.type in ('cash','bank'):
+                    ped_id.action_pos_order_paid()
             # se a prazo criando a Fatura
             if metodo_pag and metodo_pag.name[:2] == '4-':
                 ped_id.write({'to_invoice': True})
@@ -459,11 +463,17 @@ class PosSession(models.Model):
                         vals['note'] = p['motivo'] 
                         prd['location_id'] = tipo.default_location_src_id.id
                         prd['location_dest_id'] = tipo.default_location_dest_id.id
-                prod = self.search([('default_code', '=', line['product_code'])])
+                prod = self.env['product.product'].search([('id', '=', line['product_code'])])
                 if not prod:
-                    prod = self.search([('name', 'ilike', line['name'])], limit=1)
+                    prod = self.env['product.product'].search([('name', 'ilike', line['name'])], limit=1)
+                if not prod:
+                    print('Produto nao localizado: %s' %(line['name']))
+                    continue
                 prd['product_id'] =  prod.id
-                prd['product_uom_qty'] = line['qty_done'] 
+                qty = line['qty_done']
+                if line['qty_done']<1.0:
+                    qty = 1
+                prd['product_uom_qty'] = qty
                 prd['product_uom'] = prod.uom_id.id
                 prd['quantity_done'] = line['qty_done'] 
                 prd['name'] = line['name']               
@@ -471,10 +481,10 @@ class PosSession(models.Model):
                 vals['move_ids_without_package'] = item
 
                 pos = self.env['stock.picking']
-                pick = pos.sudo().create(vals)
-                pick.action_confirm()
-                pick.action_assign()            
-                pick.button_validate()
+                pick_ids = pos.sudo().create(vals)
+                pick_ids.action_confirm()
+                pick_ids.action_assign()            
+                pick_ids.button_validate()
 
     def insere_sangria(self):
         arquivos = sorted(fnmatch.filter(os.listdir(path_file), "san_*.json"))

@@ -595,22 +595,22 @@ class ImportarWizard(models.TransientModel):
                     cnpj_cpf = ""
                     if rowValues[c_name] or rowValues[c_razao]:
                         vals['name'] = rowValues[c_name] or rowValues[c_razao]
-                    if rowValues[c_ref]:
+                    if len(rowValues) > c_ref - 1 and rowValues[c_ref]:
                         cod = rowValues[c_ref]
                         if type(cod) == float:
                             vals['ref'] = str(int(cod))
                         else:
                             vals['ref'] = cod
-                    else:
-                        # REF e obrigatorio
-                        if mensagem == "":
-                            mensagem += "Sem o campo codigo : <br>"
-                        mensagem += f"{vals['name']}<br>"                        
-                        continue
+                    # else:
+                    #     # REF e obrigatorio
+                    #     if mensagem == "":
+                    #         mensagem += "Sem o campo codigo : <br>"
+                    #     mensagem += f"{vals['name']}<br>"                        
+                    #     continue
                     # if cod and cod == '0000518':
-                    c_id = cli_obj.search([('ref', '=', vals['ref'])])
-                    if c_id:
-                        continue
+                    # c_id = cli_obj.search([('ref', '=', vals['ref'])])
+                    # if c_id:
+                    #     continue
                     c_id = cli_obj.search([('name', 'ilike', vals['name'])])
                     if c_id:
                         continue
@@ -649,8 +649,7 @@ class ImportarWizard(models.TransientModel):
                             vals['rg'] = str(int(rg))
                         else:
                             vals['rg'] = str(rg)
-
-                    if rowValues[c_zip]:
+                    if len(rowValues) > c_zip-1 and rowValues[c_zip]:
                         cep = rowValues[c_zip]
                         if type(cep) == float:
                             cep = str(int(cep))
@@ -1032,7 +1031,7 @@ class ImportarWizard(models.TransientModel):
                                 vals['state_id'] = uf.id
                                 if rowValues[c_city_id]:
                                     city = self.env['res.city'].search([
-                                        ('name', '=', rowValues[c_city_id]),
+                                        ('name', '=', rowValues[c_city_id].strip()),
                                         ('country_id', '=', 31),
                                         ('state_id', '=', uf.id),
                                     ])

@@ -14,8 +14,8 @@ class AccountMove(models.Model):
     def _onchange_comission_value(self):
         for move in self:
             if move.commission_value:
-                value = move.commission_value - move.amount_price_gross
-                value_percent = (value * 100 / move.amount_price_gross) * -1
+                value = move.commission_value - move.amount_untaxed
+                value_percent = (value * 100 / move.amount_untaxed) * -1
                 for line in move.with_context(check_move_validity=False).line_ids:
                     # credito Venda de produtos
                     if line.account_id.user_type_id.internal_group == "income" and line.credit:
@@ -35,8 +35,8 @@ class AccountMove(models.Model):
                 move.update({
                     'amount_tax': value,
                 })
-                move.amount_total = move.amount_price_gross + move.amount_tax
-                move.amount_financial_total = move.amount_price_gross + move.amount_tax
+                move.amount_total = move.amount_untaxed + move.amount_tax
+                move.amount_financial_total = move.amount_untaxed + move.amount_tax
                 move.amount_residual = move.amount_financial_total
 
     def button_dummy(self): 

@@ -23,7 +23,7 @@ class SaleOrder(models.Model):
                 for line in order.order_line:
                     line.ipi_percent = value_percent
                     line.ipi_value = value
-                    line.amount
+                    # line.amount
                 order.amount_total = order.amount_price_gross + order.amount_tax
                 order.amount_financial_total = order.amount_price_gross + order.amount_tax
 

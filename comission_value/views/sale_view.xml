@@ -7,14 +7,14 @@
             <field name="inherit_id" ref="l10n_br_sale.l10n_br_sale_order_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='note']" position="after">
-                    <group>
-                        <div class="o_row">
+                    <div class="o_row">
+                        <group>
                             <field name="commission_value" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                             <button name="button_dummy"
                                 states="draft,sent" string="Atualizar" type="object"
                                 class="oe_edit_only btn-primary"/>
-                        </div>
-                    </group>
+                        </group>
+                    </div>
                 </xpath>
             </field>
         </record>

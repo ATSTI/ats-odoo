@@ -18,7 +18,7 @@ Module to manage discount on total amount in Sale.
 """,
     'depends': [
         'l10n_br_sale',
-        # 'l10n_br_delivery',
+        'l10n_br_account',
                 ],
     'data': [
         'views/sale_view.xml',

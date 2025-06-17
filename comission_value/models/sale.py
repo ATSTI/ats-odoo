@@ -15,17 +15,18 @@ class SaleOrder(models.Model):
     def _onchange_comission_value(self):
         for order in self:
             if order.commission_value:
-                value = order.commission_value - order.amount_price_gross
-                value_percent = (value * 100 / order.amount_price_gross) * -1
-                order.update({
-                    'amount_tax': value,
-                })
-                for line in order.order_line:
-                    line.ipi_percent = value_percent
-                    line.ipi_value = value
-                    # line.amount
-                order.amount_total = order.amount_price_gross + order.amount_tax
-                order.amount_financial_total = order.amount_price_gross + order.amount_tax
+                value = order.amount_price_gross - order.commission_value
+                # value_percent = (value * 100 / order.amount_price_gross) * -1
+                # order.update({
+                #     'amount_tax': value,
+                # })
+                # for line in order.order_line:
+                #     line.ipi_percent = value_percent
+                #     line.ipi_value = value
+                #     # line.amount
+                order.amount_other_value = value
+                order.amount_total = order.commission_value
+                order.amount_financial_total = order.commission_value
 
     def _prepare_invoice(self, ):
         invoice_vals = super(SaleOrder, self)._prepare_invoice()

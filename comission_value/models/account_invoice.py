@@ -15,14 +15,13 @@ class AccountMove(models.Model):
     @api.onchange('commission_value')
     def _onchange_comission_value(self):        
         for move in self:
-            import pudb;pu.db
             if move.commission_value:
                 if move.commission == False:
                     move.commission = True
                     return {
                         'warning': {
                             'title': "Aviso",
-                            'message': "Você digitou 'aviso', só um alerta...",
+                            'message': "Insira Novamente o Valor da Comissão",
                         }
                     }
                 value = move.commission_value - move.amount_untaxed

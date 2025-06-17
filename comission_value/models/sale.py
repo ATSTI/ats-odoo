@@ -37,6 +37,7 @@ class SaleOrder(models.Model):
     
     def _create_invoices(self, grouped=False, final=False, date=None):
         invoice = super()._create_invoices(grouped=grouped, final=final, date=date)
+        invoice.comission = True
         invoice._onchange_comission_value()
         return invoice
 

@@ -10,13 +10,21 @@ class AccountMove(models.Model):
 
     commission_value = fields.Float('Comissão', digits=dp.get_precision('Account'),
                                 readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
+    commission = fields.Boolean('Comissão', invisible=True)
 
     @api.onchange('commission_value')
     def _onchange_comission_value(self):        
         for move in self:
+            import pudb;pu.db
             if move.commission_value:
-                if not move.amount_price_gross:
-                    raise UserError(_(f"Insira Novamente o Valor de Comissão"))
+                if move.commission == False:
+                    move.commission = True
+                    return {
+                        'warning': {
+                            'title': "Aviso",
+                            'message': "Você digitou 'aviso', só um alerta...",
+                        }
+                    }
                 value = move.commission_value - move.amount_untaxed
                 # value_percent = (value * 100 / move.amount_untaxed) * -1
                 value_comission = move.commission_value / len(move.invoice_line_ids)
@@ -44,9 +52,7 @@ class AccountMove(models.Model):
                         line.debit = move.commission_value
                         
 
-                move.update({
-                    'amount_other_value': value * -1 ,
-                })
+                move.amount_other_value = value * -1
                 move.amount_total = move.commission_value
                 move.amount_financial_total = move.commission_value
                 move.amount_residual = move.amount_financial_total

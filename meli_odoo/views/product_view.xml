@@ -20,12 +20,12 @@
                                 <field name="price_meli" attrs="{'invisible': [('meli', '=', False)]}"/>
                                 <field name="qtd_meli" attrs="{'invisible': [('meli', '=', False)]}"/>
                                 <field name="meli_sku" attrs="{'invisible': [('meli', '=', False)]}"/>
-                                <!-- <field name="category_meli" attrs="{'invisible': [('meli', '=', False)]}"/>
-                                <field name="guarantee_meli" attrs="{'invisible': [('meli', '=', False)]}"/> -->
+                                <field name="category_meli" attrs="{'invisible': [('meli', '=', False)]}"/>
+                                <field name="guarantee_meli" attrs="{'invisible': [('meli', '=', False)]}"/>
                                 <!-- <field name="image_meli" attrs="{'invisible': [('meli', '=', False)]}"/> -->
                             </group>
                             <group>
-                                <button name="action_envia_produto_meli" string="Atualizar Preço/Estoque no Mercado Livre" type="object" class="btn btn-primary" attrs="{'invisible': [('meli', '=', False)]}"/>
+                                <button name="action_envia_produto_meli" string=" Enviar Produto para Mercado Livre" type="object" class="btn btn-primary" attrs="{'invisible': [('meli', '=', False)]}"/>
                                 <field name="meli_item_id" attrs="{'invisible': [('meli', '=', False)]}" readonly="1"/>
                             </group>
                         </group>

@@ -42,4 +42,4 @@ class SaleOrder(models.Model):
         return invoice
 
     def button_dummy(self): 
-        return self._comission_value()
+        return self._onchange_comission_value()

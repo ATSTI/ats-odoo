@@ -110,7 +110,7 @@ class PosSession(models.Model):
                 'payment_difference_handling': baixar_tudo,
                 'writeoff_label': 'importados'
             }
-            Payment = dest.env['account.payment']        
+            Payment = self.env['account.payment']        
             pay = Payment.create(vals)
             pay.post()
    
@@ -251,7 +251,6 @@ class PosSession(models.Model):
             vals['date_order'] = ped['date_order'][:19]
             cli_n = ped['nomecliente']
             #if vals['name'] == '23-351':
-            #    import pudb;pu.db
             if ped['nomecliente'] == 'Cliente do Sistema':
                 cli_n = 'Consumidor'
             prt = prt_obj.search([('name', 'ilike', cli_n)], limit=1)
@@ -316,14 +315,17 @@ class PosSession(models.Model):
                 #if len(prod):
                 #    print (f"ITEM : {line.product_id.default_code}")
                 codpro = line['product_id']
-                prd = prod_obj.search([('id', '=', codpro)], limit=1)
+                if isinstance(codpro, int):
+                    prd = prod_obj.search([('id', '=', codpro)], limit=1)
+                else:
+                    prd = prod_obj.search([('default_code', '=', codpro)], limit=1)
                 descricao  = line['name']
                 if not prd:
                     if 'Troca' in descricao:
                         prd = prod_obj.search([('default_code', '=', 'troca')])
                 if not prd:
                     prd = prod_obj.search([('name', 'ilike', line['name'])], limit=1)
-                    if len(line['product_id']) < 10 and not prd:
+                    if len(str(line['product_id'])) < 10 and not prd:
                         prd = prod_obj.search([('id', '=', line['product_id'])])
                     if not prd:
                         prd = prod_obj.search([('default_code', '=', '321')])

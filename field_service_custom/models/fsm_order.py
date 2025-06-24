@@ -73,3 +73,12 @@ class FSMOrder(models.Model):
             res.name = f'{name} {res.name}'
         res._create_calendar_event()
         return res
+    
+
+    def account_create_invoice(self):
+        import pudb;pu.db
+        invoice_vals = self.account_prepare_invoice()
+        invoice = self.env["account.move"].sudo().create(invoice_vals)
+
+        self.account_stage = "invoiced"
+        return invoice

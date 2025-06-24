@@ -388,6 +388,7 @@ class IntegracaoPdv(http.Controller):
         ], order='date_maturity')
         #print('Diarios :' + cj.name + ',' + cj_p.name)
         vlr = float(valor_pago)
+        juro = juro.replace(',', '.')
         juros = float(juro)
         vlr = vlr - juros
         vlr_baixado = '0.00'

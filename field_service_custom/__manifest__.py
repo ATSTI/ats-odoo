@@ -29,8 +29,9 @@
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['fieldservice', 'hr', 'base'],
+    'depends': ['fieldservice', 'hr', 'base', 'fieldservice_isp_account'],
     'data': [
+        'views/fsm_order_view.xml',
         'views/res_partner_view.xml',
     ],
     'installable': True,

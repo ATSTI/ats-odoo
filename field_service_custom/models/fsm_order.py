@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import fields, models, _, api
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from datetime import datetime, timedelta
 
 class FSMOrder(models.Model):
@@ -74,11 +74,107 @@ class FSMOrder(models.Model):
         res._create_calendar_event()
         return res
     
+    def account_prepare_invoice(self):
+        jrnl = self.env["account.journal"].search(
+            [
+                ("company_id", "=", self.env.company.id),
+                ("type", "=", "sale"),
+                ("active", "=", True),
+            ],
+            limit=1,
+        )
+        if self.bill_to == "contact":
+            if not self.customer_id:
+                raise ValidationError(_("Customer empty"))
+            fpos = self.customer_id.property_account_position_id
+            invoice_vals = {
+                "partner_id": self.customer_id.id,
+                "move_type": "out_invoice",
+                "journal_id": jrnl.id or False,
+                "fiscal_position_id": fpos.id or False,
+                "fsm_order_ids": [(4, self.id)],
+            }
+            price_list = self.customer_id.property_product_pricelist
+
+        else:
+            fpos = self.location_id.customer_id.property_account_position_id
+            invoice_vals = {
+                "partner_id": self.location_id.customer_id.id,
+                "move_type": "out_invoice",
+                "journal_id": jrnl.id or False,
+                "fiscal_position_id": fpos.id or False,
+                "fsm_order_ids": [(4, self.id)],
+                "company_id": self.env.company.id,
+            }
+            price_list = self.location_id.customer_id.property_product_pricelist
+
+        invoice_line_vals = []
+        for cost in self.contractor_cost_ids:
+            if jrnl.id == 23:
+                break
+            price = price_list.get_product_price(
+                product=cost.product_id,
+                quantity=cost.quantity,
+                partner=invoice_vals.get("partner_id"),
+                date=False,
+                uom_id=False,
+            )
+            template = cost.product_id.product_tmpl_id
+            accounts = template.get_product_accounts()
+            account = accounts["income"]
+            taxes = template.taxes_id
+            tax_ids = fpos.map_tax(taxes)
+            invoice_line_vals.append(
+                (
+                    0,
+                    0,
+                    {
+                        "product_id": cost.product_id.id,
+                        "analytic_account_id": self.location_id.analytic_account_id.id,
+                        "quantity": cost.quantity,
+                        "name": cost.product_id.display_name,
+                        "price_unit": price,
+                        "account_id": account.id,
+                        "fsm_order_ids": [(4, self.id)],
+                        "tax_ids": [(6, 0, tax_ids.ids)],
+                    },
+                )
+            )
+        for line in self.employee_timesheet_ids:
+            price = price_list.get_product_price(
+                product=line.product_id,
+                quantity=line.unit_amount,
+                partner=invoice_vals.get("partner_id"),
+                date=False,
+                uom_id=False,
+            )
+            template = line.product_id.product_tmpl_id
+            accounts = template.get_product_accounts()
+            account = accounts["income"]
+            taxes = template.taxes_id
+            tax_ids = fpos.map_tax(taxes)
+            invoice_line_vals.append(
+                (
+                    0,
+                    0,
+                    {
+                        "product_id": line.product_id.id,
+                        "analytic_account_id": line.account_id.id,
+                        "quantity": line.unit_amount,
+                        "name": line.name,
+                        "price_unit": price,
+                        "account_id": account.id,
+                        "fsm_order_ids": [(4, self.id)],
+                        "tax_ids": [(6, 0, tax_ids.ids)],
+                    },
+                )
+            )
+        invoice_vals.update({"invoice_line_ids": invoice_line_vals})
+        return invoice_vals
 
     def account_create_invoice(self):
-        import pudb;pu.db
         invoice_vals = self.account_prepare_invoice()
         invoice = self.env["account.move"].sudo().create(invoice_vals)
-
+        invoice.action_post()
         self.account_stage = "invoiced"
         return invoice

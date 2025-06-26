@@ -175,6 +175,10 @@ class FSMOrder(models.Model):
     def account_create_invoice(self):
         invoice_vals = self.account_prepare_invoice()
         invoice = self.env["account.move"].sudo().create(invoice_vals)
+        invoice.payment_reference = self.name
+        # for line in invoice.invoice_line_ids:
+        #     line.fiscal_operation_id = invoice.fiscal_operation_id.id
+        #     line._onchange_product_id_fiscal()
         invoice.action_post()
         self.account_stage = "invoiced"
         return invoice

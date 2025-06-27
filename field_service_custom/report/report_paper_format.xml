@@ -8,6 +8,16 @@
         name="field_service_custom.report_lavanderia_document"
         file="field_service_custom.report_lavanderia_document"
     />
+
+    <report
+        id="report_cliente_document_id"
+        string="Impressão p/ Cliente"
+        model="account.move"
+        report_type="qweb-pdf"
+        name="field_service_custom.report_cliente_document"
+        file="field_service_custom.report_cliente_document"
+    />
+
     <record id="termica_paperformat_id" model="report.paperformat">
         <field name="name">Impressora Termica</field>
         <field name="default" eval="True"/>

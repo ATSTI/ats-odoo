@@ -29,11 +29,12 @@
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['fieldservice', 'hr', 'base', 'fieldservice_isp_account', 'l10n_br_fiscal'],
+    'depends': ['fieldservice', 'hr', 'base', 'account', 'fieldservice_isp_account', 'l10n_br_fiscal'],
     'data': [
         'views/fsm_order_view.xml',
         'views/res_partner_view.xml',
         'report/report_paper_format.xml',
+        'report/report_cliente.xml',
         'report/report_lavanderia.xml',
     ],
     'installable': True,

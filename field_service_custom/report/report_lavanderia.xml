@@ -54,13 +54,13 @@
                     </h5>
                 </div>
                 <div class="page">
-                    <h3>
+                    <h5>
                         <strong style="font-size:14px">
                             <span t-field="o.narration"/>
                         </strong>
                         <br/>
                         -----------------------------------------------------<br/>
-                    </h3>
+                    </h5>
 
                     <!-- <div id="informations" class="row mt-4 mb-4">
                         <div class="col-auto col-3 mw-100 mb-2" t-if="o.invoice_date_due and o.move_type == 'out_invoice' and o.state == 'posted'" name="due_date">
@@ -137,7 +137,7 @@
                                             <span class="text-nowrap" t-field="line.price_total" groups="account.group_show_line_subtotals_tax_included"/>
                                         </td>
                                     </t>
-                                    <t t-if="line.name != line.product_id.name">
+                                    <t t-if="line.name and line.name not in line.product_id.name">
                                         <tr>
                                             <td style="border: 1px solid; width:100%; height: 30px;" colspan="4" class="text-left">
                                                 <strong>OBS: <p/></strong>
@@ -175,7 +175,9 @@
                             </t>
                         </tbody>
                     </table>
+                    <h5>
                     -----------------------------------------------------<br/>
+                    </h5>
                     <div class="clearfix">
                         <div id="total" class="row">
                             <div t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ml-auto">
@@ -226,7 +228,9 @@
                             </div>
                         </div>
                     </div>
+                    <h5>
                     -----------------------------------------------------<br/>
+                    </h5>
                     <br/>
                     <br/>
                     <br/>

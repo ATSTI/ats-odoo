@@ -61,7 +61,7 @@
                                 <t t-set="current_subtotal" t-value="current_subtotal + line.price_total" groups="account.group_show_line_subtotals_tax_included"/>
                                 <tr>
                                     <td style="text-align: left;">
-                                        <span t-field="line.name" />
+                                        <span t-field="line.product_id.name" />
                                     </td>
                                     <td style="text-align: center;">
                                         <span t-field="line.quantity" />
@@ -73,7 +73,17 @@
                                         <span t-field="line.price_subtotal" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
                                     </td>
                                 </tr>
-
+                                <t t-if="line.name and line.name not in line.product_id.name">
+                                    <tr>
+                                        <td style="border: 1px solid; width:100%; height: 30px;" colspan="4" class="text-left">
+                                            <strong>OBS: <p/></strong>
+                                            <span t-field="line.name" t-options="{'widget': 'text'}"/>
+                                        </td>
+                                        <td/>
+                                        <td/>
+                                        <td/>
+                                    </tr>
+                                </t>
                                 <t t-if="current_section and (line_last or lines[line_index+1].display_type == 'line_section')">
                                     <tr class="is-subtotal text-right">
                                         <td colspan="99">

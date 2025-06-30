@@ -110,8 +110,8 @@ class FSMOrder(models.Model):
 
         invoice_line_vals = []
         for cost in self.contractor_cost_ids:
-            # DEPENDE DE QUAL O ID QUE VEM NA BASE, DEMO-MSM: 15
-            if jrnl.id == 15:
+            # DEPENDE DE QUAL O ID QUE VEM NA BASE, DEMO-MSM: 23
+            if jrnl.id == 23:
                 break
             price = price_list.get_product_price(
                 product=cost.product_id,
@@ -183,3 +183,10 @@ class FSMOrder(models.Model):
         invoice.action_post()
         self.account_stage = "invoiced"
         return invoice
+
+    def create_bills(self):
+        vals = self.prepare_bills()
+        fornecedor = self.env["account.move"].sudo().create(vals)
+        fornecedor.invoice_date = datetime.now()
+        fornecedor.action_post()
+        return fornecedor

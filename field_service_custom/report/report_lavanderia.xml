@@ -34,7 +34,7 @@
                     </h5>
                     <h5>
                         <t t-if="o.partner_id">
-                            -------------------------------------------------------------------------<br/>
+                            -----------------------------------------------------<br/>
                             <strong>CLIENTE: <t t-esc="o.partner_id.name"/></strong>
                             <br/>
                             <strong>Endereço: </strong>
@@ -49,17 +49,17 @@
                             <strong>CEP: </strong>
                             <t t-esc="o.partner_id.zip"/>
                             <br/>
-                            -------------------------------------------------------------------------<br/>
+                            -----------------------------------------------------<br/>
                         </t>
                     </h5>
                 </div>
                 <div class="page">
                     <h3>
-                        <strong>
+                        <strong style="font-size:14px">
                             <span t-field="o.narration"/>
                         </strong>
                         <br/>
-                        -------------------------------------------------------------------------<br/>
+                        -----------------------------------------------------<br/>
                     </h3>
 
                     <!-- <div id="informations" class="row mt-4 mb-4">
@@ -117,7 +117,7 @@
                                 <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''" style="line-height: 1.8;">
                                     <t t-if="not line.display_type" name="account_invoice_line_accountable">
                                         <td name="account_invoice_line_name">
-                                            <span t-field="line.name" t-options="{'widget': 'text'}"/>
+                                            <span t-field="line.product_id.name" t-options="{'widget': 'text'}"/>
                                         </td>
                                         <td class="text-right">
                                             <span t-esc="round(line.quantity, 0)"/>
@@ -137,11 +137,11 @@
                                             <span class="text-nowrap" t-field="line.price_total" groups="account.group_show_line_subtotals_tax_included"/>
                                         </td>
                                     </t>
-                                    <t t-if="line.product_id.description">
+                                    <t t-if="line.name != line.product_id.name">
                                         <tr>
                                             <td style="border: 1px solid; width:100%; height: 30px;" colspan="4" class="text-left">
                                                 <strong>OBS: <p/></strong>
-                                                <span t-field="line.product_id.description" t-options="{'widget': 'text'}"/>
+                                                <span t-field="line.name" t-options="{'widget': 'text'}"/>
                                             </td>
                                             <td/>
                                             <td/>
@@ -175,7 +175,7 @@
                             </t>
                         </tbody>
                     </table>
-                    -------------------------------------------------------------------------<br/>
+                    -----------------------------------------------------<br/>
                     <div class="clearfix">
                         <div id="total" class="row">
                             <div t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ml-auto">
@@ -226,11 +226,11 @@
                             </div>
                         </div>
                     </div>
-                    -------------------------------------------------------------------------<br/>
+                    -----------------------------------------------------<br/>
                     <br/>
                     <br/>
                     <br/>
-                    <table style="border: 0px solid; width:100%">
+                    <table style="width:100%">
                         <tr>
                             <td style="text-align: center; font-size: 14px; height: 30px; width: 100%;">
                                 <strong>______________________________</strong>
@@ -244,7 +244,7 @@
                     </table>
                     <br/>
                     <br/>
-                    <table style="border: 1px solid; width:100%">
+                    <table style="width:100%">
                         <tr>
                             <td style="text-align: left; font-size: 14px; height: 70px; width: 100%;">
                                 <strong>Prazo máximo para retirada: 45 dias.<p/>

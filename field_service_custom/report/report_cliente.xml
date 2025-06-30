@@ -8,10 +8,10 @@
                 <div class="page">
                     <div class="oe_structure"/>
                     <br/>
-                    <table style="border: 0px solid; width:49%; height: 60px;float: left;">
+                    <table style="width:49%; height: 60px;float: left;">
                         <tr><td style="height: 30px"></td></tr>
                         <tr>
-                            <td style="text-align: left; border: 0px solid; width:100%" >
+                            <td style="text-align: left; width:100%" >
                                 <b style="font-size:18px" t-field="o.company_id.name"/>                                
                                 <br/> <span t-field="o.company_id.street"/>, <span t-field="o.company_id.street_number"/>
                                 <br/> <span t-field="o.company_id.district"/> - <span t-field="o.company_id.city_id.name"/>;
@@ -23,9 +23,9 @@
                             </td>
                         </tr>
                     </table>
-                    <table style="border: 0px solid; width:49%; height: 30px;text-align: right;">
+                    <table style="width:49%; height: 30px;text-align: right;">
                         <tr>
-                            <td style="border: 0px solid; width:40%">
+                            <td style="width:40%">
                                 <div style="width: 100%;float: right;">
                                     <img t-attf-src="data:image/*;base64,{{o.company_id.logo}}"
                                         t-att-alt="o.company_id.name" style="width:50%; height:50%"/>
@@ -36,7 +36,7 @@
                     <br/>
                     <br/>
                     <t t-set="display_discount" t-value="any(l.discount for l in o.invoice_line_ids)"/>
-                    <table style="border: 0px solid; width:100%;" name="invoice_line_table">
+                    <table style="width:100%;" name="invoice_line_table">
                         <thead>
                             <tr>
                                 <th name="th_description" style="width: 50%; text-align: left;"><span>Item</span></th>
@@ -97,7 +97,7 @@
                                             <span t-field="o.amount_untaxed"/>
                                         </td>
                                     </tr>
-                                    <t t-foreach="o.amount_by_group" t-as="amount_by_group">
+                                    <!-- <t t-foreach="o.amount_by_group" t-as="amount_by_group">
                                         <tr style="">
                                             <t t-if="len(o.line_ids.filtered(lambda line: line.tax_line_id)) in [0, 1] and float_compare(o.amount_untaxed, amount_by_group[2], precision_rounding=o.currency_id.rounding) == 0">
                                                 <td><span class="text-nowrap" t-esc="amount_by_group[0]"/></td>
@@ -117,7 +117,7 @@
                                                 </td>
                                             </t>
                                         </tr>
-                                    </t>
+                                    </t> -->
                                     <tr class="border-black o_total">
                                         <td><strong>Total: </strong></td>
                                         <td class="text-right">

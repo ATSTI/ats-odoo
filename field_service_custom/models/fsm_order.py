@@ -110,7 +110,8 @@ class FSMOrder(models.Model):
 
         invoice_line_vals = []
         for cost in self.contractor_cost_ids:
-            if jrnl.id == 23:
+            # DEPENDE DE QUAL O ID QUE VEM NA BASE, DEMO-MSM: 15
+            if jrnl.id == 15:
                 break
             price = price_list.get_product_price(
                 product=cost.product_id,

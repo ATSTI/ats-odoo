@@ -9,7 +9,6 @@ class FSMPerson(models.Model):
 
     @api.onchange('name')
     def _onchange_name(self):
-        import pudb;pu.db
         if self.name:
             prt = self.env['res.partner'].search([
                 ('name', '=', self.name),

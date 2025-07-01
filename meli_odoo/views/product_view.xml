@@ -20,8 +20,8 @@
                                 <field name="price_meli" attrs="{'invisible': [('meli', '=', False)]}"/>
                                 <field name="qtd_meli" attrs="{'invisible': [('meli', '=', False)]}"/>
                                 <field name="meli_sku" attrs="{'invisible': [('meli', '=', False)]}"/>
-                                <field name="category_meli" attrs="{'invisible': [('meli', '=', False)]}"/>
-                                <field name="guarantee_meli" attrs="{'invisible': [('meli', '=', False)]}"/>
+                                <!-- <field name="category_meli" attrs="{'invisible': [('meli', '=', False)]}"/>
+                                <field name="guarantee_meli" attrs="{'invisible': [('meli', '=', False)]}"/> -->
                                 <!-- <field name="image_meli" attrs="{'invisible': [('meli', '=', False)]}"/> -->
                             </group>
                             <group>

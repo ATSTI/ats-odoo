@@ -18,26 +18,26 @@ class ProducTemplate(models.Model):
     meli_sku = fields.Char('SKU Mercado Livre')
     price_meli = fields.Float('Preço Mercado Livre')
     qtd_meli = fields.Float('Quantidade Disponivel Mercado Livre')
-    # category_meli = fields.Selection([
-    #     # CATEGORIAS MERCADO LIVRE (VITTON)
-    #     ('MLB455528', 'Agasalhos'),
-    #     ('MLB188064', 'Bermudas e Shorts'),
-    #     ('MLB23262', 'Calçados'),
-    #     ('MLB188065', 'Calças'),
-    #     ('MLB107292', 'Camisas'),
-    #     ('MLB278018', 'Leggings'),
-    #     ('MLB27250', 'Macacão'),
-    #     ('MLB270215', 'Moda Fitness'),
-    #     #TODO ADICIONAR TODAS CATEGORIAS UTILIZADAS NO MERCADO LIVRE
-    # ],'Categoria Mercado Livre')
-    # guarantee_meli = fields.Selection([
-    #     ('0', 'Sem Garantia'),
-    #     ('30', '30 dias'),
-    #     ('60', '60 dias'),
-    #     ('90', '90 dias'),
-    #     ('120', '120 dias'),
-    #     ('180', '180 dias'),
-    #     ('360', '360 dias'),    ], string='Garantia do Comprador', default='0')
+    category_meli = fields.Selection([
+        # CATEGORIAS MERCADO LIVRE (VITTON)
+        ('MLB455528', 'Agasalhos'),
+        ('MLB188064', 'Bermudas e Shorts'),
+        ('MLB23262', 'Calçados'),
+        ('MLB188065', 'Calças'),
+        ('MLB107292', 'Camisas'),
+        ('MLB278018', 'Leggings'),
+        ('MLB27250', 'Macacão'),
+        ('MLB270215', 'Moda Fitness'),
+        #TODO ADICIONAR TODAS CATEGORIAS UTILIZADAS NO MERCADO LIVRE
+    ],'Categoria Mercado Livre')
+    guarantee_meli = fields.Selection([
+        ('0', 'Sem Garantia'),
+        ('30', '30 dias'),
+        ('60', '60 dias'),
+        ('90', '90 dias'),
+        ('120', '120 dias'),
+        ('180', '180 dias'),
+        ('360', '360 dias'),    ], string='Garantia do Comprador', default='0')
     # image_meli = fields.Char('Imagem Mercado Livre')
     meli_config_id = fields.Many2one('meli.config', 'Mercado Livre')
 

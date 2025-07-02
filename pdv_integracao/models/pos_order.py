@@ -330,23 +330,18 @@ class PosSession(models.Model):
                 # if not len(prod):
                 #if len(prod):
                 #    print (f"ITEM : {line.product_id.default_code}")
-                codpro = str(line['product_id'])
-                prd = prod_obj.search([('default_code', '=', codpro)])
-                try:
-                    int(codpro)
+                codpro = line['product_id']
+                if isinstance(codpro, int):
                     prd = prod_obj.search([('id', '=', codpro)], limit=1)
-                except:
-                    prd = prod_obj.search([('default_code', 'ilike', codpro)], limit=1)
+                else:
+                    prd = prod_obj.search([('default_code', '=', str(codpro))], limit=1)
                 descricao  = line['name']
                 if not prd:
                     prd = prod_obj.search([('name', 'ilike', line['name'])], limit=1)
-                    # if len(line['product_id']) < 10 and not prd:
-                    #     prd = prod_obj.search([('id', '=', line['product_id'])])
+                    if len(str(line['product_id'])) < 10 and not prd:
+                        prd = prod_obj.search([('id', '=', line['product_id'])])
                     if not prd:
-                        if 'Troca' in line['name']:
-                            prd = prod_obj.search([('default_code', '=', 'troca')])
-                    if not prd:
-                        prd = prod_obj.search([('default_code', '=', 'DISC')])
+                        prd = prod_obj.search([('default_code', '=', '321')])
                         descricao = f"{descricao} - PRODUTO NAO LOCALIZADO"
                 #TODO buscar pelo codigo nao id
                 # px = line['product_id']

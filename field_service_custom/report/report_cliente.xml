@@ -16,10 +16,8 @@
                                 <br/> <span t-field="o.company_id.street"/>, <span t-field="o.company_id.street_number"/>
                                 <br/> <span t-field="o.company_id.district"/> - <span t-field="o.company_id.city_id.name"/>;
                                 <br/>
-                                <br/> <span>Data de coleta: <span t-field="o.invoice_date"/></span>
                                 <br/> <span>Cod.:</span>
-                                <br/> <span>Data prevista de entrega: <span t-field="o.invoice_date_due"/></span>
-                                <br/> <span>Hora prevista de entrega:</span>
+                                <br/> <span t-field="o.narration"></span>
                             </td>
                         </tr>
                     </table>

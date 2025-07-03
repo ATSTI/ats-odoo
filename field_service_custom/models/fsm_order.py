@@ -34,7 +34,8 @@ class FSMOrder(models.Model):
                 self.write({'employee_timesheet_ids': [(0, 0, vals_line)]})
             if self.employee_timesheet_ids:
                 for line in self.employee_timesheet_ids:
-                    line.name = f'{line.product_id.name}'          
+                    line.name = f'{line.product_id.name}'
+                    line.unit_amount = 1         
 
     def write(self, vals):
         res = super(FSMOrder, self).write(vals)

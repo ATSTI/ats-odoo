@@ -176,7 +176,10 @@ class MeliConfig(models.Model):
                 state_buyer = address.get('state', {}).get('name')
                 zip_buyer = address.get('zip_code')
             name_buyer = f"{first_name} {order.get('buyer', {}).get('last_name')}"
-            order_name = order.get('pack_id')
+            if not order.get('pack_id'):
+                order_name = str(order.get('id'))
+            else:
+                order_name = str(order.get('pack_id'))
             order_idd = order.get('id')
             url = f'https://api.mercadolibre.com/orders/{order_idd}/billing_info'
             hd = {

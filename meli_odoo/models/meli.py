@@ -64,9 +64,10 @@ class MeliConfig(models.Model):
                     ('default_code', '=', 999999),
                 ])
                 prd_name = f"[SEM SKU NO MELI] {prd_name}"
-            prod = self.env["product.product"].search([
-                ('default_code', '=', sku_item),
-            ])
+            if sku_item:
+                prod = self.env["product.product"].search([
+                    ('default_code', '=', sku_item),
+                ])
             if not prod:
                 prod = self.env["product.product"].search([
                     ('default_code', '=', 999999),
@@ -76,8 +77,8 @@ class MeliConfig(models.Model):
                 prod.meli = True
                 prod.meli_sku = sku_item
                 prod.title_meli = prd_name
-                prod.category_meli = categ
-                prod.categ_meli_id = categ_item
+                # prod.category_meli = categ
+                # prod.categ_meli_id = categ_item
                 prod.meli_config_id = self.id
                 prod.meli_item_id = id_item
             vals_line = {
@@ -93,7 +94,7 @@ class MeliConfig(models.Model):
                 for line in pedido.order_line:
                     prd_price = line.price_unit
                     prd_name = line.name
-                    if pedido.name == str(order['id']):
+                    if pedido.name == str(order.get('pack_id')):
                         line.write(
                             {'price_unit': prd_price,'name': prd_name}
                         )
@@ -175,8 +176,9 @@ class MeliConfig(models.Model):
                 state_buyer = address.get('state', {}).get('name')
                 zip_buyer = address.get('zip_code')
             name_buyer = f"{first_name} {order.get('buyer', {}).get('last_name')}"
-            order_name = order['id']
-            url = f'https://api.mercadolibre.com/orders/{order_name}/billing_info'
+            order_name = order.get('pack_id')
+            order_idd = order.get('id')
+            url = f'https://api.mercadolibre.com/orders/{order_idd}/billing_info'
             hd = {
                 'Authorization': f'Bearer {self.access_token}',
                 'x-version': '2'

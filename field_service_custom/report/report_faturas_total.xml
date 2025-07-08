@@ -73,12 +73,12 @@
                             <td style="border: 1px solid #dcdcdc; height:27px;  border-collapse: collapse; font-size:12px;text-align: center; width: 20%">
                                 <span>Data da Fatura: <b><t t-esc="o.invoice_date"/></b></span>
                             </td>
-                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 60%">
+                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 40%">
+                                <span>Cliente: <b style="font-size:15px;" t-field="o.partner_id.name"/></span>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 40%">
                                 <span>Pedido: <b style="font-size:15px;" t-field="o.name"/></span>
                             </td>
-                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; width: 10%"></td>
-                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; width: 5%"></td>
-                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; width: 5%"></td>
                         </tr>
                     </table>
                     <table style="border: 1px solid #dcdcdc; border-collapse: collapse; font-size:14px;width: 100%;">

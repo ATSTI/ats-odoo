@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 class FSMOrder(models.Model):
     _inherit = "fsm.order"
 
+    loc_location = fields.Char(related="location_id.partner_id.contact_address", string="Endereço do Local")
+
     @api.onchange('person_id')
     def _onchange_person_id(self):
         if self.person_id:

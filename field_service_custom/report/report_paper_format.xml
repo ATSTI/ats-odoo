@@ -18,6 +18,15 @@
         file="field_service_custom.report_cliente_document"
     />
 
+    <report
+        id="report_account_document_id"
+        string="Faturamento Total"
+        model="account.move"
+        report_type="qweb-pdf"
+        name="field_service_custom.report_account_fullist"
+        file="field_service_custom.report_account_fullist"
+    />
+
     <record id="termica_paperformat_id" model="report.paperformat">
         <field name="name">Impressora Termica</field>
         <field name="default" eval="True"/>

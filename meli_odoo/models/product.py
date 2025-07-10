@@ -3,6 +3,7 @@ from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 from datetime import datetime, timedelta, date
 import requests
+import time
 
 
 class ProducTemplate(models.Model):
@@ -50,6 +51,77 @@ class ProducTemplate(models.Model):
             self.price_meli = self.list_price 
             self.qtd_meli = 1
 
+    def encontrar_item_por_sku(self):
+        user_id = self.meli_config_id.user_id
+        access_token = self.meli_config_id.access_token
+        sku_alvo = self.meli_sku
+
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
+
+        max_iter = 2200  # limite para evitar loop infinito, ajuste conforme necessário
+        iter_count = 0
+        scroll_id = None
+        todos_ids = []
+
+        while True:
+            url = f"https://api.mercadolibre.com/users/{user_id}/items/search?search_type=scan"
+            if scroll_id:
+                url += f"&scroll_id={scroll_id}"
+
+            response = requests.get(url, headers=headers)
+            if response.status_code != 200:
+                print(f"Erro na busca com scroll: {response.status_code} - {response.text}")
+                break
+
+            data = response.json()
+            results = data.get("results", [])
+            if not results:
+                break
+
+            todos_ids.extend(results)
+            scroll_id = data.get("scroll_id")
+            if not scroll_id:
+                break
+
+            iter_count += 1
+            if iter_count >= max_iter:
+                print("Atingiu máximo de iterações, saindo do loop para evitar loop infinito.")
+                break
+
+            time.sleep(0.1)
+
+        # 2. Processar os itens em lotes de 20
+        for i in range(0, len(todos_ids), 20):
+            batch_ids = todos_ids[i:i+20]
+            ids_str = ",".join(batch_ids)
+            url = f"https://api.mercadolibre.com/items?ids={ids_str}"
+            response = requests.get(url, headers=headers)
+            if response.status_code != 200:
+                print(f"Erro ao buscar lote de itens: {response.status_code} - {response.text}")
+                continue
+            results = response.json()
+            for item in results:
+                item_data = item.get("body", {})
+                # if not item_data or item_data.get("status") != "active":
+                #     continue
+                item_id = item_data.get("id")
+                sku_visto = False
+                for att in item_data.get("attributes", []):
+                    if att.get("id") == "SELLER_SKU":
+                        if att.get("value_id") == sku_alvo or att.get("value_name") == sku_alvo:
+                            sku_visto = True
+                if item_data.get("seller_custom_field") == sku_alvo:
+                    sku_visto = True
+                if sku_visto:
+                    self.meli_item_id = item_id
+                    msg = f"Item encontrado: {item_id}"
+                    return   
+
+        print("SKU não encontrado entre os itens do usuário.")        
+        raise UserError(_("SKU não encontrado entre os itens do usuário."))
+
     def action_envia_produto_meli(self):
         if self.meli_config_id.expire_date_token and self.meli_config_id.expire_date_token < datetime.now():
             self.meli_config_id.action_gera_acess_token()
@@ -83,34 +155,7 @@ class ProducTemplate(models.Model):
             item = response.json()
             self.meli_item_id = item['id']
         else:
-            user_id = self.meli_config_id.user_id
-            url = f"https://api.mercadolibre.com/users/{user_id}/items/search"
-            headers = {
-                "Authorization": f"Bearer {self.meli_config_id.access_token}"
-            }
-
-            response = requests.get(url, headers=headers)
-            data = response.json()
-            for item_id in data.get("results", []):
-                url = f"https://api.mercadolibre.com/items/{item_id}"
-                headers = {
-                    "Authorization": f"Bearer {self.meli_config_id.access_token}"
-                }
-
-                response = requests.get(url, headers=headers)
-                data = response.json()
-                if data.get("status") == "active":
-                    for att in data.get("attributes"):
-                        if att['id'] == "SELLER_SKU":
-                            sku = att["value_name"]
-                            if sku == self.meli_sku:
-                                self.meli_item_id = item_id
-                    if data.get("seller_custom_field"):
-                        sku = data.get("seller_custom_field")
-                        if sku == self.meli_sku:
-                            self.meli_item_id = item_id
-                else:
-                    print("Produto INATIVO", item_id)
+            self.encontrar_item_por_sku()
         insere_meli_item = False
         if insere_meli_item == True:
             import pudb;pu.db

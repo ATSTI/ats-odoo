@@ -25,7 +25,7 @@
                                 <!-- <field name="image_meli" attrs="{'invisible': [('meli', '=', False)]}"/> -->
                             </group>
                             <group>
-                                <button name="action_envia_produto_meli" string=" Enviar Produto para Mercado Livre" type="object" class="btn btn-primary" attrs="{'invisible': [('meli', '=', False)]}"/>
+                                <button name="action_envia_produto_meli" string="Atualizar Produto no Mercado Livre" type="object" class="btn btn-primary" attrs="{'invisible': [('meli', '=', False)]}"/>
                                 <field name="meli_item_id" attrs="{'invisible': [('meli', '=', False)]}" readonly="1"/>
                             </group>
                         </group>

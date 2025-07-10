@@ -124,7 +124,9 @@ class MeliConfig(models.Model):
         for orders in order_list.get("results", []):
             order_id = orders['id']
             sale_exists = self.env['sale.order'].search([
+                '|',
                 ('name', '=', str(order_id)),
+                ('name', '=', str(orders.get('pack_id'))),
             ])
             if sale_exists:
                 continue

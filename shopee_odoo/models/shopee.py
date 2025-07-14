@@ -5,6 +5,8 @@ from odoo.exceptions import UserError
 from datetime import datetime, timedelta
 import requests
 import json
+import base64
+import tempfile
 import time
 import hmac
 import hashlib
@@ -110,13 +112,20 @@ class ShopeeConfig(models.Model):
                 tmp_base_string = "%s%s%s%s%s" % (self.shopee_partner_id, path, timest, self.access_token, self.shopee_id)
                 base_string = tmp_base_string.encode()
                 sign = hmac.new(self.shopee_partner_key.encode(), base_string, hashlib.sha256).hexdigest()
-                payload={}
-                headers = {
-                }
                 optional = "total_amount,buyer_user_id,buyer_username,recipient_address,buyer_cpf_id,item_list"
-                path_cat = "?access_token=%s&order_sn_list=%s&partner_id=%s&request_order_status_pending=true&response_optional_fields=%s&shop_id=%s&sign=%s&timestamp=%s" %(self.access_token,order_sn, self.shopee_partner_id,optional,self.shopee_id,sign,timest)
+                path_cat = (
+                    f"?access_token={self.access_token}"
+                    f"&order_sn_list={order_sn}"
+                    f"&partner_id={self.shopee_partner_id}"
+                    f"&response_optional_fields={optional}"
+                    f"&shop_id={self.shopee_id}"
+                    f"&sign={sign}"
+                    f"&timestamp={timest}"
+                )
+
                 url = url_ini + path + path_cat
-                response = requests.request("GET",url,headers=headers, data=payload, allow_redirects=False)
+
+                response = requests.get(url)
                 od_detail = response.json()
                 order_name = ''
                 prd_id = ''
@@ -241,4 +250,66 @@ class ShopeeConfig(models.Model):
                                 {'price_unit': prd_price,'name': prd_name,}
                             )
         return True
+
+    def teste_move_id(self):
+        move_id = self.env['account.move'].search([
+            ('state', '=', 'posted'),
+            ('document_type_id', '=', 31)
+        ], limit=1)
+        if not move_id:
+            raise UserError(_("Fatura não encontrada."))
+        self.action_envia_xml_shopee(move_id)
+    
+    def action_envia_xml_shopee(self, move_id):
+        import pudb;pu.db
+        if self.shop_real == True:
+            url_ini = "https://openplatform.shopee.com.br"
+        if self.shop_real == False:
+            url_ini = "https://partner.test-stable.shopeemobile.com"
+        if self.expire_date_token and self.expire_date_token < datetime.now():
+            self.action_gera_acess_token()
+            # print("TOKEN GERADO")
+        path = "/api/v2/order/upload_invoice_doc"
+        timestamp = int(time.time())
+        access_token = self.access_token.strip()
+
+        # Gera assinatura
+        string_to_sign = f"{self.shopee_partner_id}{path}{timestamp}{access_token}{self.shopee_id}"
+        sign = hmac.new(self.shopee_partner_key.encode(), string_to_sign.encode(), hashlib.sha256).hexdigest()
+        file_path = tempfile.gettempdir()+'/' + move_id.fiscal_document_id.authorization_file_id.name
+        data = base64.decodebytes(move_id.fiscal_document_id.authorization_file_id.datas)
+        f = open(file_path,'wb')
+        f.write(data)
+        f.close()
+
+        # Caminho do arquivo
+        order_sn = "2507143K4Y2CY7"
+
+        url = (
+            f"{url_ini}{path}"
+            f"?access_token={access_token}"
+            f"&partner_id={self.shopee_partner_id}"
+            f"&shop_id={self.shopee_id}"
+            f"&sign={sign}"
+            f"&timestamp={timestamp}"
+        )
+
+        # Parâmetros obrigatórios
+        payload = {
+            "order_sn": order_sn,
+            "file_type": 4
+        }
+
+        # Arquivo XML com tipo MIME correto
+        files = {
+            'file': (file_path.split('/')[-1], open(file_path, 'rb'), 'application/xml')
+        }
+
+        # Cabeçalhos – não defina Content-Type manualmente!
+
+        # Envia POST
+        response = requests.post(url, data=payload, files=files)
+
+        print("Status code:", response.status_code)
+        print("Response:", response.text)
 

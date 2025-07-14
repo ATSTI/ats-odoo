@@ -117,50 +117,104 @@ class ProducTemplate(models.Model):
                 raise UserError(_(f"Quantidade Atualizada Com Sucesso!"))
         else:
             self.procura_item_existente()
-            
+
     def procura_item_existente(self):
+        sp = self.shopee_config_id
+
+        # URL da Shopee, ambiente real ou sandbox
+        url_ini = "https://openplatform.shopee.com.br" if sp.shop_real else "https://partner.test-stable.shopeemobile.com"
+
+        # Define intervalo de data amplo (últimos 3 anos)
+        data_i = int((datetime.now() - timedelta(days=3*365)).timestamp())
+        data_f = int((datetime.now() + timedelta(hours=1)).timestamp())
+
+        offset = 0
         if self.shopee_config_id.shop_real == True:
             url_ini = "https://openplatform.shopee.com.br"
         if self.shopee_config_id.shop_real == False:
             url_ini = "https://partner.test-stable.shopeemobile.com"
-        timest = str(int(time.time()))
-        sp = self.shopee_config_id
-        path = '/api/v2/product/get_item_list'
-        tmp_base_string = "%s%s%s%s%s" % (sp.shopee_partner_id, path, timest, sp.access_token, sp.shopee_id)
-        base_string = tmp_base_string.encode()
-        sign = hmac.new(sp.shopee_partner_key.encode(), base_string, hashlib.sha256).hexdigest()
-        data_i = int((datetime(2025, 1, 1, 15, 30)).timestamp())
-        data_f = int((datetime.now() + timedelta(hours=1)).timestamp())
-        path_attr = "/api/v2/product/get_item_list?access_token=%s&offset=0&page_size=10&item_status=NORMAL&partner_id=%s&shop_id=%s&sign=%s&timestamp=%s&update_time_from=%s&update_time_to=%s" %(sp.access_token, sp.shopee_partner_id,sp.shopee_id, sign, timest, data_i, data_f)
-        payload={}
-        headers = {}
-        url = url_ini + path_attr
-        response = requests.request("GET",url,headers=headers, data=payload, allow_redirects=False)
-        data = response.json()
-        for rs in data['response']['item']:
-            item = rs['item_id']
-            path = '/api/v2/product/get_item_base_info'
-            tmp_base_string = "%s%s%s%s%s" % (sp.shopee_partner_id, path, timest, sp.access_token, sp.shopee_id)
-            base_string = tmp_base_string.encode()
-            sign = hmac.new(sp.shopee_partner_key.encode(), base_string, hashlib.sha256).hexdigest()
-            path_attr = "/api/v2/product/get_item_base_info?access_token=%s&need_complaint_policy=true&need_tax_info=true&item_id_list=%s&partner_id=%s&shop_id=%s&sign=%s&timestamp=%s" %(sp.access_token, item, sp.shopee_partner_id, sp.shopee_id, sign, timest)
-            payload = {}
-            headers = {}
-            url = url_ini + path_attr
-            response = requests.get(url,headers=headers, data=payload, allow_redirects=False)
-            data = response.json()
-            for it in data['response']['item_list']:
-                sku = it['item_sku']
-                if sku == self.shopee_sku:
-                    self.shopee_item_id = it['item_id']
-                    break
-            if self.shopee_item_id:
-                break
+        page_size = 100
+        for item_status in ["NORMAL", "UNLIST", "SOLD_OUT"]:
+            offset = 0
+            while True:
+                timest = str(int(time.time()))
+                path = '/api/v2/product/get_item_list'
+                base_string = f"{sp.shopee_partner_id}{path}{timest}{sp.access_token}{sp.shopee_id}".encode()
+                sign = hmac.new(sp.shopee_partner_key.encode(), base_string, hashlib.sha256).hexdigest()
 
+                url = (
+                    f"{url_ini}{path}?access_token={sp.access_token}&offset={offset}&page_size={page_size}"
+                    f"&item_status={item_status}&partner_id={sp.shopee_partner_id}&shop_id={sp.shopee_id}"
+                    f"&sign={sign}&timestamp={timest}&update_time_from={data_i}&update_time_to={data_f}"
+                )
+
+                response = requests.get(url)
+                if response.status_code != 200:
+                    print(f"❌ Erro na requisição: {response.status_code} - {response.text}")
+                    break
+
+                data = response.json()
+                items = data.get('response', {}).get('item', [])
+                if not items:
+                    break
+
+                item_ids = [str(item['item_id']) for item in items]
+
+                for i in range(0, len(item_ids), 50):  # Shopee só aceita até 50 item_ids por vez
+                    batch = item_ids[i:i+50]
+                    item_id_list_str = ",".join(batch)
+
+                    timest = str(int(time.time()))
+                    path_info = '/api/v2/product/get_item_base_info'
+                    base_string = f"{sp.shopee_partner_id}{path_info}{timest}{sp.access_token}{sp.shopee_id}".encode()
+                    sign = hmac.new(sp.shopee_partner_key.encode(), base_string, hashlib.sha256).hexdigest()
+
+                    url_info = (
+                        f"{url_ini}{path_info}?access_token={sp.access_token}&need_complaint_policy=true"
+                        f"&need_tax_info=true&item_id_list={item_id_list_str}&partner_id={sp.shopee_partner_id}"
+                        f"&shop_id={sp.shopee_id}&sign={sign}&timestamp={timest}"
+                    )
+
+                    response_info = requests.get(url_info)
+                    if response_info.status_code != 200:
+                        print(f"❌ Erro ao buscar info dos itens: {response_info.status_code} - {response_info.text}")
+                        continue
+
+                    item_data = response_info.json()
+                    for it in item_data.get('response', {}).get('item_list', []):
+                        # if str(it['item_id']) == "23797586082":/
+                        sku = it.get('item_sku', '')
+                        if sku == self.shopee_sku:
+                            self.shopee_item_id = it['item_id']
+                            print(f"✅ Item encontrado: {sku} → ID: {self.shopee_item_id}")
+                            return
+                        if it['has_model']:
+                            path_model = '/api/v2/product/get_model_list'
+                            timest = str(int(time.time()))
+                            base_string = f"{sp.shopee_partner_id}{path_model}{timest}{sp.access_token}{sp.shopee_id}".encode()
+                            sign = hmac.new(sp.shopee_partner_key.encode(), base_string, hashlib.sha256).hexdigest()
+
+                            url_model = (
+                                f"{url_ini}{path_model}?access_token={sp.access_token}&item_id={it['item_id']}"
+                                f"&partner_id={sp.shopee_partner_id}&shop_id={sp.shopee_id}&sign={sign}&timestamp={timest}"
+                            )
+
+                            response_model = requests.get(url_model)
+                            data_model = response_model.json()
+                            for dm in data_model.get('response', {}).get('model', {}):
+                                if str(dm['model_sku']) == self.shopee_sku:
+                                    self.shopee_item_id = it['item_id']
+                                    # self.shopee_model_id = dm['model']['model_id']
+                                    print(f"✅ SKU de variação encontrado: {dm['model_sku']} → item_id: {self.shopee_item_id}")
+                                    return
+
+                offset += page_size
+
+            print("❌ Item não encontrado.")
 
     def action_envia_produto_shopee(self):
         return True
-        # FUNÇÃO DE ADICIONAR PEDIDO VIA ODOO REMOVIDO ( PEDIDO DA FELICITA)
+        # FUNÇÃO DE ADICIONAR PEDIDO VIA ODOO REMOVIDO (PEDIDO DA FELICITA)
         # FUNCIONA CORRETAMENTE
         timest = str(int(time.time()))
         if self.shopee_config_id.expire_date_token and self.shopee_config_id.expire_date_token < datetime.now():

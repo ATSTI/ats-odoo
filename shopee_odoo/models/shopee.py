@@ -251,17 +251,20 @@ class ShopeeConfig(models.Model):
                             )
         return True
 
-    def teste_move_id(self):
+    def action_envia_xml_shopee(self):
+        shopee = self.env['res.users'].search([
+            ('name', '=', "Shopee"),
+        ], limit=1)
         move_id = self.env['account.move'].search([
             ('state', '=', 'posted'),
-            ('document_type_id', '=', 31)
+            ('document_type_id', '=', 31),
+            ('invoice_user_id', '=', shopee.id),
         ], limit=1)
         if not move_id:
             raise UserError(_("Fatura não encontrada."))
-        self.action_envia_xml_shopee(move_id)
-    
-    def action_envia_xml_shopee(self, move_id):
-        import pudb;pu.db
+        self.envia_xml_shopee(move_id)
+
+    def envia_xml_shopee(self, move_id):
         if self.shop_real == True:
             url_ini = "https://openplatform.shopee.com.br"
         if self.shop_real == False:
@@ -272,7 +275,6 @@ class ShopeeConfig(models.Model):
         path = "/api/v2/order/upload_invoice_doc"
         timestamp = int(time.time())
         access_token = self.access_token.strip()
-
         # Gera assinatura
         string_to_sign = f"{self.shopee_partner_id}{path}{timestamp}{access_token}{self.shopee_id}"
         sign = hmac.new(self.shopee_partner_key.encode(), string_to_sign.encode(), hashlib.sha256).hexdigest()
@@ -281,10 +283,8 @@ class ShopeeConfig(models.Model):
         f = open(file_path,'wb')
         f.write(data)
         f.close()
-
         # Caminho do arquivo
-        order_sn = "2507143K4Y2CY7"
-
+        name_order = move_id.invoice_origin
         url = (
             f"{url_ini}{path}"
             f"?access_token={access_token}"
@@ -293,23 +293,18 @@ class ShopeeConfig(models.Model):
             f"&sign={sign}"
             f"&timestamp={timestamp}"
         )
-
         # Parâmetros obrigatórios
         payload = {
-            "order_sn": order_sn,
+            "order_sn": name_order,
             "file_type": 4
         }
-
         # Arquivo XML com tipo MIME correto
         files = {
             'file': (file_path.split('/')[-1], open(file_path, 'rb'), 'application/xml')
         }
-
-        # Cabeçalhos – não defina Content-Type manualmente!
-
         # Envia POST
         response = requests.post(url, data=payload, files=files)
 
-        print("Status code:", response.status_code)
-        print("Response:", response.text)
+        # print("Status code:", response.status_code)
+        # print("Response:", response.text)
 

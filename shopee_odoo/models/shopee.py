@@ -261,8 +261,8 @@ class ShopeeConfig(models.Model):
                 ('state', '=', 'posted'),
                 ('document_type_id', '=', 31),
                 ('invoice_user_id', '=', shopee.id),
-                ('invoice_date', '>=', (datetime.now() - timedelta(days=1))),
-                ('ref', '=', False),
+                ('create_date', '>=', (datetime.now() - timedelta(hours=7))),
+                ('ref', '=', ''),
                 ('fiscal_document_id.state', '=', 'autorizada'),
             ])
             if not move_id:
@@ -313,7 +313,7 @@ class ShopeeConfig(models.Model):
         response = requests.post(url, data=payload, files=files)
         print("Status code:", response.status_code)
         print("Response:", response.text)
-        if response.status_code == 200:
+        if response.status_code == 200 and response.json().get('message') == '':
             print("XML enviado com sucesso.")
             move_id.ref = "XML enviado para Shopee"
         else:

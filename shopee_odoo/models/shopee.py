@@ -252,17 +252,24 @@ class ShopeeConfig(models.Model):
         return True
 
     def action_envia_xml_shopee(self):
-        shopee = self.env['res.users'].search([
-            ('name', '=', "Shopee"),
-        ], limit=1)
-        move_id = self.env['account.move'].search([
-            ('state', '=', 'posted'),
-            ('document_type_id', '=', 31),
-            ('invoice_user_id', '=', shopee.id),
-        ], limit=1)
-        if not move_id:
-            raise UserError(_("Fatura não encontrada."))
-        self.envia_xml_shopee(move_id)
+        lj = self.search([('id', '=', 2 )])  # Ajuste o filtro conforme necessário
+        for loja in lj:
+            shopee = self.env['res.users'].search([
+                ('name', '=', "Shopee"),
+            ], limit=1)
+            move_id = self.env['account.move'].search([
+                ('state', '=', 'posted'),
+                ('document_type_id', '=', 31),
+                ('invoice_user_id', '=', shopee.id),
+                ('create_date', '>=', (datetime.now() - timedelta(hours=7))),
+                ('ref', '=', ''),
+                ('fiscal_document_id.state', '=', 'autorizada'),
+            ])
+            if not move_id:
+                print("Fatura não encontrada.")
+                return True
+            for mv in move_id:
+                loja.envia_xml_shopee(mv)
 
     def envia_xml_shopee(self, move_id):
         if self.shop_real == True:
@@ -304,7 +311,11 @@ class ShopeeConfig(models.Model):
         }
         # Envia POST
         response = requests.post(url, data=payload, files=files)
-
-        # print("Status code:", response.status_code)
-        # print("Response:", response.text)
+        print("Status code:", response.status_code)
+        print("Response:", response.text)
+        if response.status_code == 200 and response.json().get('message') == '':
+            print("XML enviado com sucesso.")
+            move_id.ref = "XML enviado para Shopee"
+        else:
+            print("Erro ao enviar XML:", response.text)
 

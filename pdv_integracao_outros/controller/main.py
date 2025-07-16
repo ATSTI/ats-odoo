@@ -96,7 +96,10 @@ class IntegracaoPdv(http.Controller):
             # prod['rateio'] = prd.rateio
             #prod['qtdeatacado'] = prd.qtde_atacado
             #prod['precoatacado'] = prd.preco_atacado
-            data_alt = prd.write_date
+            if prd.write_date > prd.product_tmpl_id.write_date:
+                data_alt = prd.write_date
+            else:
+                data_alt = prd.product_tmpl_id.write_date
             data_alterado = data_alt + timedelta(hours=+3)
             prod['datacadastro'] = datetime.strftime(data_alterado,'%m/%d/%Y %H:%M:%S')
             if prd.default_code:
@@ -140,7 +143,10 @@ class IntegracaoPdv(http.Controller):
             #prod['promocao_jpg'] = ''
             #prod['promocao_txt'] = ''
             prod['codproduto'] = prd.id
-            data_alt = prd.write_date
+            if prd.write_date > prd.product_tmpl_id.write_date:
+                data_alt = prd.write_date
+            else:
+                data_alt = prd.product_tmpl_id.write_date
             data_alterado = data_alt + timedelta(hours=+3)
             prod['datacadastro'] = datetime.strftime(data_alterado,'%m/%d/%Y %H:%M:%S')
             prod['usa'] = 'N'

@@ -252,7 +252,7 @@ class ShopeeConfig(models.Model):
         return True
 
     def action_envia_xml_shopee(self):
-        lj = self.search([('id', '=', 2 )])  # Ajuste o filtro conforme necessário
+        lj = self.search([('id', '=', 1 )])  # Ajuste o filtro conforme necessário
         for loja in lj:
             shopee = self.env['res.users'].search([
                 ('name', '=', "Shopee"),
@@ -261,7 +261,7 @@ class ShopeeConfig(models.Model):
                 ('state', '=', 'posted'),
                 ('document_type_id', '=', 31),
                 ('invoice_user_id', '=', shopee.id),
-                ('create_date', '>=', (datetime.now() - timedelta(hours=7))),
+                ('create_date', '>=', (datetime.now() - timedelta(hours=3))),
                 ('ref', '=', ''),
                 ('fiscal_document_id.state', '=', 'autorizada'),
             ])
@@ -311,11 +311,13 @@ class ShopeeConfig(models.Model):
         }
         # Envia POST
         response = requests.post(url, data=payload, files=files)
-        print("Status code:", response.status_code)
-        print("Response:", response.text)
         if response.status_code == 200 and response.json().get('message') == '':
             print("XML enviado com sucesso.")
             move_id.ref = "XML enviado para Shopee"
         else:
-            print("Erro ao enviar XML:", response.text)
+            if response.json().get('message') == "Wrong parameters, detail: Upload invoice failed. Upload is not accepted after shipment is arranged.":
+                print("Nota já enviada na Shopee.")
+                move_id.ref = "Nota já enviada na Shopee"
+            else:
+                print("Erro ao enviar XML:", response.text)
 

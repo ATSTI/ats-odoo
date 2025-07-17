@@ -3,18 +3,13 @@
 from odoo import _, fields, models, api
 
 class AccountMove(models.Model):
-    _name = "account.move"
-    _inherit = [
-        _name,
-        "l10n_br_fiscal.document.move.mixin",
-    ]
-    _inherits = {"l10n_br_fiscal.document": "fiscal_document_id"}
-    _order = "date DESC, name DESC"
+    _inherit = "account.move"
 
     amount_discount_value = fields.Monetary(
         string="Total do desconto",
         inverse="_inverse_amount_discount",
     )
+    
 
     @api.onchange("amount_discount_value")
     def _onchange_amount_discount_value(self):

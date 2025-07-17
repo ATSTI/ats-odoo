@@ -4,6 +4,7 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from datetime import datetime, timedelta
 import requests
+import base64
 import json
 import time
 import hmac
@@ -265,4 +266,69 @@ class MeliConfig(models.Model):
                 sale._check_wh_operating_unit()
             else:
                 sale.onchange_partner_id()
-            self._inserir_linhas(order, sale)   
+            self._inserir_linhas(order, sale)
+
+    def action_envia_xml_meli(self):
+        lj = self.search([('name', 'ilike', 'felicita')])  # Ajuste o filtro conforme necessário
+        for loja in lj:
+            meli = self.env['res.users'].search([
+                ('name', '=', "Mercado Livre"),
+            ], limit=1)
+            move_id = self.env['account.move'].search([
+                ('state', '=', 'posted'),
+                ('document_type_id', '=', 31),
+                ('invoice_user_id', '=', meli.id),
+                ('create_date', '>=', (datetime.now() - timedelta(hours=3))),
+                ('ref', '=', ''),
+                ('fiscal_document_id.state', '=', 'autorizada'),
+            ])
+            if not move_id:
+                print("Fatura não encontrada.")
+                return True
+            for mv in move_id:
+                loja.envia_xml_meli(mv)
+
+    def envia_xml_meli(self, move_id):
+        site_id = "MLB"  # ou MLC
+        pack_id = move_id.invoice_origin
+        url = f'https://api.mercadolibre.com/orders/{pack_id}'
+        headers = {
+            'Authorization': f'Bearer {self.access_token}'
+        }
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            shipment_id = response.json()["shipment"]["id"]
+            # URL da API
+            # file_path = "/home/publico/tmp/NFe35250718880480000198550010000436321173372979-proc-env.xml"
+            # file_path = tempfile.gettempdir()+'/' + move_id.fiscal_document_id.authorization_file_id.name
+            data = base64.decodebytes(move_id.fiscal_document_id.authorization_file_id.datas)
+            # f = open(file_path,'wb')
+            # f.write(data)
+            # f.close()
+            # with open(file_path, 'rb') as xml_file:
+            #     xml_content = xml_file.read()
+            url = f"https://api.mercadolibre.com/shipments/{shipment_id}/invoice_data/?siteId={site_id}"
+
+            # XML da nota fiscal (substitua pelo conteúdo real do seu XML)
+
+            # Cabeçalhos HTTP
+            headers = {
+                "Authorization": f"Bearer {self.access_token}",
+                "Content-Type": "application/xml"
+            }
+
+            # Envio do POST
+            response = requests.post(url, headers=headers, data=data)
+
+            # Resposta
+            print("Status code:", response.status_code)
+            if response.status_code == 201 and response.json().get('id'):
+                print("XML enviado com sucesso.")
+                move_id.ref = "XML enviado para Mercado Livre" + " " + response.json().get('id')
+            else:
+                # if response.json().get('message') == "Wrong parameters, detail: Upload invoice failed. Upload is not accepted after shipment is arranged.":
+                #     print("Nota já enviada na Mercado Livre.")
+                #     move_id.ref = "Nota já enviada na Mercado Livre"
+                # else:
+                print("Erro ao enviar XML:", response.text)
+            

@@ -6,8 +6,8 @@
         string="Faturamento Total"
         model="account.move"
         report_type="qweb-pdf"
-        name="field_service_custom.report_account_fullist"
-        file="field_service_custom.report_account_fullist"
+        name="report_faturamento_total.report_account_fullist"
+        file="report_faturamento_total.report_account_fullist"
     />
 
 </odoo>

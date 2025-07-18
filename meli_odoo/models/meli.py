@@ -297,6 +297,12 @@ class MeliConfig(models.Model):
             'Authorization': f'Bearer {self.access_token}'
         }
         response = requests.get(url, headers=headers)
+        if response.status_code != 200 and response.json().get('error') == "order_not_found":
+            url = f'https://api.mercadolibre.com/packs/{pack_id}'
+            headers = {
+                'Authorization': f'Bearer {self.access_token}'
+            }
+            response = requests.get(url, headers=headers)
         if response.status_code == 200:
             shipment_id = response.json()["shipment"]["id"] if "shipment" in response.json() and "id" in response.json()["shipment"] else response.json()["shipping"]["id"]
             # URL da API
@@ -332,5 +338,4 @@ class MeliConfig(models.Model):
                 #     move_id.ref = "Nota já enviada na Mercado Livre"
                 # else:
                 print("Erro ao enviar XML:", response.text)
-                move_id.ref = "Nota já enviada para o Mercado Livre" + " ou com erro: " + response.json().get('message', 'Erro desconhecido')
-            
+                move_id.ref = "Nota já enviada para o Mercado Livre"

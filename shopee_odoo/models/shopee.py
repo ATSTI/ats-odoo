@@ -82,7 +82,7 @@ class ShopeeConfig(models.Model):
         headers = {
         }
         # 1607235072&time_range_field=create_time&time_to=1608271872
-        data_i = datetime.now() - timedelta(days=1)
+        data_i = datetime.now() - timedelta(days=3)
         data_inicio = int(data_i.timestamp())
         data_fim = int(time.time())
         data_f = datetime.now() + timedelta(hours=1)

@@ -119,7 +119,8 @@ class MeliConfig(models.Model):
             'Authorization': 'Bearer %s' %(self.access_token),
         }
         hoje = str(datetime.today().date())
-        url = f"https://api.mercadolibre.com/orders/search?seller={self.user_id}&order.date_created.from={hoje}T00:00:00Z&order.date_created.to={hoje}T23:59:59Z"
+        inicio = str(datetime.today().date() - timedelta(days=3))
+        url = f"https://api.mercadolibre.com/orders/search?seller={self.user_id}&order.date_created.from={inicio}T00:00:00Z&order.date_created.to={hoje}T23:59:59Z&limit=100"
         response = requests.get(url, headers=headers)
         order_list = response.json()
         for orders in order_list.get("results", []):
@@ -297,7 +298,7 @@ class MeliConfig(models.Model):
         }
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
-            shipment_id = response.json()["shipment"]["id"]
+            shipment_id = response.json()["shipment"]["id"] if "shipment" in response.json() and "id" in response.json()["shipment"] else response.json()["shipping"]["id"]
             # URL da API
             # file_path = "/home/publico/tmp/NFe35250718880480000198550010000436321173372979-proc-env.xml"
             # file_path = tempfile.gettempdir()+'/' + move_id.fiscal_document_id.authorization_file_id.name
@@ -331,4 +332,5 @@ class MeliConfig(models.Model):
                 #     move_id.ref = "Nota já enviada na Mercado Livre"
                 # else:
                 print("Erro ao enviar XML:", response.text)
+                move_id.ref = "Nota já enviada para o Mercado Livre" + " ou com erro: " + response.json().get('message', 'Erro desconhecido')
             

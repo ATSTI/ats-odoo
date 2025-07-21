@@ -305,15 +305,7 @@ class MeliConfig(models.Model):
             response = requests.get(url, headers=headers)
         if response.status_code == 200:
             shipment_id = response.json()["shipment"]["id"] if "shipment" in response.json() and "id" in response.json()["shipment"] else response.json()["shipping"]["id"]
-            # URL da API
-            # file_path = "/home/publico/tmp/NFe35250718880480000198550010000436321173372979-proc-env.xml"
-            # file_path = tempfile.gettempdir()+'/' + move_id.fiscal_document_id.authorization_file_id.name
             data = base64.decodebytes(move_id.fiscal_document_id.authorization_file_id.datas)
-            # f = open(file_path,'wb')
-            # f.write(data)
-            # f.close()
-            # with open(file_path, 'rb') as xml_file:
-            #     xml_content = xml_file.read()
             url = f"https://api.mercadolibre.com/shipments/{shipment_id}/invoice_data/?siteId={site_id}"
 
             # XML da nota fiscal (substitua pelo conteúdo real do seu XML)
@@ -333,9 +325,16 @@ class MeliConfig(models.Model):
                 print("XML enviado com sucesso.")
                 move_id.ref = "XML enviado para Mercado Livre" + " " + response.json().get('id')
             else:
-                # if response.json().get('message') == "Wrong parameters, detail: Upload invoice failed. Upload is not accepted after shipment is arranged.":
-                #     print("Nota já enviada na Mercado Livre.")
-                #     move_id.ref = "Nota já enviada na Mercado Livre"
-                # else:
-                print("Erro ao enviar XML:", response.text)
-                move_id.ref = "Nota já enviada para o Mercado Livre"
+                url = f"https://api.mercadolibre.com/shipments/{shipment_id}/invoice_data?siteId=MLB"
+                headers = {
+                    "Authorization": f"Bearer {self.access_token}"
+                }
+
+                response = requests.get(url, headers=headers)
+
+                if response.status_code == 200:
+                    if response.json().get('id'):
+                        print("XML já enviado anteriormente.")
+                        move_id.ref = "XML já enviado para Mercado Livre" + " " + response.json().get('fiscal_key')
+                else:
+                    print(f"Erro {response.status_code}: {response.text}")

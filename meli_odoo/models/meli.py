@@ -323,7 +323,7 @@ class MeliConfig(models.Model):
             print("Status code:", response.status_code)
             if response.status_code == 201 and response.json().get('id'):
                 print("XML enviado com sucesso.")
-                move_id.ref = "XML enviado para Mercado Livre" + " " + response.json().get('id')
+                move_id.ref = "XML enviado para Mercado Livre" + " " + str(response.json().get('id'))
             else:
                 url = f"https://api.mercadolibre.com/shipments/{shipment_id}/invoice_data?siteId=MLB"
                 headers = {
@@ -335,6 +335,6 @@ class MeliConfig(models.Model):
                 if response.status_code == 200:
                     if response.json().get('id'):
                         print("XML já enviado anteriormente.")
-                        move_id.ref = "XML já enviado para Mercado Livre" + " " + response.json().get('fiscal_key')
+                        move_id.ref = "XML já enviado para Mercado Livre" + " " + str(response.json().get('fiscal_key'))
                 else:
                     print(f"Erro {response.status_code}: {response.text}")

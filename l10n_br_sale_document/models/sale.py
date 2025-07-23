@@ -20,7 +20,11 @@ class SaleOrder(models.Model):
     
     def action_print_danfe(self):
         if self.invoice_ids and self.invoice_ids.fiscal_document_id:
-            report = self.env['ir.action.report']
-            return report._render_danfe(self.invoice_ids.fiscal_document_id.id)
+            report = self.env['ir.actions.report'].search([
+                ('name', '=', 'DANFE'),
+                ('report_name', '=', 'main_template_danfe_account')
+            ])
+            if report:
+                return report._render_danfe(self.invoice_ids)
         else:
             raise UserError(_("Documento Fiscal não encontrado para esse pedido de venda."))

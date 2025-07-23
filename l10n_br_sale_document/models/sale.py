@@ -4,9 +4,6 @@
 import logging
 from datetime import datetime
 
-from erpbrasil.assinatura import certificado as cert
-from erpbrasil.edoc.nfe import NFe as edoc_nfe
-from erpbrasil.transmissao import TransmissaoSOAP
 from requests import Session
 
 from odoo import _, fields, models
@@ -22,8 +19,7 @@ class SaleOrder(models.Model):
                 lambda inv: inv.fiscal_document_id and inv.fiscal_document_id.file_report_id
             )
             if not invoice:
-                raise UserError("Nenhuma fatura com DANFE disponível foi encontrada.")
-
+                raise UserError("Nenhuma DANFE disponível para este pedido de venda.")
             # Pega o primeiro anexo
             attachment = invoice[0].fiscal_document_id.file_report_id
             return {

@@ -1,40 +1,20 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
 
-    <record id="l10n_br_sale_document_form" model="ir.ui.view">
-        <field name="name">l10n_br_sale_document.form</field>
+    <record id="view_order_form_inherit_danfe_button" model="ir.ui.view">
+        <field name="name">sale.order.form.danfe.button</field>
         <field name="model">sale.order</field>
-        <field name="priority">99</field>
-        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//button[@name='action_draft']" position="after">
-                <button
-                    name="action_print_danfe"
-                    type="object"
-                    class="oe_stat_button"
-                    icon="fa-print"
-                    string="Imprimir DANFE"
-                    attrs="{'invisible': [('state', '!=', 'sale')]}">
-                </button>
+            <xpath expr="//header" position="inside">
+                <button name="action_download_danfe"
+                        type="object"
+                        string="Download DANFE"
+                        class="btn-primary"
+                        attrs="{'invisible': [('state', '!=', 'sale')]}" />
             </xpath>
         </field>
     </record>
 
-    <record id="report_danfe" model="ir.actions.report">
-        <field name="name">DANFE</field>
-        <field name="model">sale.order</field>
-        <field name="report_type">qweb-pdf</field>
-        <field name="report_name">main_template_danfe_sale_order</field>
-        <field name="report_file">main_template_danfe_sale_order</field>
-        <field name="print_report_name">'DANFE_%s' % (object.name)</field>
-        <field name="binding_model_id" ref="sale.model_sale_order" />
-        <field name="binding_type">report</field>
-    </record>
-
-    <template id="main_template_danfe_sale_order">
-        <t t-call="main_template_danfe_account">
-            <t t-set="doc" t-value="doc"/>
-        </t>
-    </template>
 
 </odoo>

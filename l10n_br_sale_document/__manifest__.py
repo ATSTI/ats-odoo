@@ -14,7 +14,6 @@
     "website": "",
     "depends": ["l10n_br_base", "l10n_br_nfe", "l10n_br_account_nfe"],
     "data": [
-        "views/relatorio_danfe.xml",
         "views/sale_view.xml",
     ],
     "demo": [

@@ -16,15 +16,18 @@ from odoo.exceptions import UserError
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    file_document = fields.Binary(related="invoice_ids.fiscal_document_id.file_report_id.datas", string="Document File", readonly=True, invisible=True)
-    
-    def action_print_danfe(self):
-        if self.invoice_ids and self.invoice_ids.fiscal_document_id:
-            report = self.env['ir.actions.report'].search([
-                ('name', '=', 'DANFE'),
-                ('report_name', '=', 'main_template_danfe_account')
-            ])
-            if report:
-                return report._render_danfe(self.invoice_ids)
-        else:
-            raise UserError(_("Documento Fiscal não encontrado para esse pedido de venda."))
+    def action_download_danfe(self):
+        for order in self:
+            invoice = order.invoice_ids.filtered(
+                lambda inv: inv.fiscal_document_id and inv.fiscal_document_id.file_report_id
+            )
+            if not invoice:
+                raise UserError("Nenhuma fatura com DANFE disponível foi encontrada.")
+
+            # Pega o primeiro anexo
+            attachment = invoice[0].fiscal_document_id.file_report_id
+            return {
+                'type': 'ir.actions.act_url',
+                'url': f'/web/content/{attachment.id}?download=true',
+                'target': 'new',
+            }

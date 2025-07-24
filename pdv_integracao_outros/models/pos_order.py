@@ -496,7 +496,9 @@ class PosSession(models.Model):
         for i in arquivos:
             f = open(path_file + '/' + i, mode="r")
             lt = json.load(f)
-
+            if 'user_id' not in lt:
+                os.remove(path_file + '/' + i)
+                continue
             # caixa = f"-{nome_arq[:6]}"
             caixa = f"-{lt['caixa']}"
             sg_obj = self.env['account.bank.statement.line']
@@ -511,7 +513,9 @@ class PosSession(models.Model):
             ])
             if not session:
                 continue
-            
+            if session.state == 'closed':
+                os.remove(path_file + '/' + i)
+                continue
             lista_st = []
             for lt_st in session.statement_ids:
                 lista_st.append(lt_st.id)

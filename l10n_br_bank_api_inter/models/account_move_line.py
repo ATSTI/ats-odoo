@@ -39,6 +39,7 @@ ESTADO = [
     ("baixado", "Baixado"),
     ("cancelado", "Cancelado"),
     ("recebido", "Recebido"),
+    ("atrasado", "Atrasado"),
 ]
 
 

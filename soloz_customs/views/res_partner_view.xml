@@ -1,15 +1,16 @@
 <?xml version="1.0"?>
 <odoo>
 
-    <record id="view_res_partner_soloz_form" model="ir.ui.view">
-        <field name="name">res.partner.soloz</field>
+    <record id="view_res_partner_soloz_custom_form" model="ir.ui.view">
+        <field name="name">res.partner.custom.soloz</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
-        <field name="priority">1</field>
+        <field name="priority">100</field>
         <field name="arch" type="xml">
-            <group name="sale" position="inside">
-                <field name="agente_int" string="Agente intermediador"/>
-            </group>
+            <field name="user_id" position="attributes">
+                <attribute name="groups">sales_team.group_sale_manager</attribute>
+                <attribute name="attrs">{'readonly': [('user_id', '!=', uid)]}</attribute>
+            </field>
         </field>
     </record>
 

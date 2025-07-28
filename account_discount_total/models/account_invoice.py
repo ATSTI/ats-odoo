@@ -145,14 +145,26 @@ class AccountMove(models.Model):
 
     discount_type = fields.Selection([('percent', 'Percentagem'), ('amount', 'Valor')], string='Tipo desconto',
                                      readonly=True, states={'draft': [('readonly', False)]}, default='percent')
-    discount_rate = fields.Float('Tota desconto', digits=(16, 2), readonly=True,
+    discount_rate = fields.Float('Total desconto', digits=(16, 2), readonly=True,
                                  states={'draft': [('readonly', False)]})
     amount_discount = fields.Monetary(string='Desconto', store=True, readonly=True, compute='_compute_amount',
                                       track_visibility='always')
 
+    def ajusta_valores(self):
+        import pudb;pu.db
+        for move in self:
+            if move.amount_untaxed and move.invoice_line_ids:
+                total = 0.0
+                for line in move.invoice_line_ids:
+                    total += (line.quantity * line.price_unit)
+                move.amount_discount_value = move.discount_rate
+                move.amount_total = total - move.amount_discount_value
+                move.amount_untaxed = total
+
     @api.onchange('discount_type', 'discount_rate', 'invoice_line_ids')
     def supply_rate(self):
         for inv in self:
+            self.discount_rate = self.discount_rate
             if inv.discount_type == 'percent':
                 for line in inv.invoice_line_ids:
                     price_unit_discount = (
@@ -175,6 +187,7 @@ class AccountMove(models.Model):
                     line.discount_value = price_unit_discount
                     line._onchange_price_subtotal()
             inv._move_autocomplete_invoice_lines_values()
+            inv.amount_untaxed = total
 
     def button_dummy(self):
         self.supply_rate()

@@ -66,8 +66,8 @@ class SaleOrder(models.Model):
                 erros += "\n Nome deve ser menor que 60 caracteres."
             if self.partner_id.legal_name and len(self.partner_id.legal_name) > 60:
                 erros += "\n Razão social deve ser menor que 60 caracteres."
-            if self.fiscal_operation_id.name and len(self.fiscal_operation_id.name) > 60:
-                erros += "\n Natureza da operação deve ser menor que 60 caracteres."
+            # if self.fiscal_operation_id.name and len(self.fiscal_operation_id.name) > 60:
+            #     erros += "\n Natureza da operação deve ser menor que 60 caracteres."
 
             # erros = "\n".join(erros)
             self.message_error_partner = erros or False

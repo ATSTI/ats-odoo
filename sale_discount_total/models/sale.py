@@ -93,6 +93,11 @@ class SaleOrder(models.Model):
             'discount_rate': self.discount_rate_t,
         })
         return invoice_vals
+    
+    def _create_invoices(self, grouped=False, final=False, date=None):
+        invoice = super()._create_invoices(grouped=grouped, final=final, date=date)
+        invoice.ajusta_valores()
+        return invoice
 
     def button_dummy(self):
 

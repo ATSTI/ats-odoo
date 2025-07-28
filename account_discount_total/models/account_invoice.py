@@ -151,7 +151,6 @@ class AccountMove(models.Model):
                                       track_visibility='always')
 
     def ajusta_valores(self):
-        import pudb;pu.db
         for move in self:
             if move.amount_untaxed and move.invoice_line_ids:
                 total = 0.0

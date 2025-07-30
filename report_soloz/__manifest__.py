@@ -32,6 +32,7 @@
     'depends': ['account', 'sale_order_tag', 'mrp', 'report_cabecalho'],
     'data': [
         'report/report_orcamento_soloz.xml',
+        'report/report_separacao_total.xml',
         'views/report_relatorios.xml',
     ],
     'installable': True,

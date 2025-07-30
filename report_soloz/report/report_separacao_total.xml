@@ -82,7 +82,7 @@
                             <t t-set="grouped_lines" t-value="{}"/>
                             <t t-foreach="o.move_line_ids" t-as="ml">
                                 <t t-set="key" t-value="(ml.product_id.id, ml.location_id.id, ml.location_dest_id.id)"/>
-                                <t t-set="qty" t-value="grouped_lines.get(key, 0) + (ml.qty_done if o.state == 'done' else ml.product_uom_qty)"/>
+                                <t t-set="qty" t-value="grouped_lines.get(key, 0) + (ml.product_uom_qty)"/>
                                 <t t-set="new_grouped" t-value="grouped_lines.copy()"/>
                                 <t t-set="dummy" t-value="new_grouped.update({key: qty})"/>
                                 <t t-set="grouped_lines" t-value="new_grouped"/>

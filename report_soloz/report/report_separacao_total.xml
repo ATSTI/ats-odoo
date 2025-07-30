@@ -2,80 +2,22 @@
 <odoo>
     <template id="report_operacao_separacao_total">
         <t t-call="web.html_container">
-            <div class="page">
-                <div class="oe_structure"/>
-                <br/>
-                <table style="width:49%; height: 60px;float: left;">
-                    <tr><td style="height: 30px"></td></tr>
-                    <tr>
-                        <td style="text-align: left; width:100%" >
-                            <b style="font-size:18px" t-field="docs.company_id.name"/>                                
-                            <br/> <span t-field="docs.company_id.street"/>, <span t-field="docs.company_id.street_number"/>
-                            <br/> <span t-field="docs.company_id.district"/> - <span t-field="docs.company_id.city_id.name"/>;
-                        </td>
-                    </tr>
-                </table>
-                <table style="width:49%; height: 30px;text-align: right;">
-                    <tr>
-                        <td style="width:40%">
-                            <div style="width: 100%;float: right;">
-                                <img t-attf-src="data:image/*;base64,{{docs.company_id.logo}}"
-                                    t-att-alt="docs.company_id.name" style="width:50%; height:50%"/>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-                <br/><br/>
-                <table style="border: 1px solid #dcdcdc; border-collapse: collapse; font-size:14px;width: 100%;">
-                    <tr>
-                        <td style="border: 1px solid #dcdcdc; height:27px; font-size:12px;text-align: left; width: 50%">
-                            <b>Endereço do cliente</b>
-                        </td>
-                        <td style="border: 1px solid #dcdcdc; height:27px; font-size:12px;text-align: center; width: 20%">
-                            <b>Pedido</b>
-                        </td>
-                        <td style="border: 1px solid #dcdcdc; height:27px; font-size:12px;text-align: center; width: 20%">
-                            <b>Status</b>
-                        </td>
-                        <td style="border: 1px solid #dcdcdc; height:27px; font-size:12px;text-align: center; width: 20%">
-                            <b>Data Prevista</b>
-                        </td>
-                    </tr>
-                    <t t-foreach="docs" t-as="o">
-                        <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})"/>
-                        <tr>
-                            <td style="border: 1px solid #dcdcdc; height:25px; font-size:12px;text-align: left;">
-                                <div t-if="o.partner_id" name="partner_header">
-                                <div t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;name&quot;, &quot;phone&quot;], &quot;no_marker&quot;: True, &quot;phone_icons&quot;: True}"/>
-                                    <p/> CNPJ / CPF :  <span t-field="o.partner_id.cnpj_cpf"/>
-                                </div>
-                            </td>
-                            <td style="border: 1px solid #dcdcdc; height:25px; font-size:12px;text-align: center;">
-                               <div t-if="o.origin" class="col-auto" name="div_origin">
-                                    <p t-field="o.origin"/>
-                                </div>
-                            </td>
-                            <td style="border: 1px solid #dcdcdc; height:25px; font-size:12px;text-align: center;">
-                                <div class="col-auto" name="div_state">
-                                    <p t-field="o.state"/>
-                                </div>
-                            </td>
-                            <td style="border: 1px solid #dcdcdc; height:25px; font-size:12px;text-align: center;">
-                                <div class="col-auto" name="div_sched_date">
-                                    <p t-field="o.scheduled_date"/>
-                                </div>
-                            </td>
-                        </tr>
-                    </t>
-                </table>
-                    <!-- <div class="row">
+            <t t-set="docs" t-value="docs.with_context({'lang':docs.partner_id.lang})"/>
+            <t t-foreach="docs" t-as="o">
+                <div class="page">
+                    <div class="row justify-content-end mb16">
+                        <div class="col-4" name="right_box">
+                            <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', o.name, 600, 100)" style="width:300px;height:50px;" alt="Barcode"/>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-6" name="div_outgoing_address">
                             <div t-if="o.move_ids_without_package and o.move_ids_without_package[0].partner_id and o.move_ids_without_package[0].partner_id.id != o.partner_id.id">
-                                <span><strong>Endereço da Entrega:</strong></span>
+                                <span><strong>Endereço de Entrega:</strong></span>
                                 <div t-field="o.move_ids_without_package[0].partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;], &quot;no_marker&quot;: True, &quot;phone_icons&quot;: True}"/>
                             </div>
                             <div t-if="o.picking_type_id.code != 'internal' and (not o.move_ids_without_package or not o.move_ids_without_package[0].partner_id) and o.picking_type_id.warehouse_id.partner_id">
-                                <span><strong>Endereço do Depósito:</strong></span>
+                                <span><strong>Endereço do Armazém:</strong></span>
                                 <div t-field="o.picking_type_id.warehouse_id.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;], &quot;no_marker&quot;: True, &quot;phone_icons&quot;: True}"/>
                             </div>
                         </div>
@@ -87,7 +29,7 @@
                                 <span><strong>Endereço do Depósito:</strong></span>
                             </div>
                             <div t-if="o.picking_type_id.code=='outgoing' and o.partner_id">
-                                <span><strong>Endereço do Cliente</strong></span>
+                                <span><strong>Endereço do Cliente:</strong></span>
                             </div>
                             <div t-if="o.partner_id" name="partner_header">
                                 <div t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;name&quot;, &quot;phone&quot;], &quot;no_marker&quot;: True, &quot;phone_icons&quot;: True}"/>
@@ -110,98 +52,83 @@
                             <strong>Data Programada:</strong>
                             <p t-field="o.scheduled_date"/>
                         </div>
-                    </div> -->
-                <br/><br/>
-                <t t-set="product" t-value="set()" />
-                <t t-foreach="request.env['stock.move'].search([('picking_id', 'in', docs.mapped('id'))])" t-as="prod">
-                    <t t-if="prod.product_id">
-                        <t t-set="dummy" t-value="product.add(prod.product_id)" />
-                    </t>
-                </t>
-
-                <table style="border: 1px solid #dcdcdc; border-collapse: collapse; font-size:14px;width: 100%;">
-                    <tr>
-                        <td style="border: 1px solid #dcdcdc; height:27px; font-size:12px;text-align: left; width: 50%">
-                            <b>Produto</b>
-                        </td>
-                        <td style="border: 1px solid #dcdcdc; height:27px; font-size:12px;text-align: center; width: 20%">
-                            <b>Demanda</b>
-                        </td>
-                        <td style="border: 1px solid #dcdcdc; height:27px; font-size:12px;text-align: center; width: 20%">
-                            <b>De</b>
-                        </td>
-                    </tr>
-
-                    <t t-set="valores" t-value="[]" />
-                    <t t-foreach="product" t-as="p">
-                        <t t-set="qtd" t-value="0" />
-                        <t t-set="value" t-value="0" />
-                        <t t-set="locations" t-value="set()" />
-
-                        <t t-foreach="request.env['stock.move'].search([('picking_id', 'in', docs.mapped('id')), ('product_id', '=', p.id)])" t-as="mv_line">
-                            <t t-set="qtd" t-value="qtd + mv_line.product_uom_qty" />
-                            <t t-set="value" t-value="value + (mv_line.product_uom_qty * mv_line.price_unit if mv_line.price_unit else 0)" />
-                            <t t-if="mv_line.location_id">
-                                <t t-set="dummy" t-value="locations.add(mv_line.location_id.display_name)" />
+                    </div>
+                    <table class="table table-sm" t-if="o.move_line_ids and o.move_ids_without_package">
+                        <t t-set="has_barcode" t-value="any(move_line.product_id and move_line.product_id.sudo().barcode or move_line.package_id for move_line in o.move_line_ids)"/>
+                        <t t-set="has_serial_number" t-value="any(move_line.lot_id or move_line.lot_name for move_line in o.move_line_ids)" groups="stock.group_production_lot"/>
+                        <thead>
+                            <tr>
+                                <th name="th_product">
+                                    <strong>Produto</strong>
+                                </th>
+                                <th>
+                                    <strong>Demanda</strong>
+                                </th>
+                                <th name="th_from" t-if="o.picking_type_id.code != 'incoming'" align="left" groups="stock.group_stock_multi_locations">
+                                    <strong>De</strong>
+                                </th>
+                                <th name="th_to" t-if="o.picking_type_id.code != 'outgoing'" groups="stock.group_stock_multi_locations">
+                                    <strong>Para</strong>
+                                </th>
+                                <th name="th_serial_number" class="text-center" t-if="has_serial_number">
+                                    <strong>Número do Lote/Série</strong>
+                                </th>
+                                <th name="th_barcode" class="text-center" t-if="has_barcode">
+                                    <strong>Código de Barras do Produto</strong>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="grouped_lines" t-value="{}"/>
+                            <t t-foreach="o.move_line_ids" t-as="ml">
+                                <t t-set="key" t-value="(ml.product_id.id, ml.location_id.id, ml.location_dest_id.id)"/>
+                                <t t-set="qty" t-value="grouped_lines.get(key, 0) + (ml.qty_done if o.state == 'done' else ml.product_uom_qty)"/>
+                                <t t-set="new_grouped" t-value="grouped_lines.copy()"/>
+                                <t t-set="dummy" t-value="new_grouped.update({key: qty})"/>
+                                <t t-set="grouped_lines" t-value="new_grouped"/>
                             </t>
-                        </t>
-
-                        <t t-set="valores" t-value="valores + [value]" />
-
-                        <tr>
-                            <td style="border: 1px solid #dcdcdc; height:25px; font-size:12px;text-align: left;">
-                                <t t-esc="p.name"/>
-                            </td>
-                            <td style="border: 1px solid #dcdcdc; height:25px; font-size:12px;text-align: center;">
-                                <span t-esc="qtd"/>
-                            </td>
-                            <td style="border: 1px solid #dcdcdc; height:25px; font-size:12px;text-align: center;">
-                                <t t-foreach="locations" t-as="loc" t-separator=", ">
-                                    <t t-esc="loc"/>
-                                </t>
-                            </td>
-                        </tr>
-                    </t>
-
-                    <t t-set="value_t" t-value="sum(valores)" />
-                    <!-- <tr>
-                        <td colspan="3" style="border: 1px solid #dcdcdc; height:25px; font-size:12px;text-align: right;">
-                            <b>Total Geral: 
-                                <span t-esc="value_t" 
-                                    t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: docs.company_id.currency_id}"/>
-                            </b>
-                        </td>
-                    </tr> -->
-                </table>
-                <!-- <table class="table table-sm" t-if="docs.package_level_ids and docs.picking_type_entire_packs and docs.state in ['assigned', 'done']">
-                    <thead>
-                        <tr>
-                            <th name="th_package">Pacote</th>
-                            <th name="th_pko_from" t-if="docs.picking_type_id.code != 'incoming'" groups="stock.group_stock_multi_locations">From</th>
-                            <th name="th_pki_from" t-if="docs.picking_type_id.code != 'outgoing'" groups="stock.group_stock_multi_locations">To</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr t-foreach="docs.package_level_ids.sorted(key=lambda p: p.package_id.name)" t-as="package">
-                            <t t-set="package" t-value="package.with_context(picking_id=docs.id)"/>
-                            <td name="td_pk_barcode">
-                                <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s&amp;humanreadable=1' % ('Code128', package.package_id.name, 600, 100)" style="width:300px;height:50px; margin-left: -50px;" alt="Barcode"/><br/>
-                            </td>
-                            <td t-if="docs.picking_type_id.code != 'incoming'" groups="stock.group_stock_multi_locations">
-                                <span t-field="package.location_id"/>
-                            </td>
-                            <td t-if="docs.picking_type_id.code != 'outgoing'" groups="stock.group_stock_multi_locations">
-                                <span t-field="package.location_dest_id"/>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <t t-set="no_reserved_product" t-value="docs.move_lines.filtered(lambda x: x.product_uom_qty != x.reserved_availability and x.move_line_ids and x.state!='done')"/>
-                <p t-if="docs.state in ['draft', 'waiting', 'confirmed'] or no_reserved_product"><i class="fa fa-exclamation-triangle"/>
-                    Nem todos os produtos puderam ser reservados. Clique no botão "Verificar Disponibilidade" para tentar reservar os produtos.
-                </p>
-                <p t-field="docs.note"/> -->
-            </div>
+                            <t t-foreach="grouped_lines.items()" t-as="line">
+                                <t t-set="product" t-value="request.env['product.product'].browse(line[0][0])"/>
+                                <t t-set="location" t-value="request.env['stock.location'].browse(line[0][1])"/>
+                                <t t-set="location_dest" t-value="request.env['stock.location'].browse(line[0][2])"/>
+                                <tr>
+                                    <td><span t-esc="product.display_name"/></td>
+                                    <td><span t-esc="line[1]"/></td>
+                                    <td><span t-esc="location.display_name"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    <table class="table table-sm" t-if="o.package_level_ids and o.picking_type_entire_packs and o.state in ['assigned', 'done']">
+                        <thead>
+                            <tr>
+                                <th name="th_package">Pacote</th>
+                                <th name="th_pko_from" t-if="o.picking_type_id.code != 'incoming'" groups="stock.group_stock_multi_locations">From</th>
+                                <th name="th_pki_from" t-if="o.picking_type_id.code != 'outgoing'" groups="stock.group_stock_multi_locations">To</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="o.package_level_ids.sorted(key=lambda p: p.package_id.name)" t-as="package">
+                                <t t-set="package" t-value="package.with_context(picking_id=o.id)"/>
+                                <td name="td_pk_barcode">
+                                    <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s&amp;humanreadable=1' % ('Code128', package.package_id.name, 600, 100)" style="width:300px;height:50px; margin-left: -50px;" alt="Barcode"/><br/>
+                                </td>
+                                <td t-if="o.picking_type_id.code != 'incoming'" groups="stock.group_stock_multi_locations">
+                                    <span t-field="package.location_id"/>
+                                </td>
+                                <td t-if="o.picking_type_id.code != 'outgoing'" groups="stock.group_stock_multi_locations">
+                                    <span t-field="package.location_dest_id"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <t t-set="no_reserved_product" t-value="o.move_lines.filtered(lambda x: x.product_uom_qty != x.reserved_availability and x.move_line_ids and x.state!='done')"/>
+                    <p t-if="o.state in ['draft', 'waiting', 'confirmed'] or no_reserved_product"><i class="fa fa-exclamation-triangle"/>
+                        Nem todos os produtos puderam ser reservados. Clique no botão "Verificar Disponibilidade" para tentar reservar os produtos.
+                    </p>
+                    <p t-field="o.note"/>
+                </div>
+            </t>
         </t>
     </template>
 </odoo>

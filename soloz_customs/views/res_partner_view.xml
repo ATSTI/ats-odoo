@@ -7,9 +7,12 @@
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="priority">100</field>
         <field name="arch" type="xml">
+            <field name="user_id" position="before">
+                <field name="readonly_user_id" invisible="1"/>
+            </field>
             <field name="user_id" position="attributes">
                 <attribute name="groups">sales_team.group_sale_manager</attribute>
-                <attribute name="attrs">{'readonly': [('user_id', '!=', uid)]}</attribute>
+                <attribute name="attrs">{'readonly': [('readonly_user_id', '=', True)]}</attribute>
             </field>
         </field>
     </record>

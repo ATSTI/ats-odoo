@@ -22,13 +22,12 @@ class SaleOrder(models.Model):
     def _compute_contact_partner(self):
         for order in self:
             if order.partner_id:
-                order.contact_partner = order.partner_id.child_ids
-                # CASO QUEIRAM QUE SÓ APAREÇA O PRIMEIRO CONTATO (USAAR ROTINA ABAIXO)
-                # for ctt in order.partner_id.child_ids:
-                #     if ctt.active:
-                #         order.contact_partner = [(4, ctt.id)]
-                #         break
+                active_contacts = order.partner_id.child_ids.filtered(lambda c: c.active)
+                order.contact_partner = active_contacts
+            else:
+                order.contact_partner = [(5, 0, 0)]
 
+    
     def action_confirm(self):
         result = super().action_confirm()
         self.message_error_partner = False

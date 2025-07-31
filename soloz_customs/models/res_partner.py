@@ -25,4 +25,9 @@ class Partner(models.Model):
 
     _inherit = 'res.partner'
 
-    agente_int = fields.Many2one('res.partner')
+    readonly_user_id = fields.Boolean(compute='_compute_readonly_user_id')
+
+    @api.depends('user_id')
+    def _compute_readonly_user_id(self):
+        for rec in self:
+            rec.readonly_user_id = rec.user_id.id != self.env.uid

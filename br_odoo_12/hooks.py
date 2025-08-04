@@ -77,6 +77,18 @@ def post_init_hook(cr, registry):
     # )
 
 
+    # correção cadastros :
+    # """
+    # update res_partner set cnpj_cpf_bkp = cnpj_cpf, inscr_est_bkp = inscr_est, indicador_ie_dest_bkp = indicador_ie_dest,  
+    #     rg_fisica_bkp = rg_fisica, inscr_mun_bkp = inscr_mun, suframa_bkp = suframa, legal_name_bkp = legal_name, district_bkp = district,
+    #     number_bkp = number;
+    # """
+
+    # correcao cidade
+    # """
+    #   reference=# update res_partner set ibge_code = d.ibge_code from res_state_city d where d.id = res_partner.city_id;
+    # """
+
 # access_nfe_reboque_manager,access_nfe_reboque,model_nfe_reboque,account.group_account_manager,1,1,1,1
 # access_nfe_volume_manager,access_nfe_volume,model_nfe_volume,account.group_account_manager,1,1,1,1
 # access_nfe_duplicata_manager,access_nfe_duplicata,model_nfe_duplicata,account.group_account_manager,1,1,1,1
@@ -89,3 +101,4 @@ def post_init_hook(cr, registry):
 # access_invoice_eletronic_event_user,access_invoice_eletronic_event,model_br_odoo_nfe_event,account.group_account_invoice,1,0,1,0
 # access_invoice_eletronic_event_accountant,access_invoice_eletronic_event,model_br_odoo_nfe_event,account.group_account_user,1,1,1,0
 # access_invoice_eletronic_event_manager,access_invoice_eletronic_event,model_br_odoo_nfe_event,account.group_account_manager,1,1,1,1
+

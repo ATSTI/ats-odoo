@@ -108,147 +108,162 @@ class ShopeeConfig(models.Model):
                 continue
             # PARTE QUE TRAS AS FATURAS CRIADAS E AS RESPECTIVAS INFORMACOES
             if od['order_status'] == "READY_TO_SHIP":
-                path = "/api/v2/order/get_order_detail"
-                tmp_base_string = "%s%s%s%s%s" % (self.shopee_partner_id, path, timest, self.access_token, self.shopee_id)
-                base_string = tmp_base_string.encode()
-                sign = hmac.new(self.shopee_partner_key.encode(), base_string, hashlib.sha256).hexdigest()
-                optional = "total_amount,buyer_user_id,buyer_username,recipient_address,buyer_cpf_id,item_list"
-                path_cat = (
-                    f"?access_token={self.access_token}"
-                    f"&order_sn_list={order_sn}"
-                    f"&partner_id={self.shopee_partner_id}"
-                    f"&response_optional_fields={optional}"
-                    f"&shop_id={self.shopee_id}"
-                    f"&sign={sign}"
-                    f"&timestamp={timest}"
-                )
+                self.criar_pedido_shopee(order_sn)
 
-                url = url_ini + path + path_cat
+    def criar_pedido_shopee(self, order_sn):
+        if self.shop_real == True:
+            url_ini = "https://openplatform.shopee.com.br"
+        if self.shop_real == False:
+            url_ini = "https://partner.test-stable.shopeemobile.com"
+        if self.expire_date_token and self.expire_date_token < datetime.now():
+            self.action_gera_acess_token()
+            # print("TOKEN GERADO")
+        timest = str(int(time.time()))
+        path = "/api/v2/order/get_order_detail"
+        tmp_base_string = "%s%s%s%s%s" % (self.shopee_partner_id, path, timest, self.access_token, self.shopee_id)
+        base_string = tmp_base_string.encode()
+        sign = hmac.new(self.shopee_partner_key.encode(), base_string, hashlib.sha256).hexdigest()
+        optional = "total_amount,buyer_user_id,buyer_username,recipient_address,buyer_cpf_id,item_list"
+        path_cat = (
+            f"?access_token={self.access_token}"
+            f"&order_sn_list={order_sn}"
+            f"&partner_id={self.shopee_partner_id}"
+            f"&response_optional_fields={optional}"
+            f"&shop_id={self.shopee_id}"
+            f"&sign={sign}"
+            f"&timestamp={timest}"
+        )
 
-                response = requests.get(url)
-                od_detail = response.json()
-                order_name = ''
-                prd_id = ''
-                prd_qtd = ''
-                prd_price = ''
-                for z in od_detail['response']['order_list']:
-                    order_line = []
-                    for key, value in z.items():
-                        if key == "item_list":
-                            # print("ITEMS : ----------------------")
-                            for itens in z["item_list"]:
-                                for key, value in itens.items():
-                                    # print(f"---------------ITEM : {key}--{value}")
-                                    prd_sku = itens['item_sku']
-                                    prd_id = itens['item_id']
-                                    prd_qtd = itens['model_quantity_purchased']
-                                    prd_price = itens['model_original_price']
-                                    prd_name = itens['item_name']
-                                    if itens['model_sku'] != "":
-                                        prd_sku = itens['model_sku']
-                                    prod = self.env["product.product"].search([
-                                        ('default_code', '=', prd_sku),
-                                    ])
-                                if not prod:
-                                    prod = self.env["product.product"].search([
-                                        ('default_code', '=', 999999),
-                                    ])
-                                    prd_name = f"[{prd_sku}] {prd_name}"
-                                else:
-                                    prod.shopee = True
-                                    prod.shopee_sku = prd_sku
-                                    prod.title_shopee = prd_name
-                                    prod.shopee_config_id = self.id
-                                    prod.shopee_item_id = prd_id
-                                vals_line = {
-                                    'product_id': prod.id,
-                                    'product_uom_qty': prd_qtd,
-                                    'product_uom': prod.uom_id.id,
-                                    'price_unit': prd_price,
-                                    'name': prd_name,
-                                }
-                                order_line.append((0, 0,vals_line))
-                        elif key == "recipient_address":
-                            # print("Endereço : ===========================================")
-                            for key, value in z["recipient_address"].items():
-                                # print(f"ENDERECO : {key}-{value}")
-                                if key == "name":
-                                    name_buyer = value
-                                if key == "city":
-                                    city_buyer = value
-                                if key == "full_address":
-                                    street = value
-                                    st_n = value
-                                    street_n = st_n[st_n.find(",")+2:]
+        url = url_ini + path + path_cat
+        response = requests.get(url)
+        od_detail = response.json()
+        order_name = ''
+        prd_id = ''
+        prd_qtd = ''
+        prd_price = ''
+        for z in od_detail['response']['order_list']:
+            order_line = []
+            for key, value in z.items():
+                date_envi = z['ship_by_date']
+                data_envio_limite = datetime.fromtimestamp(date_envi)
+                # data_limite = data_envio_limite.strftime('%d/%m/%Y %H:%M:%S')
+                if key == "item_list":
+                    # print("ITEMS : ----------------------")
+                    for itens in z["item_list"]:
+                        for key, value in itens.items():
+                            # print(f"---------------ITEM : {key}--{value}")
+                            prd_sku = itens['item_sku']
+                            prd_id = itens['item_id']
+                            prd_qtd = itens['model_quantity_purchased']
+                            prd_price = itens['model_original_price']
+                            prd_name = itens['item_name']
+                            if itens['model_sku'] != "":
+                                prd_sku = itens['model_sku']
+                            prod = self.env["product.product"].search([
+                                ('default_code', '=', prd_sku),
+                            ])
+                        if not prod:
+                            prod = self.env["product.product"].search([
+                                ('default_code', '=', 999999),
+                            ])
+                            prd_name = f"[{prd_sku}] {prd_name}"
                         else:
-                            # print(f"{key}--{value}")
-                            order_name = str(z['order_sn'])
-                            id_buyer = str(z['buyer_user_id'])
-                            cpf_b = str(z['buyer_cpf_id'])
-                            if len(cpf_b) < 11:
-                                cpf_b = cpf_b.zfill(11)
-                            cpf = '{}.{}.{}-{}'.format(cpf_b[:3], cpf_b[3:6], cpf_b[6:9], cpf_b[9:])
-                    # print("PEDIDO CRIADO")
-                    pr = self.env["res.partner"].search([
-                        ('cnpj_cpf', '=', cpf),
-                    ])
-                    tag_pr = self.env['res.partner.category'].search([
-                        ('name', '=', "Shopee"),
-                    ])
-                    state = self.env['res.country.state'].search([('name', '=', z['recipient_address']['state'])], limit=1)
-                    if state.code == 'SP':
-                        venda_final = self.env['account.fiscal.position'].search([
-                            ('name', '=', 'Venda Consumidor Final - SP'),
-                        ])
-                    if state.code != 'SP':
-                        venda_final = self.env['account.fiscal.position'].search([
-                            ('name', '=', 'Venda Consumidor Final - Outros Estados'),
-                        ])
-                    cty = self.env['res.city'].search([
-                        ('name', '=', city_buyer),
-                        ('state_id', '=', state.id)
-                    ])
-                    if not pr:
-                        vals_pr = {
-                            'name': name_buyer,
-                            'legal_name': name_buyer,
-                            'cnpj_cpf': cpf,
-                            'ref': id_buyer,
-                            'street_name':  street[:street.find(",")],
-                            'street_number': street_n[:street_n.find(",")],
-                            'district': z['recipient_address']['district'],
-                            'city_id': cty.id,
-                            'state_id': state.id,
-                            'zip': z['recipient_address']['zipcode'],
-                            'category_id': [(6, 0, tag_pr.ids)],
-                            'ind_final': '1',
-                            'property_account_position_id': venda_final.id,
-                            # 'is_customer': True,
+                            prod.shopee = True
+                            prod.shopee_sku = prd_sku
+                            prod.title_shopee = prd_name
+                            prod.shopee_config_id = self.id
+                            prod.shopee_item_id = prd_id
+                        vals_line = {
+                            'product_id': prod.id,
+                            'product_uom_qty': prd_qtd,
+                            'product_uom': prod.uom_id.id,
+                            'price_unit': prd_price,
+                            'name': prd_name,
                         }
-                        pr = self.env['res.partner'].create(vals_pr)
-                        if pr.cnpj_cpf:
-                            pr._onchange_cnpj_cpf()
-                    tag = self.env['crm.tag'].search([
-                        ('name', '=', "Shopee"),
-                    ])
-                    vals={
-                        "name": order_name,
-                        "partner_id": pr.id,
-                        "tag_ids": [(6, 0, tag.ids)],
-                    }
-                    
-                    sale = self.env['sale.order'].create(vals)
-                    sale.onchange_partner_id()
-                    if len(order_line):
-                        sale['order_line'] = order_line
-                        for line in sale.order_line:
-                            # preco unitario alterado no onchange
-                            prd_price = line.price_unit
-                            prd_name = line.name
-                            line._onchange_product_id_fiscal()
-                            line.write(
-                                {'price_unit': prd_price,'name': prd_name,}
-                            )
+                        order_line.append((0, 0,vals_line))
+                elif key == "recipient_address":
+                    # print("Endereço : ===========================================")
+                    for key, value in z["recipient_address"].items():
+                        # print(f"ENDERECO : {key}-{value}")
+                        if key == "name":
+                            name_buyer = value
+                        if key == "city":
+                            city_buyer = value
+                        if key == "full_address":
+                            street = value
+                            st_n = value
+                            street_n = st_n[st_n.find(",")+2:]
+                else:
+                    # print(f"{key}--{value}")
+                    order_name = str(z['order_sn'])
+                    id_buyer = str(z['buyer_user_id'])
+                    cpf_b = str(z['buyer_cpf_id'])
+                    if len(cpf_b) < 11:
+                        cpf_b = cpf_b.zfill(11)
+                    cpf = '{}.{}.{}-{}'.format(cpf_b[:3], cpf_b[3:6], cpf_b[6:9], cpf_b[9:])
+            # print("PEDIDO CRIADO")
+            pr = self.env["res.partner"].search([
+                ('cnpj_cpf', '=', cpf),
+            ])
+            tag_pr = self.env['res.partner.category'].search([
+                ('name', '=', "Shopee"),
+            ])
+            state = self.env['res.country.state'].search([('name', '=', z['recipient_address']['state'])], limit=1)
+            if state.code == 'SP':
+                venda_final = self.env['account.fiscal.position'].search([
+                    ('name', '=', 'Venda Consumidor Final - SP'),
+                ])
+            if state.code != 'SP':
+                venda_final = self.env['account.fiscal.position'].search([
+                    ('name', '=', 'Venda Consumidor Final - Outros Estados'),
+                ])
+            cty = self.env['res.city'].search([
+                ('name', '=', city_buyer),
+                ('state_id', '=', state.id)
+            ])
+            if not pr:
+                vals_pr = {
+                    'name': name_buyer,
+                    'legal_name': name_buyer,
+                    'cnpj_cpf': cpf,
+                    'ref': id_buyer,
+                    'street_name':  street[:street.find(",")],
+                    'street_number': street_n[:street_n.find(",")],
+                    'district': z['recipient_address']['district'],
+                    'city_id': cty.id,
+                    'state_id': state.id,
+                    'zip': z['recipient_address']['zipcode'],
+                    'category_id': [(6, 0, tag_pr.ids)],
+                    'ind_final': '1',
+                    'property_account_position_id': venda_final.id,
+                    # 'is_customer': True,
+                }
+                pr = self.env['res.partner'].create(vals_pr)
+                if pr.cnpj_cpf:
+                    pr._onchange_cnpj_cpf()
+            tag = self.env['crm.tag'].search([
+                ('name', '=', "Shopee"),
+            ])
+            vals={
+                "name": order_name,
+                "partner_id": pr.id,
+                "tag_ids": [(6, 0, tag.ids)],
+                # "note": data_limite,
+                "commitment_date": data_envio_limite
+            }
+            
+            sale = self.env['sale.order'].create(vals)
+            sale.onchange_partner_id()
+            if len(order_line):
+                sale['order_line'] = order_line
+                for line in sale.order_line:
+                    # preco unitario alterado no onchange
+                    prd_price = line.price_unit
+                    prd_name = line.name
+                    line._onchange_product_id_fiscal()
+                    line.write(
+                        {'price_unit': prd_price,'name': prd_name,}
+                    )
         return True
 
     def action_envia_xml_shopee(self):

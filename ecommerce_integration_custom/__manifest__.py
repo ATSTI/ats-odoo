@@ -20,19 +20,23 @@
 ##############################################################################
 
 {
-    'name': 'Relatorios Felicita',
+    'name': "Complementos de integração com E-Commerce's",
     'version': '1.0',
     'category': 'Others',
     'sequence': 2,
-    'summary': 'relatorios personalizados',
+    'summary': 'Esse Modulo é um complementar para os modulos Shopee e Meli e suas respectivas Integrações. + Um relatório personalizado d elista de separação',
     'description': """
     """,
     'author': 'ATS Soluções',
+    'maintainer': 'Mauricio Silveira, mauricio@atsti.com.br',
     'website': '',
-    'depends': ['account', 'sale'],
+    'depends': ['account', 'sale', 'shopee_odoo', 'meli_odoo'],
     'data': [
+        'security/ir.model.access.csv',
         'report/report_separacao_felicita.xml',
-        'views/report_orcamento.xml'
+        'views/sale_view.xml',
+        'views/report_orcamento.xml',
+        'wizard/importar_view.xml',
     ],
     'installable': True,
     'application': False,

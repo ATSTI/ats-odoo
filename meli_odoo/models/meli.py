@@ -132,142 +132,150 @@ class MeliConfig(models.Model):
             ])
             if sale_exists:
                 continue
-            url = f'https://api.mercadolibre.com/orders/{order_id}'
-            response = requests.get(url, headers=headers)
-            order = response.json()
-            first_name = order.get('buyer', {}).get('first_name')
-            email = order.get('buyer', {}).get('email')
-            shipping_id = order["shipping"]["id"]
-            same_sale = self.env['sale.order'].search([
-                ('origin', '=', shipping_id),
-                ('state', 'in', ['draft']),
-            ])
-            if same_sale:
-                sale_line_exist = False
-                for ol in same_sale.order_line:
-                    if ol.order_id_meli:
-                        for y in ol.order_id_meli.split():
-                            sale_line_exist = self.env['sale.order.line'].search([
-                                ('order_id_meli', '=', y),
-                            ])
-                            if sale_line_exist:
-                                sale_line_exist = True
-                                break
-                if sale_line_exist == False:
-                    self._inserir_linhas(order, same_sale)
-                    continue
-                if sale_line_exist == True:
-                    continue
-            url = f'https://api.mercadolibre.com/shipments/{shipping_id}'
-            ship_address = requests.get(url, headers=headers)
-            if ship_address.status_code == 200:
-                data = ship_address.json()
-                ou1 = self.env["operating.unit"].search([
-                        ('code', '=', 'OU1'),
-                    ])
-                full = ou1
-                mf = self.env["operating.unit"].search([
-                        ('code', '=', 'MF'),
-                    ])
-                if data.get('logistic_type') == 'fulfillment':
-                    full = mf
-                # print(f'Full: {full.name}')
-                address = data.get('receiver_address', {})
-                bairro = address.get('neighborhood')
-                rua = address.get('street_name')
-                numero = address.get('street_number')
-                city_buyer = address.get('city', {}).get('name')
-                state_buyer = address.get('state', {}).get('name')
-                zip_buyer = address.get('zip_code')
-            name_buyer = f"{first_name} {order.get('buyer', {}).get('last_name')}"
-            if not order.get('pack_id'):
-                order_name = str(order.get('id'))
-            else:
-                order_name = str(order.get('pack_id'))
-            order_idd = order.get('id')
-            url = f'https://api.mercadolibre.com/orders/{order_idd}/billing_info'
-            hd = {
-                'Authorization': f'Bearer {self.access_token}',
-                'x-version': '2'
-            }
-            address_buyer = requests.get(url, headers=hd)
-            cpfj_buyer = address_buyer.json()['buyer']['billing_info']['identification']['number']
-            if len(cpfj_buyer) == 11:
-                cpfj_buyer = cpfj_buyer.zfill(11)
-                cpfj = '{}.{}.{}-{}'.format(cpfj_buyer[:3], cpfj_buyer[3:6], cpfj_buyer[6:9], cpfj_buyer[9:])
-            if len(cpfj_buyer) == 14:
-                cpfj_buyer = cpfj_buyer.zfill(14)
-                cpfj = '{}.{}.{}/{}-{}'.format(cpfj_buyer[:2], cpfj_buyer[2:5], cpfj_buyer[5:8], cpfj_buyer[8:12], cpfj_buyer[12:])    
-            order_amount = order['total_amount']
-            order_date = order['date_created']
-            buyer_id = order['buyer']['id']
-            pr = self.env["res.partner"].search([
-                ('cnpj_cpf', '=' , cpfj) or ('ref', '=', buyer_id),
-            ])
-            if not pr:
-                tag_pr = self.env['res.partner.category'].search([
-                    ('name', '=', "Mercado Livre"),
+            self.cria_pedido_meli(order_id, headers)
+
+    def cria_pedido_meli(self, order_id, headers):
+        url = f'https://api.mercadolibre.com/orders/{order_id}'
+        response = requests.get(url, headers=headers)
+        order = response.json()
+        first_name = order.get('buyer', {}).get('first_name')
+        email = order.get('buyer', {}).get('email')
+        shipping_id = order["shipping"]["id"]
+        same_sale = self.env['sale.order'].search([
+            ('origin', '=', shipping_id),
+            ('state', 'in', ['draft']),
+        ])
+        if same_sale:
+            sale_line_exist = False
+            for ol in same_sale.order_line:
+                if ol.order_id_meli:
+                    for y in ol.order_id_meli.split():
+                        sale_line_exist = self.env['sale.order.line'].search([
+                            ('order_id_meli', '=', y),
+                        ])
+                        if sale_line_exist:
+                            sale_line_exist = True
+                            break
+            if sale_line_exist == False:
+                self._inserir_linhas(order, same_sale)
+                return
+            if sale_line_exist == True:
+                return
+        url = f'https://api.mercadolibre.com/shipments/{shipping_id}'
+        ship_address = requests.get(url, headers=headers)
+        if ship_address.status_code == 200:
+            data = ship_address.json()
+            ou1 = self.env["operating.unit"].search([
+                    ('code', '=', 'OU1'),
                 ])
-                state = self.env['res.country.state'].search([
-                    ('name', '=', state_buyer), 
-                    ('country_id', '=', 32)
-                ], limit=1)
-                if state.code == 'SP':
-                    venda_final = self.env['account.fiscal.position'].search([
-                        ('name', '=', 'Venda Consumidor Final - SP'),
-                    ])
-                if state.code != 'SP':
-                    venda_final = self.env['account.fiscal.position'].search([
-                        ('name', '=', 'Venda Consumidor Final - Outros Estados'),
-                    ])
-                cty = self.env['res.city'].search([
-                    ('name', '=', city_buyer),
-                    ('state_id', '=', state.id)
+            full = ou1
+            mf = self.env["operating.unit"].search([
+                    ('code', '=', 'MF'),
                 ])
-                vals_pr = {
-                    'name': name_buyer,
-                    'legal_name': name_buyer,
-                    'cnpj_cpf': cpfj,
-                    'ref': buyer_id,
-                    'street_name':  rua,
-                    'street_number': numero,
-                    'district': bairro['name'],
-                    'city_id': cty.id,
-                    'state_id': state.id,
-                    'zip': zip_buyer,
-                    'category_id': [(6, 0, tag_pr.ids)],
-                    'ind_final': '1',
-                    'is_customer': True,
-                    'property_account_position_id': venda_final.id,
-                }
-                pr = self.env['res.partner'].create(vals_pr)
-                if pr.cnpj_cpf:
-                    pr._onchange_cnpj_cpf()
-            tag = self.env['crm.tag'].search([
+            if data.get('logistic_type') == 'fulfillment':
+                full = mf
+            # print(f'Full: {full.name}')
+            limit_date = data.get("shipping_option", {}).get("buffering", {}).get("date")
+            if limit_date:
+                dt_limite = datetime.fromisoformat(limit_date.replace("Z", "+00:00")).strftime("%d/%m/%Y %H:%M:%S")
+                data_formatada = datetime.strptime(dt_limite, '%d/%m/%Y %H:%M:%S').strftime('%Y-%m-%d %H:%M:%S') 
+            address = data.get('receiver_address', {})
+            bairro = address.get('neighborhood')
+            rua = address.get('street_name')
+            numero = address.get('street_number')
+            city_buyer = address.get('city', {}).get('name')
+            state_buyer = address.get('state', {}).get('name')
+            zip_buyer = address.get('zip_code')
+        name_buyer = f"{first_name} {order.get('buyer', {}).get('last_name')}"
+        if not order.get('pack_id'):
+            order_name = str(order.get('id'))
+        else:
+            order_name = str(order.get('pack_id'))
+        order_idd = order.get('id')
+        url = f'https://api.mercadolibre.com/orders/{order_idd}/billing_info'
+        hd = {
+            'Authorization': f'Bearer {self.access_token}',
+            'x-version': '2'
+        }
+        address_buyer = requests.get(url, headers=hd)
+        cpfj_buyer = address_buyer.json()['buyer']['billing_info']['identification']['number']
+        if len(cpfj_buyer) == 11:
+            cpfj_buyer = cpfj_buyer.zfill(11)
+            cpfj = '{}.{}.{}-{}'.format(cpfj_buyer[:3], cpfj_buyer[3:6], cpfj_buyer[6:9], cpfj_buyer[9:])
+        if len(cpfj_buyer) == 14:
+            cpfj_buyer = cpfj_buyer.zfill(14)
+            cpfj = '{}.{}.{}/{}-{}'.format(cpfj_buyer[:2], cpfj_buyer[2:5], cpfj_buyer[5:8], cpfj_buyer[8:12], cpfj_buyer[12:])    
+        order_amount = order['total_amount']
+        order_date = order['date_created']
+        buyer_id = order['buyer']['id']
+        pr = self.env["res.partner"].search([
+            ('cnpj_cpf', '=' , cpfj) or ('ref', '=', buyer_id),
+        ])
+        if not pr:
+            tag_pr = self.env['res.partner.category'].search([
                 ('name', '=', "Mercado Livre"),
             ])
-            team = self.env['crm.team'].search([
-                ('operating_unit_id','=', full.id),
+            state = self.env['res.country.state'].search([
+                ('name', '=', state_buyer), 
+                ('country_id', '=', 32)
             ], limit=1)
-            wh = self.env["stock.warehouse"].search(
-                [("operating_unit_id", "=", full.id)]
-            )
-            vals={
-                "name": order_name,
-                "partner_id": pr.id,
-                "tag_ids": [(6, 0, tag.ids)],
-                "origin": shipping_id,
-                "fiscal_operation_id": 1,
+            if state.code == 'SP':
+                venda_final = self.env['account.fiscal.position'].search([
+                    ('name', '=', 'Venda Consumidor Final - SP'),
+                ])
+            if state.code != 'SP':
+                venda_final = self.env['account.fiscal.position'].search([
+                    ('name', '=', 'Venda Consumidor Final - Outros Estados'),
+                ])
+            cty = self.env['res.city'].search([
+                ('name', '=', city_buyer),
+                ('state_id', '=', state.id)
+            ])
+            vals_pr = {
+                'name': name_buyer,
+                'legal_name': name_buyer,
+                'cnpj_cpf': cpfj,
+                'ref': buyer_id,
+                'street_name':  rua,
+                'street_number': numero,
+                'district': bairro['name'],
+                'city_id': cty.id,
+                'state_id': state.id,
+                'zip': zip_buyer,
+                'category_id': [(6, 0, tag_pr.ids)],
+                'ind_final': '1',
+                'is_customer': True,
+                'property_account_position_id': venda_final.id,
             }
-            sale = self.env['sale.order'].create(vals)
-            if full.id == mf.id:
-                sale.write({"operating_unit_id": full.id, "team_id": team.id, "warehouse_id": wh.id, "fiscal_operation_id": False})
-                sale.onchange_team_id()
-                sale.onchange_operating_unit_id()
-                sale._check_wh_operating_unit()
-            else:
-                sale.onchange_partner_id()
-            self._inserir_linhas(order, sale)
+            pr = self.env['res.partner'].create(vals_pr)
+            if pr.cnpj_cpf:
+                pr._onchange_cnpj_cpf()
+        tag = self.env['crm.tag'].search([
+            ('name', '=', "Mercado Livre"),
+        ])
+        team = self.env['crm.team'].search([
+            ('operating_unit_id','=', full.id),
+        ], limit=1)
+        wh = self.env["stock.warehouse"].search(
+            [("operating_unit_id", "=", full.id)]
+        )
+        vals={
+            "name": order_name,
+            "partner_id": pr.id,
+            "tag_ids": [(6, 0, tag.ids)],
+            "origin": shipping_id,
+            "fiscal_operation_id": 1,
+            "commitment_date": data_formatada
+        }
+        sale = self.env['sale.order'].create(vals)
+        if full.id == mf.id:
+            sale.write({"operating_unit_id": full.id, "team_id": team.id, "warehouse_id": wh.id, "fiscal_operation_id": False})
+            sale.onchange_team_id()
+            sale.onchange_operating_unit_id()
+            sale._check_wh_operating_unit()
+        else:
+            sale.onchange_partner_id()
+        self._inserir_linhas(order, sale)
 
     def action_envia_xml_meli(self):
         lj = self.search([('name', 'ilike', 'felicita')])  # Ajuste o filtro conforme necessário

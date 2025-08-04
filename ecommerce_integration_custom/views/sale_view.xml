@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="saleorder_tree_view_custom" model="ir.ui.view">
+        <field name="name">saleorder.tree.view.custom</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
+        <field name="priority">999</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='commitment_date']" position="replace">
+                <field name="commitment_date" optional="hide" widget="datetime"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

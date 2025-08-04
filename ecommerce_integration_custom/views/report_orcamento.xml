@@ -4,8 +4,8 @@
         <field name="name">Lista De Separação</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">report_prod_felicita.report_saleorder_separacao</field>
-        <field name="report_file">report_prod_felicita.report_saleorder_separacao</field>
+        <field name="report_name">ecommerce_integration_custom.report_saleorder_separacao</field>
+        <field name="report_file">ecommerce_integration_custom.report_saleorder_separacao</field>
         <field name="binding_model_id" ref="sale.model_sale_order"/>
     </record>
 </odoo>

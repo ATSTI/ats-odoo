@@ -50,12 +50,16 @@
                                     <span>Plataforma: <b><t t-esc="tag.name"/></b></span>
                                 </t>
                             </td>
-                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 60%">
+                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 40%">
                                 <span>Pedido: <b style="font-size:15px;" t-field="o.name"/></span>
                             </td>
-                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; width: 10%"></td>
+                            <td style="border: 1px solid #dcdcdc; height:27px; font-size:12px;text-align: center;border-collapse: collapse; width: 20%">
+                                <span>Nome: <b style="font-size:12px;" t-field="o.partner_id.name"/></span>
+                            </td>
                             <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; width: 5%"></td>
-                            <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; width: 5%"></td>
+                            <td style="border: 1px solid #dcdcdc; height:27px; font-size:12px;text-align: center;border-collapse: collapse; width: 15%">
+                                <span>Enviar Até: </span><p/><b style="font-size:10px;" t-field="o.commitment_date"/>
+                            </td>
                         </tr>
                     </table>
                     <table style="border: 1px solid #dcdcdc; border-collapse: collapse; font-size:14px;width: 100%;">

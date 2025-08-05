@@ -17,7 +17,7 @@
         <field name="inherit_id" ref="sale.view_order_tree"/>
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
-                <field name="contact_partner" widget="many2many_tags" options="{'color_field': 'color'}" optional="show"/>
+                <field name="contact_partner_names" optional="show"/>
             </field>
         </field>
     </record>
@@ -27,7 +27,7 @@
         <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
-                <field name="contact_partner" widget="many2many_tags" options="{'color_field': 'color'}" />
+                <field name="contact_partner_names" />
             </field>
         </field>
     </record>

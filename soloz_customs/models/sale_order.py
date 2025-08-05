@@ -7,26 +7,38 @@ from odoo import api, fields, models, _
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
-    
+
     contact_partner = fields.Many2many(
         comodel_name='res.partner',
         compute='_compute_contact_partner',
-        string='Contatos do Parceiro',)
-    
+        string='Contatos do Parceiro',
+        store=False)
+
+    contact_partner_names = fields.Char(
+        string='Contatos do Parceiro',
+        compute='_compute_contact_partner_names',
+        store=False)
+
     message_error_partner = fields.Char(
         string='Mensagem de erro do parceiro',
         readonly=True,
-        invisible=True,)
-    
+        invisible=True)
+
     @api.depends('partner_id')
     def _compute_contact_partner(self):
         for order in self:
             if order.partner_id:
-                active_contacts = order.partner_id.child_ids.filtered(lambda c: c.active)
-                order.contact_partner = active_contacts
+                # Só contatos ativos (e sem empresas)
+                contacts = order.partner_id.child_ids.filtered(lambda c: c.active)
+                order.contact_partner = contacts
             else:
                 order.contact_partner = [(5, 0, 0)]
 
+    @api.depends('contact_partner')
+    def _compute_contact_partner_names(self):
+        for order in self:
+            names = order.contact_partner.mapped('name')
+            order.contact_partner_names = ', '.join(names)
     
     def action_confirm(self):
         result = super().action_confirm()

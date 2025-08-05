@@ -31,3 +31,4 @@ class Partner(models.Model):
     def _compute_readonly_user_id(self):
         for rec in self:
             rec.readonly_user_id = rec.user_id.id != self.env.uid
+    

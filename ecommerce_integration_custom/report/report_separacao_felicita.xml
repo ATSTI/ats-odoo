@@ -96,16 +96,29 @@
                                     <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 5%;">
                                         <span t-field="line.product_uom_qty"/>
                                     </td>
-                                    <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:10px;text-align: left; width: 20%;">
-                                    <t t-foreach="line.product_id.product_tmpl_id.bom_ids" t-as="mrp">
-                                        <t t-foreach="mrp.bom_line_ids" t-as="bom">
-                                            <span t-field="bom.product_id.name"/><br/>
-                                        </t>
+                                    <t t-if="line.product_id.product_tmpl_id.bom_ids" >
+                                        <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:10px;text-align: left; width: 20%;">
+                                            <t t-foreach="line.product_id.product_tmpl_id.bom_ids" t-as="mrp">
+                                                <t t-foreach="mrp.bom_line_ids" t-as="bom">
+                                                    <span t-field="bom.product_id.name"/><br/>
+                                                </t>
+                                            </t>
+                                        </td>
+                                        <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 20%;">
+                                            <t t-foreach="line.product_id.product_tmpl_id.bom_ids" t-as="mrp">
+                                                <t t-foreach="mrp.bom_line_ids" t-as="bom">
+                                                    <span t-field="bom.product_id.barcode"/><br/>
+                                                </t>
+                                            </t>
+                                        </td>
                                     </t>
-                                    </td>
-                                    <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 30%;">
-                                        <span t-field="line.product_id.barcode"/>
-                                    </td>
+                                    <t t-else="">
+                                        <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 20%;">
+                                        </td>
+                                        <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 20%;">
+                                            <span t-field="line.product_id.barcode"/>
+                                        </td>
+                                    </t>
                                 </tr>
                             </t>
                         <t t-foreach="range(linhas)" t-as="compl">

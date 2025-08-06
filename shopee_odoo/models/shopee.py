@@ -111,6 +111,7 @@ class ShopeeConfig(models.Model):
                 self.criar_pedido_shopee(order_sn)
 
     def criar_pedido_shopee(self, order_sn):
+        import pudb;pu.db
         if self.shop_real == True:
             url_ini = "https://openplatform.shopee.com.br"
         if self.shop_real == False:
@@ -137,10 +138,12 @@ class ShopeeConfig(models.Model):
         url = url_ini + path + path_cat
         response = requests.get(url)
         od_detail = response.json()
+        print(od_detail)
         order_name = ''
         prd_id = ''
         prd_qtd = ''
         prd_price = ''
+        variante = ''
         for z in od_detail['response']['order_list']:
             order_line = []
             for key, value in z.items():
@@ -173,6 +176,9 @@ class ShopeeConfig(models.Model):
                             prod.title_shopee = prd_name
                             prod.shopee_config_id = self.id
                             prod.shopee_item_id = prd_id
+                        if itens['model_name']:
+                            variante = itens['model_name']
+                            prd_name = f"[{prd_sku}] {prd_name} - {variante}"
                         vals_line = {
                             'product_id': prod.id,
                             'product_uom_qty': prd_qtd,

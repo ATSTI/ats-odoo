@@ -91,7 +91,7 @@
                                         <t t-esc="item" ></t>
                                     </td>
                                     <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: left; width: 50%;">
-                                        <span t-field="line.product_id.name"/>
+                                        [<span t-field="line.product_id.default_code"/>]<span t-field="line.name">
                                     </td>
                                     <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 5%;">
                                         <span t-field="line.product_uom_qty"/>

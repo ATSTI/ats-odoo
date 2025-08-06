@@ -7,8 +7,8 @@
             <form string="Importar Pedido Online">
                 <group>
                     <group>
-                        <field name="shopee" />
-                        <field name="meli" />
+                        <field name="shopee" attrs="{'invisible': [('meli', '=', True)]}"/>
+                        <field name="meli" attrs="{'invisible': [('shopee', '=', True)]}"/>
                         <!-- <field name="shopee_config_id"  attrs="{'invisible': [('shopee', '=', False)]}"/>
                         <field name="meli_config_id" attrs="{'invisible': [('meli', '=', False)]}" /> -->
                     </group>

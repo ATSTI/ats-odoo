@@ -120,7 +120,7 @@ class MeliConfig(models.Model):
         }
         hoje = str(datetime.today().date())
         inicio = str(datetime.today().date() - timedelta(days=3))
-        url = f"https://api.mercadolibre.com/orders/search?seller={self.user_id}&order.date_created.from={inicio}T00:00:00Z&order.date_created.to={hoje}T23:59:59Z&limit=100"
+        url = f"https://api.mercadolibre.com/orders/search?seller={self.user_id}&order.date_created.from={inicio}T00:00:00Z&order.date_created.to={hoje}T23:59:59Z&limit=50"
         response = requests.get(url, headers=headers)
         order_list = response.json()
         for orders in order_list.get("results", []):

@@ -111,7 +111,6 @@ class ShopeeConfig(models.Model):
                 self.criar_pedido_shopee(order_sn)
 
     def criar_pedido_shopee(self, order_sn):
-        import pudb;pu.db
         if self.shop_real == True:
             url_ini = "https://openplatform.shopee.com.br"
         if self.shop_real == False:
@@ -138,7 +137,6 @@ class ShopeeConfig(models.Model):
         url = url_ini + path + path_cat
         response = requests.get(url)
         od_detail = response.json()
-        print(od_detail)
         order_name = ''
         prd_id = ''
         prd_qtd = ''

@@ -60,7 +60,12 @@ class AccountMove(models.Model):
 
         return res
 
-    def action_confirma_parcela(self): 
+    def action_confirma_parcela(self):
+        valor_total = 0
+        for prc in self.parcela_ids:
+            valor_total += prc.valor
+        if round(self.amount_total, 2) != round(valor_total, 2):
+            raise UserError(_(f"Valor da soma das parcelas: {str(valor_total)}, diferente do valor total: {str(self.amount_total)}.")) 
         if self.num_parcela > 0:
             account = self.financial_move_line_ids[0].account_id
             self.financial_move_line_ids.with_context(check_move_validity=False).unlink()

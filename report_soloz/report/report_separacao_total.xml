@@ -54,7 +54,8 @@
                                 <p t-field="o.scheduled_date"/>
                             </div>
                         </div>
-                        <table class="table table-sm" t-if="o.move_line_ids and o.move_ids_without_package">
+                        <!-- t-if="o.move_line_ids and o.move_ids_without_package" -->
+                        <table class="table table-sm" >
                             <t t-set="has_barcode" t-value="any(move_line.product_id and move_line.product_id.sudo().barcode or move_line.package_id for move_line in o.move_line_ids)"/>
                             <t t-set="has_serial_number" t-value="any(move_line.lot_id or move_line.lot_name for move_line in o.move_line_ids)" groups="stock.group_production_lot"/>
                             <thead>
@@ -81,7 +82,7 @@
                             </thead>
                             <tbody>
                                 <t t-set="grouped_lines" t-value="{}"/>
-                                <t t-foreach="o.move_line_ids" t-as="ml">
+                                <t t-foreach="o.move_ids_without_package" t-as="ml">
                                     <t t-set="key" t-value="(ml.product_id.id, ml.location_id.id, ml.location_dest_id.id)"/>
                                     <t t-set="qty" t-value="grouped_lines.get(key, 0) + (ml.product_uom_qty)"/>
                                     <t t-set="new_grouped" t-value="grouped_lines.copy()"/>
@@ -123,10 +124,10 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <t t-set="no_reserved_product" t-value="o.move_lines.filtered(lambda x: x.product_uom_qty != x.reserved_availability and x.move_line_ids and x.state!='done')"/>
+                        <!-- <t t-set="no_reserved_product" t-value="o.move_lines.filtered(lambda x: x.product_uom_qty != x.reserved_availability and x.move_line_ids and x.state!='done')"/>
                         <p t-if="o.state in ['draft', 'waiting', 'confirmed'] or no_reserved_product"><i class="fa fa-exclamation-triangle"/>
                             Nem todos os produtos puderam ser reservados. Clique no botão "Verificar Disponibilidade" para tentar reservar os produtos.
-                        </p>
+                        </p> -->
                         <p t-field="o.note"/>
                     </div>
                 </t>

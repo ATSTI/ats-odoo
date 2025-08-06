@@ -5,8 +5,13 @@ from collections import defaultdict
 
 
 class AccountMove(models.Model):
-
     _inherit = "account.move"
+    # _inherit = [
+    #     _name,
+    #     "l10n_br_fiscal.document.mixin.methods",
+    #     "l10n_br_account.decorator.mixin",
+    # ]
+
 
     # amount_freight_value = fields.Monetary(
     #     string="Frete",

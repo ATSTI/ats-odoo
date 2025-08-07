@@ -175,10 +175,12 @@ class MeliConfig(models.Model):
             if data.get('logistic_type') == 'fulfillment':
                 full = mf
             # print(f'Full: {full.name}')
-            limit_date = data.get("shipping_option", {}).get("buffering", {}).get("date")
-            if limit_date:
-                dt_limite = datetime.fromisoformat(limit_date.replace("Z", "+00:00")).strftime("%d/%m/%Y %H:%M:%S")
-                data_formatada = datetime.strptime(dt_limite, '%d/%m/%Y %H:%M:%S').strftime('%Y-%m-%d %H:%M:%S') 
+            # limit_date = data.get("shipping_option", {}).get("buffering", {}).get("date")
+            # if limit_date:
+            #     dt_limite = datetime.fromisoformat(limit_date.replace("Z", "+00:00")).strftime("%d/%m/%Y %H:%M:%S")
+            #     data_formatada = datetime.strptime(dt_limite, '%d/%m/%Y %H:%M:%S').strftime('%Y-%m-%d %H:%M:%S')
+            # CONFIRMAR SE A DATA VEM CERTO OU ERRADO, ABAIXO É PRA SER A CERTA
+            data_envio = datetime.strptime(data.get("shipping_option", {})['estimated_delivery_time']['pay_before'], "%Y-%m-%dT%H:%M:%S.000-03:00") + timedelta(hours=3)
             address = data.get('receiver_address', {})
             bairro = address.get('neighborhood')
             rua = address.get('street_name')
@@ -265,7 +267,7 @@ class MeliConfig(models.Model):
             "tag_ids": [(6, 0, tag.ids)],
             "origin": shipping_id,
             "fiscal_operation_id": 1,
-            "commitment_date": data_formatada
+            "commitment_date": data_envio
         }
         sale = self.env['sale.order'].create(vals)
         if full.id == mf.id:

@@ -42,14 +42,34 @@ class ProducTemplate(models.Model):
     # image_meli = fields.Char('Imagem Mercado Livre')
     meli_config_id = fields.Many2one('meli.config', 'Mercado Livre')
 
+    #CUSTOS
+    # MELI: Percentual 15%, Taxa por item 6,0
+    # Depois mais a margem nossa por exemplo de 45%
+
+    # Pc = 50,00 + T = Taxa por venda 6,00 + Cv = comissão de venda 15% + Ml = margem de lucro 45%
+    # Formula: Vt = Pc + T + Cv + Ml
+    # Pc; vem do ODOO
+    # T; fixa de cada plataforma
+    # Cv; Variavel (pensar como colocar isso)
+    # Ml; Proavelmente fixo em 45%
+
+    def calcula_valor_venda_meli(self):
+        #Por enquanto essa aplicação, apresentar para eles e ver...
+        pc = self.standard_price
+        t = 6
+        cv = 0.15 * pc
+        ml = 0.45 * pc
+        Vt = pc + t + cv + ml
+        self.price_meli = Vt
+
 
     @api.onchange('meli')
     def onchange_meli(self):
         if self.meli == True:
             self.title_meli = self.name
             self.meli_sku = self.default_code
-            self.price_meli = self.list_price 
             self.qtd_meli = 1
+            self.calcula_valor_venda_meli()
 
     def encontrar_item_por_sku(self):
         user_id = self.meli_config_id.user_id

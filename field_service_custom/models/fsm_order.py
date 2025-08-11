@@ -15,6 +15,8 @@ class FSMOrder(models.Model):
             self.write({'person_ids': [(4, self.person_id.id)]})
             users = self.env['hr.employee']
             us = users.search([('name', '=', self.person_id.name)])
+            if len(us) > 1:
+                raise UserError(_("Muitos funcionarios encontrados para o mesmo Usuario; Definições > Usuarios > Usuario escolhido > Funcionarios."))
             if us:
                 vals_line = {
                     'employee_id': us.id,

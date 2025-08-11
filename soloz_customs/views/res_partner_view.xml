@@ -1,18 +1,24 @@
 <?xml version="1.0"?>
 <odoo>
 
-    <record id="view_res_partner_soloz_custom_form" model="ir.ui.view">
+   <record id="view_res_partner_soloz_custom_form" model="ir.ui.view">
         <field name="name">res.partner.custom.soloz</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="priority">999</field>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='user_id']" position="after">
-                <field name="readonly_user_id" invisible="1" />
+            <!-- <xpath expr="//field[@name='user_id']" position="replace">
+                <field name="user_id"
+                    attrs="{'readonly': ['&',
+                        ('user_id', '!=', uid),
+                        ('not in_group', 'sales_team_security.group_sale_team_manager')
+                    ]}" />
+            </xpath> -->
+            <xpath expr="//field[@name='user_id']" position="before">
+                <field name="readonly_user_id" invisible="1"/>
             </xpath>
-            <xpath expr="//field[@name='user_id']" position="attributes">
-                <attribute name="groups">sales_team.group_sale_manager</attribute>
-                <attribute name="attrs">{'readonly': [('readonly_user_id', '=', True)]}</attribute>
+            <xpath expr="//field[@name='user_id']" position="replace">
+                <field name="user_id" attrs="{'readonly': [('readonly_user_id', '=', True)]}" />
             </xpath>
         </field>
     </record>

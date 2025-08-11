@@ -23,6 +23,10 @@ class MeliConfig(models.Model):
     user_id = fields.Char('Usuario ID') #TODO PENSAR NO CASO DE EXISTIREM MAIS DE UM USUARIO
     client_meli_key = fields.Char('Client Secret Key', required=True)
 
+    margin_meli = fields.Float('Margem Mercado Livre (porcentagem)', default=15)
+    taxa_meli = fields.Float('Taxa Mercado Livre', default=6)
+    margem_lucro = fields.Float('Margem de Lucro (porcentagem)', default=45)
+
     def action_gera_acess_token(self):
         headers = {
             'accept': 'application/json',

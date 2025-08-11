@@ -16,7 +16,7 @@ class ProducTemplate(models.Model):
         default=False,
         )
     shopee_item_id = fields.Char('Id do Item')
-    margin_shopee = fields.Char('Margem Shopee')
+    # margin_shopee = fields.Char('Margem Shopee')
     title_shopee = fields.Char('Titulo do Produto')
     price_shopee = fields.Float('Preço Shopee')
     qtd_shopee = fields.Float('Quantidade Disponivel Shopee')
@@ -28,10 +28,6 @@ class ProducTemplate(models.Model):
     #url_ini = "https://openplatform.shopee.com.br" 
     # url_ini = "https://partner.test-stable.shopeemobile.com"
 
-    #CUSTOS
-    # Por exemplo; Shopee: Percentual comissão 22% ,Taxa por cada item vendido 4,00
-    # Depois mais a margem nossa por exemplo de 45%
-
     # Pc = 50,00 + T = Taxa por venda 6,00 + Cv = comissão de venda 15% + Ml = margem de lucro 45%
     # Formula: Vt = Pc + T + Cv + Ml
     # Pc; vem do ODOO
@@ -40,14 +36,20 @@ class ProducTemplate(models.Model):
     # Ml; Proavelmente fixo em 45%
 
 
+    @api.depends('standard_price')
     def calcula_valor_venda_shopee(self):
         #Por enquanto essa aplicação, apresentar para eles e ver...
         pc = self.standard_price
-        t = 6
-        cv = 0.22 * pc
-        ml = 0.45 * pc
+        t = self.shopee_config_id.taxa_shopee
+        cv = self.shopee_config_id.margin_shopee/100 * pc
+        ml = self.shopee_config_id.margem_lucro/100 * pc
         Vt = pc + t + cv + ml
         self.price_shopee = Vt
+
+    @api.onchange('standard_price')
+    def onchange_standard_price_shopee(self):
+        if self.shopee == True:
+            self.calcula_valor_venda_shopee()
 
     @api.onchange('shopee')
     def onchange_shopee(self):

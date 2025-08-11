@@ -14,54 +14,54 @@ class ProducTemplate(models.Model):
         default=False,
         )
     meli_item_id = fields.Char('Id do Item')
-    margin_meli = fields.Char('Margem Mercado Livre')
+    # margin_meli = fields.Char('Margem Mercado Livre (porcentagem)')
     title_meli = fields.Char('Titulo do Produto')
     meli_sku = fields.Char('SKU Mercado Livre')
     price_meli = fields.Float('Preço Mercado Livre')
     qtd_meli = fields.Float('Quantidade Disponivel Mercado Livre')
-    category_meli = fields.Selection([
-        # CATEGORIAS MERCADO LIVRE (VITTON)
-        ('MLB455528', 'Agasalhos'),
-        ('MLB188064', 'Bermudas e Shorts'),
-        ('MLB23262', 'Calçados'),
-        ('MLB188065', 'Calças'),
-        ('MLB107292', 'Camisas'),
-        ('MLB278018', 'Leggings'),
-        ('MLB27250', 'Macacão'),
-        ('MLB270215', 'Moda Fitness'),
-        #TODO ADICIONAR TODAS CATEGORIAS UTILIZADAS NO MERCADO LIVRE
-    ],'Categoria Mercado Livre')
-    guarantee_meli = fields.Selection([
-        ('0', 'Sem Garantia'),
-        ('30', '30 dias'),
-        ('60', '60 dias'),
-        ('90', '90 dias'),
-        ('120', '120 dias'),
-        ('180', '180 dias'),
-        ('360', '360 dias'),    ], string='Garantia do Comprador', default='0')
+    # category_meli = fields.Selection([
+    #     # CATEGORIAS MERCADO LIVRE (VITTON)
+    #     ('MLB455528', 'Agasalhos'),
+    #     ('MLB188064', 'Bermudas e Shorts'),
+    #     ('MLB23262', 'Calçados'),
+    #     ('MLB188065', 'Calças'),
+    #     ('MLB107292', 'Camisas'),
+    #     ('MLB278018', 'Leggings'),
+    #     ('MLB27250', 'Macacão'),
+    #     ('MLB270215', 'Moda Fitness'),
+    #     #TODO ADICIONAR TODAS CATEGORIAS UTILIZADAS NO MERCADO LIVRE
+    # ],'Categoria Mercado Livre')
+    # guarantee_meli = fields.Selection([
+    #     ('0', 'Sem Garantia'),
+    #     ('30', '30 dias'),
+    #     ('60', '60 dias'),
+    #     ('90', '90 dias'),
+    #     ('120', '120 dias'),
+    #     ('180', '180 dias'),
+    #     ('360', '360 dias'),    ], string='Garantia do Comprador', default='0')
     # image_meli = fields.Char('Imagem Mercado Livre')
     meli_config_id = fields.Many2one('meli.config', 'Mercado Livre')
 
-    #CUSTOS
-    # MELI: Percentual 15%, Taxa por item 6,0
-    # Depois mais a margem nossa por exemplo de 45%
-
-    # Pc = 50,00 + T = Taxa por venda 6,00 + Cv = comissão de venda 15% + Ml = margem de lucro 45%
     # Formula: Vt = Pc + T + Cv + Ml
     # Pc; vem do ODOO
     # T; fixa de cada plataforma
     # Cv; Variavel (pensar como colocar isso)
     # Ml; Proavelmente fixo em 45%
 
+    @api.depends('standard_price')
     def calcula_valor_venda_meli(self):
         #Por enquanto essa aplicação, apresentar para eles e ver...
         pc = self.standard_price
-        t = 6
-        cv = 0.15 * pc
-        ml = 0.45 * pc
+        t = self.meli_config_id.taxa_meli
+        cv = self.meli_config_id.margin_meli/100 * pc
+        ml = self.meli_config_id.margem_lucro/100 * pc
         Vt = pc + t + cv + ml
         self.price_meli = Vt
 
+    @api.onchange('standard_price')
+    def onchange_standard_price_meli(self):
+        if self.meli == True:
+            self.calcula_valor_venda_meli()
 
     @api.onchange('meli')
     def onchange_meli(self):

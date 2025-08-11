@@ -8,30 +8,35 @@
             <field name="arch" type="xml">
                 <form string="Shopee Configurações">
                     <header>
-                        <button name="action_pega_faturas_shopee" string="Sincronizar Faturas Shopee" type="object" class="btn btn-primary"/>
-                        <button name="envia_xml_shopee" string="Enviar XML's Para Shopee" type="object" class="btn btn-primary"/>
-                        <button name="action_gera_acess_token" string="Gerar Access Token" type="object" class="btn btn-primary"/>
+                        <button name="action_pega_faturas_shopee" string="Sincronizar Faturas Shopee" type="object" class="btn btn-primary" groups="base.group_no_one"/>
+                        <button name="envia_xml_shopee" string="Enviar XML's Para Shopee" type="object" class="btn btn-primary" groups="base.group_no_one"/>
+                        <button name="action_gera_acess_token" string="Gerar Access Token" type="object" class="btn btn-primary" groups="base.group_no_one"/>
                     </header>
                     <sheet>
                         <group>
                             <group>
                                 <field name="name"/>
-                                <field name="shop_real" />
-                                <field name="shopee_id"/>
-                                <field name="shopee_partner_id"/>
-                                <field name="shopee_partner_key"/>
-                                <!-- <button name="action_pega_faturas_shopee" string="Sincronizar Faturas Shopee" type="object" class="btn btn-primary"/> -->
+                                <field name="shop_real"  groups="base.group_no_one"/>
+                                <field name="shopee_id" groups="base.group_no_one"/>
+                                <field name="shopee_partner_id" groups="base.group_no_one"/>
+                                <field name="shopee_partner_key" groups="base.group_no_one"/>
                             </group>
                             <group>
                                 <div class="o_row">
                                     <group>
                                         <field name="refresh_token_security" invisible='1'/>
-                                        <field name="refresh_token"/>
-                                        <!-- <button name="action_gera_acess_token" string="Gerar Access Token" type="object" class="btn btn-primary"/> -->
-                                        <field name="access_token"/>
-                                        <field name="expire_date_token" />
+                                        <field name="refresh_token" groups="base.group_no_one"/>
+                                        <field name="access_token" groups="base.group_no_one"/>
+                                        <field name="expire_date_token"  groups="base.group_no_one"/>
                                     </group>
                                 </div>
+                            </group>
+                            <group>
+                                <group string="Informações do Preço de Venda">
+                                    <field name="margin_shopee"/>
+                                    <field name="taxa_shopee"/>
+                                    <field name="margem_lucro"/>
+                                </group>
                             </group>
                         </group>
                     </sheet>

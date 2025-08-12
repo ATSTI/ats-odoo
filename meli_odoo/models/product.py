@@ -14,7 +14,7 @@ class ProducTemplate(models.Model):
         default=False,
         )
     meli_item_id = fields.Char('Id do Item')
-    # margin_meli = fields.Char('Margem Mercado Livre (porcentagem)')
+    other_costs_meli = fields.Float('Outros Custos Mercado Livre', default='0')
     title_meli = fields.Char('Titulo do Produto')
     meli_sku = fields.Char('SKU Mercado Livre')
     price_meli = fields.Float('Preço Mercado Livre')
@@ -57,6 +57,13 @@ class ProducTemplate(models.Model):
         ml = self.meli_config_id.margem_lucro/100 * pc
         Vt = pc + t + cv + ml
         self.price_meli = Vt
+        if self.other_costs_meli >= 0.0:
+            self.price_meli += self.other_costs_meli
+
+    @api.onchange('other_costs_meli')
+    def onchange_other_costs_meli(self):
+        if self.meli == True:
+            self.calcula_valor_venda_meli()
 
     @api.onchange('standard_price')
     def onchange_standard_price_meli(self):

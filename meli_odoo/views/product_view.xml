@@ -13,11 +13,11 @@
                             <group>
                                 <field name="meli" />
                                 <field name="meli_config_id" attrs="{'invisible': [('meli', '=', False)]}"/>
-                                <!-- <field name="margin_meli" attrs="{'invisible': [('meli', '=', False)]}"/> -->
                             </group>
                             <group>
                                 <field name="title_meli" attrs="{'invisible': [('meli', '=', False)]}"/>
                                 <field name="price_meli" attrs="{'invisible': [('meli', '=', False)]}"/>
+                                <field name="other_costs_meli" attrs="{'invisible': [('meli', '=', False)]}"/>
                                 <field name="qtd_meli" attrs="{'invisible': [('meli', '=', False)]}"/>
                                 <field name="meli_sku" attrs="{'invisible': [('meli', '=', False)]}"/>
                                 <!-- <field name="category_meli" attrs="{'invisible': [('meli', '=', False)]}"/>

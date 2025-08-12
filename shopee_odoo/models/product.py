@@ -30,10 +30,11 @@ class ProducTemplate(models.Model):
 
     # Pc = 50,00 + T = Taxa por venda 6,00 + Cv = comissão de venda 15% + Ml = margem de lucro 45%
     # Formula: Vt = Pc + T + Cv + Ml
-    # Pc; vem do ODOO
-    # T; fixa de cada plataforma
-    # Cv; Variavel (pensar como colocar isso)
-    # Ml; Proavelmente fixo em 45%
+    # Pc; Preço de Custo ODOO
+    # T; Taxa fixa de cada plataforma
+    # Cv; Comissão de Venda da plataforma
+    # Ml; Margem de lucro da Felicita
+    # Vt; Valor de Venda Total
 
 
     @api.depends('standard_price')

@@ -22,13 +22,34 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
-class Partner(models.Model):
+class ProductTemplate(models.Model):
 
-    _inherit = 'res.partner'
+    _inherit = 'product.template'
 
-    def write(self, vals_list):
-        if 'user_id' in vals_list:
-            if self.user_id != self.env.user and not self.env.user.has_group('sales_team.group_sale_manager'):
-                raise UserError(_("Você não pode alterar o campo Vendedor do Contato se este não for seu, ou você não for Administrador de Vendas"))
-        return super().write(vals_list)
+    def write(self, vals):
+        for rec in self:
+            mensagens = []
+
+            for key, value in vals.items():
+                field = rec._fields[key]
+
+                # Many2one
+                if isinstance(field, fields.Many2one):
+                    old_name = rec[key].name
+                    new_name = self.env[field.comodel_name].browse(value).name
+                    mensagens.append(f"{field.string}: {old_name} --> {new_name}")
+
+                # Boolean
+                elif isinstance(value, bool):
+                    mensagens.append(f"{field.string}: {rec[key]} --> {value}")
+
+                # Int/Float/Char/Outros
+                else:
+                    mensagens.append(f"{field.string}: {rec[key]} --> {value}")
+
+            if mensagens:
+                # Posta no chatter
+                rec.message_post(body="<br/>".join(mensagens))
+
+        return super().write(vals)
 

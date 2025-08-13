@@ -28,11 +28,9 @@
         'Mauricio Silveira<maurs320@gmail.com>',
     ],
     'depends': [
-        'base', 'sale', 'sales_team'
+        'base', 'sale'
     ],
     'data': [
-        'security/security.xml',
-        'views/res_partner_view.xml',
         'views/sale_order_view.xml',
     ],
     'demo': [],

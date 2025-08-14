@@ -8,7 +8,7 @@
     "license": "AGPL-3",
     "author": "",
     "website": "https://github.com/OCA/contract",
-    "depends": ["l10n_br_account", "contract", "l10n_br_sale"],
+    "depends": ["l10n_br_account", "contract", "sale"],
     "development_status": "Production/Stable",
     "data": [
         "views/account.xml",

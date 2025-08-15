@@ -13,7 +13,7 @@
                             <group>
                                 <field name="shopee" />
                                 <field name="shopee_config_id" attrs="{'invisible': [('shopee', '=', False)]}"/>
-                                <field name="margin_shopee" attrs="{'invisible': [('shopee', '=', False)]}"/>
+                                <!-- <field name="margin_shopee" attrs="{'invisible': [('shopee', '=', False)]}"/> -->
                             </group>
                             <div>
                                 <group>

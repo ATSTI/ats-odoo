@@ -2,3 +2,4 @@
 
 from . import contract
 from . import account_move
+from . import sale

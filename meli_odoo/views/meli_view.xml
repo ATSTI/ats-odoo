@@ -8,27 +8,34 @@
             <field name="arch" type="xml">
                 <form string="Mercado Livre Configurações">
                     <header>
-                        <button name="action_pega_faturas_meli" string="Sincronizar Faturas Mercado Livre" type="object" class="btn btn-primary"/>
-                        <button name="action_envia_xml_meli" string="Enviar XML's para o Mercado Livre" type="object" class="btn btn-primary"/>
-                        <button name="action_gera_acess_token" string="Gerar Access Token" type="object" class="btn btn-primary"/>
+                        <button name="action_pega_faturas_meli" string="Sincronizar Faturas Mercado Livre" type="object" class="btn btn-primary" groups="base.group_no_one"/>
+                        <button name="action_envia_xml_meli" string="Enviar XML's para o Mercado Livre" type="object" class="btn btn-primary" groups="base.group_no_one"/>
+                        <button name="action_gera_acess_token" string="Gerar Access Token" type="object" class="btn btn-primary" groups="base.group_no_one"/>
                     </header>
                     <sheet>
                         <group>
                             <group>
                                 <field name="name" string="Nome Mercado Livre" required="1"/>
-                                <field name="meli_id"/>
-                                <field name="user_id"/>
-                                <field name="client_meli_key"/>
+                                <field name="meli_id" groups="base.group_no_one"/>
+                                <field name="user_id" groups="base.group_no_one"/>
+                                <field name="client_meli_key" groups="base.group_no_one"/>
                             </group>
                             <group>
                                 <div class="o_row">
                                     <group>
                                         <field name="refresh_token_security" invisible='1'/>
-                                        <field name="refresh_token"/>
-                                        <field name="access_token"/>
-                                        <field name="expire_date_token" />
+                                        <field name="refresh_token" groups="base.group_no_one"/>
+                                        <field name="access_token" groups="base.group_no_one"/>
+                                        <field name="expire_date_token" groups="base.group_no_one"/>
                                     </group>
                                 </div>
+                            </group>
+                            <group>
+                                <group string="Informações do Preço de Venda">
+                                    <field name="margin_meli"/>
+                                    <field name="taxa_meli"/>
+                                    <field name="margem_lucro"/>
+                                </group>
                             </group>
                         </group>
                     </sheet>

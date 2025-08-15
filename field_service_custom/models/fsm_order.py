@@ -15,6 +15,8 @@ class FSMOrder(models.Model):
             self.write({'person_ids': [(4, self.person_id.id)]})
             users = self.env['hr.employee']
             us = users.search([('name', '=', self.person_id.name)])
+            if len(us) > 1:
+                raise UserError(_("Muitos funcionarios encontrados para o mesmo Usuario; Definições > Usuarios > Usuario escolhido > Funcionarios."))
             if us:
                 vals_line = {
                     'employee_id': us.id,
@@ -113,8 +115,8 @@ class FSMOrder(models.Model):
 
         invoice_line_vals = []
         for cost in self.contractor_cost_ids:
-            # DEPENDE DE QUAL O ID QUE VEM NA BASE, DEMO-MSM: 23
-            if jrnl.id == 23:
+            # 23 Artur; 32 Cosmopolis; 33 Holambra
+            if self.company_id.id == 1 and jrnl.id == 23 or self.company_id.id == 2 and jrnl.id == 32 or self.company_id.id == 3 and jrnl.id == 33:
                 break
             price = price_list.get_product_price(
                 product=cost.product_id,

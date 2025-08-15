@@ -24,7 +24,11 @@ class ShopeeConfig(models.Model):
     shopee_partner_id = fields.Char('Partner ID', required=True)
     shopee_partner_key = fields.Char('Partner Key', required=True)
     shop_real = fields.Boolean('Loja Real?', default=True)
-    
+
+    margin_shopee = fields.Float('Margem Shopee', default=22.0)
+    taxa_shopee = fields.Float('Taxa Shopee', default=6.0)
+    margem_lucro = fields.Float('Margem de Lucro Shopee', default=45.0)
+
     # url_ini = "https://partner.shopeemobile.com" 
 
     def action_gera_acess_token(self):

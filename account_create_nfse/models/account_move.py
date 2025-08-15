@@ -5,13 +5,7 @@ from odoo.exceptions import ValidationError
 
 
 class AccountMove(models.Model):
-    _name = "account.move"
-    _inherit = [
-        _name,
-        "l10n_br_fiscal.document.move.mixin",
-    ]
-    _inherits = {"l10n_br_fiscal.document": "fiscal_document_id"}
-    _order = "date DESC, name DESC"
+    _inherit = "account.move"
 
     def _recompute_fiscal_operation_id(self, move):
         move._compute_amount()

@@ -30,7 +30,7 @@
     'author': 'ATS Soluções',
     'maintainer': 'Mauricio Silveira, mauricio@atsti.com.br',
     'website': '',
-    'depends': ['account', 'sale', 'shopee_odoo', 'meli_odoo'],
+    'depends': ['account', 'sale', 'shopee_odoo', 'meli_odoo', 'auditlog'],
     'data': [
         'security/ir.model.access.csv',
         'report/report_separacao_felicita.xml',

@@ -56,7 +56,7 @@ class ProducTemplate(models.Model):
         ml = self.meli_config_id.margem_lucro/100 * pc
         Vt = pc + t + cv + ml
         self.price_meli = Vt
-        if self.price_meli >= 79.0:
+        if self.price_meli >= self.meli_config_id.costs_freight_meli:
             self.price_meli += self.meli_config_id.other_costs_meli
 
     @api.onchange('other_costs_meli')

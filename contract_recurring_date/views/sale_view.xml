@@ -23,7 +23,8 @@
         <field name="priority">999</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='user_id']" position="after">
-                <field name="sale_tag_ids" optional="show"/>
+                <field name="sale_tag_ids" optional="show" widget="many2many_tags"
+                       options="{'color_field': 'color'}" />
             </xpath>
         </field>
     </record>

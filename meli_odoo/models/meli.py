@@ -22,7 +22,7 @@ class MeliConfig(models.Model):
     refresh_token_security = fields.Char('Refresh Token security', invisible=True, readonly=True)
     user_id = fields.Char('Usuario ID') #TODO PENSAR NO CASO DE EXISTIREM MAIS DE UM USUARIO
     client_meli_key = fields.Char('Client Secret Key', required=True)
-
+    other_costs_meli = fields.Float('Outros Custos Mercado Livre', default='0')
     margin_meli = fields.Float('Margem Mercado Livre (porcentagem)', default=15)
     taxa_meli = fields.Float('Taxa Mercado Livre', default=6)
     margem_lucro = fields.Float('Margem de Lucro (porcentagem)', default=45)

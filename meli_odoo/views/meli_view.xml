@@ -35,6 +35,7 @@
                                     <field name="margin_meli"/>
                                     <field name="taxa_meli"/>
                                     <field name="margem_lucro"/>
+                                    <field name="other_costs_meli"/>
                                 </group>
                             </group>
                         </group>

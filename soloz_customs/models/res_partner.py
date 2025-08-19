@@ -27,8 +27,9 @@ class Partner(models.Model):
     _inherit = 'res.partner'
 
     def write(self, vals_list):
-        if 'user_id' in vals_list:
-            if self.user_id != self.env.user and not self.env.user.has_group('sales_team.group_sale_manager'):
-                raise UserError(_("Você não pode alterar o campo Vendedor do Contato se este não for seu, ou você não for Administrador de Vendas"))
+        if self.user_id:
+            if 'user_id' in vals_list:
+                if self.user_id != self.env.user and not self.env.user.has_group('sales_team.group_sale_manager'):
+                    raise UserError(_("Você não pode alterar o campo Vendedor do Contato se este não for seu, ou você não for Administrador de Vendas"))
         return super().write(vals_list)
 

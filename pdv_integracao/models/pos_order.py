@@ -110,7 +110,7 @@ class PosSession(models.Model):
                 'payment_difference_handling': baixar_tudo,
                 'writeoff_label': 'importados'
             }
-            Payment = dest.env['account.payment']        
+            Payment = self.env['account.payment']        
             pay = Payment.create(vals)
             pay.post()
    

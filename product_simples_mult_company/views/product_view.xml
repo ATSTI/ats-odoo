@@ -21,6 +21,7 @@
                 <page name="general_information" string="Informações Gerais">
                     <group>
                         <group>
+                            <field name="detailed_type" invisible="1" />
                             <field name="company_ids" 
                                 groups="base.group_multi_company"
                                 widget="many2many_tags"

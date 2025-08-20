@@ -129,10 +129,10 @@ class PosSession(models.Model):
         # para cada arquivo na pasta
         num_arq = 1
         user_adic = []
-        ses = self.env['pos.session']       
+        ses = self.env['pos.session']
         for i in arquivos:
             f = open(path_file + '/' + i, mode="r")
-            arq = json.load(f)            
+            arq = json.load(f)
             ses_config = self.get_pos_config(arq['user_id'])
             if not ses_config:
                 # nao encontrou um pos_config para este usuario
@@ -140,8 +140,6 @@ class PosSession(models.Model):
             num_arq += 1
             # buscar pedido ja existe
             caixa = "-%s" % (arq['caixa'])
-            #session = ses.search([('config_id', '=', ses_config.id), ('state', 'in', ('opened','closing_control'))], order='id desc', limit=3)
-            #session = ses.search([('config_id', '=', ses_config.id), ('name', 'like', caixa)], order='id desc', limit=3)
             session = ses.search([('config_id', '=', ses_config.id), ('name', '=like', '%'+caixa)], order='id desc', limit=3)
             state = arq["state"]
             if session:
@@ -318,7 +316,7 @@ class PosSession(models.Model):
                 if isinstance(codpro, int):
                     prd = prod_obj.search([('id', '=', codpro)], limit=1)
                 else:
-                    prd = prod_obj.search([('default_code', '=', codpro)], limit=1)
+                    prd = prod_obj.search([('default_code', '=', str(codpro))], limit=1)
                 descricao  = line['name']
                 if not prd:
                     if 'Troca' in descricao:
@@ -335,8 +333,10 @@ class PosSession(models.Model):
                     desconto = 0.0
                     if sub_total:
                         desconto =  (desc_soma / sub_total) * 100
+                    # print('4-Desc Final : %s' %str(desconto))
                 else:
                     desc_soma -= sub_total * (desconto/100)
+                    # print('3-total desc : %s' %str(desc_soma))
                 sub_total = sub_total - (sub_total * (desconto/100))
                 vals_item = {
                     "name": descricao, 
@@ -348,7 +348,7 @@ class PosSession(models.Model):
                     "price_subtotal": sub_total,
                     "price_subtotal_incl": sub_total,
 
-                }    
+                }
                 list_adi.append(vals_item)
                 ped_id.write({'lines': [(0, 0, vals_item)]})
             if troca or dif_pag:
@@ -360,11 +360,14 @@ class PosSession(models.Model):
                 })
             #  aqui aba pagamento 
             metodo_pag = ''
+            para_faturar = 0.0
             falha_pag = True
             for pag_ids in ped['statement_ids']:
                 pag = pag_ids[2]
                 if pag['journal'] in ('R-', 'S-','U-'):
                     continue
+                if pag['journal'] == '4-':
+                    para_faturar += pag['amount']
                 jrn = self.env['account.journal'].search([
                         ('name', 'like', pag['journal']),
                         ('company_id','=', ses.company_id.id)
@@ -384,19 +387,25 @@ class PosSession(models.Model):
                 # print('Total PAGO: %s' %(str(pag['amount'])))
                 vals_pag = {
                     "name": pag['name'],                
-                    "amount": pag['amount'],                     
+                    "amount": pag['amount'],
+                    'pos_order_id': ped_id.id,
                     "payment_method_id": metodo_pag.id,
                     "payment_date": pag['date'][:10],
-                    "session_id": ses.id,
+                    'is_change': True,
                 }
-                ped_id.write({'payment_ids': [(0, 0, vals_pag)]})
-            if metodo_pag and metodo_pag.name[:2] != '4-' and falha_pag:
+                # list_pag.append(vals_pag)
+                # vLine = b_pedidoPag.create(vals_pag)
+                #ped_id.write({'payment_ids': [(0, 0, vals_pag)]})
+                ped_id.add_payment(vals_pag)
+            if metodo_pag and not para_faturar and falha_pag:
                 if jrn and jrn.type in ('cash','bank'):
                     ped_id.action_pos_order_paid()
             # se a prazo criando a Fatura
-            if metodo_pag and metodo_pag.name[:2] == '4-':
+            if metodo_pag and para_faturar:
                 ped_id.write({'to_invoice': True})
                 move_vals = ped_id._prepare_invoice_vals()
+                for line in move_vals['invoice_line_ids']:
+                    line[2]['price_unit'] = para_faturar
                 move_vals['invoice_origin'] = 'POS/' + move_vals['invoice_origin']
                 new_move = ped_id._create_invoice(move_vals)
                 ped_id.write({'account_move': new_move.id, 'state': 'invoiced'})

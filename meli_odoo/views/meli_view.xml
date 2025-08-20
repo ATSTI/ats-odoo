@@ -36,6 +36,7 @@
                                     <field name="taxa_meli"/>
                                     <field name="margem_lucro"/>
                                     <field name="other_costs_meli"/>
+                                    <field name="costs_freight_meli"/>
                                 </group>
                             </group>
                         </group>

@@ -239,7 +239,7 @@ class PosSession(models.Model):
             # vals['date_order'] = datetime.strftime(ped['date_order'],'%Y-%m-%d %H:%M:%S')
             vals['date_order'] = ped['date_order'][:19]
             cli_n = ped['nomecliente']
-            if ped['nomecliente'] == 'Cliente do Sistema':
+            if ped['nomecliente'] == 'Cliente do Sistema' or ped['partner_id'] == 1:
                 cli_n = 'Consumidor'
             prt = prt_obj.search([('name', 'ilike', cli_n)], limit=1)
             if not prt:

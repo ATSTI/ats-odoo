@@ -78,7 +78,7 @@ class PosSession(models.Model):
     #     arqx.close()
     
     def baixa_pagamentos(self, move_line_id, journal_id, caixa, valor, cod_forma, juros):
-        if journal_id:
+        if journal_id and journal_id.type in ('cash','bank'):
             invoices = move_line_id
             # amount = self._compute_payment_amount(invoices=invoices) if self.multi else self.amount
             if move_line_id.amount_residual > valor or ((move_line_id.amount_residual - valor) > 0.01):
@@ -110,7 +110,7 @@ class PosSession(models.Model):
                 'payment_difference_handling': baixar_tudo,
                 'writeoff_label': 'importados'
             }
-            Payment = self.env['account.payment']        
+            Payment = self.env['account.payment']
             pay = Payment.create(vals)
             pay.post()
    
@@ -123,20 +123,12 @@ class PosSession(models.Model):
         # para cada arquivo na pasta
         num_arq = 1
         user_adic = []
+        ses = self.env['pos.session']
         for i in arquivos:
-            # nome_arq = i[:i.index('.')]
-            # if nome_arq[:4] != 'cai_POS_':
-            #     continue
-            # if num_arq == 20:
-            #     continue
-            num_arq += 1
-
-            # buscar pedido ja existe
-            ses = self.env['pos.session']
             f = open(path_file + '/' + i, mode="r")
             arq = json.load(f)
-
-            # caixa = f"-{nome_arq[:6]}"
+            num_arq += 1
+            # buscar pedido ja existe
             caixa = f"-{arq['caixa']}"
             session = ses.search([('name', 'like', caixa)])
             state = arq["state"]
@@ -147,6 +139,8 @@ class PosSession(models.Model):
                         px.action_pos_session_closing_control()
                     if px.state == "closing_control" and state == "closed":
                         px._validate_session()
+                    if px.state == "closed" and state == "closed":
+                        continue
                     else:    
                         px_ids = {}
                         px_ids['tipo'] = 'sessao'
@@ -158,11 +152,9 @@ class PosSession(models.Model):
                 with open(path_file_return, 'a+') as tfile:
                     for items in list(sesd):
                         tfile.write('%s,' % items)
-
                 os.remove(path_file + '/' + i)
                 continue
             vals = {}
-            # vals["name"] = arq["name"]
             vals["start_at"] = arq["start_at"]
             usuario = self.env['res.users'].browse(arq["user_id"])
             vals["user_id"] = usuario.id
@@ -171,8 +163,6 @@ class PosSession(models.Model):
             user_adic.append(usuario.id)
             session_open = ses.search([('user_id', '=', usuario.id), ('state', '=', 'opened')])
             if session_open:
-                # if state == "closed":
-                    # session_open.action_pos_session_closing_control()
                 continue
             pv = self.env['pos.config'].search([('name', 'ilike', usuario.name)], limit=1)
             ses_id = []
@@ -193,21 +183,17 @@ class PosSession(models.Model):
                 caixa = px.name[px.name.find('-')+1:]
                 px_ids['caixa'] = caixa
                 sesd.append(px_ids)
-            # if len(list(lista_pedido)):
             with open(path_file_return, 'a+') as tfile:
-                # tfile.write(list(pd))
                 for items in list(sesd):
                     tfile.write('%s,' % items)
 
     def insere_pedido_integracao(self):
-        # lê arquivos json recebido dos pedidos
-        # verifica se o pedido ja foi incluido
-        # gera um arquivo com todos os pedidos da sessao
-        # pra ser enviado para o pdv evitando o envio dos 
-        # arquivos que ja estao neste retorno
-        # path_file = '/var/www/webroot/arquivos'
-        # path_file_return = '/var/www/webroot/retornos/retorno.json'
-        # arquivos = os.listdir(path_file)
+        """ lê arquivos json recebido dos pedidos
+        verifica se o pedido ja foi incluido
+        gera um arquivo com todos os pedidos da sessao
+        pra ser enviado para o pdv evitando o envio dos 
+        arquivos que ja estao neste retorno
+        path_file = '/var/www/webroot/arquivos"""
         arquivos = fnmatch.filter(os.listdir(path_file), "ped_*.json")
         # para cada arquivo na pasta
         num_arq = 1
@@ -261,8 +247,7 @@ class PosSession(models.Model):
             if prt:
                 vals['partner_id'] = prt.id
             else:
-                # f.write(f"############# - Cliente nao encontrado : {ped['partner_id']}")
-                print(f"############# - Cliente nao encontrado : {ped['nomecliente']}")
+                #print(f"############# - Cliente nao encontrado : {ped['nomecliente']}")
                 continue
             # dicionario felicita
             user = ped['user_id']
@@ -308,6 +293,7 @@ class PosSession(models.Model):
             vals['company_id'] = 1
             vals['pricelist_id'] = 1
             try:
+                #print(f"arquivo : {i}")
                 ped_id = pos.create(vals)
             except Error as e:
                 ses.message_post(
@@ -323,11 +309,6 @@ class PosSession(models.Model):
             for line_ids in ped['lines']:
                 linhas -= 1
                 line = line_ids[2]
-                # prod = dest.env['product.product'].search([('default_code', '=', line.product_id.default_code)])
-                # if not len(prod):
-                #     #logger.info(f"ITEM nao encontrado : {line.product_id.default_code}")
-                #     prod = dest.env['product.product'].search([('barcode', '=', line.product_id.barcode)])
-                # if not len(prod):
                 #if len(prod):
                 #    print (f"ITEM : {line.product_id.default_code}")
                 codpro = line['product_id']
@@ -337,31 +318,16 @@ class PosSession(models.Model):
                     prd = prod_obj.search([('default_code', '=', str(codpro))], limit=1)
                 descricao  = line['name']
                 if not prd:
+                    if 'Troca' in descricao:
+                        prd = prod_obj.search([('default_code', '=', 'troca')])
+                if not prd:
                     prd = prod_obj.search([('name', 'ilike', line['name'])], limit=1)
                     if len(str(line['product_id'])) < 10 and not prd:
                         prd = prod_obj.search([('id', '=', line['product_id'])])
                     if not prd:
                         prd = prod_obj.search([('default_code', '=', '321')])
                         descricao = f"{descricao} - PRODUTO NAO LOCALIZADO"
-                #TODO buscar pelo codigo nao id
-                # px = line['product_id']
-                # if px == 30979:
-                #     px = 30683
-                # if px == 31344:
-                #     px = 31242
-                # if px == 30430:
-                #     px = 30495
-                # if px == 29899:
-                #     px = 30586
-                # if px == 30406:
-                #     px = 30404
-                # if px == 30406:
-                #     px = 30404
-                # if 'Troca' in line['name']:
-                #     troca += line['price_unit'] * line['qty']
                 sub_total = line['price_unit'] * line['qty']
-                # print('1-VALOR : %s' %str(sub_total))
-                # print('2-Reducao : %s' %str(sub_total * (desconto/100)))
                 if linhas == 0:
                     desconto = 0.0
                     if sub_total:
@@ -383,31 +349,29 @@ class PosSession(models.Model):
                     "price_subtotal_incl": sub_total,
 
                 }
-                # print('5-GERALLLLLLLLLLLLLL : %s' %str(sub_total))
-                # if 'discount' in line:
-                    # vals_item["discount"] = line['discount']
-                # "order_id": ped_id.id,
-                # ped_id.write({'lines'(vals_iten)
-     
                 list_adi.append(vals_item)
                 ped_id.write({'lines': [(0, 0, vals_item)]})
             if troca or dif_pag:
                 tot = ped_id.amount_total + troca - dif_pag
-                # print('Total GERAL XXXXXXXXXXXXXXXXXXX: %s' %(str(tot)))
                 ped_id.write({
                     'amount_tax': tot,
                     'amount_total': tot,
                     'amount_return': tot,
                 })
             #  aqui aba pagamento 
-            list_pag = []
             metodo_pag = ''
+            para_faturar = 0.0
             falha_pag = True
             for pag_ids in ped['statement_ids']:
                 pag = pag_ids[2]
                 if pag['journal'] in ('R-', 'S-','U-'):
                     continue
-                jrn = self.env['account.journal'].search([('name', 'like', pag['journal'])])
+                if pag['journal'] == '4-':
+                    para_faturar += pag['amount']
+                jrn = self.env['account.journal'].search([
+                        ('name', 'like', pag['journal']),
+                        ('company_id','=', ses.company_id.id)
+                    ])
                 if not jrn:
                     ses.message_post(
                         body=_(
@@ -416,51 +380,44 @@ class PosSession(models.Model):
                     )
                     falha_pag = False
                     continue 
-                metodo_pag = self.env['pos.payment.method'].search([('name', 'ilike', jrn.name[:2])])
-                # datetime.strftime(pag['date'],'%Y-%m-%d'),
-                # "pos_order_id": ped_id.id,
+                metodo_pag = self.env['pos.payment.method'].search([
+                    ('name', 'ilike', jrn.name[:2]),
+                    ('company_id','=', ses.company_id.id)
+                ])
                 # print('Total PAGO: %s' %(str(pag['amount'])))
                 vals_pag = {
                     "name": pag['name'],                
-                    "amount": pag['amount'],                     
+                    "amount": pag['amount'],
+                    'pos_order_id': ped_id.id,
                     "payment_method_id": metodo_pag.id,
                     "payment_date": pag['date'][:10],
-                    "session_id": ses.id,
+                    'is_change': True,
                 }
                 # list_pag.append(vals_pag)
                 # vLine = b_pedidoPag.create(vals_pag)
-                ped_id.write({'payment_ids': [(0, 0, vals_pag)]})
-            if metodo_pag and metodo_pag.name[:2] != '4-' and falha_pag:
-                ped_id.action_pos_order_paid()
+                #ped_id.write({'payment_ids': [(0, 0, vals_pag)]})
+                ped_id.add_payment(vals_pag)
+            if metodo_pag and not para_faturar and falha_pag:
+                if jrn and jrn.type in ('cash','bank'):
+                    ped_id.action_pos_order_paid()
             # se a prazo criando a Fatura
-            if metodo_pag and metodo_pag.name[:2] == '4-':
+            if metodo_pag and para_faturar:
                 ped_id.write({'to_invoice': True})
                 move_vals = ped_id._prepare_invoice_vals()
+                for line in move_vals['invoice_line_ids']:
+                    line[2]['price_unit'] = para_faturar
+                move_vals['invoice_origin'] = 'POS/' + move_vals['invoice_origin']
                 new_move = ped_id._create_invoice(move_vals)
                 ped_id.write({'account_move': new_move.id, 'state': 'invoiced'})
                 new_move.sudo().with_company(ped_id.company_id)._post()
             
             ped_id._create_order_picking()
-            
-                # ver se esta paga
-
-                # if ped.invoice_id.state == 'paid':
-                # for ct in ped.invoice_id.receivable_move_line_ids:
-                #     if ct.reconciled:
-                #         bancos = origem.env['account.journal'].search([
-                #             ('type', 'in', ('cash', 'bank'))])
-                #         aml = origem.env['account.move.line'].search([
-                #             ('ref','=',ped.name),
-                #             ('journal_id', 'in', bancos)
-                #         ])
-                #         for ml in aml:
-                #             aml_id = origem.env['account.move.line'].browse(ml)
-                #             jrn = dest.env['account.journal'].search([('name', 'ilike', ml.journal_id.name[:2])])
-                #             jrn_id = dest.env['account.journal'].browse(jrn)
-                #             baixa_pagamentos(new_move, jrn_id, 0, aml_id.debit, 0, 0)
         if ses:
             # crio um arquivo com todos os pedidos desta sessao
-            pedido_ses = self.env['pos.order'].search([('session_id', '=', ses.id)])
+            pedido_ses = self.env['pos.order'].search([
+                ('session_id', '=', ses.id),
+                ('config_id', '=', ses.config_id.id),
+            ])
             pd = []
             for px in pedido_ses:
                 px_ids = {}
@@ -470,10 +427,7 @@ class PosSession(models.Model):
                 px_ids['codmovimento'] = px.name
                 px_ids['user_id'] = px.user_id.id
                 pd.append(px_ids)
-            # if len(list(lista_pedido)):
             with open(path_file_return, 'w') as tfile:
-                # tfile.write(list(pd))
-
                 for items in list(pd):
                     tfile.write('%s,' % items)
 
@@ -520,11 +474,17 @@ class PosSession(models.Model):
                         vals['note'] = p['motivo'] 
                         prd['location_id'] = tipo.default_location_src_id.id
                         prd['location_dest_id'] = tipo.default_location_dest_id.id
-                prod = self.search([('default_code', '=', line['product_code'])])
+                prod = self.env['product.product'].search([('id', '=', line['product_code'])])
                 if not prod:
-                    prod = self.search([('name', 'ilike', line['name'])], limit=1)
+                    prod = self.env['product.product'].search([('name', 'ilike', line['name'])], limit=1)
+                if not prod:
+                    print('Produto nao localizado: %s' %(line['name']))
+                    continue
                 prd['product_id'] =  prod.id
-                prd['product_uom_qty'] = line['qty_done'] 
+                qty = line['qty_done']
+                if line['qty_done']<1.0:
+                    qty = 1
+                prd['product_uom_qty'] = qty
                 prd['product_uom'] = prod.uom_id.id
                 prd['quantity_done'] = line['qty_done'] 
                 prd['name'] = line['name']               
@@ -532,10 +492,10 @@ class PosSession(models.Model):
                 vals['move_ids_without_package'] = item
 
                 pos = self.env['stock.picking']
-                pick = pos.sudo().create(vals)
-                pick.action_confirm()
-                pick.action_assign()            
-                pick.button_validate()
+                pick_ids = pos.sudo().create(vals)
+                pick_ids.action_confirm()
+                pick_ids.action_assign()            
+                pick_ids.button_validate()
 
     def insere_sangria(self):
         arquivos = sorted(fnmatch.filter(os.listdir(path_file), "san_*.json"))
@@ -545,19 +505,26 @@ class PosSession(models.Model):
         for i in arquivos:
             f = open(path_file + '/' + i, mode="r")
             lt = json.load(f)
-
+            if 'user_id' not in lt:
+                os.remove(path_file + '/' + i)
+                continue
             # caixa = f"-{nome_arq[:6]}"
             caixa = f"-{lt['caixa']}"
             sg_obj = self.env['account.bank.statement.line']
         
             # vejo os diarios usados no PDV do Caixa aberto       
-            session = self.env['pos.session'].sudo().search([('name', 'ilike', caixa)])
+            #session = self.env['pos.session'].sudo().search([('name', 'ilike', caixa)])
+            # TODO incluir no arquivo o user_id
+            ses_config = self.get_pos_config(int(lt['user_id']))
+            session = self.env['pos.session'].search([
+                ('name', 'like', caixa),
+                ('config_id', '=', ses_config.id),
+            ])
             if not session:
                 continue
-
-            if session.state not in ('opened'):
+            if session.state == 'closed':
+                os.remove(path_file + '/' + i)
                 continue
-            
             lista_st = []
             for lt_st in session.statement_ids:
                 lista_st.append(lt_st.id)

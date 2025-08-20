@@ -8,7 +8,8 @@
     "depends": [
         "website",
         "account",
-        "point_of_sale"
+        "point_of_sale",
+        "l10n_br_account_due_list"
     ],
     'license': 'AGPL-3',
     "author": "ATS Solucoes, ",

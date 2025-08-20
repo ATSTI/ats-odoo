@@ -18,6 +18,11 @@ class ProducTemplate(models.Model):
     meli_sku = fields.Char('SKU Mercado Livre')
     price_meli = fields.Float('Preço Mercado Livre')
     qtd_meli = fields.Float('Quantidade Disponivel Mercado Livre')
+    other_costs_meli = fields.Float(
+        string="Outros Custos Mercado Livre",
+        related="meli_config_id.other_costs_meli",
+        store=True
+    )
     # category_meli = fields.Selection([
     #     # CATEGORIAS MERCADO LIVRE (VITTON)
     #     ('MLB455528', 'Agasalhos'),
@@ -49,6 +54,8 @@ class ProducTemplate(models.Model):
 
     @api.depends('standard_price')
     def calcula_valor_venda_meli(self):
+        if not self.meli_config_id:
+            return
         #Por enquanto essa aplicação, apresentar para eles e ver...
         pc = self.standard_price
         t = self.meli_config_id.taxa_meli
@@ -58,11 +65,6 @@ class ProducTemplate(models.Model):
         self.price_meli = Vt
         if self.price_meli >= self.meli_config_id.costs_freight_meli:
             self.price_meli += self.meli_config_id.other_costs_meli
-
-    @api.onchange('other_costs_meli')
-    def onchange_other_costs_meli(self):
-        if self.meli == True:
-            self.calcula_valor_venda_meli()
 
     @api.onchange('standard_price')
     def onchange_standard_price_meli(self):
@@ -75,6 +77,7 @@ class ProducTemplate(models.Model):
             self.title_meli = self.name
             self.meli_sku = self.default_code
             self.qtd_meli = 1
+            self.meli_config_id = self.env['meli.config'].search([('name', 'ilike', 'Felicita')]).id
             self.calcula_valor_venda_meli()
 
     def encontrar_item_por_sku(self):

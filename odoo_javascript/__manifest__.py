@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# Copyright (C) 2025 - ATSTi
+# License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 {
     'name': "Javascript Button Click Event",
     'summary': """
@@ -9,6 +10,7 @@
     'author': "Zahid Mehmood",
     'website': "http://www.zahid-mehmood.chussar.com",
     'category': 'Uncategorized',
+    'license': 'AGPL-3',
     'version': '1.0',
     'depends': [
         'base',

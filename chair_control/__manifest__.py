@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
-
-
+# Copyright (C) 2025 - ATSTi
+# License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 {
     'name': 'Controle de cadeiras',
     'version': '1.0',
     'category': 'Others',
+    'license': 'AGPL-3',
     'sequence': 2,
     'summary': 'controle de cadeiras',
     'description': """

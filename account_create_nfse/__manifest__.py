@@ -1,10 +1,11 @@
-# © 2024 Carlos R. Silveira, Maurício Rodrigues Silveira, ATSti Solucoes
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+# Copyright (C) 2025 - ATSTi
+# License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 {
     'name': 'Duplicar uma fatura, copiando somente Serviço',
     'version': '14.0.0.1.0',
     'category': 'Localisation',
+    'license': 'AGPL-3',
     'sequence': 2,
     'summary': 'ATSti Soluções',
     'description': """

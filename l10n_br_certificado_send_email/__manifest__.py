@@ -1,10 +1,11 @@
-#© 2023 Carlos R. Silveira, Mauricio Silveira, ATSti Solucoes
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+# Copyright (C) 2025 - ATSTi
+# License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 {
     'name': 'Envia Email',
     'version': '1.0',
     'category': 'Others',
+    'license': 'AGPL-3',
     'sequence': 2,
     'summary': 'Enviar email vencimento do certificados',
     'description': """
@@ -17,7 +18,7 @@
             7 = Dias antes de vencer, 
             30 = Outro dia antes de vencer.
     """,
-    'author': 'ATS Soluções',
+    'author': 'ATSTi',
     'website': '',
     'depends': ['l10n_br_nfe'],
     'data': [

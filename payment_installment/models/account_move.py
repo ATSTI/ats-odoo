@@ -257,6 +257,7 @@ class AccountMoveLine(models.Model):
 class InvoiceParcela(models.Model):
     _name = 'invoice.parcela'
     _order = 'data_vencimento'
+    _description = "Parcelas da Fatura"
 
     move_id = fields.Many2one('account.move', string="Fatura")
     currency_id = fields.Many2one(

@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 
 class CertificadoSendEmail(models.Model):
     _name = "certificado.send.email"
+    _description = "Modelo para envio de email de certificado"
 
     def send_email_certificado(self, user_id, date1, date2=None):
         company = self.env['res.company'].search([])

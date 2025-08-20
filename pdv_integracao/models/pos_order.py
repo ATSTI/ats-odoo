@@ -114,11 +114,17 @@ class PosSession(models.Model):
             pay = Payment.create(vals)
             pay.post()
    
+    def get_pos_config(self, user):
+        ses_conf = self.env['pos.config']
+        ses_config_ids = ses_conf.search([])
+        for cn in ses_config_ids:
+            for employee in cn.employee_ids:
+                if employee.user_id.id == user:
+                    return cn
+        return False
+
     def insere_caixa_integracao(self):
         # lê arquivos na pasta
-        # path_file = '/var/www/webroot/arquivos'
-        # path_file_return = '/var/www/webroot/retornos/retorno.json'
-        # arquivos = os.listdir(path_file)
         arquivos = sorted(fnmatch.filter(os.listdir(path_file), "cai_*.json"))
         # para cada arquivo na pasta
         num_arq = 1
@@ -127,9 +133,15 @@ class PosSession(models.Model):
         for i in arquivos:
             f = open(path_file + '/' + i, mode="r")
             arq = json.load(f)
+            """
+            # ses_config = self.get_pos_config(arq['user_id'])
+            # if not ses_config:
+            #     # nao encontrou um pos_config para este usuario
+            #     continue
+            """
             num_arq += 1
             # buscar pedido ja existe
-            caixa = f"-{arq['caixa']}"
+            caixa = "-%s" % (arq['caixa'])
             session = ses.search([('name', 'like', caixa)])
             state = arq["state"]
             if session:
@@ -192,29 +204,21 @@ class PosSession(models.Model):
         verifica se o pedido ja foi incluido
         gera um arquivo com todos os pedidos da sessao
         pra ser enviado para o pdv evitando o envio dos 
-        arquivos que ja estao neste retorno
-        path_file = '/var/www/webroot/arquivos"""
-        arquivos = fnmatch.filter(os.listdir(path_file), "ped_*.json")
-        # para cada arquivo na pasta
+        arquivos que ja estao neste retorno"""
+        arquivos = sorted(fnmatch.filter(os.listdir(path_file), "ped_*.json"))
         num_arq = 1
-        # lista_pedido = set()
         ses = 0
         for i in arquivos:
             nome_arq = i[:i.index('.')][4:]
-            # if nome_arq[:4] != 'ped_':
-            #     continue
             if num_arq == 50:
                 continue
             num_arq += 1
-            
+
             # buscar pedido ja existe
             pos = self.env['pos.order']
             pedido = pos.search([('name', '=', nome_arq)])
 
             if pedido:
-                # lista_pedido.add(nome_arq)
-                # retorno.writelines(list(lista_pedido)+',')
-                # Usando a sessao pra gerar o RETORNO
                 ses = pedido.session_id
                 os.remove(path_file + '/' + i)
                 continue
@@ -227,10 +231,6 @@ class PosSession(models.Model):
             ses = session.search([('name', 'like', session_name)])
             if not ses:
                 continue
-            # for p_lancado in pedb_lancado:
-            #     if p_lancado.state == 'draft':
-            #         p_lancado.write({'amount_paid': ped.amount_paid})
-            #         p_lancado.action_pos_order_paid()
 
             _logger.info(f"Inserido PEDIDO : {nome_arq}")
             vals = {}
@@ -304,6 +304,7 @@ class PosSession(models.Model):
             list_adi = []
             
             linhas = len(ped['lines'])
+            conta_itens = linhas
             desc_soma = dif_pag
             # print('Inicio : %s' %str(desc_soma))
             for line_ids in ped['lines']:
@@ -361,11 +362,13 @@ class PosSession(models.Model):
             #  aqui aba pagamento 
             metodo_pag = ''
             para_faturar = 0.0
+            total_pedido = 0.0
             falha_pag = True
             for pag_ids in ped['statement_ids']:
                 pag = pag_ids[2]
                 if pag['journal'] in ('R-', 'S-','U-'):
                     continue
+                total_pedido += pag['amount']
                 if pag['journal'] == '4-':
                     para_faturar += pag['amount']
                 jrn = self.env['account.journal'].search([
@@ -404,8 +407,16 @@ class PosSession(models.Model):
             if metodo_pag and para_faturar:
                 ped_id.write({'to_invoice': True})
                 move_vals = ped_id._prepare_invoice_vals()
-                for line in move_vals['invoice_line_ids']:
-                    line[2]['price_unit'] = para_faturar
+                indice_faturar = para_faturar / total_pedido
+                faturado = para_faturar
+                for line in move_vals['invoice_line_ids']:                    
+                    if conta_itens == 1:
+                        valor_linha = faturado
+                    else:
+                        valor_linha = round(line[2]['price_unit'] * indice_faturar, 2)
+                    faturado -= valor_linha
+                    line[2]['price_unit'] = valor_linha
+                    conta_itens -= 1
                 move_vals['invoice_origin'] = 'POS/' + move_vals['invoice_origin']
                 new_move = ped_id._create_invoice(move_vals)
                 ped_id.write({'account_move': new_move.id, 'state': 'invoiced'})

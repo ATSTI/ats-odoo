@@ -248,7 +248,6 @@ class PosSession(models.Model):
             # vals['date_order'] = datetime.strftime(ped['date_order'],'%Y-%m-%d %H:%M:%S')
             vals['date_order'] = ped['date_order'][:19]
             cli_n = ped['nomecliente']
-            #if vals['name'] == '23-351':
             if ped['nomecliente'] == 'Cliente do Sistema':
                 cli_n = 'Consumidor'
             prt = prt_obj.search([('name', 'ilike', cli_n)], limit=1)
@@ -305,6 +304,7 @@ class PosSession(models.Model):
             list_adi = []
             
             linhas = len(ped['lines'])
+            conta_itens = linhas
             desc_soma = dif_pag
             # print('Inicio : %s' %str(desc_soma))
             for line_ids in ped['lines']:
@@ -361,11 +361,13 @@ class PosSession(models.Model):
             #  aqui aba pagamento 
             metodo_pag = ''
             para_faturar = 0.0
+            total_pedido = 0.0
             falha_pag = True
             for pag_ids in ped['statement_ids']:
                 pag = pag_ids[2]
                 if pag['journal'] in ('R-', 'S-','U-'):
                     continue
+                total_pedido += pag['amount']
                 if pag['journal'] == '4-':
                     para_faturar += pag['amount']
                 jrn = self.env['account.journal'].search([
@@ -404,8 +406,16 @@ class PosSession(models.Model):
             if metodo_pag and para_faturar:
                 ped_id.write({'to_invoice': True})
                 move_vals = ped_id._prepare_invoice_vals()
-                for line in move_vals['invoice_line_ids']:
-                    line[2]['price_unit'] = para_faturar
+                indice_faturar = para_faturar / total_pedido
+                faturado = para_faturar
+                for line in move_vals['invoice_line_ids']:                    
+                    if conta_itens == 1:
+                        valor_linha = faturado
+                    else:
+                        valor_linha = round(line[2]['price_unit'] * indice_faturar, 2)
+                    faturado -= valor_linha
+                    line[2]['price_unit'] = valor_linha
+                    conta_itens -= 1
                 move_vals['invoice_origin'] = 'POS/' + move_vals['invoice_origin']
                 new_move = ped_id._create_invoice(move_vals)
                 ped_id.write({'account_move': new_move.id, 'state': 'invoiced'})

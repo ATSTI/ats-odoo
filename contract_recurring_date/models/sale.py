@@ -16,8 +16,7 @@ class SaleOrder(models.Model):
         for order in self:
             if order.sale_tag_ids:
                 return True
-                # and order.create_date >= primeiro_dia_mes_anterior
-            if order.create_date:
+            if order.partner_id and order.partner_id.contract_ids:
                 order.sale_tag_ids = order.partner_id.contract_ids.mapped("tag_ids")
             else:
                 order.sale_tag_ids = False

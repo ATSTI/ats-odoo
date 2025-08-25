@@ -12,13 +12,16 @@
                 </t>
                 <table style="border: 1px solid #dcdcdc; border-collapse: collapse; font-size:14px;width: 100%;">
                     <tr>
-                        <td style="border: 1px solid #dcdcdc; height:27px;  border-collapse: collapse; font-size:12px;text-align: left; width: 50%">
+                        <td style="border: 1px solid #dcdcdc; height:27px;  border-collapse: collapse; font-size:12px;text-align: left; width: 40%">
                             <b>Produto</b>
                         </td>
-                        <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 20%">
+                        <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 10%">
                             <b>Demanda</b>
                         </td>
                         <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 30%">
+                            <b>Componentes (KIT) </b>
+                        </td>
+                        <td style="border: 1px solid #dcdcdc; height:27px; border-collapse: collapse; font-size:12px;text-align: center; width: 20%">
                             <b>Cod Barras</b>
                         </td>
                     </tr>
@@ -28,15 +31,35 @@
                             <t t-set="qtd" t-value="qtd + pr_line.product_uom_qty" />
                         </t>
                         <tr>
-                        <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: left; width: 50%;">
+                        <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: left; width: 40%;">
                             <t t-esc="p.name" ></t>
                         </td>
-                        <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 20%;">
+                        <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 10%;">
                             <span t-esc="qtd"/>
                         </td>
-                        <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 30%;">
-                            <span t-esc="p.barcode"/>
-                        </td>
+                        <t t-if="p.product_tmpl_id.bom_ids" >
+                            <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:10px;text-align: left; width: 30%;">
+                                <t t-foreach="p.product_tmpl_id.bom_ids" t-as="mrp">
+                                    <t t-foreach="mrp.bom_line_ids" t-as="bom">
+                                        <span t-field="bom.product_id.name"/><br/>
+                                    </t>
+                                </t>
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 20%;">
+                                <t t-foreach="p.product_tmpl_id.bom_ids" t-as="mrp">
+                                    <t t-foreach="mrp.bom_line_ids" t-as="bom">
+                                        <span t-field="bom.product_id.barcode"/><br/>
+                                    </t>
+                                </t>
+                            </td>
+                        </t>
+                        <t t-else="">
+                            <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 20%;">
+                            </td>
+                            <td style="border: 1px solid #dcdcdc; height:25px; border-collapse: collapse; font-size:12px;text-align: center; width: 20%;">
+                                <span t-field="p.barcode"/>
+                            </td>
+                        </t>
                     </tr>
                     </t>
                 </table>

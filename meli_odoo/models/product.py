@@ -59,9 +59,10 @@ class ProducTemplate(models.Model):
         #Por enquanto essa aplicação, apresentar para eles e ver...
         pc = self.standard_price
         t = self.meli_config_id.taxa_meli
+        pc = pc + t
         cv = self.meli_config_id.margin_meli/100 * pc
         ml = self.meli_config_id.margem_lucro/100 * pc
-        Vt = pc + t + cv + ml
+        Vt = pc + cv + ml
         self.price_meli = Vt
         if self.price_meli >= self.meli_config_id.costs_freight_meli:
             self.price_meli += self.meli_config_id.other_costs_meli

@@ -30,7 +30,7 @@ class ProductTemplate(models.Model):
     def rotina_atualiza_preco_online(self):
         import pudb;pu.db
         hj = datetime.now()
-        hj = hj - timedelta(days=5)
+        hj = hj - timedelta(hours=12)
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
         audit = self.env['auditlog.log'].search([
             ('create_date', '>=', hj),

@@ -46,7 +46,7 @@ class AccountMove(models.Model):
                     for line in record._get_product_amount_lines():
                         line.discount_value = amount_discount_value
                         line._onchange_fiscal_taxes()
-                        line._compute_amounts()
+                        line._compute_fiscal_amounts()
                 for line in record._get_product_amount_lines()[:-1]:
                     if line.price_gross and amount_total:
                         line.discount_value = amount_discount_value * (

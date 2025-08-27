@@ -32,7 +32,7 @@ class AccountMove(models.Model):
     def action_post(self):
         different = False
         for prc in self.parcela_ids:
-            fin = self.financial_move_line_ids.filtered(lambda l: l.date_maturity == prc.data_vencimento)
+            fin = self.due_line_ids.filtered(lambda l: l.date_maturity == prc.data_vencimento)
             if len(fin) > 1:
                 raise UserError(_(f"Existe mais de uma parcela com o mesmo vencimento, faça a correção."))
             if self.move_type == "in_invoice":
@@ -48,13 +48,13 @@ class AccountMove(models.Model):
         res = super().action_post()
         # TODO quando confirma a primeira vez esta excluindo as parcelas
         # rotina abaixo pra evitar isso, rever
-        if len(self.financial_move_line_ids) < len(self.parcela_ids):
+        if len(self.due_line_ids) < len(self.parcela_ids):
             self.button_draft()
             self.action_confirma_parcela()
             res = super().action_post()
         # correcao name parcela
         # for prc in self.parcela_ids:
-        #     fin = self.financial_move_line_ids.filtered(lambda l: l.date_maturity == prc.data_vencimento)
+        #     fin = self.due_line_ids.filtered(lambda l: l.date_maturity == prc.data_vencimento)
         #     if fin.name and fin.name.find('-') < 0:
         #         fin.write({'name': f"{self.name}-{fin.name}"})
 
@@ -67,8 +67,8 @@ class AccountMove(models.Model):
         if round(self.amount_total, 2) != round(valor_total, 2):
             raise UserError(_(f"Valor da soma das parcelas: {str(valor_total)}, diferente do valor total: {str(self.amount_total)}.")) 
         if self.num_parcela > 0:
-            account = self.financial_move_line_ids[0].account_id
-            self.financial_move_line_ids.with_context(check_move_validity=False).unlink()
+            account = self.due_line_ids[0].account_id
+            self.due_line_ids.with_context(check_move_validity=False).unlink()
             date_due = False
             for prc in self.parcela_ids:
                 create_method = self.env['account.move.line'].with_context(check_move_validity=False).create

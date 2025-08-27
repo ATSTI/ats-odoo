@@ -185,7 +185,7 @@ class FSMOrder(models.Model):
         # for line in invoice.invoice_line_ids:
         #     line.fiscal_operation_id = invoice.fiscal_operation_id.id
         #     line._onchange_product_id_fiscal()
-        invoice.action_post()
+        # invoice.action_post()
         self.account_stage = "invoiced"
         return invoice
 
@@ -193,5 +193,5 @@ class FSMOrder(models.Model):
         vals = self.prepare_bills()
         fornecedor = self.env["account.move"].sudo().create(vals)
         fornecedor.invoice_date = datetime.now()
-        fornecedor.action_post()
+        # fornecedor.action_post()
         return fornecedor

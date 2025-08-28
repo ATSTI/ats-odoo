@@ -42,9 +42,10 @@ class ProducTemplate(models.Model):
         #Por enquanto essa aplicação, apresentar para eles e ver...
         pc = self.standard_price
         t = self.shopee_config_id.taxa_shopee
+        pc = pc + t
         cv = self.shopee_config_id.margin_shopee/100 * pc
         ml = self.shopee_config_id.margem_lucro/100 * pc
-        Vt = pc + t + cv + ml
+        Vt = pc + cv + ml
         self.price_shopee = Vt
 
     @api.onchange('standard_price')

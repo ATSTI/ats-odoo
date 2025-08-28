@@ -59,10 +59,10 @@ class PurchaseItens(models.Model):
                         [('bom_line_ids.product_tmpl_id', '=', product.id)])
                     for p in bom:
                         p.product_tmpl_id.button_bom_cost()
-                        if p.shopee:
-                            p.calcula_valor_venda_shopee()
-                        if p.meli:
-                            p.calcula_valor_venda_meli()
+                        if p.product_tmpl_id.shopee:
+                            p.product_tmpl_id.calcula_valor_venda_shopee()
+                        if p.product_tmpl_id.meli:
+                            p.product_tmpl_id.calcula_valor_venda_meli()
             if l.new_margin > 0:
                 product.margin = l.new_margin
         self.state = 'done'

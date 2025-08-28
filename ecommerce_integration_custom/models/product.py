@@ -28,30 +28,25 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     def rotina_atualiza_preco_online(self):
-        prods = self.search([('bom_count', '>', 0)])
-        for prd in prods:
-            prd.button_bom_cost()
         hj = datetime.now()
-        hj = hj - timedelta(minutes=10)
+        hj = hj - timedelta(hours=12)
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
-        audit = self.env['auditlog.log'].search([
-            ('create_date', '>=', hj),
-            ('model_id', '=', 'product.template'),
+        lines = self.env['auditlog.log.line'].search([
+            ('log_id.create_date', '>=', hj),
+            ('log_id.model_id.model', '=', 'product.template'),
+            ('field_name', 'in', ['price_shopee', 'price_meli']),
+            ('new_value_text', '!=', False),
         ])
-        prod_ids = []
-        for pr in audit:
-            for line in pr.line_ids:
-                if line.field_name in (
-                    'price_shopee'
-                ) and line.new_value_text:
-                    prod_ids = self.env['product.template'].browse([pr.res_id])
-                    if prod_ids and prod_ids.shopee:
-                        print("PRODUTO SERIA ATUALIZADO SHOPEE - ", prod_ids.name)
-                        prod_ids.atualiza_preco_shopee()
-                if line.field_name in (
-                    'price_meli'
-                ) and line.new_value_text:
-                    prod_ids = self.env['product.template'].browse([pr.res_id])
-                    if prod_ids and prod_ids.meli:
-                        print("PRODUTO SERIA ATUALIZADO MELI - ", prod_ids.name)
-                        prod_ids.action_envia_produto_meli()
+
+        for line in lines:
+            product = self.env['product.template'].browse(line.log_id.res_id)
+            if not product:
+                continue
+
+            if line.field_name == 'price_shopee' and product.shopee:
+                print("PRODUTO SERIA ATUALIZADO SHOPEE - ", product.name)
+                product.atualiza_preco_shopee()
+
+            elif line.field_name == 'price_meli' and product.meli:
+                print("PRODUTO SERIA ATUALIZADO MELI - ", product.name)
+                product.action_envia_produto_meli()

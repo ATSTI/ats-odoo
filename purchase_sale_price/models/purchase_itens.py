@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from tempfile import template
 from odoo import api, fields, models, _
 
 
@@ -53,6 +54,15 @@ class PurchaseItens(models.Model):
                     product.calcula_valor_venda_shopee()
                 if product.meli:
                     product.calcula_valor_venda_meli()
+                if product.used_in_bom_count:
+                    bom = self.env['mrp.bom'].search(
+                        [('bom_line_ids.product_tmpl_id', '=', product.id)])
+                    for p in bom:
+                        p.product_tmpl_id.button_bom_cost()
+                        if p.shopee:
+                            p.calcula_valor_venda_shopee()
+                        if p.meli:
+                            p.calcula_valor_venda_meli()
             if l.new_margin > 0:
                 product.margin = l.new_margin
         self.state = 'done'

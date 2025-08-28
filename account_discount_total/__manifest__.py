@@ -2,26 +2,21 @@
 #############################################################################
 
 {
-    'name': 'Account Discount on Total Amount',
+    'name': 'Account - discount on total amount',
     'version': '14.0.1.1.0',
     'category': 'Accounting',
-    'summary': "Discount on Total in Invoice based on sale_discount_total (Cybrosys)",
+    'summary': "Desconto no total da fatura por valor ou percentual",
     'author': 'ATSTi Soluções',
     'company': 'ATSTi Soluções',
     'website': '',
     'description': """
-
-Invoice Discount for Total Amount
-=======================
-Module to manage discount on total amount in Invoice.
-        as an specific amount or percentage
 """,
     'depends': ['l10n_br_account', "l10n_br_account_discount"],
     'data': [
         'views/account_invoice_view.xml',
         #'views/invoice_report.xml',
     ],
-    'images': ['static/description/banner.png'],
+    'images': [],
     'license': 'AGPL-3',
     'application': True,
     'installable': True,

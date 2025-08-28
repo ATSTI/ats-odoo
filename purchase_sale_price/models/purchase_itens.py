@@ -45,8 +45,14 @@ class PurchaseItens(models.Model):
         for l in self.purchase_lines:
             product = self.env['product.template'].browse(l.product_id.product_tmpl_id.id)
             if l.new_price > 0:
-                product.list_price = l.new_price
-                product.standard_price = l.product_cst
+                product.write({
+                    'list_price': l.new_price,
+                    'standard_price': l.product_cst,
+                })
+                if product.shopee:
+                    product.calcula_valor_venda_shopee()
+                if product.meli:
+                    product.calcula_valor_venda_meli()
             if l.new_margin > 0:
                 product.margin = l.new_margin
         self.state = 'done'

@@ -39,6 +39,8 @@ class ProducTemplate(models.Model):
 
     @api.depends('standard_price')
     def calcula_valor_venda_shopee(self):
+        if not self.shopee_config_id:
+            return
         #Por enquanto essa aplicação, apresentar para eles e ver...
         pc = self.standard_price
         t = self.shopee_config_id.taxa_shopee

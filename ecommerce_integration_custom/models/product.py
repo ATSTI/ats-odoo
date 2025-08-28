@@ -30,7 +30,7 @@ class ProductTemplate(models.Model):
     def rotina_atualiza_preco_online(self):
         import pudb;pu.db
         hj = datetime.now()
-        hj = hj - timedelta(hours=12)
+        hj = hj - timedelta(minutes=12)
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
         audit = self.env['auditlog.log'].search([
             ('create_date', '>=', hj),
@@ -40,11 +40,16 @@ class ProductTemplate(models.Model):
         for pr in audit:
             for line in pr.line_ids:
                 if line.field_name in (
-                    'standard_price'
+                    'price_shopee'
                 ):
                     import pudb;pu.db
                     prod_ids = self.env['product.template'].browse([pr.res_id])
                     if prod_ids and prod_ids.shopee:
                         prod_ids.atualiza_preco_shopee()
+                if line.field_name in (
+                    'price_meli'
+                ):
+                    import pudb;pu.db
+                    prod_ids = self.env['product.template'].browse([pr.res_id])
                     if prod_ids and prod_ids.meli:
                         prod_ids.action_envia_produto_meli()

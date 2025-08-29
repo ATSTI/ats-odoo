@@ -98,6 +98,25 @@ class ProducTemplate(models.Model):
             if data.get('error'):
                 raise UserError(_(f"(Atualize a Pagina e Tente Novamente) Erro ao atualizar preço: {data['debug_message']}"))
             else:
+                msg = f'<table style="border: 1px solid">\
+                <th>Shopee:</th>\
+                <tr> \
+                <td style="border: 1px solid; text-align: center; width: 120px;">Id do produto</td>\
+                <td style="border: 1px solid; text-align: center; width: 200px;">Nome do Produto</td>\
+                <td style="border: 1px solid; text-align: center; width: 100px;">Preço Novo</td>\
+                </tr>\
+                <tr> \
+                <td style="border: 1px solid;text-align: center; width: 120px;">{self.shopee_item_id}</td>\
+                <td style="border: 1px solid;text-align: center; width: 200px;">{self.name}</td>\
+                <td style="border: 1px solid;text-align: center; width: 100px;">R${self.price_shopee}</td>\
+                </tr>\
+                </table>'
+                canal = self.env['mail.channel'].search([('name', '=', 'Preços Online')])
+                canal.message_post(
+                    body=(msg),
+                    message_type='comment',
+                    subtype_xmlid='mail.mt_comment',
+                )
                 raise UserError(_(f"Preço Atualizado Com Sucesso!"))
         else:
             self.procura_item_existente()

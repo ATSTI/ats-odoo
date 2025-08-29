@@ -184,6 +184,27 @@ class ProducTemplate(models.Model):
             response = requests.post(url, headers=headers, data=data)
             item = response.json()
             self.meli_item_id = item['id']
+            msg = f'<table style="border: 1px solid">\
+            <th>Mercado Livre:</th>\
+            <tr> \
+            <td style="border: 1px solid; text-align: center; width: 120px;">Id do produto</td>\
+            <td style="border: 1px solid; text-align: center; width: 200px;">Nome do Produto</td>\
+            <td style="border: 1px solid; text-align: center; width: 100px;">Preço Novo</td>\
+            <td style="border: 1px solid; text-align: center; width: 100px;">Estoque Novo</td>\
+            </tr>\
+            <tr> \
+            <td style="border: 1px solid;text-align: center; width: 120px;">{self.meli_item_id}</td>\
+            <td style="border: 1px solid;text-align: center; width: 200px;">{self.name}</td>\
+            <td style="border: 1px solid;text-align: center; width: 100px;">R${self.price_meli}</td>\
+            <td style="border: 1px solid;text-align: center; width: 100px;">{self.qtd_meli}</td>\
+            </tr>\
+            </table>'
+            canal = self.env['mail.channel'].search([('name', '=', 'Preços Online')])
+            canal.message_post(
+                body=(msg),
+                message_type='comment',
+                subtype_xmlid='mail.mt_comment',
+            )
         else:
             self.encontrar_item_por_sku()
         insere_meli_item = False

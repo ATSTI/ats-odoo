@@ -9,7 +9,7 @@
     'author': 'Carlos R. Silveira '
               ,
     'license': 'AGPL-3',
-    'depends': ['base', 'account', 'l10n_br_fiscal', 'sale', 'sale_stock_operating_unit'],
+    'depends': ['base', 'account', 'l10n_br_fiscal', 'sale', 'sale_stock_operating_unit', 'mail'],
     'data': [
         'security/res_groups.xml',
         'security/ir.model.access.csv',

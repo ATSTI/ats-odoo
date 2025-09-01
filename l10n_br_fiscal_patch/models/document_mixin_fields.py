@@ -5,7 +5,7 @@ from odoo import fields, models
 
 
 class FiscalDocumentMixinFields(models.AbstractModel):
-    _inherit = "l10n_br_fiscal.document.mixin.fields"
+    _inherit = "l10n_br_fiscal.document.mixin"
 
 
     amount_icms_relief_value = fields.Monetary(

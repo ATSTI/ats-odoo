@@ -30,19 +30,6 @@ class AccountMove(models.Model):
                                      readonly=True, states={'draft': [('readonly', False)]}, default='percent')
     discount_rate = fields.Float('Total desconto', digits=(16, 2), readonly=True,
                                  states={'draft': [('readonly', False)]})
-    amount_discount = fields.Monetary(string='Desconto', store=True, readonly=True, compute='_compute_amount',
-                                      track_visibility='always')
-
-    @api.model_create_multi
-    def create(self, vals_list):
-       for vals in vals_list:
-           line_ids = vals["line_ids"] if isinstance(vals, dict) and "line_ids" in vals else []
-           for line in line_ids:
-               line_vals = line[2]  # dicionário da linha
-               if "discount_value" in line_vals and line_vals.get('discount_value') == 0.0:
-                   move_id = self.env['account.move'].browse(line_vals.get('move_id'))
-                   line_vals["discount_value"] = move_id.amount_untaxed - move_id.amount_total
-       return super(AccountMove, self).create(vals_list)
 
     def ajusta_valores(self):
         for move in self:
@@ -56,9 +43,8 @@ class AccountMove(models.Model):
 
     @api.onchange('discount_type', 'discount_rate', 'invoice_line_ids')
     def supply_rate(self):
-        import pudb;pu.db
         for inv in self:
-            total = discount = 0.0
+            total = discount = discount_value = 0.0
             for line in inv.invoice_line_ids:
                 total += (line.quantity * line.price_unit)
             self.discount_rate = self.discount_rate
@@ -69,6 +55,7 @@ class AccountMove(models.Model):
                     )                    
                     line.discount_value = price_unit_discount
                     line._onchange_price_subtotal()
+                    discount_value += line.discount_value
             else:
                 if inv.discount_rate != 0:
                     discount = (inv.discount_rate / total) * 100
@@ -80,8 +67,10 @@ class AccountMove(models.Model):
                     )
                     line.discount_value = price_unit_discount
                     line._onchange_price_subtotal()
+                    discount_value += line.discount_value
             inv._move_autocomplete_invoice_lines_values()
             inv.amount_untaxed = total
+            inv.amount_discount_value = discount_value
 
     def button_dummy(self):
         self.supply_rate()

@@ -27,42 +27,12 @@ import odoo.addons.decimal_precision as dp
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    @api.depends('order_line.price_total')
-    def _amount_all(self):
-        """
-        Compute the total amounts of the SO.
-        """
-        res = super()._compute_amount()
-        """
-        for order in self:
-            amount_discount = 0.0
-            for line in order.order_line:
-                # amount_untaxed += line.price_subtotal
-                # amount_tax += line.price_tax
-                amount_discount += (line.product_uom_qty * line.price_unit * line.discount) / 100
-            order.update({
-                # 'amount_untaxed': amount_untaxed,
-                # 'amount_tax': amount_tax,
-                'amount_discount': amount_discount,
-                # 'amount_total': amount_untaxed + amount_tax,
-            })
-        """
-        return res
-
     discount_type = fields.Selection([('percent', 'Percentagem'), ('amount', 'Valor')], string='Tipo desconto',
                                      readonly=True,
                                      states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
                                      default='percent')
     discount_rate_t = fields.Float('Desconto', digits=dp.get_precision('Account'),
                                  readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
-    # amount_untaxed = fields.Monetary(string='Untaxed Amount', store=True, readonly=True, compute='_amount_all',
-    #                                  track_visibility='always')
-    # amount_tax = fields.Monetary(string='Taxes', store=True, readonly=True, compute='_amount_all',
-    #                              track_visibility='always')
-    # amount_total = fields.Monetary(string='Total', store=True, readonly=True, compute='_amount_all',
-    #                                track_visibility='always')
-    amount_discount = fields.Monetary(string='Total desconto', store=True, readonly=True, compute='_amount_all',
-                                    digits=dp.get_precision('Account'), track_visibility='always')
 
     @api.onchange('discount_type', 'discount_rate_t', 'order_line')
     def supply_rate(self):
@@ -79,8 +49,6 @@ class SaleOrder(models.Model):
                     discount = (order.discount_rate_t / total) * 100
                 else:
                     discount = order.discount_rate_t
-                # for line in order.order_line:
-                    # line.discount = discount
                 order.discount_rate = discount
                 for line in order.order_line:                
                     line.discount_value = (line.product_uom_qty * line.price_unit * discount) / 100
@@ -93,15 +61,10 @@ class SaleOrder(models.Model):
             'discount_rate': self.discount_rate_t,
         })
         return invoice_vals
-    
-    def _create_invoices(self, grouped=False, final=False, date=None):
-        invoice = super()._create_invoices(grouped=grouped, final=final, date=date)
-        invoice.ajusta_valores()
-        return invoice
 
     def button_dummy(self):
-
         self.supply_rate()
+        self._amount_all()
         return True
 
 
@@ -114,16 +77,11 @@ class SaleOrderLine(models.Model):
                                      default='percent')
     discount_rate_t = fields.Float('Desconto', digits=dp.get_precision('Account'),
                                  readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
-    
-    # discount = fields.Float(string='Discount (%)', digits=(16, 20), default=0.0)
 
     def _prepare_invoice_line(self, **optional_values):
         self.ensure_one()
         invoice_line_vals = super()._prepare_invoice_line(**optional_values)
         if self.discount_value:
-            # discount = (
-            #             (self.product_uom_qty * self.price_unit) * (self.discount / 100.0)
-            #         )
             invoice_line_vals.update({
                 'discount_value': self.discount_value,
                 'discount': self.discount
@@ -135,9 +93,6 @@ class SaleOrderLine(models.Model):
             if line.discount_type == 'percent':
                 line.discount_fixed = True
                 line.discount_fixed = True
-                # order.discount_rate = order.discount_rate_t
-                # for line in order.order_line:
-                #     line.discount_value = (line.product_uom_qty * line.price_unit * order.discount_rate_t) / 100                
                 if line.discount_rate_t:
                     line.discount = line.discount_rate_t
                     line.discount_value = (line.discount_rate_t / 100) * (

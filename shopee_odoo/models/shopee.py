@@ -127,7 +127,7 @@ class ShopeeConfig(models.Model):
         tmp_base_string = "%s%s%s%s%s" % (self.shopee_partner_id, path, timest, self.access_token, self.shopee_id)
         base_string = tmp_base_string.encode()
         sign = hmac.new(self.shopee_partner_key.encode(), base_string, hashlib.sha256).hexdigest()
-        optional = "total_amount,buyer_user_id,buyer_username,recipient_address,buyer_cpf_id,item_list"
+        optional = "total_amount,buyer_user_id,buyer_username,recipient_address,buyer_cpf_id,item_list,payment_info"
         path_cat = (
             f"?access_token={self.access_token}"
             f"&order_sn_list={order_sn}"

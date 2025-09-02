@@ -223,7 +223,11 @@ class PosSession(models.Model):
                 os.remove(path_file + '/' + i)
                 continue
             f = open(path_file + '/' + i, mode="r")
-            ped = json.load(f)
+            try:
+                ped = json.load(f)
+            except:
+                os.remove(path_file + '/' + i)
+                continue
             session = self.env['pos.session']
             prt_obj = self.env['res.partner']
             prod_obj = self.env['product.product']

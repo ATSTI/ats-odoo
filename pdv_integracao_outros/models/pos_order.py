@@ -211,7 +211,11 @@ class PosSession(models.Model):
             num_arq += 1
 
             f = open(path_file + '/' + i, mode="r")
-            ped = json.load(f)
+            try:
+                ped = json.load(f)
+            except:
+                os.remove(path_file + '/' + i)
+                continue
             user = ped['user_id']
             ses_config = self.get_pos_config(user)
             if not ses_config:
@@ -326,7 +330,7 @@ class PosSession(models.Model):
                     if len(str(line['product_id'])) < 10 and not prd:
                         prd = prod_obj.search([('id', '=', line['product_id'])])
                     if not prd:
-                        prd = prod_obj.search([('default_code', '=', '321')])
+                        prd = prod_obj.search([('name', 'ilike', 'diverso')])
                         descricao = f"{descricao} - PRODUTO NAO LOCALIZADO"
                 sub_total = line['price_unit'] * line['qty']
                 if linhas == 0:

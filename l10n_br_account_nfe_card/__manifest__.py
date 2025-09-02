@@ -12,7 +12,6 @@
     "depends": [
         "l10n_br_nfe",
         "l10n_br_account",
-        "l10n_br_delivery_nfe",
     ],
     "data": [
         "security/ir.model.access.csv",

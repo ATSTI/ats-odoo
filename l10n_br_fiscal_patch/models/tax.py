@@ -28,12 +28,15 @@ class Tax(models.Model):
                 icms_relief = (icms_base * (1 - icms_reduction)) * icms_percent
                 tax_dict.update({"icms_relief": icms_relief})
             elif cst["code"] in ["20", "70"]:
-                icms_relief = (
-                    icms_base
-                    * (1 - (icms_percent * (1 - icms_reduction)))
-                    / (1 - icms_percent)
-                    - icms_base
-                )
+                #icms_relief = (
+                #    icms_base
+                #    * (1 - (icms_percent * (1 - icms_reduction)))
+                #    / (1 - icms_percent)
+                #    - icms_base
+                #)
+                icms_normal = icms_base * icms_percent
+                icms_reduzido = (icms_base * (1 - icms_reduction)) * icms_percent
+                icms_relief = icms_normal - icms_reduzido
                 tax_dict.update({"icms_relief": icms_relief})
             else:
                 icms_relief = (icms_base / (1 - icms_percent)) * icms_percent
@@ -41,3 +44,4 @@ class Tax(models.Model):
         else:
             tax_dict.update({"icms_relief": 0})
         return result
+    

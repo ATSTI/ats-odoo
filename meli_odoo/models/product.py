@@ -72,14 +72,18 @@ class ProducTemplate(models.Model):
         if self.meli == True:
             self.calcula_valor_venda_meli()
 
-    @api.onchange('meli')
-    def onchange_meli(self):
+    @api.onchange('meli_config_id')
+    def onchange_meli_config_id(self):
         if self.meli == True:
             self.title_meli = self.name
             self.meli_sku = self.default_code
             self.qtd_meli = 1
             self.meli_config_id = self.env['meli.config'].search([('name', 'ilike', 'Felicita')]).id
             self.calcula_valor_venda_meli()
+            if self.meli_config_id:
+                conf = self.meli_config_id
+                porcen = conf.percentual_stock_meli / 100 * self.qty_available
+                self.qtd_meli = int(porcen) if int(porcen) > 0 or int(porcen) == 1 else 0
 
     def encontrar_item_por_sku(self):
         user_id = self.meli_config_id.user_id

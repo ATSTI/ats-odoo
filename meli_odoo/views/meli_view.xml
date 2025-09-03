@@ -38,6 +38,9 @@
                                     <field name="other_costs_meli"/>
                                     <field name="costs_freight_meli"/>
                                 </group>
+                                <group string="Informações do Estoque">
+                                    <field name="percentual_stock_meli"/>
+                                </group>
                             </group>
                         </group>
                     </sheet>

@@ -55,13 +55,17 @@ class ProducTemplate(models.Model):
         if self.shopee == True:
             self.calcula_valor_venda_shopee()
 
-    @api.onchange('shopee')
-    def onchange_shopee(self):
+    @api.onchange('shopee_config_id')
+    def onchange_shopee_config_id(self):
         if self.shopee == True:
             self.title_shopee = self.name
             self.shopee_sku = self.default_code 
             self.qtd_shopee = 1
             self.calcula_valor_venda_shopee()
+            if self.shopee_config_id:
+                conf = self.shopee_config_id
+                porcen = conf.percentual_stock_shopee / 100 * self.qty_available
+                self.qtd_shopee = int(porcen) if int(porcen) > 0 or int(porcen) == 1 else 0
 
     def atualiza_preco_shopee(self):
         if self.shopee_config_id.shop_real == True:

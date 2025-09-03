@@ -37,6 +37,9 @@
                                     <field name="taxa_shopee"/>
                                     <field name="margem_lucro"/>
                                 </group>
+                                <group string="Informações do Estoque">
+                                    <field name="percentual_stock_shopee"/>
+                                </group>
                             </group>
                         </group>
                     </sheet>

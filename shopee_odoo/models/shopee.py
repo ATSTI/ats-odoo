@@ -60,6 +60,8 @@ class ShopeeConfig(models.Model):
     taxa_shopee = fields.Float('Taxa Shopee', default=6.0)
     margem_lucro = fields.Float('Margem de Lucro Shopee', default=45.0)
 
+    percentual_stock_shopee = fields.Float('Percentual de Estoque', default=100.0)
+
     # url_ini = "https://partner.shopeemobile.com" 
 
     def action_gera_acess_token(self):
@@ -297,7 +299,6 @@ class ShopeeConfig(models.Model):
                 # "note": data_limite,
                 "commitment_date": data_envio_limite
             }
-            import pudb;pu.db
             if payment_method:
                 if payment_method == "Shopee PayLater":
                     payment_method = "Dinheiro"

@@ -11,6 +11,37 @@ import time
 import hmac
 import hashlib
 
+BAND_MAP = {
+    'VISA': '01',
+    'MASTER': '02',
+    'AMERICAN EXPRESS': '03',
+    'SOROCRED': '04',
+    'DINERS CLUB': '05',
+    'ELO': '06',
+    'HIPERCARD': '07',
+    'AURA': '08',
+    'CABAL': '09',
+    'ALELO': '10',
+    'BANES CARD': '11',
+    'CALCARD': '12',
+    'CREDZ': '13',
+    'DISCOVER': '14',
+    'GOODCARD': '15',
+    'GREENCARD': '16',
+    'HIPER': '17',
+    'JCB': '18',
+    'MAIS': '19',
+    'MAXVAN': '20',
+    'POLICARD': '21',
+    'REDECOMPRAS': '22',
+    'SODEXO': '23',
+    'VALECARD': '24',
+    'VEROCHEQUE': '25',
+    'VR': '26',
+    'TICKET': '27',
+    'OUTROS': '99',
+}
+
 class ShopeeConfig(models.Model):
     _name = 'shopee.config'
     _description = "Shopee Config"
@@ -209,6 +240,13 @@ class ShopeeConfig(models.Model):
                     if len(cpf_b) < 11:
                         cpf_b = cpf_b.zfill(11)
                     cpf = '{}.{}.{}-{}'.format(cpf_b[:3], cpf_b[3:6], cpf_b[6:9], cpf_b[9:])
+                    payment_method = ''
+                    if z['payment_info']:
+                        for payment in z['payment_info']:
+                            payment_method = payment['payment_method']
+                            cnpj_processor = payment['payment_processor_register']
+                            card_brand = payment['card_brand']
+                            auth_code = payment['transaction_id']
             # print("PEDIDO CRIADO")
             pr = self.env["res.partner"].search([
                 ('cnpj_cpf', '=', cpf),
@@ -259,7 +297,19 @@ class ShopeeConfig(models.Model):
                 # "note": data_limite,
                 "commitment_date": data_envio_limite
             }
-            
+            if payment_method:
+                if payment_method == "Credit Card":
+                    payment_method = "Cartão de Crédito"
+                if payment_method == "Debit Card":
+                    payment_method = "Cartão de Débito"
+                mode = self.env['account.payment.mode'].search([
+                    ('name', 'ilike', payment_method)
+                ])
+                if mode:
+                    vals['payment_mode_id'] = mode.id
+                vals['nfe40_CNPJ'] = cnpj_processor
+                vals['nfe40_tBand'] = BAND_MAP.get(card_brand)
+                vals['nfe40_cAut'] = auth_code
             sale = self.env['sale.order'].create(vals)
             sale.onchange_partner_id()
             if len(order_line):

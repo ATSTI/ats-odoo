@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sale_order_payment_info_shopee" model="ir.ui.view">
+        <field name="name">shoppe.sale.order.card.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="priority">399</field>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name ='other_information']" position="after">
+                <page name="info_card_pay" string="Informações do pagamento">
+                    <group string="Info do pagamento">
+                        <group>
+                            <field name="nfe40_CNPJ" />
+                            <field name="nfe40_tBand" />
+                            <field name="nfe40_cAut" />
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

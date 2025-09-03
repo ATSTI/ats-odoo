@@ -9,11 +9,12 @@
     'author': 'Carlos R. Silveira '
               ,
     'license': 'AGPL-3',
-    'depends': ['base', 'account', 'l10n_br_fiscal', 'sale', 'mail'],
+    'depends': ['base', 'account', 'l10n_br_fiscal', 'sale', 'mail', 'l10n_br_account_nfe_card'],
     'data': [
         'security/res_groups.xml',
         'security/ir.model.access.csv',
         'views/shopee_view.xml',
+        'views/sale_order_views.xml',
         'views/product_view.xml',
         ],
     'installable': True,

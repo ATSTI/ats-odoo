@@ -297,7 +297,10 @@ class ShopeeConfig(models.Model):
                 # "note": data_limite,
                 "commitment_date": data_envio_limite
             }
+            import pudb;pu.db
             if payment_method:
+                if payment_method == "Shopee PayLater":
+                    payment_method = "Dinheiro"
                 if payment_method == "Credit Card":
                     payment_method = "Cartão de Crédito"
                 if payment_method == "Debit Card":
@@ -307,9 +310,10 @@ class ShopeeConfig(models.Model):
                 ])
                 if mode:
                     vals['payment_mode_id'] = mode.id
-                vals['nfe40_CNPJ'] = cnpj_processor
-                vals['nfe40_tBand'] = BAND_MAP.get(card_brand)
-                vals['nfe40_cAut'] = auth_code
+                if mode.id != 1:
+                    vals['nfe40_CNPJ'] = cnpj_processor
+                    vals['nfe40_tBand'] = BAND_MAP.get(card_brand)
+                    vals['nfe40_cAut'] = auth_code
             sale = self.env['sale.order'].create(vals)
             sale.onchange_partner_id()
             if len(order_line):

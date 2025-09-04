@@ -3,7 +3,7 @@
 
 {
     'name': 'Duplicar uma fatura, copiando somente Serviço',
-    'version': '14.0.0.1.0',
+    'version': '16.0',
     'category': 'Localisation',
     'license': 'AGPL-3',
     'sequence': 2,
@@ -13,7 +13,7 @@
         No diario diversos(general), somente para poder gerar a NFe,
         pois, na fatura consta serviços tbém, que será gerado uma nota de serviço.
    """,
-    'author': 'ATS Soluções',
+    'author': 'ATSTi,Odoo Community Association (OCA)',
     'website': '',
     'depends': ["l10n_br_fiscal", "l10n_br_nfse", "l10n_br_account"],
     'data': [

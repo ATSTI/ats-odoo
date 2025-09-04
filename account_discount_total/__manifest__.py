@@ -3,19 +3,18 @@
 
 {
     'name': 'Account Discount on Total Amount',
-    'version': '14.0.1.1.0',
+    'version': '16.0',
     'category': 'Accounting',
     'summary': "Discount on Total in Invoice based on sale_discount_total (Cybrosys)",
-    'author': 'ATSTi Soluções',
+    'author': 'ATSTi,Odoo Community Association (OCA)',
     'company': 'ATSTi Soluções',
     'website': '',
     'description': """
-
-Invoice Discount for Total Amount
-=======================
-Module to manage discount on total amount in Invoice.
-        as an specific amount or percentage
-""",
+        Invoice Discount for Total Amount
+        =======================
+        Module to manage discount on total amount in Invoice.
+                as an specific amount or percentage
+        """,
     'depends': ['l10n_br_account', "l10n_br_account_discount"],
     'data': [
         'views/account_invoice_view.xml',

@@ -6,13 +6,14 @@
     "summary": "Adicionado campos para parcelamento",
     "category": "Account",
     "license": "AGPL-3",
-    "author": "ATSTi Solucoes",
+    "author": "ATSTi,Odoo Community Association (OCA)",
     "website": "http://www.atsti.com.br",
-    "version": "14.0.1.0.0",
+    "version": "16.0",
     "development_status": "Alpha",
     "depends": [
         "l10n_br_account",
-        "account_payment_mode", 
+        "l10n_br_account_payment_order",
+        "account_payment_mode",
     ],
     "data": [
         "views/payment_installment.xml",

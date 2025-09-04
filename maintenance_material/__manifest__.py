@@ -2,9 +2,9 @@
 {
     "name": "Maintenance Material",
     "summary": "Adiciona materiais na OM",
-    "version": "14.0.1.0.0",
+    "version": "16.0",
     "category": "Maintenance",
-    "author": "Carlos Silveira," "ATSTi,",
+    "author": "ATSTi,Odoo Community Association (OCA)",
     "website": "",
     "license": "AGPL-3",
     "installable": True,

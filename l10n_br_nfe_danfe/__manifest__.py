@@ -6,10 +6,10 @@
     "summary": "Brazilian Eletronic Invoice NF-e - Danfe(ReportLab).",
     "category": "Localisation",
     "license": "AGPL-3",
-    "author": "ATSTi, ITK Soft",
+    "author": "ATSTi,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/l10n-brazil",
     "development_status": "Beta",
-    "version": "14.0.1.0.0",
+    "version": "16.0",
     "depends": [
         "l10n_br_nfe",
     ],

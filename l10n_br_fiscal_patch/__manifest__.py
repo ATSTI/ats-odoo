@@ -7,9 +7,9 @@
         Quando tem icms de desoneração e com código 03-Alívio do ICMS, desconta o valor do ICMS do total da nota.
     """,
     "license": "AGPL-3",
-    "author": "ATSTi, ",
+    "author": "ATSTi,Odoo Community Association (OCA)",
     "website": "",
-    "version": "14.0.1.0.0",
+    "version": "16.0",
     "depends": [
         "l10n_br_fiscal",
         "l10n_br_nfe",

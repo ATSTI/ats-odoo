@@ -2,8 +2,8 @@
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 {
-    'name': 'Conats Analiticas Criar',
-    'version': '1.0',
+    'name': 'Contas Analiticas Criar',
+    'version': '16.0',
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
@@ -11,7 +11,7 @@
     'description': """
         Importa Planilha de Produtos e Cliente
    """,
-    'author': 'ATS Soluções',
+    'author': 'ATSTi,Odoo Community Association (OCA)',
     'website': '',
     'depends': [
         'analytic',

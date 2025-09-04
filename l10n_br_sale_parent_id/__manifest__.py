@@ -5,9 +5,9 @@
     "summary": "Quando o pedido de venda e emitido para uma contato a fatura deve sair no nome da Empresa",
     "category": "Localisation",
     "license": "AGPL-3",
-    "author": "ATSTi, ",
+    "author": "ATSTi,Odoo Community Association (OCA)",
     "website": "",
-    "version": "14.0.1.1.1",
+    "version": "16.0",
     "depends": ["l10n_br_sale", "l10n_br_account"],
     "data": [
     ],

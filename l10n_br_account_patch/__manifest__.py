@@ -4,9 +4,9 @@
     "name": "Brazilian Localization Accounts Patch",
     "category": "Localisation",
     "license": "AGPL-3",
-    "author": "ATSTi, ",
+    "author": "ATSTi,Odoo Community Association (OCA)",
     "website": "",
-    "version": "14.0.1.0.0",
+    "version": "16.0",
     "depends": ["l10n_br_account"],
     "data": [
     ],

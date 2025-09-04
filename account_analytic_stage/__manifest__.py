@@ -5,9 +5,9 @@
     "name": "Account Analytic Stage",
     "summary": """
         Add stage""",
-    "version": "14.0.1.0.0",
+    "version": "16.0",
     "license": "AGPL-3",
-    "author": "ATSTi",
+    "author": "ATSTi,Odoo Community Association (OCA)",
     "website": "https://github.com/ATSTI/ats-odoo/account_analytic_stage",
     "depends": [
         "analytic",

@@ -5,9 +5,9 @@
     "summary": "Quando copia um documento de um periodo fechado, deixa este fora do fechamento",
     "category": "Localisation",
     "license": "AGPL-3",
-    "author": "ATSTi, ",
+    "author": "ATSTi,Odoo Community Association (OCA)",
     "website": "",
-    "version": "14.0.1.0.0",
+    "version": "16.0",
     "depends": ["l10n_br_fiscal_closing"],
     "data": [
     ],

@@ -4,15 +4,14 @@
     "name": "NFCe com cpf,",
     "category": "Localisation",
     "license": "AGPL-3",
-    "author": "ATSTi, ",
+    "author": "ATSTi,Odoo Community Association (OCA)",
     "website": "",
     'description': """
         Grava o cpf no cadastro do cliente quando é do tipo consumidor anonimo
    """,
-    "version": "14.0.1.0.0",
+    "version": "16.0",
     "depends": ["l10n_br_fiscal", "l10n_br_account"],
     "data": [
-        # View
         "views/account_invoice_view.xml",
     ],
     "demo": [

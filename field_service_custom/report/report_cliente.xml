@@ -108,6 +108,9 @@
                                             <span t-field="o.amount_untaxed"/>
                                         </td>
                                     </tr>
+
+
+
                                     <!-- <t t-foreach="o.amount_by_group" t-as="amount_by_group">
                                         <tr style="">
                                             <t t-if="len(o.line_ids.filtered(lambda line: line.tax_line_id)) in [0, 1] and float_compare(o.amount_untaxed, amount_by_group[2], precision_rounding=o.currency_id.rounding) == 0">
@@ -135,13 +138,25 @@
                                             <span class="text-nowrap" t-field="o.amount_total"/>
                                         </td>
                                     </tr>
+
+                                    <t t-if ="o.payment_state == 'paid' and o.get_payment_date()">
+                                        <tr>
+                                            <td>
+                                                <strong>Pago em:</strong>
+                                            </td>
+                                            <td class ='text-right'>
+                                                <span t-esc ="o.get_payment_date()"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                        
                                     <t t-if="print_with_payments">
                                         <t t-if="o.payment_state != 'invoicing_legacy'">
                                             <t t-set="payments_vals" t-value="o.sudo()._get_reconciled_info_JSON_values()"/>
                                             <t t-foreach="payments_vals" t-as="payment_vals">
                                                 <tr>
                                                     <td>
-                                                        <i class="oe_form_field text-right oe_payment_label">Pago em <t t-esc="payment_vals['date']" t-options="{&quot;widget&quot;: &quot;date&quot;}"/></i>
+                                                        <i class="oe_form_field text-right oe_payment_label">Pago em<t t-esc="payment_vals['date']" t-options="{&quot;widget&quot;: &quot;date&quot;}"/></i>
                                                     </td>
                                                     <td class="text-right">
                                                         <span t-esc="payment_vals['amount']" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>

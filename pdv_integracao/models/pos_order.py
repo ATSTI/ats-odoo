@@ -80,13 +80,6 @@ class PosSession(models.Model):
     def baixa_pagamentos(self, move_line_id, journal_id, caixa, valor, cod_forma, juros):
         if journal_id and journal_id.type in ('cash','bank'):
             invoices = move_line_id
-            # amount = self._compute_payment_amount(invoices=invoices) if self.multi else self.amount
-            if move_line_id.amount_residual > valor or ((move_line_id.amount_residual - valor) > 0.01):
-                baixar_tudo = 'open'
-            else:
-                baixar_tudo = 'reconcile'
-            bank_account = invoices.partner_bank_id or invoices.partner_bank_account_id
-            # pmt_communication = self._prepare_communication(invoices)
 
             payment_type = 'inbound'# if move_line_id.debit else 'outbound'
             payment_methods = \
@@ -94,25 +87,29 @@ class PosSession(models.Model):
                 journal_id.inbound_payment_method_ids or \
                 journal_id.outbound_payment_method_ids
             payment_method_id = payment_methods and payment_methods[0] or False
-            vals = {
-                'journal_id': journal_id.id,
-                'payment_method_id': payment_method_id.id,
-                'payment_date': datetime.now(),
-                'communication': invoices.name,
-                'invoice_ids': [(6, 0, invoices.ids)],
-                'payment_type': payment_type,
+
+            apr = self.env['account.payment.register']
+            to_process = []
+            payment_vals = {
+                'date': datetime.now(),
                 'amount': valor,
+                'payment_type': payment_type,
+                'partner_type': 'customer',
+                'ref': invoices.name,
+                'journal_id': journal_id.id,
                 'currency_id': journal_id.company_id.currency_id.id,
                 'partner_id': move_line_id.partner_id.id,
-                'partner_type': 'customer',
-                'partner_bank_account_id': bank_account.id,
-                'multi': False,
-                'payment_difference_handling': baixar_tudo,
-                'writeoff_label': 'importados'
+                'payment_method_id': payment_method_id.id,
+                'destination_account_id': move_line_id.financial_move_line_ids[0].account_id.id,
             }
-            Payment = self.env['account.payment']
-            pay = Payment.create(vals)
-            pay.post()
+            to_process.append({
+                'create_vals': payment_vals,
+                'to_reconcile': move_line_id.financial_move_line_ids,
+                'batch': invoices,
+            })
+            apr._init_payments(to_process, edit_mode=True)
+            apr._post_payments(to_process, edit_mode=True)
+            apr._reconcile_payments(to_process, edit_mode=True)
    
     def get_pos_config(self, user):
         ses_conf = self.env['pos.config']
@@ -367,6 +364,7 @@ class PosSession(models.Model):
             metodo_pag = ''
             para_faturar = 0.0
             total_pedido = 0.0
+            total_fatura_paga = 0.0
             falha_pag = True
             for pag_ids in ped['statement_ids']:
                 pag = pag_ids[2]
@@ -375,6 +373,9 @@ class PosSession(models.Model):
                 total_pedido += pag['amount']
                 if pag['journal'] == '4-':
                     para_faturar += pag['amount']
+                else:
+                    total_fatura_paga += pag['amount']
+                    jrn_paga = pag['journal']
                 jrn = self.env['account.journal'].search([
                         ('name', 'like', pag['journal']),
                         ('company_id','=', ses.company_id.id)
@@ -411,20 +412,17 @@ class PosSession(models.Model):
             if metodo_pag and para_faturar:
                 ped_id.write({'to_invoice': True})
                 move_vals = ped_id._prepare_invoice_vals()
-                indice_faturar = para_faturar / total_pedido
-                faturado = para_faturar
-                for line in move_vals['invoice_line_ids']:                    
-                    if conta_itens == 1:
-                        valor_linha = faturado
-                    else:
-                        valor_linha = round(line[2]['price_unit'] * indice_faturar, 2)
-                    faturado -= valor_linha
-                    line[2]['price_unit'] = valor_linha
-                    conta_itens -= 1
                 move_vals['invoice_origin'] = 'POS/' + move_vals['invoice_origin']
                 new_move = ped_id._create_invoice(move_vals)
                 ped_id.write({'account_move': new_move.id, 'state': 'invoiced'})
                 new_move.sudo().with_company(ped_id.company_id)._post()
+                if total_fatura_paga:
+                    caixa = 0
+                    jrn = self.env['account.journal'].search([
+                        ('name', 'like', jrn_paga),
+                        ('company_id','=', ses.company_id.id)
+                    ])
+                    self.baixa_pagamentos(new_move, jrn, caixa, total_fatura_paga, 0, 0.0)
             
             ped_id._create_order_picking()
         if ses:

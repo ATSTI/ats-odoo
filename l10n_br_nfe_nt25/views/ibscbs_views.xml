@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <!-- CST -->
+        <record id="ibscbs_cst_form_view" model="ir.ui.view">
+            <field name="name">ibs_cbs.cst.form</field>
+            <field name="model">ibs_cbs.cst</field>
+            <field name="arch" type="xml">
+                <form string="IBSCBS Configurações">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="ibs_aliquota"/>
+                    <field name="cbs_aliquota" />
+                </form>
+            </field>
+        </record>
+
+        <record id="ibscbs_cst_tree_view" model="ir.ui.view">
+            <field name="name">ibs_cbs.cst.tree</field>
+            <field name="model">ibs_cbs.cst</field>
+            <field eval="7" name="priority"/>
+            <field name="arch" type="xml">
+                <tree string="IBSCBS Cst">
+                    <field name="name"/>
+                    <field name="code"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_config_ibscbs_cst" model="ir.actions.act_window">
+            <field name="name">Configurações IBSCBS Cst</field>
+            <field name="res_model">ibs_cbs.cst</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+            id="ibscbs_cst_menu"
+            action="action_config_ibscbs_cst"
+            groups="l10n_br_fiscal.group_manager"
+            parent="l10n_br_fiscal.products_config_menu"
+            sequence="31"
+        />
+
+        <!-- ClassTrib -->
+        <record id="ibscbs_classtrib_form_view" model="ir.ui.view">
+            <field name="name">ibs_cbs.classtrib.form</field>
+            <field name="model">ibs_cbs.classtrib</field>
+            <field name="arch" type="xml">
+                <form string="IBSCBS Configurações">
+                    <field name="name"/>
+                    <field name="code"/>
+                </form>
+            </field>
+        </record>
+
+        <record id="ibscbs_classtrib_tree_view" model="ir.ui.view">
+            <field name="name">ibs_cbs.classtrib.tree</field>
+            <field name="model">ibs_cbs.classtrib</field>
+            <field eval="7" name="priority"/>
+            <field name="arch" type="xml">
+                <tree string="IBSCBS ClassTrib">
+                    <field name="name"/>
+                    <field name="code"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_config_ibscbs_classtrib" model="ir.actions.act_window">
+            <field name="name">Configurações IBSCBS ClassTrib</field>
+            <field name="res_model">ibs_cbs.classtrib</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+            id="ibscst_classtrib_menu"
+            action="action_config_ibscbs_classtrib"
+            groups="l10n_br_fiscal.group_manager"
+            parent="l10n_br_fiscal.products_config_menu"
+            sequence="32"
+        />
+    </data>
+</odoo>

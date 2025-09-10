@@ -29,6 +29,18 @@
                         options="{'currency_field': 'currency_id'}"
                     />
                 </field>
+                <field name="discount_value" position="after">
+                    <group>
+                        <field name="discount_type" />
+                        <field name="discount_rate_t" />
+                        <button name="button_update_discount"
+                            states="draft,sent" string="Atualizar" type="object"
+                            class="oe_edit_only btn-primary"/>
+                    </group>
+                    <group>
+                        <field name="amount_total" />
+                    </group>
+                </field>
             </field>
         </record>
 </odoo>

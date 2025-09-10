@@ -32,7 +32,7 @@
                             CNPJ: <span t-esc="o.company_id.cnpj_cpf"/>
                         </strong>
                     </h5>
-                    <h5>
+                    <h5>                          
                         <t t-if="o.partner_id">
                             -----------------------------------------------------<br/>
                             <strong>FATURA: <t t-esc="o.name"/></strong>
@@ -50,7 +50,7 @@
                             <br/>
                             <strong>CEP: </strong>
                             <t t-esc="o.partner_id.zip"/>
-                            <br/>
+                            <br/>                        
                             -----------------------------------------------------<br/>
                         </t>
                     </h5>
@@ -200,13 +200,25 @@
                                             <span class="text-nowrap" t-field="o.amount_total"/>
                                         </td>
                                     </tr>
+
+                                    <t t-if ="o.payment_state == 'paid' and o.get_payment_date()">
+                                        <tr>
+                                            <td>
+                                                <strong>Pago em:</strong>
+                                            </td>
+                                            <td class ='text-right'>
+                                                <span t-esc ="o.get_payment_date()"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+
                                     <t t-if="print_with_payments">
                                         <t t-if="o.payment_state != 'invoicing_legacy'">
                                             <t t-set="payments_vals" t-value="o.sudo()._get_reconciled_info_JSON_values()"/>
                                             <t t-foreach="payments_vals" t-as="payment_vals">
                                                 <tr>
                                                     <td>
-                                                        <i class="oe_form_field text-right oe_payment_label">Paid on <t t-esc="payment_vals['date']" t-options="{&quot;widget&quot;: &quot;date&quot;}"/>
+                                                        <i class="oe_form_field text-right oe_payment_label">Pago em<t t-esc="payment_vals['date']" t-options="{&quot;widget&quot;: &quot;date&quot;}"/>
                                                         </i>
                                                     </td>
                                                     <td class="text-right">

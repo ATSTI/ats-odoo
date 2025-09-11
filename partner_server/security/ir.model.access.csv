@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_servidores_infos_user,servidores.infos user,model_servidores_infos,,1,1,1,1
 access_portas_server_user,portas.server user,model_portas_server,,1,1,1,1
 access_res_partner_user,res.partner user,base.model_res_partner,,1,1,1,1
+=======
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_partner_info_server","info.server","model_portas_server","base.group_partner_manager",1,1,1,1
+>>>>>>> 53808342506d7bb9f18524fd1279810841e2c661

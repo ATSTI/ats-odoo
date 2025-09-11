@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # -*- encoding: utf-8 -*-
 ##############################################################################
 #
@@ -18,6 +19,13 @@
 
 {
     'name': 'Informações de servidor',
+=======
+# Copyright (C) 2025 - ATSTi
+# License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
+
+{
+    'name': 'Informações de Servidor',
+>>>>>>> 53808342506d7bb9f18524fd1279810841e2c661
     'version': '1.0',
     'category': 'Res Partner',
     'author': 'ATS Solucoes',
@@ -25,13 +33,21 @@
     'license': 'AGPL-3',
     'contributors': [
         'Carlos Silveira<carlos@atsti.com.br>',
+<<<<<<< HEAD
+=======
+        'Mauricio Silveira<maurs320@gmail.com>',
+        'Otavio Andretta<otavio12257@gmail.com>'
+>>>>>>> 53808342506d7bb9f18524fd1279810841e2c661
     ],
     'depends': [
         'base_setup','nfe_integracao'
     ],
     'data': [
         'security/ir.model.access.csv',
+<<<<<<< HEAD
         'views/res_partner_server_view.xml',
+=======
+>>>>>>> 53808342506d7bb9f18524fd1279810841e2c661
         'views/res_partner_view.xml',
     ],
     'demo': [],

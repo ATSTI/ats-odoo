@@ -17,7 +17,7 @@
                     <group string="Ações">
                         <button name="action_sincronizar_servidores"
                                 type="object"
-                                string="Sincronizar Servidores dos Dependentes(Clique estando dentro do responsavel financeiro que foi alterado as infos de porta)"
+                                string="Sincronizar Servidores dos Dependentes (Clique estando dentro do responsavel financeiro que foi alterado as infos de porta)"
                                 class="btn-primary"
                                 attrs="{'invisible': [('id', '=', False)]}"/>
                     </group>

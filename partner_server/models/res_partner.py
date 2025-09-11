@@ -4,20 +4,23 @@ class Partner(models.Model):
     _inherit = 'res.partner'
 
     servidor_id = fields.Many2one(
-    'servidores.infos',
-    string='Servidor',
-    store=True
-)
+        'servidores.infos',
+        string='Servidor',
+        store=True
+    )
+    
     porta_selection = fields.Many2one(
-    'portas.server',
-    string='Porta',
-    store=True,
-    domain="[('servidor_id', '!=', False), ('servidor_id', '=', servidor_id)]"
-)
+        'portas.server',
+        string='Porta',
+        store=True,
+        domain="[('servidor_id', '!=', False), ('servidor_id', '=', servidor_id)]"
+    )
+    
     obs_server_texto = fields.Text(
-    string="Observação do Servidor",
-    compute="_compute_obs_server_texto"
-)
+        string="Observação do Servidor",
+        compute="_compute_obs_server_texto"
+    )
+
     @api.depends('servidor_id')
     def _compute_obs_server_texto(self):
         for rec in self:

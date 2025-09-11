@@ -5,26 +5,26 @@
             <t t-set="docs" t-value="docs.with_context({'lang':docs.partner_id.lang})"/>
             <t t-foreach="docs" t-as="o">
                 <!-- CABEÇALHO -->
-                <div class="header" style="width:100%; text-align:center; margin-bottom:20px;">
-                    <table style="width:100%; border:0; font-size:12px; font-family: Arial, sans-serif; margin-bottom:10px;">
-                            <tr>
-                                <td style="width:40%; vertical-align:top; padding:0;">
-                                    <img t-attf-src="data:image/*;base64,{{o.company_id.logo}}"
-                                        t-att-alt="o.company_id.name"
-                                        style="max-width:300px; max-height:225px; display:block;"/>
-                                </td>
-                                <td style="width:100%; text-align:right; vertical-align:top; padding:0; font-size:15px;">
-                                <strong><span t-field="o.company_id.name"/></strong><br/>
-                                    CNPJ/CPF: <span t-field="o.company_id.cnpj_cpf"/><br/>
-                                <span t-field="o.company_id.street_name"/>, <span t-field="o.company_id.street_number"/> - 
-                                <span t-field="o.company_id.district"/>, CEP: <span t-field="o.company_id.zip"/> - 
-                                <span t-field="o.company_id.state_id.code"/><br/>
-                                <span t-field="o.company_id.phone"/> | <span t-field="o.company_id.email"/>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
                 <main>
+                    <div class="header" style="width:100%; text-align:center; margin-bottom:20px;">
+                        <table style="width:100%; border:0; font-size:12px; font-family: Arial, sans-serif; margin-bottom:10px;">
+                                <tr>
+                                    <td style="width:40%; vertical-align:top; padding:0;">
+                                        <img t-attf-src="data:image/*;base64,{{o.company_id.logo}}"
+                                            t-att-alt="o.company_id.name"
+                                            style="max-width:300px; max-height:225px; display:block;"/>
+                                    </td>
+                                    <td style="width:100%; text-align:right; vertical-align:top; padding:0; font-size:15px;">
+                                    <strong><span t-field="o.company_id.name"/></strong><br/>
+                                        CNPJ/CPF: <span t-field="o.company_id.cnpj_cpf"/><br/>
+                                    <span t-field="o.company_id.street_name"/>, <span t-field="o.company_id.street_number"/> - 
+                                    <span t-field="o.company_id.district"/>, CEP: <span t-field="o.company_id.zip"/> - 
+                                    <span t-field="o.company_id.state_id.code"/><br/>
+                                    <span t-field="o.company_id.phone"/> | <span t-field="o.company_id.email"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
                     <!-- CORPO DO DOCUMENTO -->
                     <div class="page" style="font-family: Arial, sans-serif; margin:0; padding:0;">
                         <!-- TÍTULO -->
@@ -115,28 +115,27 @@
                             MM Portas Internas - Representante Legal<br/>
                             CNPJ: 56.704.764/0001-12
                         </div>
-
-                        <!-- <div style="width:100%; font-size:12px; text-align:center; margin-top:20px;">
-                            <hr style="border:none; border-top:1px solid #999; margin:5px 0;"/>
-                            
-                            <img t-att-src="'/report_mm/static/src/img/instagram.png'" style="width:20px; height:20px; vertical-align:middle; margin-right:5px;"/>
-                            <span style="margin-right: 25px;">@mmportas</span>
-                            
-                            <img t-att-src="'/report_mm/static/src/img/whatsapp.png'" style="width:20px; height:20px; vertical-align:middle; margin-right:5px;"/>
-                            <span style="margin-right: 25px;">(19) 99999-9999</span>
-                            
-                            <img t-att-src="'/report_mm/static/src/img/email.png'" style="width:20px; height:20px; vertical-align:middle; margin-right:5px;"/>
-                            <span>contato@mmportas.com.br</span>-->
+                    </div>
+                    <div class="footer" style="width:100%; font-size:15px; text-align:center; margin-top:20px;">
+                        <hr style="border:none; border-top:1px solid #999; margin:5px 0;"/>
+                        <!--  Instagram  -->
+                        <t t-if="o.company_id.instagram_png">
+                            <img t-attf-src="data:image/*;base64,{{o.company_id.instagram_png}}" style="width:20px; height:20px; vertical-align:middle; margin-right:5px;"/>
+                        </t>
+                        <span style="margin-right:25px;">mmportasinternas</span>
+                        <!--  WhatsApp  -->
+                        <t t-if="o.company_id.whatsapp_png">
+                            <img t-attf-src="data:image/*;base64,{{o.company_id.whatsapp_png}}" style="width:20px; height:20px; vertical-align:middle; margin-right:5px;"/>
+                        </t>
+                        <span style="margin-right:25px;">(19) 99662-1524</span>
+                        <!--  Email  -->
+                        <t t-if="o.company_id.email_png">
+                            <img t-attf-src="data:image/*;base64,{{o.company_id.email_png}}" style="width:20px; height:20px; vertical-align:middle; margin-right:5px;"/>
+                        </t>
+                        <span>contato@mmportasinternas.com.br</span>
                     </div>
                 </main>
                 <!-- RODAPÉ-->
-                <div class="footer" style="width:100%; font-size:15px; text-align:center; margin-top:20px;">
-                    <hr style="border:none; border-top:1px solid #999; margin:5px 0;"/>
-
-                    <span style="margin-right: 25px;">📸 mmportasinternas</span>
-                    <span style="margin-right: 25px;">📱 (19) 99662-1524</span>
-                    <span>📧 contato@mmportasinternas.com.br</span>
-                </div>
             </t>
         </t>
     </template>

@@ -1,17 +1,11 @@
 <?xml version="1.0"?>
 <odoo>
-<<<<<<< HEAD
-=======
-
-    <!--  Partners inherited form -->
->>>>>>> 53808342506d7bb9f18524fd1279810841e2c661
     <record id="view_res_campos_form" model="ir.ui.view">
         <field name="name">res.campos.form</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
             <xpath expr="//page[@name='internal_notes']" position="after">
-<<<<<<< HEAD
                 <page name="tecnical_notes" string="Anotações Técnicas">
                     <group string="Servidor">
                         <field name="servidor_id"/>
@@ -29,21 +23,6 @@
                     </group>
                 </page>
             </xpath>
-=======
-                <page name='tecnical_notes' string='Anotações Técnicas'>
-                    <group string='Informações servidor'>
-                        <field name='servidor'/>
-                        <field name='obs_server'/>
-                        <field name="porta_ids">
-                            <tree string="Info porta" editable="bottom">
-                                <field name="nporta"/>
-                                <field name="rp_id" invisible="1"/>
-                            </tree>
-                        </field>
-                    </group>
-                </page>
-            </xpath> 
->>>>>>> 53808342506d7bb9f18524fd1279810841e2c661
         </field>
     </record>
 </odoo>

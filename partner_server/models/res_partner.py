@@ -15,12 +15,10 @@ class Partner(models.Model):
         store=True,
         domain="[('servidor_id', '!=', False), ('servidor_id', '=', servidor_id)]"
     )
-    
     obs_server_texto = fields.Text(
         string="Observação do Servidor",
         compute="_compute_obs_server_texto"
     )
-
     @api.depends('servidor_id')
     def _compute_obs_server_texto(self):
         for rec in self:
@@ -68,12 +66,12 @@ class Servidor(models.Model):
         portas = self.env['portas.server'].search([('servidor_id', 'in', self.ids)])
         portas.unlink()
         return super().unlink()
-
+    
 class PortaServer(models.Model):
     _name = "portas.server"
     _description = "Informações da Porta"
 
-    nporta = fields.Char(string="Número da Porta")
+    nporta = fields.Char(string="Número da Porta", index = True)
 
     servidor_id = fields.Many2one(
         comodel_name="servidores.infos",

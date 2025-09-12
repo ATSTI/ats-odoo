@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <odoo>
+    <!-- Formulário personalizado -->
     <record id="view_res_campos_form" model="ir.ui.view">
         <field name="name">res.campos.form</field>
         <field name="model">res.partner</field>
@@ -12,17 +13,42 @@
                         <field name="obs_server_texto" readonly="1"/>
                     </group>
                     <group string="Porta">
-                        <field name="porta_selection"/>
+                        <field name="porta_selection" domain="[('servidor_id', '=', servidor_id), ('servidor_id', '!=', False)]"/>
+
                     </group>
                     <group string="Ações">
                         <button name="action_sincronizar_servidores"
                                 type="object"
-                                string="Sincronizar Servidores dos Dependentes (Clique estando dentro do responsavel financeiro que foi alterado as infos de porta)"
+                                string="Sincronizar Servidores dos Dependentes (Clique estando dentro do responsável financeiro que foi alterado as infos de porta)"
                                 class="btn-primary"
                                 attrs="{'invisible': [('id', '=', False)]}"/>
                     </group>
                 </page>
             </xpath>
+        </field>
+    </record>
+
+    <!-- view que aparece na hora de filtrar as portas-->
+    <record id="view_portas_server_tree" model="ir.ui.view">
+        <field name="name">portas.server.tree</field>
+        <field name="model">portas.server</field>
+        <field name="arch" type="xml">
+            <tree string="Portas">
+                <field name="nporta"/>
+                <field name="servidor_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- search pras portas-->
+    <record id="view_portas_server_search" model="ir.ui.view">
+        <field name="name">portas.server.search</field>
+        <field name="model">portas.server</field>
+        <field name="arch" type="xml">
+            <search string="Portas">
+                <field name="nporta"/>
+                <field name="servidor_id"/>
+            </search>
         </field>
     </record>
 </odoo>

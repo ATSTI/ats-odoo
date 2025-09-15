@@ -8,4 +8,12 @@
         <field name="report_file">report_mm.report_contrato_mmportas</field>
         <field name="binding_model_id" ref="sale.model_sale_order"/>
     </record>
+    <record id="action2_report_ambos" model="ir.actions.report">
+        <field name="name">Contrato + Orçamento</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">report_mm.report_ambos_mmportas</field>
+        <field name="report_file">report_mm.report_ambos_mmportas</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+    </record>
 </odoo>

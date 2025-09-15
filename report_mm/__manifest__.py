@@ -20,6 +20,7 @@
     'data': [
         'report/report_contrato_mmportas.xml',
         'report/report_orcamento_mmportas.xml',
+        'report/report_ambos_mmportas.xml',
         'report/report_actions.xml',
     ],
     'installable': True,

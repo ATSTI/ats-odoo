@@ -41,3 +41,41 @@ class Tax(models.Model):
         else:
             tax_dict.update({"icms_relief": 0})
         return result
+    
+    # Calcula icms St para empresa do simples nacional
+    @api.model
+    def _compute_icmsst(self, tax, taxes_dict, **kwargs):
+        tax_dict = taxes_dict.get(tax.tax_domain)
+        company = kwargs.get("company", tax.env.company)
+        currency = kwargs.get("currency", company.currency_id)
+
+        icms_base = self._compute_tax_base(tax, taxes_dict.get(tax.tax_domain), **kwargs)
+        base_st_icms = tax_dict.get("base")
+
+        # Get Computed IPI Tax
+        tax_dict_ipi = taxes_dict.get("ipi", {})
+        tax_dict["add_to_base"] += tax_dict_ipi.get("tax_value", 0.00)
+
+        if taxes_dict.get(tax.tax_domain):
+            taxes_dict[tax.tax_domain]["icmsst_mva_percent"] = tax.icmsst_mva_percent
+
+        if tax_dict.get("icmsst_mva_percent"):
+            # somente empresa emitente simples nacional
+            icms_base_st = base_st_icms + tax_dict_ipi.get("tax_value", 0.00)
+            if tax.percent_debit_credit:
+                icms_base['base'] = currency.round(
+                    icms_base_st * (1 + (tax_dict["icmsst_mva_percent"] / 100))
+                )
+            else:
+                icms_base = self._compute_tax_base(tax, taxes_dict.get(tax.tax_domain), **kwargs)
+        taxes_dict[tax.tax_domain].update(icms_base)
+
+        tax_dict = self._compute_tax(tax, taxes_dict, **kwargs)
+        if tax_dict.get("icmsst_mva_percent"):
+            if tax.percent_debit_credit:
+                # somente empresa emitente simples nacional
+                tax_dict["tax_value"] -= (base_st_icms) * (tax.percent_debit_credit / 100)
+            else:
+                tax_dict["tax_value"] -= taxes_dict.get("icms", {}).get("tax_value", 0.0)
+
+        return tax_dict

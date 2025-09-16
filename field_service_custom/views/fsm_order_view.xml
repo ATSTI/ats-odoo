@@ -73,4 +73,25 @@
             </xpath>
         </field>
     </record>
+
+    <record id="fsm_order_timeline_replace_view" model="ir.ui.view">
+        <field name="name">fsm.order.timeline</field>
+        <field name="model">fsm.order</field>
+        <field name="type">timeline</field>
+        <field name="arch" type="xml">
+            <xpath expr="//timeline" position="replace">
+                <timeline
+                    date_start="scheduled_date_start"
+                    date_stop="scheduled_date_end"
+                    string="Orders"
+                    default_group_by="person_id"
+                    event_open_popup="true"
+                    colors="#ffffff:stage_id=='New';"
+                    custom_color="true"
+                >
+                </timeline>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>

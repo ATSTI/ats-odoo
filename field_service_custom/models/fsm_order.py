@@ -195,3 +195,13 @@ class FSMOrder(models.Model):
         fornecedor.invoice_date = datetime.now()
         # fornecedor.action_post()
         return fornecedor
+
+    def name_get(self):
+        result = []
+        for order in self:
+            if order.location_id.partner_id and order.location_id.partner_id.name:
+                display_name = order.location_id.partner_id.name
+            else:
+                display_name = 'Sem nome definido'
+            result.append((order.id, display_name))
+        return result

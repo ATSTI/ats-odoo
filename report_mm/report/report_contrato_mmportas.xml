@@ -24,10 +24,7 @@
                             </tr>
                         </table>
                     </div>
-                    <div class="page" style="font-family: Arial, sans-serif; margin-top: 250px; margin-left:0; margin-right:0; padding:0;">
-                        <br/>
-                        <br/>
-                        <br/>
+                    <div class="page" style="font-family: Arial, sans-serif; margin-top: 100px; margin-left:0; margin-right:0; padding:0;">
                         <br/>
                         <p style="text-align:center; font-size:18px; margin:10px 0;"><b>Contrato</b></p>
                         <b style="background-color:#efefef; font-size:14px; display:block; padding:2px 4px; page-break-inside: avoid;">INFORMAÇÕES SOBRE A PROPOSTA/PEDIDO</b>
@@ -48,14 +45,14 @@
                             <p>9. Declaramos que será enviado junto à Nota Fiscal o Termo de Garantia MM Portas Internas (MM COMÉRCIO DE PORTAS INTERNAS LTDA. CNPJ: 56.704.764/0001-12).</p>
                         </div>
                         <br/>
-                     <div style="padding-top:25%;page-break-inside: avoid;">
-                        <b style="background-color:#efefef; font-size:14px; display:block; padding:2px 4px; page-break-inside: avoid;">Opções de Instalação dos produtos (a critério do cliente)</b>
-                        <div style="margin-left:30px; font-size:12px; line-height:1.3; page-break-inside: avoid;">
-                            <p>Salientamos que a mão de obra incluída na proposta comercial se aplica exclusivamente aos materiais nela descritos. Serviços adicionais são de responsabilidade do cliente, não estando cobertos pela mão de obra mencionada.</p>
-                            <p>( ) Instalação Inclusa na Proposta: Caso o cliente opte por adquirir a instalação dos produtos inclusa da MM Portas Internas, a mesma estará inclusa na proposta devidamente precificada e com garantia. Compreende esta instalação a fixação dos conjuntos, alizares, fechaduras e acessórios constantes no pedido.</p>
-                            <p>( ) Instalação a cargo do cliente: Caso o cliente opte por contratar a instalação por conta própria, fica isenta a MM COMÉRCIO DE PORTAS INTERNAS LTDA. CNPJ: 56.704.764/0001-12 de quaisquer responsabilidades pelo resultado do serviço de instalação ou danos causados por esse profissional. Por tratar-se de mão de obra terceirizada, a MM Portas Internas se exime de qualquer conduta ética inadequada pelo profissional, ficando apenas no âmbito comercial.</p>
+                        <div style="padding-top:25%;page-break-inside: avoid;">
+                            <b style="background-color:#efefef; font-size:14px; display:block; padding:2px 4px; page-break-inside: avoid;">Opções de Instalação dos produtos (a critério do cliente)</b>
+                            <div style="margin-left:30px; font-size:12px; line-height:1.3; page-break-inside: avoid;">
+                                <p>Salientamos que a mão de obra incluída na proposta comercial se aplica exclusivamente aos materiais nela descritos. Serviços adicionais são de responsabilidade do cliente, não estando cobertos pela mão de obra mencionada.</p>
+                                <p>( ) Instalação Inclusa na Proposta: Caso o cliente opte por adquirir a instalação dos produtos inclusa da MM Portas Internas, a mesma estará inclusa na proposta devidamente precificada e com garantia. Compreende esta instalação a fixação dos conjuntos, alizares, fechaduras e acessórios constantes no pedido.</p>
+                                <p>( ) Instalação a cargo do cliente: Caso o cliente opte por contratar a instalação por conta própria, fica isenta a MM COMÉRCIO DE PORTAS INTERNAS LTDA. CNPJ: 56.704.764/0001-12 de quaisquer responsabilidades pelo resultado do serviço de instalação ou danos causados por esse profissional. Por tratar-se de mão de obra terceirizada, a MM Portas Internas se exime de qualquer conduta ética inadequada pelo profissional, ficando apenas no âmbito comercial.</p>
+                            </div>
                         </div>
-                    </div>
                         <b style="background-color:#efefef; font-size:14px; display:block; padding:2px 4px; page-break-inside: avoid;">Trocas e devoluções</b>
                         <div style="margin-left:30px; font-size:12px; line-height:1.3; page-break-inside: avoid;">
                             <p>1. Produtos de conjuntos montados, portas e esquadrias, independente do seu modelo ou acabamento, são itens personalizados e não podem ser trocados.</p>
@@ -68,7 +65,7 @@
                             <p>8. Se o pedido estiver em produção ou expedido, e houver cancelamento, será aplicada multa de 50% do valor do produto a título compensatório.</p>
                             <p>9. Estorno de diferença de valores será realizado em até 12 (doze) dias úteis. Caso a modalidade do estorno seja em cartão de crédito, o valor será devolvido diretamente na fatura do cartão, podendo ocorrer em até duas faturas, sendo que o prazo para devolução é de responsabilidade da administradora do cartão.</p>
                         </div>
-                         <div style="padding-top:25%;page-break-inside: avoid;">
+                        <div style="padding-top:25%;page-break-inside: avoid;">
                             <b style="background-color:#efefef; font-size:14px; display:block; padding:2px 4px; page-break-inside: avoid;">Condições gerais para transporte/frete/entrega</b>
                             <div style="margin-left:30px; font-size:12px; line-height:1.3">
                                 <p>1. A conferência no recebimento dos produtos deve compreender: quantidade de volumes, integridade das embalagens e produtos. A não conferência atesta que os produtos foram entregues nas quantidades corretas e sem danos. Caso o conferente não seja o cliente, terceiros (porteiro, síndico, mestre de obras etc.) serão considerados responsáveis pela conferência.</p>

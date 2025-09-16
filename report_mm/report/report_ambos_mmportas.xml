@@ -4,8 +4,6 @@
         <t t-call="web.external_layout">
             <t t-set="docs" t-value="docs.with_context({'lang': docs.partner_id.lang})"/>
             <style>
-                /* Header fixo que vai repetir em todas as páginas.
-                   Ajuste height conforme seu conteúdo (ex: 120px) */
                 .header {
                     position: fixed;
                     top: 0;
@@ -18,10 +16,7 @@
                 }
                 .header table { margin-bottom: 0; }
 
-                /* Cada .page representa o conteúdo que ficará abaixo do header.
-                   padding-top desloca o conteúdo para não ficar sobreposto pelo header. */
                 .page {
-                    font-family: Arial, sans-serif;
                     font-size: 12px;
                     line-height: 1.3;
                     padding: 40px;
@@ -41,9 +36,8 @@
                     margin-top: 20px;
                     page-break-inside: avoid;
                 }
-
                 .page p { margin: 6px 0; page-break-inside: avoid; }
-
+                
                 .signature-left,
                 .signature-right {
                     width: 49%;
@@ -65,7 +59,6 @@
             </style>
 
             <t t-foreach="docs" t-as="doc">
-                <!-- HEADER fixo (repetido em todas as páginas pelo wkhtmltopdf) -->
                 <div class="header">
                     <table style="width:100%; border:0; font-size:12px; margin:0; padding:0;">
                         <tr>
@@ -89,7 +82,6 @@
                     </table>
                 </div>
                 <main>
-                    <!-- PRIMEIRA PÁGINA: ORÇAMENTO/PEDIDO -->
                     <div class="page">
                         <div class="oe_structure"/>
                         <h2 class="mt-4">
@@ -98,8 +90,6 @@
                             <span t-else="">Pedido # </span>
                             <span t-field="doc.name"/>
                         </h2>
-
-                        <!-- cliente / infos -->
                         <div class="mt-3 mb-3">
                             <div t-field="doc.partner_id" 
                                  t-options="{'widget': 'contact', 'fields': ['address','name'], 'no_marker': True}"/>
@@ -126,8 +116,6 @@
                                 </t>
                             </t>
                         </div>
-
-                        <!-- infos pedido -->
                         <div class="row mt-4 mb-4" id="informations">
                             <div t-if="doc.client_order_ref" class="col-auto col-3 mw-100 mb-2">
                                 <strong>Cliente:</strong>
@@ -147,8 +135,6 @@
                                 <p class="m-0" t-field="doc.user_id"/>
                             </div>
                         </div>
-
-                        <!-- linhas -->
                         <t t-set="lines_to_report" t-value="doc._get_order_lines_to_report()"/>
                         <t t-set="display_discount" t-value="any(l.discount for l in lines_to_report)"/>
                         <table class="table table-sm o_main_table table-borderless mt-4">
@@ -186,8 +172,6 @@
                                 </t>
                             </tbody>
                         </table>
-
-                        <!-- total -->
                         <div class="clearfix" name="so_total_summary">
                             <div id="total" class="row" name="total">
                                 <div t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ms-auto">
@@ -242,17 +226,14 @@
 
                     <div class="page" style="page-break-before: always;">
                         <p style="text-align:center; font-size:18px; margin:10px 0;"><b>Contrato</b></p>
-
-                        <!-- INFORMAÇÕES SOBRE A PROPOSTA/PEDIDO -->
                         <b style="background-color:#efefef; font-size:14px; display:block; padding:2px 4px; page-break-inside: avoid;">INFORMAÇÕES SOBRE A PROPOSTA/PEDIDO</b>
-                        <div style="margin-left:30px; font-size:12px; line-height:1.3; page-break-inside: avoid;">
+                        <div style="font-size:12px; line-height:1.3; page-break-inside: avoid;">
                             <p>1. Informações sobre a proposta/pedido: O cliente declara estar ciente do tempo destinado à fabricação do produto, de acordo com o recebido na proposta, bem como a seleção dos itens nela anotados. Ademais, confirma também os seus dados cadastrais na proposta, certificando estar plenamente ciente de que:</p>
                             <p><strong>ATENÇÃO</strong>: conforme ABNT NBR 15930-4, devem ser cumpridos os requisitos para instalação das portas, onde as esquadrias devem estar instaladas com vidros, acabamento (gesso, argamassa, 1ª demão de tinta, etc.), soleiras instaladas e rejuntadas livres de resíduos, revestimento de paredes e pisos. Os pedidos devem ser enviados para produção quando forem cumpridos os requisitos acima.</p>
                         </div>
 
-                        <!-- TERMOS E CONDIÇÕES -->
                         <b style="background-color:#efefef; font-size:14px; display:block; padding:2px 4px; page-break-inside: avoid;">TERMOS E CONDIÇÕES</b>
-                        <div style="margin-left:30px; font-size:12px; line-height:1.3; page-break-inside: avoid;">
+                        <div style="font-size:12px; line-height:1.3; page-break-inside: avoid;">
                             <p>1. O prazo de produção e entrega começa a ser contado quando for realizada a medição final e confirmado o envio para a produção junto ao cliente e consultor.</p>
                             <p>2. Após o levantamento de medidas dos vãos (medida final) pelo responsável da MM PORTAS INTERNAS na obra, poderão ocorrer ajustes nos preços orçados em função de divergências nas quantidades, modelos e medidas (para mais ou para menos) das portas, batentes, alizares e demais produtos.</p>
                             <p>3. A Nota Fiscal é emitida após a finalização da produção do pedido e enviada no e-mail cadastrado na proposta.</p>
@@ -264,16 +245,14 @@
                             <p>9. Declaramos que será enviado junto à Nota Fiscal o Termo de Garantia MM Portas Internas (MM COMÉRCIO DE PORTAS INTERNAS LTDA. CNPJ: 56.704.764/0001-12).</p>
                         </div>
 
-                        <!-- OPÇÕES DE INSTALAÇÃO -->
-                     
                         <b style="background-color:#efefef; font-size:14px; display:block; padding:2px 4px; page-break-inside: avoid;">Opções de Instalação dos produtos (a critério do cliente)</b>
-                        <div style="margin-left:30px; font-size:12px; line-height:1.3; page-break-inside: avoid;">
+                        <div style="font-size:12px; line-height:1.3; page-break-inside: avoid;">
                             <p>Salientamos que a mão de obra incluída na proposta comercial se aplica exclusivamente aos materiais nela descritos. Serviços adicionais são de responsabilidade do cliente, não estando cobertos pela mão de obra mencionada.</p>
                             <p>( ) Instalação Inclusa na Proposta: Caso o cliente opte por adquirir a instalação dos produtos inclusa da MM Portas Internas, a mesma estará inclusa na proposta devidamente precificada e com garantia. Compreende esta instalação a fixação dos conjuntos, alizares, fechaduras e acessórios constantes no pedido.</p>
                             <p>( ) Instalação a cargo do cliente: Caso o cliente opte por contratar a instalação por conta própria, fica isenta a MM COMÉRCIO DE PORTAS INTERNAS LTDA. CNPJ: 56.704.764/0001-12 de quaisquer responsabilidades pelo resultado do serviço de instalação ou danos causados por esse profissional. Por tratar-se de mão de obra terceirizada, a MM Portas Internas se exime de qualquer conduta ética inadequada pelo profissional, ficando apenas no âmbito comercial.</p>
                         </div>
-                        <!-- TROCAS E DEVOLUÇÕES -->
-                            <div style="padding-top:25%;page-break-inside: avoid; margin-left:30px;">
+
+                            <div style="padding-top:25%;page-break-inside: avoid;">
                                 <b style="background-color:#efefef; font-size:14px; display:block; padding:2px 4px;">
                                     Trocas e devoluções
                                 </b>
@@ -289,11 +268,9 @@
                                 <p>9. Estorno de diferença de valores será realizado em até 12 (doze) dias úteis. Caso a modalidade do estorno seja em cartão de crédito, o valor será devolvido diretamente na fatura do cartão, podendo ocorrer em até duas faturas, sendo que o prazo para devolução é de responsabilidade da administradora do cartão.</p>
                                 </div>
                             </div>
-
-                        <!-- CONDIÇÕES DE TRANSPORTE -->
                         <br/><br/><br/>
                         <b style="background-color:#efefef; font-size:14px; display:block; padding:2px 4px; page-break-inside: avoid;">Condições gerais para transporte/frete/entrega</b>
-                        <div style="margin-left:30px; font-size:12px; line-height:1.3">
+                        <div style="font-size:12px; line-height:1.3">
                             <p>1. A conferência no recebimento dos produtos deve compreender: quantidade de volumes, integridade das embalagens e produtos. A não conferência atesta que os produtos foram entregues nas quantidades corretas e sem danos. Caso o conferente não seja o cliente, terceiros (porteiro, síndico, mestre de obras etc.) serão considerados responsáveis pela conferência.</p>
                             <p>2. Devem ser conferidos os produtos com avarias visíveis, quando a embalagem apresentar dano no ato do recebimento, e feita a devida ressalva (anotação) no Termo de Entrega ou CTe/DACTe (Conhecimento de Transporte).</p>
                             <p>3. Informamos que o transporte, pelas transportadoras terceirizadas, é prioritário para itens essenciais (alimentos, medicamentos, equipamentos médicos etc.).</p>
@@ -301,14 +278,16 @@
                             <p>5. Em face da segurança do cliente e do entregador, conforme determinação dos transportadores, é vedada a subida por elevadores, escadas, içamentos, utilização de janelas ou acessos que possam comprometer a integridade do produto e dos profissionais de entrega. Caso haja elevador de carga, o mesmo poderá ser utilizado desde que os produtos caibam, sem comprometer a segurança e integridade.</p>
                         </div>
 
-                                <!-- LGPD -->
-                        <div style="padding-top:25%;page-break-inside: avoid; margin-left:30px;">
+                        <div style="padding-top:12%;page-break-inside: avoid;">
                             <b style="margin-top:50px; background-color:#efefef; font-size:14px; display:block; padding:2px 4px; page-break-inside: avoid;">Tratamento de Dados Pessoais (LGPD)</b>
-                            <div style="margin-left:30px; font-size:12px; line-height:1.3; page-break-inside: avoid; margin-top:20px;">
+                            <div style="font-size:12px; line-height:1.3; page-break-inside: avoid; margin-top:20px;">
                                 <p>Conforme disposto na Lei Geral de Proteção de Dados (LGPD), Lei nº 13.709/2018, seus dados pessoais serão tratados de acordo com os princípios e diretrizes estabelecidos por essa legislação. O consentimento para o uso de seus dados para recebimento de informações da empresa e seus produtos, por SMS, WhatsApp, e-mail e telefone, está de acordo com o Artigo 7º, Inciso IX da LGPD.</p>
                                 <p>E, por estarem assim justas e acordadas, as partes assinam ou aceitam de forma tácita, e a empresa MM Portas (MM COMÉRCIO DE PORTAS INTERNAS LTDA CNPJ: 56.704.764/0001-12) se responsabiliza em cumprir integralmente o termo e a proposta, e o cliente declara que leu e aceitou todos os termos da proposta, eximindo a empresa MM Portas Internas de qualquer irregularidade que seja de obrigação do cliente.</p>
-                            </div>
 
+                            </div>
+                        </div>
+
+                        <div style="padding-top:8%;page-break-inside: avoid; margin-left:30px;">
                                 <div class="signature-left">
                                     _____________________________________________________<br/>
                                     Local e Data
@@ -326,6 +305,7 @@
                                     CNPJ: 56.704.764/0001-12
                                 </div>
                         </div>
+                        
                     </div> 
                 </main>
             </t>

@@ -4,15 +4,14 @@
         <xpath expr="//t[@t-call='web.external_layout']" position="replace">
             <t t-call="web.external_layout">
                 <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
-                
-                <!-- HEADER: apenas dados da empresa (logo ajustar) -->
+    
                 <div class="header" style="width:100%; text-align:center; margin-bottom:20px;">
                     <table style="width:100%; border:0; font-size:12px; font-family: Arial, sans-serif; margin-bottom:10px;">
                         <tr>
                             <td style="width:40%; vertical-align:top; padding:0;">
                                 <img t-attf-src="data:image/*;base64,{{doc.company_id.logo}}"
-                                    t-att-alt="doc.company_id.name"
-                                    style="max-width:300px; max-height:225px; display:block;"/>
+                                     t-att-alt="doc.company_id.name"
+                                     style="max-width:300px; max-height:225px; display:block;"/>
                             </td>
                             <td style="width:100%; text-align:right; vertical-align:top; padding:0; font-size:15px;">
                                 <strong><span t-field="doc.company_id.name"/></strong><br/>
@@ -28,11 +27,22 @@
                         </tr>
                     </table>
                 </div>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
-                <div class="page">
+                <div class="footer" style="width:100%; font-size:15px; text-align:center; margin-top:20px;">
+                    <hr style="border:none; border-top:1px solid #999; margin:5px 0;"/>
+                    <t t-if="doc.company_id.instagram_png">
+                        <img t-attf-src="data:image/*;base64,{{doc.company_id.instagram_png}}" style="width:20px; height:20px; vertical-align:middle; margin-right:5px;"/>
+                    </t>
+                    <span style="margin-right:25px;">mmportasinternas</span>
+                    <t t-if="doc.company_id.whatsapp_png">
+                        <img t-attf-src="data:image/*;base64,{{doc.company_id.whatsapp_png}}" style="width:20px; height:20px; vertical-align:middle; margin-right:5px;"/>
+                    </t>
+                    <span style="margin-right:25px;">(19) 99662-1524</span>
+                    <t t-if="doc.company_id.email_png">
+                        <img t-attf-src="data:image/*;base64,{{doc.company_id.email_png}}" style="width:20px; height:20px; vertical-align:middle; margin-right:5px;"/>
+                    </t>
+                    <span>contato@mmportasinternas.com.br</span>
+                </div>
+                <div class="page" style ='padding-top:10%;'>
                     <div class="oe_structure"/>
                     <h2 class="mt-4">
                         <span t-if="env.context.get('proforma', False) or is_pro_forma">Pro-Forma Invoice # </span>
@@ -40,8 +50,6 @@
                         <span t-else="">Pedido # </span>
                         <span t-field="doc.name"/>
                     </h2>
-
-                    <!-- infos do cliente aq -->
                     <div class="mt-3 mb-3">
                         <div t-field="doc.partner_id" 
                              t-options="{'widget': 'contact', 'fields': ['address','name'], 'no_marker': True}"/>
@@ -68,8 +76,6 @@
                             </t>
                         </t>
                     </div>
-
-                    <!-- INFORMAÇÕES DO PEDIDO (datas, vendedor,e afins do pedido) -->
                     <div class="row mt-4 mb-4" id="informations">
                         <div t-if="doc.client_order_ref" class="col-auto col-3 mw-100 mb-2" name="informations_reference">
                             <strong>Cliente:</strong>
@@ -100,7 +106,7 @@
                                 <th class="text-end">Quantidade</th>
                                 <th class="text-end">Preço Unitário</th>
                                 <th t-if="display_discount" class="text-end">Disc.%</th>
-                                <th class="text-end" style="display:none;">Taxes</th> 
+                                <th class="text-end" style="width:0.01%; font-size:1px; color:transparent;">Taxes</th> 
                                 <th class="text-end">Subtotal</th>
                             </tr>
                         </thead>
@@ -117,12 +123,10 @@
                                         <td class="text-end"><span t-field="line.price_unit"/></td>
                                         <td t-if="display_discount" class="text-end"><span t-field="line.discount"/></td>
 
-                                    
-                                        <td class="text-end" style="display:none;">
-                                            <span t-field="line.tax_ids"/>
+                                        <td class="text-end" style="padding:0; margin:0; border:none; width:0.01%; font-size:0; line-height:0; color:transparent;">
+                                            <span t-if="False" t-field="line.tax_ids"/>
                                         </td>
 
-                                     
                                         <td class="text-end o_price_total">
                                             <span t-field="line.price_total" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                         </td>
@@ -141,55 +145,38 @@
                     </table>
                     <div class="clearfix" name="so_total_summary">
                         <div id="total" class="row" name="total">
-                                <div t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ms-auto">
-                                    <table class="table table-sm table-borderless">
-                                        <tr>
-                                            <td style="background-color: #37b18c; color: white; padding: 10px; font-weight: bold; display: flex; justify-content: space-between;">
-                                                <span>Total:</span>
-                                                <span t-field="doc.amount_total"
-                                                    t-options='{"widget": "monetary", "display_currency": doc.currency_id}'
-                                                    style="color: white; font-weight: bold;"/>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
+                            <div t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ms-auto">
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <td style="background-color: #37b18c; color: white; padding: 10px; font-weight: bold; display: flex; justify-content: space-between;">
+                                            <span>Total:</span>
+                                            <span t-field="doc.amount_total"
+                                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'
+                                                  style="color: white; font-weight: bold;"/>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
-                            <div t-if="doc.signature" class="mt-4 ml64 mr4" name="signature">
-                                <div class="offset-8"><strong>Assinatura</strong></div>
-                                <div class="offset-8">
-                                    <img t-att-src="image_data_uri(doc.signature)" style="max-height: 4cm; max-width: 8cm;"/>
-                                </div>
-                                <div class="offset-8 text-center">
-                                    <p t-field="doc.signed_by"/>
-                                </div>
-                            </div>
+                    </div>
 
-                            <!-- OBSERVAÇÕES -->
-                            <div>
-                                <p t-field="doc.note" name="order_note"/>
-                                <p t-if="doc.fiscal_position_id and not is_html_empty(doc.fiscal_position_id.sudo().note)" id="fiscal_position_remark">
-                                    <strong>Posição Fiscal:</strong>
-                                    <span t-field="doc.fiscal_position_id.sudo().note"/>
-                                </p>
-                            </div>
+                    <div t-if="doc.signature" class="mt-4 ml64 mr4" name="signature">
+                        <div class="offset-8"><strong>Assinatura</strong></div>
+                        <div class="offset-8">
+                            <img t-att-src="image_data_uri(doc.signature)" style="max-height: 4cm; max-width: 8cm;"/>
                         </div>
-                        <!-- FOOTER -->
-                        <div class="footer" style="width:100%; font-size:15px; text-align:center; margin-top:20px;">
-                            <hr style="border:none; border-top:1px solid #999; margin:5px 0;"/>
-                            <t t-if="doc.company_id.instagram_png">
-                                <img t-attf-src="data:image/*;base64,{{doc.company_id.instagram_png}}" style="width:20px; height:20px; vertical-align:middle; margin-right:5px;"/>
-                            </t>
-                            <span style="margin-right:25px;">mmportasinternas</span>
-                            <t t-if="doc.company_id.whatsapp_png">
-                                <img t-attf-src="data:image/*;base64,{{doc.company_id.whatsapp_png}}" style="width:20px; height:20px; vertical-align:middle; margin-right:5px;"/>
-                            </t>
-                            <span style="margin-right:25px;">(19) 99662-1524</span>
-                            <t t-if="doc.company_id.email_png">
-                                <img t-attf-src="data:image/*;base64,{{doc.company_id.email_png}}" style="width:20px; height:20px; vertical-align:middle; margin-right:5px;"/>
-                            </t>
-                            <span>contato@mmportasinternas.com.br</span>
+                        <div class="offset-8 text-center">
+                            <p t-field="doc.signed_by"/>
                         </div>
+                    </div>
+                    <div>
+                        <p t-field="doc.note" name="order_note"/>
+                        <p t-if="doc.fiscal_position_id and not is_html_empty(doc.fiscal_position_id.sudo().note)" id="fiscal_position_remark">
+                            <strong>Posição Fiscal:</strong>
+                            <span t-field="doc.fiscal_position_id.sudo().note"/>
+                        </p>
+                    </div>
+                </div>
             </t>
         </xpath>
     </template>

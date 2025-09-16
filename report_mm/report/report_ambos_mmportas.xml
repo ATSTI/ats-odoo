@@ -55,7 +55,7 @@
 
                 /* Footer (não fixo) */
                 .footer img { vertical-align: middle; margin-right: 5px; }
-                .footer span { margin-right: 25px; }
+                .footer span { margin-right: 25px; gap:10px; }
             </style>
 
             <t t-foreach="docs" t-as="doc">
@@ -208,18 +208,21 @@
                         </div>
                     </div> 
 
-                    <div class="footer" style="width:100%; font-size:15px; text-align:center; margin-top:20px;">
+                     <div class="footer" style="width:100%; font-size:15px; text-align:center; margin-top:20px;">
                         <hr style="border:none; border-top:1px solid #999; margin:5px 0;"/>
+                    
                         <t t-if="doc.company_id.instagram_png">
-                            <img t-attf-src="data:image/*;base64,{{doc.company_id.instagram_png}}" style="width:20px; height:20px;"/>
+                            <img t-attf-src="data:image/*;base64,{{doc.company_id.instagram_png}}" style="width:20px; height:20px; vertical-align:middle; margin-right:5px;"/>
                         </t>
-                        <span>mmportasinternas</span>
+                        <span style="margin-right:25px;">mmportasinternas</span>
+                       
                         <t t-if="doc.company_id.whatsapp_png">
-                            <img t-attf-src="data:image/*;base64,{{doc.company_id.whatsapp_png}}" style="width:20px; height:20px;"/>
+                            <img t-attf-src="data:image/*;base64,{{doc.company_id.whatsapp_png}}" style="width:20px; height:20px; vertical-align:middle; margin-right:5px;"/>
                         </t>
-                        <span>(19) 99662-1524</span>
+                        <span style="margin-right:25px;">(19) 99662-1524</span>
+                  
                         <t t-if="doc.company_id.email_png">
-                            <img t-attf-src="data:image/*;base64,{{doc.company_id.email_png}}" style="width:20px; height:20px;"/>
+                            <img t-attf-src="data:image/*;base64,{{doc.company_id.email_png}}" style="width:20px; height:20px; vertical-align:middle; margin-right:5px;"/>
                         </t>
                         <span>contato@mmportasinternas.com.br</span>
                     </div>

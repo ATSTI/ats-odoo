@@ -14,26 +14,21 @@ class Company(models.Model):
     _inherit = 'res.company'
 
     instagram_png = fields.Binary(
-        'Instagram',
+        string='Instagram',
         compute="_compute_icons",
-        store=True,
     )
     email_png = fields.Binary(
-        'Email',
+        string='Email',
         compute="_compute_icons",
-        store=True,
     )
     whatsapp_png = fields.Binary(
-        'Whatsapp',
+        string='Whatsapp',
         compute="_compute_icons",
-        store=True,
     )
+    
 
-    @api.depends()
     def _compute_icons(self):
         for company in self:
-            if company.instagram_png and company.email_png and company.whatsapp_png:
-                continue
             company.instagram_png = load_image("instagram.png")
             company.email_png = load_image("email.png")
             company.whatsapp_png = load_image("whatsapp.png")

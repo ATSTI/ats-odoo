@@ -2,16 +2,18 @@
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 {
-    'name': 'Cadastro de Cliente Fiscal Operation',
+    'name': 'Cadastro de Cliente simplificado',
     'version': '1.0',
     'category': 'Others',
     'license': 'AGPL-3',
-    'summary': 'Adiciona campo Fiscal Operation no cadastro de clientes',
+    'sequence': 2,
+    'summary': 'Simplifica o cadastro de clientes',
     'description': """
+        Alterações na tela de cadastro de clientes para simplificar o uso.
     """,
     'author': 'ATSTi Soluções',
     'website': '',
-    'depends': ['l10n_br_base','l10n_br_fiscal'],
+    'depends': ['l10n_br_base', 'l10n_br_fiscal', 'l10n_br_account', 'account_payment_partner' ],
     'data': [
         'views/partner_view.xml',
     ],

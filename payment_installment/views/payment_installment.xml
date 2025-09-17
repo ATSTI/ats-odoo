@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <odoo>
-
     <record id="view_payment_installment_form" model="ir.ui.view">
         <field name="name">view.payment.installment.form</field>
         <field name="model">account.move</field>
+        <field name="priority">199</field>
         <field name="inherit_id" ref="l10n_br_account.invoice_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//notebook" position="inside">
+            <notebook position="inside">
                 <page name="parcelas" string="Parcelas" states="draft">
                     <group class="oe_edit_only">
                         <group>
@@ -32,25 +32,7 @@
                     </field>
                     <button name="action_confirma_parcela" type="object" states="draft" class="btn-success" string="Confirmar Parcelas" groups="account.group_account_invoice"/>
                 </page>
-            </xpath>
-            <!-- <xpath expr="//notebook" position="inside">
-                <page name="vencimentos" string="Vencimentos">
-                    <field nolabel="1" name="receivable_move_line_ids">
-                        <tree name="vencimentos" string="Vencimentos" colors="grey:reconciled==True;red:date_maturity&lt;current_date">
-                            <field name="date_maturity"/>
-                            <field name="name"/>
-                            <field name="payment_mode_id"/>
-                            <field name="ref"/>
-                            <field name="debit"/>
-                            <field name="credit"/>
-                            <field name="reconciled" string="Pago" />
-                            <button name="action_register_payment" type="object" string="Register Payment" groups="account.group_account_invoice" icon="fa-usd"/>
-                            <button name="open_wizard_print_boleto" type="object" string="Boletos" icon="fa-barcode"/>
-                        </tree>
-                    </field>
-                </page>
-            </xpath> -->
+            </notebook>
         </field>
-    </record>
-    
+    </record>   
 </odoo>

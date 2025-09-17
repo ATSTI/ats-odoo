@@ -218,42 +218,6 @@ class AccountMoveLine(models.Model):
         else:
             return super()._compute_payment_mode()
 
-    # @api.model_create_multi
-    # def create(self, vals_list):
-    #     for values in vals_list:
-    #         # "amount_currency"='560.00',"amount_residual_currency"='560.00',"price_subtotal"='-560.00',"price_total"='-560.00',"price_unit"='-560.000000'
-    #         print (values)
-    #         print(f"debit: {values['debit']}, \
-    #             credit: {values['credit']}, \
-    #             amount currency: {values['amount_currency']}, \
-    #             price_subtotal: {values['price_subtotal']}, \
-    #             price_unit: {values['price_unit']} \
-    #         ")
-    #         if 'debit' in values and not values['price_unit']:
-    #             values['amount_currency'] = values['debit']
-    #             values['amount_residual_currency'] = values['debit']
-    #             values['price_unit'] = -values['debit']
-    #             values['price_subtotal'] = -values['debit']
-    #             values['price_total'] = -values['debit']
-    #     # if 'parcela_ids' in values:
-    #     #     del vals_list['parcela_ids']
-    #     #     vals_list['payment_mode_id'] = 1  
-    #     print ("=========================================")
-    #     for values in vals_list:
-    #         # "amount_currency"='560.00',"amount_residual_currency"='560.00',"price_subtotal"='-560.00',"price_total"='-560.00',"price_unit"='-560.000000'
-    #         print (values)
-    #         print(f"debit: {values['debit']}, \
-    #             credit: {values['credit']}, \
-    #             amount currency: {values['amount_currency']}, \
-    #             price_subtotal: {values['price_subtotal']}, \
-    #             price_unit: {values['price_unit']} \
-    #         ")        
-    #     result = super(
-    #         AccountMoveLine, self.with_context(create_from_move_line=True)
-    #     ).create(vals_list)     
-    #     return result
-
-
 class InvoiceParcela(models.Model):
     _name = 'invoice.parcela'
     _order = 'data_vencimento'

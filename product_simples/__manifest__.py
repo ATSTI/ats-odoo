@@ -3,16 +3,19 @@
 
 {
     'name': 'Cadastro de produto simplificado',
-    'version': '1.0',
-    'category': 'Others',
+    'version': '16.0',
+    'category': 'Product',
     'license': 'AGPL-3',
-    'sequence': 2,
-    'summary': 'relatorios personalizados',
+    'summary': 'simplificação do cadastro de produtos',
     'description': """
+            Esse Módulo tem finalidade de simplificar a tela de cadastro de produtos.
     """,
-    'author': 'ATS Soluções',
+    'author': 'ATSTi Soluções',
+    'maintainer': 'Carlos Silveira, Mauricio-ATS, ATSTi',
     'website': '',
-    'depends': ['l10n_br_fiscal', 'product', 'product_sequence'],
+    'depends': [
+        'l10n_br_fiscal', 'product', 'product_sequence'
+    ],
     'data': [
         'views/product_view.xml',
     ],

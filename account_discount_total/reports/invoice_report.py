@@ -32,4 +32,3 @@ class AccountInvoiceReport(models.Model):
         res = super(AccountInvoiceReport,self)._select()
         select_str = res + """, line.discount AS discount """
         return select_str
-

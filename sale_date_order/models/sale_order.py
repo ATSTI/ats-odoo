@@ -6,6 +6,8 @@ from odoo import _, fields, models
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
+    date_sale = fields.Date(string="Data da venda")
+
     def _prepare_confirmation_values(self):
         if self.date_order:
             return {

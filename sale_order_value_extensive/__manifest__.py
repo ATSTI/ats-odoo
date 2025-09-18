@@ -3,16 +3,17 @@
 
 {
     'name': 'Valor por extenso no Contrato de Vendas',
-    'version': '1.0',
+    'version': '16.0',
     'category': 'Sales',
     'license': 'AGPL-3',
     'sequence': 2,
     'summary': '',
     'description': """
     """,
-    'author': 'ATS Soluções',
+    'author': 'ATSTi Soluções',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
     'website': '',
-    'depends': ['sale'],
+    'depends': ['l10n_br_sale'],
     'data': [
     ],
     'installable': True,

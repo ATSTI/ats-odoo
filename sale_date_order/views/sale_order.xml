@@ -10,6 +10,7 @@
             <field name="commitment_date" position="replace" />
             <field name="date_order" position="after">
                 <field name="commitment_date" />
+                <field name="date_sale" />
             </field>    
         </field>
     </record>

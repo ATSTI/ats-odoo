@@ -15,11 +15,11 @@ class AccountMove(models.Model):
     def _onchange_amount_discount_value(self):
         self._compute_amount()
         self._inverse_amount_discount()
-        if self.amount_discount_value:
-            for record in self.filtered(lambda doc: doc._get_product_amount_lines()):
-                for line in record.invoice_line_ids:
-                    line._onchange_price_subtotal()
-                record._recompute_payment_terms_lines()
+        # if self.amount_discount_value:
+        #     for record in self.filtered(lambda doc: doc._get_product_amount_lines()):
+        #         # for line in record.invoice_line_ids:
+        #         #     line._onchange_price_subtotal()
+        #         record._recompute_payment_terms_lines()
 
     def _inverse_amount_discount(self):
         for record in self.filtered(lambda doc: doc._get_product_amount_lines()):
@@ -69,11 +69,11 @@ class AccountMove(models.Model):
             )
 
 
-class AccountMoveLine(models.Model):
-    _inherit = "account.move.line"
+# class AccountMoveLine(models.Model):
+#     _inherit = "account.move.line"
 
-    @api.onchange('quantity', 'discount', 'price_unit', 'tax_ids', 'freight_value', 'other_value', 'insurance_value', 'discount_value')
-    def _onchange_price_subtotal(self):
-        result = super()._onchange_price_subtotal()
-        #self.move_id._recompute_dynamic_lines(recompute_all_taxes=True)
-        return result
+#     @api.onchange('quantity', 'discount', 'price_unit', 'tax_ids', 'freight_value', 'other_value', 'insurance_value', 'discount_value')
+#     def _onchange_price_subtotal(self):
+#         result = super()._onchange_price_subtotal()
+#         #self.move_id._recompute_dynamic_lines(recompute_all_taxes=True)
+#         return result

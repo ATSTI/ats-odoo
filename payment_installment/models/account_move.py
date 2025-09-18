@@ -15,8 +15,8 @@ class AccountMove(models.Model):
     dia_vcto = fields.Integer('Dia Vencimento', default=0)
     rateio_frete = fields.Boolean('Rateio do Frete', default=False)
     vlr_prim_prc = fields.Float('Valor Prim. Parcela', default=0.0)
-    # payment_mode_id = fields.Many2one(
-    #    'account.payment.mode', string=u"Modo de pagamento")
+    payment_mode_install_id = fields.Many2one(
+        'account.payment.mode', string=u"Modo de pagamento")
     
 
     # @api.returns('self', lambda value: value.id)
@@ -103,54 +103,20 @@ class AccountMove(models.Model):
         else:
             hj = date.today()
         dia = hj.day
-        mes = hj.month
-        ano = hj.year
+        # calcula a data de vencimento  
         if dia_preferencia:
             if dia >= dia_preferencia:
-                # mes = mes + 1
-                # if mes > 12:
-                #     mes = 1
-                #     ano = ano + 1
                 parcela += 1
             dia = dia_preferencia
         else:
             parcela += 1
-        mes = mes + parcela
-
-        if mes > 12 and mes < 25:
-            mes = mes - 12
-            ano = ano + 1
-        if mes > 24 and mes < 37:
-            mes = mes - 24
-            ano = ano + 2
-        if mes > 36 and mes < 49:
-            mes = mes - 36
-            ano = ano + 3
-        if mes > 48 and mes < 61:
-            mes = mes - 48
-            ano = ano + 4
-        if mes > 60 and mes < 73:
-            mes = mes - 60
-            ano = ano + 5
-        if mes > 72 and mes < 85:
-            mes = mes - 72
-            ano = ano + 6
-        if mes > 84 and mes < 97:
-            mes = mes - 84
-            ano = ano + 7
-        if mes > 96 and mes < 109:
-            mes = mes - 96
-            ano = ano + 8
-        if mes > 108 and mes < 121:
-            mes = mes - 108
-            ano = ano + 9
-        
-        if dia > 28 and mes == 2:
+        year = divmod(hj.month+parcela - 1, 12)[0] + hj.year
+        next_month = (hj.month + parcela) % 12 or 12
+        if next_month == 2 and dia > 28:
             dia = 28
-        if dia == 31 and mes not in (1,3,5,7,8,10,12):
+        if dia == 31 and next_month not in (1,3,5,7,8,10,12):
             dia = 30
-        data_str = '%s-%s-%s' %(ano, mes, dia)
-        data_vcto = datetime.strptime(data_str,'%Y-%m-%d').date()
+        data_vcto = datetime(year, next_month, dia)
         return data_vcto
 
     @api.depends('num_parcela', 'dia_vcto', 'vlr_prim_prc')
@@ -195,7 +161,7 @@ class AccountMove(models.Model):
                 'data_vencimento': data_parc,
                 'valor': self.currency_id.round(valor_parc),
                 'numero_fatura': str(prc+1).zfill(2),
-                'payment_mode_id': self.payment_mode_id.id,
+                'payment_mode_id': self.payment_mode_install_id.id,
             }))
             valor_parc = valor_prc
             prc += 1
@@ -223,6 +189,7 @@ class InvoiceParcela(models.Model):
     _order = 'data_vencimento'
     _description = "Parcelas da Fatura"
 
+    name = fields.Char(string="Descrição", size=30) 
     move_id = fields.Many2one('account.move', string="Fatura")
     currency_id = fields.Many2one(
         'res.currency', related='move_id.currency_id',

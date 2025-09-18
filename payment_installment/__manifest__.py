@@ -14,10 +14,11 @@
         "account_payment_mode",
         "l10n_br_account",
         "l10n_br_account_payment_order",
+        "l10n_br_account_due_list",
     ],
     "data": [
-        "views/payment_installment.xml",
         "security/ir.model.access.csv",
+        "views/payment_installment.xml",
     ],
     "demo": [
     ],

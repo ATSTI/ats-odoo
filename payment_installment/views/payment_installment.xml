@@ -3,8 +3,8 @@
     <record id="view_payment_installment_form" model="ir.ui.view">
         <field name="name">view.payment.installment.form</field>
         <field name="model">account.move</field>
-        <field name="priority">199</field>
-        <field name="inherit_id" ref="l10n_br_account.invoice_form"/>
+        <field name="inherit_id" ref="l10n_br_account.invoice_form" />
+        <field name="priority">201</field>
         <field name="arch" type="xml">
             <notebook position="inside">
                 <page name="parcelas" string="Parcelas" states="draft">
@@ -12,7 +12,7 @@
                         <group>
                             <field name="dia_vcto" />
                             <field name="vlr_prim_prc" />
-                            <field name="payment_mode_id" />
+                            <field name="payment_mode_install_id" />
                         </group>
                         <group>
                             <field name="num_parcela" />
@@ -20,10 +20,10 @@
                             <button name="action_calcula_parcela" type="object" states="draft" class="oe_highlight" string="Calcular Parcelas" groups="account.group_account_invoice"/>
                         </group>
                     </group>    
+
                     <field nolabel="1" name="parcela_ids"> 
                         <tree name="parcelamento" string="Parcelamento" colors="grey:reconciled==True;red:date_maturity&lt;current_date" editable="bottom">
                             <field name="move_id" invisible="1" />
-                            <field name="currency_id" invisible="1" />
                             <field name="numero_fatura" />
                             <field name="payment_mode_id" />
                             <field name="data_vencimento" />
@@ -34,5 +34,21 @@
                 </page>
             </notebook>
         </field>
-    </record>   
+    </record>
+
+    <record id="view_parcelas_form" model="ir.ui.view">
+        <field name="name">view.parcelas.form</field>
+        <field name="model">invoice.parcela</field>
+        <field name="arch" type="xml">
+            <form string="Parcelas">
+                <field name="name" />
+                <field name="move_id" invisible="1" />
+                <field name="currency_id" invisible="1" />
+                <field name="numero_fatura" />
+                <field name="payment_mode_id" />
+                <field name="data_vencimento" />
+                <field name="valor" />                    
+            </form>
+        </field>
+    </record>  
 </odoo>

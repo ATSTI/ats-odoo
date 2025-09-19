@@ -18,16 +18,6 @@ class AccountMove(models.Model):
     payment_mode_install_id = fields.Many2one(
         'account.payment.mode', string=u"Modo de pagamento")
     
-
-    # @api.returns('self', lambda value: value.id)
-    # def copy(self, default=None):
-    #     move = super().copy(default)
-    #     import pudb;pu.db
-    #     if move.is_invoice(include_receipts=True):
-    #         if move.parcela_ids:
-    #             move.action_confirma_parcela()
-    #     return super().copy(default)
-
     # TODO saindo o mesmo nome para todas as parcelas
     def action_post(self):
         different = False
@@ -46,18 +36,20 @@ class AccountMove(models.Model):
         if different:
             raise UserError(_(f"Parcela não foi confirmada, favor confirmar na aba PARCELAS."))
         res = super().action_post()
+        # import pudb;pu.db
+        for line in self.due_line_ids:
+            if line.move_id.document_type_id:
+                nome_parcela = line.move_id.document_number
+            else:
+                nome_parcela = line.move_id.name
+            if not nome_parcela in line.name:
+                line.name = f"{nome_parcela}-{line.name}"
         # TODO quando confirma a primeira vez esta excluindo as parcelas
         # rotina abaixo pra evitar isso, rever
-        if len(self.due_line_ids) < len(self.parcela_ids):
-            self.button_draft()
-            self.action_confirma_parcela()
-            res = super().action_post()
-        # correcao name parcela
-        # for prc in self.parcela_ids:
-        #     fin = self.due_line_ids.filtered(lambda l: l.date_maturity == prc.data_vencimento)
-        #     if fin.name and fin.name.find('-') < 0:
-        #         fin.write({'name': f"{self.name}-{fin.name}"})
-
+        # if len(self.due_line_ids) < len(self.parcela_ids):
+        #     self.button_draft()
+        #     self.action_confirma_parcela()
+        #     res = super().action_post()
         return res
 
     def action_confirma_parcela(self):
@@ -67,35 +59,44 @@ class AccountMove(models.Model):
         if round(self.amount_total, 2) != round(valor_total, 2):
             raise UserError(_(f"Valor da soma das parcelas: {str(valor_total)}, diferente do valor total: {str(self.amount_total)}.")) 
         if self.num_parcela > 0:
-            account = self.due_line_ids[0].account_id
-            self.due_line_ids.with_context(check_move_validity=False).unlink()
             date_due = False
+            parcelas = []
             for prc in self.parcela_ids:
-                create_method = self.env['account.move.line'].with_context(check_move_validity=False).create
+                # a data de vencimento da fatura sera o ultimo vencimento
+                date_due = prc.data_vencimento
+            if date_due:
+                self.update({'invoice_date_due': date_due})
+            for prc in self.parcela_ids:
                 valor_cre = 0
                 valor_deb = 0
                 if self.move_type == "in_invoice":
                     valor_cre = prc.valor
                 if self.move_type == "out_invoice":
                     valor_deb = prc.valor
-                create_method({
+                sign = 1
+                for line in self.line_ids:
+                    if line.account_type in ('asset_receivable', 'liability_payable'):
+                        sign = 1 if line.balance > 0.0 else -1
+                        conta_lancamento = line.account_id
+                        line.with_context(check_move_validity=False, dynamic_unlink=True).unlink()
+                        break
+                create_method = {
                         'name': prc.numero_fatura,
                         'debit': valor_deb,
-                        'balance': prc.valor,
-                        'credit': valor_cre,
+                        'debit': valor_deb if valor_deb else 0.0,
+                        'credit': -valor_cre if valor_cre else 0.0,
+                        'balance': valor_deb if valor_deb else -valor_cre,
                         'quantity': 1.0,
-                        'amount_currency': prc.valor,
+                        'amount_currency': sign * prc.valor,
                         'date_maturity': prc.data_vencimento,
                         'move_id': self.id,
                         'currency_id': self.currency_id.id,
-                        'account_id': account.id,
+                        'account_id': conta_lancamento.id,
                         'partner_id': self.commercial_partner_id.id,
-                        'exclude_from_invoice_tab': True,
-                        'payment_mode_id': prc.payment_mode_id.id or self.payment_mode_id.id,
-                })
-                date_due = prc.data_vencimento
-            if date_due:
-                self.invoice_date_due = date_due
+                        'payment_mode_id': prc.payment_mode_id.id or self.payment_mode_id.id or False,
+                }
+                parcelas.append(create_method)
+            self.env['account.move.line'].with_context(check_move_validity=False,dynamic_unlink=True).create(parcelas)
    
     def calcular_vencimento(self, dia_preferencia, parcela):
         if self.invoice_date:

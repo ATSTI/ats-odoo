@@ -59,7 +59,8 @@
 					help="Pagamentos em aberto" 
 					name="open"/>
                 <separator orientation="vertical"/>
-				<field name="number_nfe" string="Nota Fiscal" />
+				<field name="name" string="Nota/Parcela" />
+				<field name="move_id" string="Lançamento" />
                 <field name="account_id"/>
                 <field name="partner_id"/>
                 <field name="date_maturity"/>

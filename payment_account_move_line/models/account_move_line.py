@@ -6,12 +6,6 @@ from datetime import date
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
-    partner_id = fields.Many2one(
-        comodel_name="res.partner",
-        related="move_id.partner_id",
-        string="Partner",
-        store=True
-    )
 
     # tirei pq qdo recebe parcial nao mostra a data correta
     # payment_date = fields.Date(

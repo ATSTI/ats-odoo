@@ -1,14 +1,23 @@
-# -*- coding: utf-8 -*-
-# © 2004-2010 OpenERP SA
-# © 2019 Carlos Silveira <crsilveira@gmail.com>
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+# Copyright (C) 2025 - ATSTi
+# License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.ht
+
 {
     'name': 'Shopee Odoo',
-    'version': '14.0.1.0.0',
-    'category': 'Product',
-    'author': 'Carlos R. Silveira '
-              ,
+    'version': '1.0',
+    'category': 'Others',
     'license': 'AGPL-3',
+    'sequence': 2,
+    'summary': 'Módulo de Integração do Odoo com a Shopee',
+    'description': """
+        Este módulo tem como finalidade a integração de diversos setores da Shopee com o Odoo, entre estas está:
+        - Sincronização de pedidos
+        - Ajuste de preços via Odoo
+        - Ajuste de estoque via Odoo
+        - Envio de notas fiscais
+    """,
+    'author': 'ATSTi Soluções',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': '',
     'depends': ['base', 'account', 'l10n_br_fiscal', 'sale'],
     'data': [
         'security/res_groups.xml',
@@ -17,5 +26,5 @@
         'views/product_view.xml',
         ],
     'installable': True,
-    'images': [],
+    'application': False,
 }

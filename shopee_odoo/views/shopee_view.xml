@@ -14,29 +14,28 @@
                     </header>
                     <sheet>
                         <group>
-                            <group>
-                                <field name="name"/>
-                                <field name="shop_real"  groups="base.group_no_one"/>
+                            <!-- Informações principais -->
+                            <group colspan="4" string="Informações Principais">
+                                <field name="name" colspan="2"/>
+                                <field name="shop_real" groups="base.group_no_one"/>
                                 <field name="shopee_id" groups="base.group_no_one"/>
                                 <field name="shopee_partner_id" groups="base.group_no_one"/>
                                 <field name="shopee_partner_key" groups="base.group_no_one"/>
                             </group>
-                            <group>
-                                <div class="o_row">
-                                    <group>
-                                        <field name="refresh_token_security" invisible='1'/>
-                                        <field name="refresh_token" groups="base.group_no_one"/>
-                                        <field name="access_token" groups="base.group_no_one"/>
-                                        <field name="expire_date_token"  groups="base.group_no_one"/>
-                                    </group>
-                                </div>
+
+                            <!-- Tokens e segurança -->
+                            <group colspan="4" string="Tokens e Segurança" groups="base.group_no_one">
+                                <field name="refresh_token_security" invisible="1"/>
+                                <field name="refresh_token" groups="base.group_no_one"/>
+                                <field name="access_token" groups="base.group_no_one"/>
+                                <field name="expire_date_token" groups="base.group_no_one"/>
                             </group>
-                            <group>
-                                <group string="Informações do Preço de Venda">
-                                    <field name="margin_shopee"/>
-                                    <field name="taxa_shopee"/>
-                                    <field name="margem_lucro"/>
-                                </group>
+
+                            <!-- Informações de preço de venda -->
+                            <group colspan="3" string="Informações do Preço de Venda">
+                                <field name="margin_shopee"/>
+                                <field name="taxa_shopee"/>
+                                <field name="margem_lucro"/>
                             </group>
                         </group>
                     </sheet>

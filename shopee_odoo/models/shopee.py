@@ -148,6 +148,7 @@ class ShopeeConfig(models.Model):
         variante = ''
         for z in od_detail['response']['order_list']:
             order_line = []
+            print(z)
             for key, value in z.items():
                 date_envi = z['ship_by_date']
                 data_envio_limite = datetime.fromtimestamp(date_envi)
@@ -211,7 +212,7 @@ class ShopeeConfig(models.Model):
                     cpf = '{}.{}.{}-{}'.format(cpf_b[:3], cpf_b[3:6], cpf_b[6:9], cpf_b[9:])
             # print("PEDIDO CRIADO")
             pr = self.env["res.partner"].search([
-                ('cnpj_cpf', '=', cpf),
+                ('vat', '=', cpf),
             ])
             tag_pr = self.env['res.partner.category'].search([
                 ('name', '=', "Shopee"),
@@ -233,7 +234,7 @@ class ShopeeConfig(models.Model):
                 vals_pr = {
                     'name': name_buyer,
                     'legal_name': name_buyer,
-                    'cnpj_cpf': cpf,
+                    'vat': cpf,
                     'ref': id_buyer,
                     'street_name':  street[:street.find(",")],
                     'street_number': street_n[:street_n.find(",")],
@@ -247,27 +248,33 @@ class ShopeeConfig(models.Model):
                     # 'is_customer': True,
                 }
                 pr = self.env['res.partner'].create(vals_pr)
-                if pr.cnpj_cpf:
-                    pr._onchange_cnpj_cpf()
+                # if pr.vat:
+                #     pr._onchange_cnpj_cpf()
             tag = self.env['crm.tag'].search([
                 ('name', '=', "Shopee"),
+            ])
+            op_fiscal = self.env['l10n_br_fiscal.operation'].search([
+                ('name', '=', 'Vendas')
             ])
             vals={
                 "name": order_name,
                 "partner_id": pr.id,
                 "tag_ids": [(6, 0, tag.ids)],
                 # "note": data_limite,
+                "fiscal_operation_id": op_fiscal.id,
                 "commitment_date": data_envio_limite
             }
             
             sale = self.env['sale.order'].create(vals)
-            sale.onchange_partner_id()
+            sale._onchange_fiscal_operation_id()
             if len(order_line):
+                import pudb;pu.db
                 sale['order_line'] = order_line
                 for line in sale.order_line:
                     # preco unitario alterado no onchange
                     prd_price = line.price_unit
                     prd_name = line.name
+                    line._onchange_fiscal_tax_ids()
                     line._onchange_product_id_fiscal()
                     line.write(
                         {'price_unit': prd_price,'name': prd_name,}

@@ -8,7 +8,6 @@ class StockPicking(models.Model):
 
     def _action_done(self):
         result = super(StockPicking, self)._action_done()
-        # TODO criar somente qdo for um tipo especifico de Picking
         for item in self.move_line_ids_without_package:
             if item.picking_id.picking_type_id.sequence_code == "IN":
                 vals = {}

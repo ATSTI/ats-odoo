@@ -1,17 +1,16 @@
 # Copyright (C) 2025 - ATSTi
-# License AGPL-3 - See https://www.gnu.org/licenses/agpl
+# License AGPL-3 - Veja https://www.gnu.org/licenses/agpl
 
 {
-    'name': 'Sale Discount on Total Amount',
+    'name': 'Desconto sobre o Valor Total de Venda',
     'version': '16.0',
-    'category': 'Sales Management',
+    'category': 'Gestão de Vendas',
     'license': 'AGPL-3',
-    'summary': 'Discount on Total in Sale and Invoice With Discount Limit and Approval (by Cybrosys) - adapted l10n-brazil',
+    'summary': 'Desconto no total em Vendas e Faturas com limite de desconto e aprovação (adaptado do módulo Cybrosys l10n-brazil)',
     'description': """
-        Sale Discount for Total Amount
-=======================
-Module to manage discount on total amount in Sale.
-        as an specific amount or percentage
+        Desconto sobre o valor total de vendas.
+        Módulo para gerenciar desconto sobre o valor total em vendas,
+        seja como valor específico ou percentual.
     """,
     'author': 'ATSTi Soluções',
     'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
@@ -21,7 +20,7 @@ Module to manage discount on total amount in Sale.
         'sale_discount_display_amount',
         'account_discount_total',
         'l10n_br_delivery',
-                ],
+    ],
     'data': [
         'views/sale_view.xml',
         # 'views/sale_order_report.xml',
@@ -30,4 +29,3 @@ Module to manage discount on total amount in Sale.
     'installable': True,
     'application': False,
 }
-

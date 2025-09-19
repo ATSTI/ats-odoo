@@ -1,39 +1,26 @@
-# -*- encoding: utf-8 -*-
-##############################################################################
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as published
-#    by the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU Affero General Public License for more details.
-#
-#    You should have received a copy of the GNU Affero General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-##############################################################################
+# Copyright (C) 2025 - ATSTi
+# License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.ht
 
 {
-    'name': 'Contatos do Parceiro - Soloz Customs',
+    'name': 'Customizações Soloz',
     'version': '1.0',
-    'category': 'Res Partner',
-    'author': 'ATS Solucoes',
-    'website': 'http://www.atsti.com.br',
+    'category': 'Others',
     'license': 'AGPL-3',
-    'contributors': [
-        'Carlos Silveira<carlos@atsti.com.br>',
-        'Mauricio Silveira<maurs320@gmail.com>',
-    ],
-    'depends': [
-        'base', 'sale'
-    ],
+    'sequence': 2,
+    'summary': 'Módulo de Customizações Específicas para a Soloz',
+    'description': """
+        Este módulo tem como finalidade algumas mecanicas que a Empresa pediu, entre elas estão:
+        - Limitação do responsavel pelo cliente
+        - Validação das informações do cliente
+        - LogCheatter de alterações no Produto
+    """,
+    'author': 'ATSTi Soluções',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': '',
+    'depends': ['base', 'sale_management'],
     'data': [
         'views/sale_order_view.xml',
     ],
-    'demo': [],
     'installable': True,
+    'application': False,
 }
-

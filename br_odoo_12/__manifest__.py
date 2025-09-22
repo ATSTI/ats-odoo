@@ -1,18 +1,19 @@
-# © 2024 Carlos Silveira <crsilveira@gmail.com>
-# License AGPL-3.0 or later (http://atsti.com.br).
+# Copyright (C) 2025 - ATSTi
+# License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 {  
-    'name': 'Mantendo dados odoo-brasil para l10n-brazil',
-    'summary': """Permite manter histórico das NF-e emitidas pelo modulo odoo-brasil""",
-    'description': 'NF-e - odoo-brasil',
-    'version': '16.0.1.0.0',
-    'category': 'account',
-    'author': 'ATSTi',
+    'name': 'Odoo Brasil Dados',
+    'version': '16.0.1.0',
+    'category': 'Localisation',
     'license': 'AGPL-3',
+    'sequence': 2,
+    'summary': 'Permite manter histórico das NF-e emitidas pelo modulo odoo-brasil',
+    'description': """
+        NF-e - odoo-brasil, Dados da NFE para migração de versões do ODOO
+    """,
+    'author': 'ATSTi Soluções',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
     'website': '',
-    'contributors': [
-        'Carlos Silveira <crsiveira@gmail.com>',
-    ],
     'depends': [
         'base', 'account',
     ],

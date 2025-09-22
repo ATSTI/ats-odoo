@@ -1,18 +1,24 @@
-# Copyright 2023 ATSTi
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+# Copyright (C) 2025 - ATSTi
+# License AGPL-3 - See https://www.gnu.org/licenses/agpl
 
 {
-    "name": "Account Analytic Stage",
-    "summary": """
-        Add stage""",
-    "version": "16.0",
-    "license": "AGPL-3",
-    "author": "ATSTi,Odoo Community Association (OCA)",
-    "website": "https://github.com/ATSTI/ats-odoo/account_analytic_stage",
-    "depends": [
-        "analytic",
+    'name': 'Estágio de Contas Analíticas',
+    'version': '1.0',
+    'category': 'Accounting',
+    'license': 'AGPL-3',
+    'summary': "Datas e prazos de estágios para Contas Analíticas",
+    'description': """
+        Esse Módulo Permite o Usuario Financiero Estabelecer estágios para Contas Analíticas
+        Data de Início e Data Final.
+    """,
+    'author': 'ATSTi Soluções',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': '',
+    'depends': ['l10n_br_account', 'analytic'],
+    'data': [
+        'views/stage.xml',
     ],
-    "data": [
-        "views/stage.xml",
-    ],
+    'application': True,
+    'installable': True,
+    'auto_install': False,
 }

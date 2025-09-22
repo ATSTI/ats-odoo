@@ -1,6 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+	<record id="receivable_payable_view_form" model="ir.ui.view">
+		<field name="name">receivable_payabale.form</field>
+		<field name="model">account.move.line</field>
+		<field name="inherit_id" ref="account.view_move_line_form" />
+		<field name="priority">999</field>
+		<field name="arch" type="xml">
+			<xpath expr="//form" position="replace">
+				<form string="Itens do Diário" create="false">
+					<sheet>
+						<field name="company_id" invisible="1"/>
+						<field name="parent_state" invisible="1"/>
+						<group>
+							<group>
+								<field name="name" readonly="1"/>
+								<field name="partner_id"
+									domain="['|', ('parent_id', '=', False), ('is_company', '=', True)]"
+									readonly="1"/>
+							</group>
+							<group string="Documentos Contábeis">
+								<field name="move_id" readonly="1"/>
+								<field name="statement_line_id"
+									readonly="True"
+									attrs="{'invisible': [('statement_line_id','=',False)]}"/>
+							</group>
+						</group>
+						<notebook colspan="4">
+							<page string="Informações Gerais" name="information">
+								<group>
+									<group string="Datas">
+										<field name="date" groups="account.group_account_readonly"/>
+										<field name="date_maturity" readonly="1"/>
+									</group>
+									<group string="Moeda" groups="base.group_multi_currency">
+										<field name="currency_id" invisible="1"/>
+										<field name="amount_currency" readonly="1"/>
+									</group>
+								</group>
+								<group string="Valores" colspan="4">
+									<group>
+										<field name="account_id"
+											options="{'no_create': True}"
+											domain="[('company_id', '=', company_id)]"
+											readonly="1"/>
+										<field name="debit" readonly="1"/>
+										<field name="credit" readonly="1"/>
+									</group>
+									<group>
+										<field name="balance" readonly="1"/>
+										<field name="quantity" readonly="1"/>
+									</group>
+								</group>
+								<group>
+									<group string="Impostos"
+										attrs="{'invisible': [('tax_line_id','=',False), ('tax_ids','=',[])]}">
+										<field name="tax_line_id" readonly="1"
+											attrs="{'invisible': [('tax_line_id','=',False)]}"/>
+										<field name="tax_ids" widget="many2many_tags" readonly="1"
+											attrs="{'invisible': [('tax_ids','=',[])]}"/>
+										<field name="tax_tag_invert" readonly="1" groups="base.group_no_one"/>
+										<field name="tax_audit"/>
+									</group>
+									<group string="Conciliação"
+										attrs="{'invisible':[('matched_debit_ids', '=', []),('matched_credit_ids', '=', [])]}">
+										<label for="full_reconcile_id"/>
+										<div>
+											<field name="full_reconcile_id"
+												attrs="{'invisible':[('full_reconcile_id','=',False)]}"/>
+											<field name="matched_debit_ids" invisible="1"/>
+											<field name="matched_credit_ids" invisible="1"/>
+											<button name="open_reconcile_view"
+												class="oe_link"
+												type="object"
+												string="→ Ver lançamentos parcialmente conciliados"
+												attrs="{'invisible': ['|', ('full_reconcile_id', '!=', False),
+																	'&amp;', ('matched_debit_ids', '=', []),
+																	('matched_credit_ids', '=', [])]}"/>
+										</div>
+									</group>
+								</group>
+								<group>
+									<group string="Produto"
+										attrs="{'invisible': [('product_id', '=', False)]}">
+										<field name="product_id" readonly="1"/>
+									</group>
+									<group string="Estados">
+										<field name="blocked" readonly="1"/>
+									</group>
+									<group string="Analítico" groups="analytic.group_analytic_accounting">
+										<field name="analytic_distribution"
+											widget="analytic_distribution"
+											readonly="1"/>
+									</group>
+								</group>
+							</page>
+							<page string="Linhas Analíticas"
+								name="analytic_lines"
+								groups="analytic.group_analytic_accounting">
+								<field name="date" invisible="1"/>
+								<field name="analytic_line_ids" readonly="1"
+									context="{'tree_view_ref':'analytic.view_account_analytic_line_tree',
+										'default_general_account_id':account_id,
+										'default_name': name,
+										'default_date':date,
+										'amount': (debit or 0.0)-(credit or 0.0)}"
+								/>
+							</page>
+						</notebook>
+					</sheet>
+				</form>
+			</xpath>
+		</field>
+	</record>
+
 	<record id="receivable_payable_view_tree" model="ir.ui.view">
 		<field name="name">receivable_payabale.view.tree</field>
 		<field name="model">account.move.line</field>

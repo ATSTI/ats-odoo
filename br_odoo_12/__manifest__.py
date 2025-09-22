@@ -10,6 +10,7 @@
     'summary': 'Permite manter histórico das NF-e emitidas pelo modulo odoo-brasil',
     'description': """
         NF-e - odoo-brasil, Dados da NFE para migração de versões do ODOO
+        para clientes migrado odoo 12 para odoo 16
     """,
     'author': 'ATSTi Soluções',
     'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',

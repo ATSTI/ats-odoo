@@ -3,142 +3,145 @@
     <template id="report_repair_document">
         <t t-name="account_move_service_report.report_service_template">
             <t t-name="service_template">
-                <t t-call="web.html_container">
+                <t t-call="web.external_layout">
                     <t t-foreach="docs" t-as="doc">
                         <style>
-                                *{
-                                    margin: 0;
-                                    padding: 0;
-                                    box-sizing: border-box;
-                                    text-transform: uppercase;
-                                }
-                                .company{
-                                    width: 100%;
-                                }
-                                .logo{
-                                    width: 20%;
-                                    padding: 0 2px;
-                                    border: thin solid black;
-                                }
-                                .address{
-                                    width: 49,5%;
-                                    border: thin solid black;
-                                    padding: 10px;
-                                }
-                                .address span{
-                                    font-size: 12px;
-                                }
-                                .shipping{
-                                    width: 29,5%;
-                                    border: thin solid black;
-                                    padding: 10px;
-                                }
-                                .shipping &gt; span{
-                                    font-size: 11px;
-                                }
-                                .data_receipt{
-                                    width: 100%;
-                                    border-collapse: collapse;
-                                    margin-top: 4px;
-                                }
-                                .data_receipt td{
-                                    border: thin solid black;
-                                    width: 19%;
-                                    text-align: center;
-                                    font-size: 12px;
-                                    padding: 8px 0;
-                                }
-                                #receipt{
-                                    width: 24%;
-                                    font-size: 19px;
-                                    text-align: center;
-                                }
-                                .extensive_value{
-                                    width: 100%;
-                                    border-collapse: collapse;
-                                    margin: 5px 0;
-                                }
-                                .extensive_value td:first-child{
-                                    width: 8%;
-                                    border: thin solid black;
-                                    text-align: left; 
-                                    font-size: 12px;
-                                    padding: 8px 4px;
-                                }
-                                .extensive_value td:last-child{
-                                    width: 92%;
-                                    border: thin solid black;
-                                    text-align: left; 
-                                    padding: 8px 0 8px 85px;
-                                    font-size: 12px;
-                                }
-                                .client{
-                                    width: 100%;
-                                    border: thin solid black;
-                                    padding: 8px;
-                                    margin-bottom: 5px;
-                                }
-                                .client td{
-                                    font-size: 12px;
-                                    padding: 12px 0;
-                                    border: 0;
-                                }
-                                .service{
-                                    width: 100%;
-                                    height: 500px;
-                                    border-collapse: collapse;
-                                    font-size: 12px;
-                                }
-                                .service td{
-                                    text-align: center;
-                                    padding: 3px;
-                                    border-left: thin solid black;
-                                    border-right: thin solid black;
-                                }
-                                #items_head{
-                                    height: 20px;
-                                    border: thin solid black;
-                                }
-                                #items{
-                                    height: 10px;
-                                }
-                                #total td{
-                                    padding: 12px 0;
-                                    border: thin solid black;
-                                    height: 30px;
-                                }
-                                #total td:first-child{
-                                    border: 0;
-                                    text-align: right;
-                                    vertical-align: middle;
-                                    padding: 0 12px;
-                                }
-                                .message{
-                                    width: 100%;
-                                    border: thin solid black;
-                                    font-size: 8px;
-                                    padding: 5px;
-                                    margin-top: 5px;
-                                }
-                                .dashed{
-                                    width: 100%;
-                                    border: 1px dashed;
-                                    margin: 7px 0;
-                                }
-                                .signature{
-                                    width: 100%;
-                                    height: 80px;
-                                    font-size: 8px;
-                                    border-collapse: collapse;
-                                }
-                                .signature td{
-                                    border: thin solid black;
-                                    padding: 4px;
-                                }
-                                .signature p, span{
-                                    text-align: left;
-                                }
+                            *{
+                                margin: 0;
+                                padding: 0;
+                                box-sizing: border-box;
+                                text-transform: uppercase;
+                                font-size: 10px; 
+                            }
+                            .company{
+                                width: 100%;
+                            }
+                            .logo{
+                                width: 18%; 
+                                padding: 0 2px;
+                                border: thin solid black;
+                            }
+                            .address{
+                                width: 48%;
+                                border: thin solid black;
+                                padding: 6px; 
+                            }
+                            .address span{
+                                font-size: 10px;
+                            }
+                            .shipping{
+                                width: 30%;
+                                border: thin solid black;
+                                padding: 6px; 
+                            }
+                            .shipping > span{
+                                font-size: 9px;
+                            }
+                            .data_receipt{
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-top: 2px;
+                            }
+                            .data_receipt td{
+                                border: thin solid black;
+                                width: 19%;
+                                text-align: center;
+                                font-size: 10px;
+                                padding: 4px 0;
+                            }
+                            #receipt{
+                                width: 24%;
+                                font-size: 16px;
+                                text-align: center;
+                            }
+                            .extensive_value{
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin: 3px 0;
+                            }
+                            .extensive_value td:first-child{
+                                width: 8%;
+                                border: thin solid black;
+                                text-align: left; 
+                                font-size: 10px;
+                                padding: 4px 2px;
+                            }
+                            .extensive_value td:last-child{
+                                width: 92%;
+                                border: thin solid black;
+                                text-align: left; 
+                                padding: 4px 0 4px 60px;
+                                font-size: 10px;
+                            }
+                            .client{
+                                width: 100%;
+                                border: thin solid black;
+                                padding: 4px; 
+                                margin-bottom: 3px;
+                            }
+                            .client td{
+                                font-size: 10px;
+                                padding: 6px 0;
+                                border: 0;
+                            }
+                            .service{
+                                width: 100%;
+                                height: 450px; 
+                                border-collapse: collapse;
+                                font-size: 10px;
+                            }
+                            .service td{
+                                text-align: center;
+                                padding: 2px; 
+                                border-left: thin solid black;
+                                border-right: thin solid black;
+                            }
+                            #items_head{
+                                height: 18px; 
+                                border: thin solid black;
+                            }
+                            #items{
+                                height: 8px; 
+                            }
+                            #total td{
+                                padding: 8px 0; 
+                                border: thin solid black;
+                                height: 25px;
+                            }
+                            #total td:first-child{
+                                border: 0;
+                                text-align: right;
+                                vertical-align: middle;
+                                padding: 0 8px;
+                            }
+                            .message{
+                                width: 100%;
+                                border: thin solid black;
+                                font-size: 7px;
+                                padding: 3px;
+                                margin-top: 3px;
+                            }
+                            .dashed{
+                                width: 100%;
+                                border: 1px dashed;
+                                margin: 5px 0;
+                            }
+                            .signature{
+                                width: 100%;
+                                height: 60px; 
+                                font-size: 7px;
+                                border-collapse: collapse;
+                            }
+                            .signature td{
+                                border: thin solid black;
+                                padding: 2px;
+                            }
+                            .signature p, span{
+                                text-align: left;
+                            }
                         </style>
+
+                    <main>
                         <div class="page">
                             <table class="company">
                                 <td class="logo">
@@ -207,19 +210,8 @@
                                 <td>
                                     <span t-field="doc.amount_total"/>
                                 </td>
-                                <!-- <td>
-                                    <span t-field="doc.date_vencimento"/>
-                                </td> -->
                             </tr>
                         </table>
-
-                        <!-- <table class="extensive_value">
-                        <tr>
-                            <td>VALOR<br/>POR<br/>EXTENSO</td>
-                            <td><span t-field="doc.extensive_value"/></td>
-                        </tr>
-                    </table> -->
-
                         <table class="client">
                             <tr>
                                 <td>CLIENTE: <span t-field="doc.partner_id.name"/>
@@ -283,11 +275,7 @@
                                 <td/>
                                 <td/>
                                 <td>
-
                                     <span t-field="doc.quotation_notes"/>
-                                    <!--<span t-field="doc.narration"/>
-                                <br/><br/><br/><br/><br/>-->
-                                    <!-- <span t-field="doc.fiscal_comment"/> -->
                                 </td>
                                 <td/>
                                 <td/>
@@ -301,32 +289,11 @@
                         </table>
 
                         <div class="dashed"/>
-
-                        <!-- <table class="signature">
-                        <tr>
-                            <td colspan="2">
-                                <p>
-                                    Recebi(emos) de <strong t-field="doc.company_id.name"/> os serviços
-                                    constantes do recibo de locação e cobrança indicado ao lado.
-                                </p>
-                            </td>
-                            <td rowspan="2" id="receipt"><strong><span t-field="doc.ref"/></strong></td>
-                        </tr>
-                        <tr>
-                            <td style="width: 20%">
-                                <span>DATA DO RECEBIMENTO:</span>
-                                <br/><br/><br/>
-                            </td>
-                            <td>
-                                <span>IDENTIFICAÇÃO ASSINATURA DO RECEBEDOR:</span>
-                                <br/><br/><br/>
-                            </td>
-                        </tr>
-                    </table>-->
                         <div style="margin-top: 35px; font-size: 8px; color: #5c5c5c">
                             <span>Powered By ATSTi Soluções - www.atsti.com.br</span>
                         </div>
                     </div>
+                </main>
                 </t>
             </t>
         </t>

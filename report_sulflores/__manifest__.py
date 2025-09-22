@@ -3,14 +3,14 @@
 
 {
     'name': 'Relatorios SulFlores',
-    'version': '1.0',
+    'version': '16.0',
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
     'summary': 'Relatorios personalizados',
     'description': """
     """,
-    'author': 'ATS Soluções',
+    'author': 'ATSTi Soluções',
     'website': '',
     'depends': ['account'],
     'data': [

@@ -3,7 +3,7 @@
 
 {
     'name': 'Relatorio de comissão',
-    'version': '1.0',
+    'version': '16.0',
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
@@ -13,7 +13,7 @@
         e colocar a porcentagem de comissão no campo REFERENCIA (contatos, vendas e compras) do respectivo,
         10 = 10%...
     """,
-    'author': 'ATS Soluções',
+    'author': 'ATSTi Soluções',
     'website': '',
     'depends': ['account'],
     'data': [

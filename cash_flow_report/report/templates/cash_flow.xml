@@ -11,9 +11,7 @@
         </t>
     </template>
     <template id="cash_flow_report.cash_flow_report_base">
-        <!-- Saved flag fields into variables, used to define columns display -->
         <t t-set="foreign_currency" t-value="foreign_currency" />
-        <!-- Defines global variables used by internal layout -->
         <t t-set="title">
             FLUXO DE CAIXA -
             <t t-raw="company_name" />
@@ -29,23 +27,11 @@
             <!-- Display filters -->
             <t t-call="cash_flow_report.cash_flow_report_filters" />
             <t t-call="cash_flow_report.cash_flow_report_balance" />
-            <!-- <t t-foreach="Open_Items.keys()" t-as="account_id"> -->
-            <!-- <t t-set="total_geral"
-                    t-value ="total_geral + total_amount[account_id]['residual']" /> -->
-            <!-- Mostrando saldo inicial -->
-            <!-- <t t-foreach="balance_start" t-as="line"> -->
-            <!-- coloco o saldo inicial aqui dos caixas -->
-            <!-- <t t-if="account_id == line['account_id'][0]"> -->
-            <!-- <t t-set="total_geral" t-value="total_geral + line['balance']" /> -->
 
-            <!-- <t t-call="account_cash_flow_report.cash_flow_report_lines_start" /> -->
-            <!-- </t>  -->
-            <!-- </t> -->
-            <!-- </t> -->
             <t t-set="total_balance_debit" t-value="0" />
             <t t-set="total_balance_credit" t-value="0" />
             <t t-set="total_geral" t-value="0" />
-            <!-- <t t-set="total_balance" t-value="0" /> -->
+
             <t t-foreach="balance_list" t-as="line">
                 <t t-set="total_geral" t-value="total_geral + line['balance_value']" />
             </t>
@@ -53,7 +39,7 @@
                 <t t-call="cash_flow_report.cash_flow_report_lines_header" />
                 <t t-foreach="Open_Items.keys()" t-as="account_id">
                     <t t-if="not show_partner_details">
-                        <!-- <t t-set="saldo_dia" t-value="0.0" /> -->
+
                         <t t-set="balance_debit" t-value="0" />
                         <t t-set="balance_credit" t-value="0" />
                         <t t-set="date_maturity" t-value="0.0" />
@@ -67,7 +53,7 @@
                                 <t t-set="debit" t-value="line['amount_residual']" />
                                 <t t-set="balance_debit" t-value="balance_debit + line['amount_residual']" />
                                 <t t-set="total_balance_debit" t-value="total_balance_debit + line['amount_residual']" />
-                                <!-- <t t-set="total_balance" t-value="total_balance + line['amount_residual']" /> -->
+
                             </t>
                             <t t-if="line['amount_residual'] &lt; 0">
                                 <t t-set="credit" t-value="line['amount_residual']" />
@@ -75,11 +61,9 @@
                                 <t t-set="total_balance_credit" t-value="total_balance_credit + line['amount_residual']" />
                             </t>
                             <t t-call="cash_flow_report.cash_flow_report_lines" />
-                            <!-- <t t-if="data_nova != '0' and data_nova != line['date_maturity']"> -->
-                            <!-- <t t-set="saldo_dia" t-value="saldo_dia + line['amount_residual']" /> -->
+
                             <t t-set="date_maturity" t-value="line['date_maturity']" />
-                            <!-- </t> -->
-                            <!-- <t t-set="data_nova" t-value="line['date_maturity']" /> -->
+
                         </t>
                         <t t-call="cash_flow_report.cash_flow_report_ending_cumul" />
                     </t>
@@ -140,7 +124,6 @@
                 <div class="act_as_cell">Saldo</div>
             </div>
             <t t-foreach="balance_list" t-as="line">
-                <!-- coloco o saldo inicial aqui dos caixas -->
                 <div class="act_as_row">
                     <div class="act_as_cell">
                         <span t-esc="line['account_id']" />
@@ -164,7 +147,6 @@
         </div>
     </template>
     <template id="cash_flow_report.cash_flow_report_lines_header">
-        <!-- Display table headers for lines -->
         <div class="act_as_thead">
             <div class="act_as_row labels">
                 <!--## date-->
@@ -174,7 +156,6 @@
                 <!--## move-->
                 <div class="act_as_cell" style="width: 8.0%;">Lançamento</div>
                 <!--## journal-->
-                <!-- <div class="act_as_cell" style="width: 5.0%;">Diário</div> -->
                 <!--## account code-->
                 <div class="act_as_cell" style="width: 14.0%;">Conta</div>
                 <!--## partner-->
@@ -195,7 +176,6 @@
                 <div class="act_as_cell" style="width: 6.0%;">Pagar</div>
                 <!--## amount_residual-->
                 <div class="act_as_cell" style="width: 6.0%;">Saldo</div>
-                <!-- <div class="act_as_cell" style="width: 6.57%;">XXXXXXX</div> -->
                 <t t-if="foreign_currency">
                     <!--## currency_name-->
                     <div class="act_as_cell" style="width: 2.25%;">Cur.</div>
@@ -224,12 +204,6 @@
                     <t t-esc="line['move_name']" />
                 </span>
             </div>
-            <!--## journal-->
-            <!-- <div class="act_as_cell left">
-                <span t-att-res-id="journals_data[line['journal_id']]['id']" res-model="account.journal" view-type="form">
-                    <t t-esc="journals_data[line['journal_id']]['code']" />
-                </span>
-            </div> -->
             <!--## account code-->
             <div class="act_as_cell left">
                 <span t-if="line.get('account_id', False)" t-att-res-id="line['account_id']" res-model="account.account" view-type="form">
@@ -256,11 +230,6 @@
             <div class="act_as_cell left">
                 <span t-esc="line['date'].strftime('%d/%m/%Y')" />
             </div>
-            <!--## amount_total_due-->
-            <!-- <div class="act_as_cell amount">
-                <span t-if="line.get('original', False)" t-esc="line['original']" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}" />
-            </div> -->
-            <!--## amount_residual-->
             <div class="act_as_cell amount">
                 <span t-esc="debit" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}" />
             </div>

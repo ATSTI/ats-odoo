@@ -3,16 +3,16 @@
 
 {
     'name': 'Relatorios de reparo ATS',
-    'version': '1.0',
+    'version': '16.0',
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
     'summary': 'relatorios personalizados',
     'description': """
     """,
-    'author': 'ATS Soluções',
+    'author': 'ATSTi Soluções',
     'website': '',
-    'depends': ['account'],
+    'depends': ['account','repair','repair_date'],
     'data': [
         'report/report_document_repair.xml',
         'views/repair_report.xml'

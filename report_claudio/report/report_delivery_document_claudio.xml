@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="report_delivery_document_claudio" inherit_id="account.report_invoice_document">
-        <xpath expr="//t[@t-call='web.external_layout']" position="replace">
+        <xpath expr="//t[@t-call='web.external_layout']" position="replace"> <!--No odoo 16.0, o account.report_invoice_document nao tem mais web.external_layout, se for usar este report, mudar o xpath para dar replace na div class = page-->
             <t t-call="web.basic_layout">
                 <t t-foreach="docs" t-as="o">
                     <t t-set="o" t-value="o.with_context(lang=lang)"/>

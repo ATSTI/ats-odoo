@@ -47,8 +47,6 @@ class CashFlowReport(models.AbstractModel):
         tipo,
     ):
 
-        # como carregar este cara duas vezes ... com tipo == liquidity
-
         domain = self._get_move_lines_domain_not_reconciled(
             company_id, account_ids, partner_ids, only_posted_moves, date_from, tipo
         )
@@ -128,7 +126,6 @@ class CashFlowReport(models.AbstractModel):
                 prt_id = move_line["partner_id"][0]
                 prt_name = move_line["partner_id"][1]
             else:
-                # TODO se for banco, pegar Conta e Agencia
                 prt_id = 0
                 prt_name = "Missing Partner"
             if prt_id not in partners_ids:
@@ -159,13 +156,7 @@ class CashFlowReport(models.AbstractModel):
             account_name = ""
             if move_line["account_id"]:
                 account_name = move_line["account_id"][1]
-            # move_id = self.env["account.move"].browse([move_line["move_id"][0]])
-            # if move_id.ref:
-            #     if ref_label:
-            #         ref_label += ', ' + move_id.ref
-            #     else:
-            #         ref_label = move_id.ref
-            # payment_mode = move_id.payment_mode_id.name
+           
             payment_mode = ""
             payment_mode_id = 0
             if move_line["payment_mode_id"]:
@@ -196,14 +187,7 @@ class CashFlowReport(models.AbstractModel):
                 }
             )
 
-            # Open Items Move Lines Data
-            # if acc_id not in open_items_move_lines_data.keys():
-            #     open_items_move_lines_data[acc_id] = {prt_id: [move_line]}
-            # else:
-            #     if prt_id not in open_items_move_lines_data[acc_id].keys():
-            #         open_items_move_lines_data[acc_id][prt_id] = [move_line]
-            #     else:
-            #         open_items_move_lines_data[acc_id][prt_id].append(move_line)
+            
             if acc_id not in open_items_move_lines_data.keys():
                 open_items_move_lines_data[acc_id] = {prt_id: [move_line]}
             else:
@@ -212,7 +196,7 @@ class CashFlowReport(models.AbstractModel):
                 else:
                     open_items_move_lines_data[acc_id][prt_id].append(move_line)
         journals_data = self._get_journals_data(list(journals_ids))
-        # accounts_data = self._get_accounts_data(open_items_move_lines_data.keys())
+       
         accounts_data = self._get_accounts_data(contas_key)
         return (
             move_lines,
@@ -252,10 +236,9 @@ class CashFlowReport(models.AbstractModel):
                 for prt_id in open_items_move_lines_data[acc_id]:
                     for move_line in open_items_move_lines_data[acc_id][prt_id]:
                         move_lines += [move_line]
-                # if tipo == "liquidity":
+               
                 move_lines = sorted(move_lines, key=lambda k: (k["date"]))
-                # else:
-                    # move_lines = sorted(move_lines, key=lambda k: (k["date_maturity"]))
+                
                 new_open_items[acc_id] = move_lines
         else:
             for acc_id in open_items_move_lines_data.keys():
@@ -268,10 +251,9 @@ class CashFlowReport(models.AbstractModel):
                     move_lines = []
                     for move_line in open_items_move_lines_data[acc_id][prt_id]:
                         move_lines += [move_line]
-                    # if tipo == "liquidity":
+                  
                     move_lines = sorted(move_lines, key=lambda k: (k["date"]))
-                    # else:
-                        # move_lines = sorted(move_lines, key=lambda k: (k["date_maturity"]))
+                   
 
                     new_open_items[acc_id][prt_id] = move_lines
         return new_open_items
@@ -291,16 +273,15 @@ class CashFlowReport(models.AbstractModel):
         only_posted_moves = data["only_posted_moves"]
         show_partner_details = data["show_partner_details"]
         
-        # contas bancarias e caixa
+        
         account_bank = self.env["account.account"].search([
             ("id", "in", account_ids),
             ("internal_type", "=", "liquidity"),
         ])
         copy_account_ids = account_ids
-        # Removo as contas Caixa e Banco
+       
         acc_ids = account_ids
-        # for acc in account_bank.ids:
-        #     acc_ids.remove(acc)
+        
         tipo = "outros"
         (
             move_lines_data,
@@ -326,9 +307,9 @@ class CashFlowReport(models.AbstractModel):
         balance_values = self.env["account.move.line"].read_group([
                 ("account_id", "in", account_bank.ids),
                 ("date", "<=", data["date_from"])
-            ], #domain
-            ["account_id", "balance:sum"], #fields
-            ["account_id"] #group_by
+            ], 
+            ["account_id", "balance:sum"], 
+            ["account_id"] 
         )
         balance_list = []
         for balance in balance_values:

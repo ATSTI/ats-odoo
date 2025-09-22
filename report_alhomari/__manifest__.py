@@ -4,16 +4,16 @@
 
 {
     'name': 'Relatorio Alhos Mari',
-    'version': '1.0',
+    'version': '16.0',
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
     'summary': 'relatorios personalizados',
     'description': """
     """,
-    'author': 'ATS Soluções',
+    'author': 'ATSTi Soluções',
     'website': '',
-    'depends': ['account', 'l10n_br_sale'],
+    'depends': ['account', 'l10n_br_sale','account_payment_mode'],
     'data': [
         'report/report_saleorder_document.xml',
         'report/account_move_alhomari_report_templates.xml',

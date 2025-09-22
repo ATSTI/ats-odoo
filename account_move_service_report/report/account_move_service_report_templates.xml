@@ -1,296 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
   <template id="report_service_template">
-    <t t-name="service_template">
-        <t t-call="web.html_container">            
-            <t t-foreach="docs" t-as="doc">
-                <style>
-                    *{
-                        margin: 0;
-                        padding: 0;
-                        box-sizing: border-box;
-                        text-transform: uppercase;
-                    }
-                    .company{
-                        width: 100%;
-                    }
-                    .logo{
-                        width: 20%;
-                        padding: 0 2px;
-                        border: thin solid black;
-                    }
-                    .address{
-                        width: 49,5%;
-                        border: thin solid black;
-                        padding: 10px;
-                    }
-                    .address span{
-                        font-size: 12px;
-                    }
-                    .shipping{
-                        width: 29,5%;
-                        border: thin solid black;
-                        padding: 10px;
-                    }
-                    .shipping &gt; span{
-                        font-size: 11px;
-                    }
-                    .data_receipt{
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin-top: 4px;
-                    }
-                    .data_receipt td{
-                        border: thin solid black;
-                        width: 19%;
-                        text-align: center;
-                        font-size: 12px;
-                        padding: 8px 0;
-                    }
-                    #receipt{
-                        width: 24%;
-                        font-size: 19px;
-                        text-align: center;
-                    }
-                    .extensive_value{
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin: 5px 0;
-                    }
-                    .extensive_value td:first-child{
-                        width: 8%;
-                        border: thin solid black;
-                        text-align: left; 
-                        font-size: 12px;
-                        padding: 8px 4px;
-                    }
-                    .extensive_value td:last-child{
-                        width: 92%;
-                        border: thin solid black;
-                        text-align: left; 
-                        padding: 8px 0 8px 85px;
-                        font-size: 12px;
-                    }
-                    .client{
-                        width: 100%;
-                        border: thin solid black;
-                        padding: 8px;
-                        margin-bottom: 5px;
-                    }
-                    .client td{
-                        font-size: 12px;
-                        padding: 12px 0;
-                        border: 0;
-                    }
-                    .service{
-                        width: 100%;
-                        height: 500px;
-                        border-collapse: collapse;
-                        font-size: 12px;
-                    }
-                    .service td{
-                        text-align: center;
-                        padding: 3px;
-                        border-left: thin solid black;
-                        border-right: thin solid black;
-                    }
-                    #items_head{
-                        height: 20px;
-                        border: thin solid black;
-                    }
-                    #items{
-                        height: 10px;
-                    }
-                    #total td{
-                        padding: 12px 0;
-                        border: thin solid black;
-                        height: 30px;
-                    }
-                    #total td:first-child{
-                        border: 0;
-                        text-align: right;
-                        vertical-align: middle;
-                        padding: 0 12px;
-                    }
-                    .message{
-                        width: 100%;
-                        border: thin solid black;
-                        font-size: 8px;
-                        padding: 5px;
-                        margin-top: 5px;
-                    }
-                    .dashed{
-                        width: 100%;
-                        border: 1px dashed;
-                        margin: 7px 0;
-                    }
-                    .signature{
-                        width: 100%;
-                        height: 80px;
-                        font-size: 8px;
-                        border-collapse: collapse;
-                    }
-                    .signature td{
-                        border: thin solid black;
-                        padding: 4px;
-                    }
-                    .signature p, span{
-                        text-align: left;
-                    }
-                </style>
-                <div class="page">
-                    <table class="company">
-                        <td class="logo">
-                            <img t-if="doc.company_id.logo" t-attf-src="data:image/png;base64,#{doc.company_id.logo}" width="175"/>
-                        </td>
-                        <td style="width: 0,5%"/>
-                        <td class="address">
-                            <h4 t-field="doc.company_id.name"/>
-                            <br/>
-                            <span t-field="doc.company_id.street_name"/>, <span t-field="doc.company_id.street_number"/> - <span t-field="doc.company_id.district"/><br/>
-                            
-                            <span>CEP: <span t-field="doc.company_id.zip"/> - <span t-field="doc.company_id.city_id"/> - <span t-field="doc.company_id.state_id.code"/></span><br/>
-                            <br/>
-                            <span>FONES: <span t-field="doc.company_id.phone"/></span><br/>
-                            <br/>
-                        </td>
-                        <td style="width: 0,5%"/>
-                        <td class="shipping">
-                            <span><h3>RECIBO DE LOCAÇÃO E COBRANÇA Nº: <span t-field="doc.name"/></h3></span><br/>
-                            <h6><span>CNPJ: <span t-field="doc.company_id.cnpj_cpf"/></span></h6>
-                            <h6><span>Insc. Municipal: <span t-field="doc.company_id.inscr_mun"/></span></h6>
-                            <h6><span>Insc. Estadual: <span t-field="doc.company_id.inscr_est"/></span></h6><br/>
-                            
-                            <h6>NAT.DA OPERACAO : Locação</h6>
-                            <span><h4>DATA DE EMISSÃO : <span t-field="doc.invoice_date"/></h4></span>
-                        </td>
-                    </table>
+    <t t-call="web.external_layout">
+      <t t-foreach="docs" t-as="doc">
+        <style>
+          * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; text-transform: uppercase; }
+          .page { width:100%; padding:15px; }
+          .company { width:100%; border-collapse: collapse; margin-bottom:15px; }
+          .logo { width:20%; text-align:center; vertical-align: top; }
+          .logo img { max-width:150px; max-height:80px; display:block; margin:auto; }
+          .address { width:50%; border: thin solid black; padding:8px; font-size:12px; vertical-align: top; }
+          .shipping { width:28%; border: thin solid black; padding:8px; font-size:12px; vertical-align: top; }
+          .data_receipt, .client, .service { width:100%; border-collapse: collapse; margin-bottom:10px; font-size:12px; }
+          .data_receipt td, .client td, .service td { border: thin solid black; padding: 6px; text-align:center; }
+          .client td { text-align:left; }
+          .service th { background-color:#f2f2f2; font-weight:bold; padding:6px; }
+          #total td { padding:6px; font-weight:bold; }
+          .message { width:100%; font-size:10px; border: thin solid black; padding:6px; margin:5px 0; }
+          .dashed { width:100%; border:1px dashed; margin:8px 0; }
+          .signature td { border: thin solid black; padding:5px; font-size:11px; vertical-align: top; }
+        </style>
 
-                    <table class="data_receipt">
-                        <tr>
-                            <td>Nº DA FATURA</td>
-                            <td>VALOR R$</td>
-                            <td>DUPLICATA</td>
-                            <td>VENCIMENTO</td>
-                            <td rowspan="2" id="receipt"><strong><span t-field="doc.ref"/></strong></td>
-                        </tr>
-                        <tr>
-                            <td><span t-field="doc.name"/></td>
-                            <td><span t-field="doc.amount_total"/></td>
-                            <td><span t-field="doc.ref"/></td>
-                            <td><span t-field="doc.invoice_date_due"/></td>
-                        </tr>
-                    </table>
+        <main>
+          <div class="page">
+            <table class="company">
+              <tr>
+                <td style="width:40%; vertical-align:top; padding:0; text-align:center;">
+                    <img t-attf-src="data:image/png;base64,{{doc.company_id.logo}}"
+                        t-att-alt="doc.company_id.name"
+                        style="max-width:300px; max-height:90px; display:inline-block;"/>
+                </td>
+                <td class="address">
+                  <strong t-field="doc.company_id.name"></strong><br/>
+                  <span t-field="doc.company_id.street_name"></span>, <span t-field="doc.company_id.street_number"></span> - <span t-field="doc.company_id.district"></span><br/>
+                  CEP: <span t-field="doc.company_id.zip"></span> - <span t-field="doc.company_id.city_id"></span> - <span t-field="doc.company_id.state_id.code"></span><br/>
+                  Fones: <span t-field="doc.company_id.phone"></span>
+                </td>
+                <td class="shipping">
+                  <strong>RECIBO Nº:</strong> <span t-field="doc.name"></span><br/>
+                  CNPJ: <span t-field="doc.company_id.cnpj_cpf"></span><br/>
+                  Insc. Municipal: <span t-field="doc.company_id.inscr_mun"></span><br/>
+                  Insc. Estadual: <span t-field="doc.company_id.inscr_est"></span><br/>
+                  Emissão: <span t-field="doc.invoice_date"></span>
+                </td>
+              </tr>
+            </table>
+            <table class="data_receipt">
+              <tr>
+                <td>Nº FATURA</td>
+                <td>VALOR R$</td>
+                <td>DUPLICATA</td>
+                <td>VENCIMENTO</td>
+                <td>RECIBO</td>
+              </tr>
+              <tr>
+                <td><span t-field="doc.name"></span></td>
+                <td><span t-field="doc.amount_total"></span></td>
+                <td><span t-field="doc.ref"></span></td>
+                <td><span t-field="doc.invoice_date_due"></span></td>
+                <td><span t-field="doc.ref"></span></td>
+              </tr>
+            </table>
+            <table class="client">
+              <tr><td colspan="3"><strong>Nome do Sacado:</strong> <span t-field="doc.partner_id.name"></span></td></tr>
+              <tr>
+                <td><strong>Endereço:</strong> <span t-field="doc.partner_id.street"></span></td>
+                <td><strong>Bairro:</strong> <span t-field="doc.partner_id.district"></span></td>
+                <td><strong>Município:</strong> <span t-field="doc.partner_id.city_id"></span></td>
+              </tr>
+              <tr>
+                <td><strong>CEP:</strong> <span t-field="doc.partner_id.zip"></span></td>
+                <td><strong>Estado:</strong> <span t-field="doc.partner_id.state_id"></span></td>
+                <td><strong>CNPJ/CPF:</strong> <span t-field="doc.partner_id.cnpj_cpf"></span></td>
+              </tr>
+            </table>
+            <table class="service">
+              <tr>
+                <th>UNIDADE</th>
+                <th>QTD</th>
+                <th>DISCRIMINAÇÃO DOS SERVIÇOS</th>
+                <th>UNITÁRIO</th>
+                <th>TOTAL</th>
+              </tr>
+              <t t-foreach="doc.invoice_line_ids" t-as="line">
+                <tr>
+                  <td><span t-field="line.uom_id.code"></span></td>
+                  <td><span t-field="line.quantity"></span></td>
+                  <td><span t-field="line.name"></span></td>
+                  <td><span t-field="line.price_unit"></span></td>
+                  <td><span t-field="line.price_subtotal"></span></td>
+                </tr>
+              </t>
+              <tr>
+                <td colspan="4">Valor Frete</td>
+                <td><span t-field="doc.amount_freight_value"></span></td>
+              </tr>
+              <tr>
+                <td colspan="4">VALOR TOTAL</td>
+                <td><span t-field="doc.amount_total"></span></td>
+              </tr>
+            </table>
+            <div class="message">
+              A importância desta fatura corresponde à prestação de serviços discriminados acima.
+              Pagamento deve ser feito a <span t-field="doc.company_id.name"></span>.
+            </div>
 
-                    <!-- <table class="extensive_value">
-                        <tr>
-                            <td>VALOR<br/>POR<br/>EXTENSO</td>
-                            <td><span t-field="doc.extensive_value"/></td>
-                        </tr>
-                    </table> -->
+            <div class="dashed"></div>
+            <table class="signature">
+              <tr>
+                <td style="width:50%">Recebi(emos) de <strong t-field="doc.company_id.name"></strong> os serviços acima.</td>
+                <td>RECIBO Nº: <span t-field="doc.ref"></span></td>
+              </tr>
+              <tr>
+                <td>Data do Recebimento: ________</td>
+                <td>Assinatura: _____________________</td>
+              </tr>
+            </table>
 
-                    <table class="client">
-                        <tr>
-                            <td>NOME DO SACADO: <span t-field="doc.partner_id.name"/></td>
-                        </tr>
-                        <tr>
-                            <td>ENDEREÇO : <span t-field="doc.partner_id.street"/></td>
-                            <td>BAIRRO : <span t-field="doc.partner_id.district"/></td>
-                        </tr>
-                        <tr>
-                            <td>MUNICÍPIO : <span t-field="doc.partner_id.city_id"/></td>
-                            <td>CEP : <span t-field="doc.partner_id.zip"/></td>
-                            <td>ESTADO : <span t-field="doc.partner_id.state_id"/></td>
-                        </tr>
-                        <tr>
-                            <td>CNPJ / CPF : <span t-field="doc.partner_id.cnpj_cpf"/></td>
-                            <td/>
-                            <td>I.E. : <span t-field="doc.partner_id.inscr_est"/></td>
-                        </tr>
-                    </table>
+            <div style="margin-top:10px; font-size:8px; color:#5c5c5c">
+              Powered By ATSTi Soluções - www.atsti.com.br
+            </div>
 
-                    <table class="service">
-                        <tr id="items_head">
-                            <td rowspan="2" style="width: 10%; vertical-align: middle;">UNIDADE</td>
-                            <td rowspan="2" style="width: 10%; vertical-align: middle;">QUANTIDADE</td> 
-                            <td rowspan="2" style="width: 50%; vertical-align: middle;">DISCRIMINAÇÃO DOS SERVIÇOS</td>
-                            <td colspan="2" style="width: 30%; vertical-align: middle;">PREÇO</td>
-                        </tr>
-                        <tr style="border-bottom: thin solid black; height: 10px">
-                            <td style="width: 15%; vertical-align: middle;">UNITÁRIO</td>
-                            <td style="width: 15%; vertical-align: middle;">TOTAL</td>
-                        </tr>
-                        <t t-foreach="doc.invoice_line_ids" t-as="line">
-                            <tr id="items">
-                                <td><span t-field="line.uom_id.code"/></td>
-                                <td><span t-field="line.quantity"/></td>
-                                <td><span t-field="line.name"/></td>
-                                <td><span t-field="line.price_unit"/></td>
-                                <td><span t-field="line.price_subtotal"/></td>
-                            </tr>
-                        </t>
-                         
-                        <tr style="border-bottom: thin solid black;">
-                            <td/>
-                            <td/>
-                            <td>
-                               
-                               <span t-field="doc.narration"/>
-                                <!--<span t-field="doc.narration"/>
-                                <br/><br/><br/><br/><br/>-->
-                                <!-- <span t-field="doc.fiscal_comment"/> -->
-                            </td>
-                            <td/>
-                            <td/>
-                        </tr>
-                        <tr id="total">
-                            <td colspan="4">Valor Frete</td>
-                            <td><span t-field="doc.amount_freight_value"/></td>
-                        </tr>
-                        <tr id="total">
-                            <td colspan="4">VALOR TOTAL</td>
-                            <td><span t-field="doc.amount_total"/></td>
-                        </tr>
-                    </table>
-                    
-                    <div class="message">
-                        <p>
-                            A importância desta fatura de locação corresponde a prestação de serviços conforme 
-                            discriminado acima. Emitimos para a cobertura da presente, a respectiva duplicata
-                            , cujo pagamento deverá ser feito a <span t-field="doc.company_id.name"/>, ou
-                            a sua ordem, na praça e no vencimento indicados.
-                        </p>
-                    </div>
-
-                    <div class="dashed"/>
-
-                    <table class="signature">
-                        <tr>
-                            <td colspan="2">
-                                <p>
-                                    Recebi(emos) de <strong t-field="doc.company_id.name"/> os serviços
-                                    constantes do recibo de locação e cobrança indicado ao lado.
-                                </p>
-                            </td>
-                            <td rowspan="2" id="receipt"><strong><span t-field="doc.ref"/></strong></td>
-                        </tr>
-                        <tr>
-                            <td style="width: 20%">
-                                <span>DATA DO RECEBIMENTO:</span>
-                                <br/><br/><br/>
-                            </td>
-                            <td>
-                                <span>IDENTIFICAÇÃO ASSINATURA DO RECEBEDOR:</span>
-                                <br/><br/><br/>
-                            </td>
-                        </tr>
-                    </table>
-                    <div style="margin-top: 35px; font-size: 8px; color: #5c5c5c">
-                        <span>Powered By ATSTi Soluções - www.atsti.com.br</span>
-                    </div>
-                </div>
-            </t>
-        </t>
+          </div>
+        </main>
+      </t>
     </t>
   </template>
 </odoo>

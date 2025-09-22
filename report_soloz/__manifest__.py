@@ -3,14 +3,14 @@
 
 {
     'name': 'Relatorio de Orçamento (soloz)',
-    'version': '1.0',
+    'version': '16.0',
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
     'summary': 'Relatorios de orçamento para a soloz',
     'description': """
     """,
-    'author': 'ATS Soluções',
+    'author': 'ATSTi Soluções',
     'website': '',
     'depends': ['account', 'sale_order_tag', 'mrp', 'report_cabecalho'],
     'data': [

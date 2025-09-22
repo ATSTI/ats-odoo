@@ -1,25 +1,38 @@
-# Copyright (C) 2025 - ATSTi
-# License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
+# -*- encoding: utf-8 -*-
+##############################################################################
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as published
+#    by the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+##############################################################################
 
 {
-    'name': 'Relatório ponto de venda - tipo venda',
+    'name': 'Relatorio ponto de venda - tipo venda',
     'version': '16.0',
     'category': 'Sales/Point of Sale',
-    'license': 'AGPL-3',
-    'sequence': 2,
-    'summary': 'Relatório POS se tipo de venda',
-    'description': """
-            Relatórios personalizados para MM Portas
-    """,
     'author': 'ATSTi Solucoes',
-    'maintainer': 'Carlos Silveira, Mauricio-ATS, ATSTi',
     'website': '',
+    'license': 'AGPL-3',
+    'contributors': [
+        'Carlos Silveira<carlos@atsti.com.br>',
+    ],
     'depends': [
         'point_of_sale',
     ],
     'data': [
         'views/pos_order_report_view.xml',
     ],
+    'demo': [],
     'installable': True,
-    'application': False,
 }
+

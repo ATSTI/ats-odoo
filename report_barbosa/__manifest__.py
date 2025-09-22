@@ -3,19 +3,19 @@
 
 {
     'name': 'Nota de Serviço',
-    'version': '1.0',
+    'version': '16.0',
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
     'summary': 'Impressão de Nota de Servico',
     'description': """
     """,
-    'author': 'ATS Soluções',
+    'author': 'ATSTi Soluções',
     'website': '',
     'depends': ['account'],
     'data': [
-        'report/account_move_barbosa_report_templates.xml',
         'report/account_move_barbosa_report.xml',
+        'report/report_saleorder_barbosa.xml',
     ],
     'installable': True,
     'application': False,

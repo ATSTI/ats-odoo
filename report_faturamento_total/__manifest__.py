@@ -3,14 +3,14 @@
 
 {
     'name': 'Relatorio de Faturamento Total',
-    'version': '1.0',
+    'version': '16.0',
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
     'summary': 'Modulo de Relatorio de Faturamento Total',
     'description': """
     """,
-    'author': 'ATS Soluções',
+    'author': 'ATSTi Soluções',
     'website': '',
     'depends': ['base', 'account', 'l10n_br_fiscal'],
     'data': [

@@ -124,19 +124,11 @@ class CashFlowReportXlsx(models.AbstractModel):
         show_partner_details = res_data["show_partner_details"]
         for date_ocor in Open_items.keys():
             if Open_items[date_ocor]:
-                # Open_items[account_id][0]['account_name'] 
-                # Write account title
                 self.write_array_title(
                     str(Open_items[date_ocor][0]['date_maturity']),
                     report_data,
                 )
 
-                # imprime o codigo da Conta no topo de cada data
-                # for balance in balance_list:
-                #     type_object = "balance"
-                #     self.write_array_title(
-                #         balance["account_id"], report_data
-                #     )
                 self.write_array_header(report_data)
             total_debit = 0.0
             total_credit = 0.0
@@ -160,7 +152,6 @@ class CashFlowReportXlsx(models.AbstractModel):
                             }
                         )
                         self.write_line_from_dict(line, report_data)
-                # balance -= total_amount[date_ocor]["residual"]
 
                 # Display ending balance line for account
                 type_object = "account"
@@ -187,10 +178,7 @@ class CashFlowReportXlsx(models.AbstractModel):
                     date_ocor=date_ocor,
                     balance_list=balance,
                 )
-                # 2 lines break
                 report_data["row_pos"] += 2
-
-                # imprime o saldo acumulado
 
 
     def write_ending_balance_from_dict(
@@ -249,12 +237,12 @@ class CashFlowReportXlsx(models.AbstractModel):
         return res
 
     def generate_xlsx_report(self, workbook, data, objects):
-        # Initialize report variables
+
         report_data = {
             "workbook": None,
-            "sheet": None,  # main sheet which will contains report
-            "columns": None,  # columns of the report
-            "row_pos": None,  # row_pos must be incremented at each writing lines
+            "sheet": None,
+            "columns": None,  
+            "row_pos": None,  
             "formats": None,
         }
         self._define_formats(workbook, report_data)

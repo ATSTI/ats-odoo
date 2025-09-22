@@ -2,7 +2,7 @@
 <odoo>
   <template id="report_commission_template">
     <t t-name="service_template">
-        <t t-call="web.html_container">            
+        <t t-call="web.external_layout">            
             <style>
                 *{
                     margin: 0;
@@ -137,7 +137,9 @@
                     text-align: left;
                 }
             </style>
+        <main>
             <div class="page">
+
                 <t t-set="o" t-value="docs" />
                 <div class="oe_structure"/>
                 <b style="font-size: 18px; text-align:center">Relatorio de comissão</b>
@@ -212,6 +214,7 @@
                         </tr>
                 </table>
             </div>
+        </main>
         </t>
     </t>
   </template>

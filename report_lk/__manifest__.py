@@ -3,19 +3,19 @@
 
 {
     'name': 'Relatorios LK-Flores',
-    'version': '1.0',
+    'version': '16.0',
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
     'summary': 'relatorios personalizados',
     'description': """
     """,
-    'author': 'ATS Soluções',
+    'author': 'ATSTi Soluções',
     'website': '',
     'depends': ['account'],
     'data': [
-        'report/report_delivery_document_lk.xml',
         'report/report_paper_format_lk.xml',
+        'report/report_delivery_document_lk.xml',
 
     ],
     'installable': True,

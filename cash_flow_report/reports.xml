@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <!-- PDF REPORTS : paperformat -->
+
     <record id="report_cash_qweb_paperformat" model="report.paperformat">
         <field name="name">Cash Flow report qweb paperformat</field>
         <field name="default" eval="True" />
@@ -17,9 +17,6 @@
         <field name="dpi">110</field>
     </record>
 
-    <!-- PDF/HMTL REPORTS -->
-    <!-- General Ledger -->
-    <!-- Open Items -->
     <record id="action_print_report_cash_flow_qweb" model="ir.actions.report">
         <field name="name">Cash Flow Report</field>
         <field name="model">cash_flow_report.report.wizard</field>
@@ -28,6 +25,7 @@
         <field name="report_file">cash_flow_report.cash_flow_report</field>
         <field name="paperformat_id" ref="report_cash_qweb_paperformat" />
     </record>
+    
     <record id="action_print_report_cash_flow_html" model="ir.actions.report">
         <field name="name">Cash Flow Report</field>
         <field name="model">cash_flow_report.report.wizard</field>
@@ -36,7 +34,6 @@
         <field name="report_file">cash_flow_report.cash_flow_report</field>
     </record>
 
-    <!-- XLSX REPORTS -->
     <record id="action_report_cash_flow_xlsx" model="ir.actions.report">
         <field name="name">Cash Flow Report XLSX</field>
         <field name="model">cash.flow.report.wizard</field>

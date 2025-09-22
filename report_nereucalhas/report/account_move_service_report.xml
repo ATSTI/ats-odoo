@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-        <report 
-            id="action_report_invoice_nereu"
-            string="Cotação"
-            model="sale.order" 
-            report_type="qweb-pdf"
-            file="report_nereucalhas.report_nereu_template" 
-            name="report_nereucalhas.report_nereu_template" 
-        />
-    </data>
+    <record id="action_report_invoice_nereu" model="ir.actions.report">
+        <field name="name">Cotação</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">report_nereucalhas.report_nereu_template</field>
+        <field name="report_file">report_mm.account_move_service_report_templates</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+    </record>
 </odoo>

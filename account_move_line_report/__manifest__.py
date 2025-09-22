@@ -3,14 +3,14 @@
 
 {
     'name': 'Relatorio Contas a Receber/Pagar',
-    'version': '1.0',
+    'version': '16.0',
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
     'summary': 'Contas a Pagar/Receber Relatorio',
     'description': """
     """,
-    'author': 'ATS Soluções',
+    'author': 'ATSTi Soluções',
     'website': '',
     'depends': ['account'],
     'data': [
@@ -22,4 +22,3 @@
     'installable': True,
     'application': False,
 }
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

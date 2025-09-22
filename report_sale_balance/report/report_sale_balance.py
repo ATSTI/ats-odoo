@@ -12,10 +12,8 @@ class BalanceReport(models.AbstractModel):
     def _get_report_values(self, docids, data=None):
         date_start = datetime.strptime(
             '%s 00:01:00' %(data['data']['date_start']), "%Y-%m-%d %H:%M:%S") + timedelta(hours=3)
-        # date_start = fields.Datetime.context_timestamp(self, document_date)
         date_end = datetime.strptime(
             '%s 23:59:00' %(data['data']['date_end']), "%Y-%m-%d %H:%M:%S") + timedelta(hours=3)
-        # date_end = fields.Datetime.context_timestamp(self, document_date)
         t_out = self.env['sale.order'].search([
             ("commitment_date", ">=", date_start),
             ("commitment_date", "<=", date_end)])

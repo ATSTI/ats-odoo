@@ -3,14 +3,14 @@
 
 {
     'name': 'Relatorios Vendas & Compras',
-    'version': '1.0',
+    'version': '16.0',
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
     'summary': 'relatorios comparativos entre vendas e compras',
     'description': """
     """,
-    'author': 'ATS Soluções',
+    'author': 'ATSTi Soluções',
     'website': '',
     'depends': ['sale'],
     'data': [

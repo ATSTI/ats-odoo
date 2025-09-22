@@ -2,19 +2,19 @@
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 {
     'name': 'Nota de Serviço',
-    'version': '1.0',
+    'version': '16.0',
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
     'summary': 'Impressão de Nota de Serviço',
     'description': """
     """,
-    'author': 'ATS Soluções',
+    'author': 'ATSTi Soluções',
     'website': '',
-    'depends': ['account'],
+    'depends': ['account','web'],
     'data': [
-        'report/account_move_service_report_templates.xml',
         'report/account_move_service_report.xml',
+        'report/account_move_service_report_templates.xml',
 
     ],
     'installable': True,

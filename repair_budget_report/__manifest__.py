@@ -3,16 +3,16 @@
 
 {
     'name': 'Cotação por Reparos',
-    'version': '1.0',
+    'version': '16.0',
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
     'summary': 'Impressão de Cotação',
     'description': """
     """,
-    'author': 'ATS Soluções',
+    'author': 'ATSTi Soluções',
     'website': '',
-    'depends': ['repair_date'],
+    'depends': ['repair_date','repair'],
     'data': [
         'report/repair_templates_repair_order.xml',
 

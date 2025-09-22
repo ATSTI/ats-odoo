@@ -215,14 +215,6 @@
                                 </td>
                             </tr>
                         </table>
-
-                        <!-- <table class="extensive_value">
-                        <tr>
-                            <td>VALOR<br/>POR<br/>EXTENSO</td>
-                            <td><span t-field="doc.extensive_value"/></td>
-                        </tr>
-                    </table> -->
-
                         <table class="client">
                             <tr>
                                 <td>CLIENTE: <span t-field="doc.partner_id.name"/>
@@ -286,11 +278,7 @@
                                 <td/>
                                 <td/>
                                 <td>
-
                                     <span t-field="doc.narration"/>
-                                    <!--<span t-field="doc.narration"/>
-                                <br/><br/><br/><br/><br/>-->
-                                    <!-- <span t-field="doc.fiscal_comment"/> -->
                                 </td>
                                 <td/>
                                 <td/>
@@ -304,28 +292,6 @@
                         </table>
 
                         <div class="dashed"/>
-
-                        <!-- <table class="signature">
-                        <tr>
-                            <td colspan="2">
-                                <p>
-                                    Recebi(emos) de <strong t-field="doc.company_id.name"/> os serviços
-                                    constantes do recibo de locação e cobrança indicado ao lado.
-                                </p>
-                            </td>
-                            <td rowspan="2" id="receipt"><strong><span t-field="doc.ref"/></strong></td>
-                        </tr>
-                        <tr>
-                            <td style="width: 20%">
-                                <span>DATA DO RECEBIMENTO:</span>
-                                <br/><br/><br/>
-                            </td>
-                            <td>
-                                <span>IDENTIFICAÇÃO ASSINATURA DO RECEBEDOR:</span>
-                                <br/><br/><br/>
-                            </td>
-                        </tr>
-                    </table>-->
                         <div style="margin-top: 35px; font-size: 8px; color: #5c5c5c">
                             <span>Powered By ATSTi Soluções - www.atsti.com.br</span>
                         </div>

@@ -50,7 +50,11 @@
 
             </style>
             <table class="cabecalho">
-                <th>Relatório Vendas x Compras - Período de <span t-esc="docs[0]['date_start']" /> a <span t-esc="docs[0]['date_end']" /> </th>
+                <th>
+                    Relatório Vendas x Compras - Período de
+                    <span t-esc="docs and docs[0].get('date_start', '') or ''"/> a 
+                    <span t-esc="docs and docs[0].get('date_end', '') or ''"/>
+                </th>
             </table>
             <table>
                 <tr>
@@ -67,7 +71,7 @@
                         <td class="qtde"><span t-esc="o['venda']" t-options='{"widget": "float", "precision": 1}'/></td>
                         <td class="preco">R$<span t-esc="o['preco']" t-options='{"widget": "float", "precision": 2}'/></td>
                         <td class="sld"><span t-esc="o['saldo']" t-options='{"widget": "float", "precision": 1}'/></td>
-                    </tr>
+                    </tr> <!--o web.external.layout nao funciona bem com dicionarios, isto ta quebrando o report!-->
                 </t>
             </table>
         </t>

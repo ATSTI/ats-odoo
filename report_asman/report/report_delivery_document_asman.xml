@@ -1,43 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="report_documento_asman">
-        <t t-call="web.html_container">
+        <t t-call="web.external_layout">
             <t t-set="docs" t-value="docs.with_context({'lang':docs.partner_id.lang})"/>
             <t t-foreach="docs" t-as="o">
-                <div class="page">
+            <main>
+                <div class="page" style ='padding-top: 10%;'>
                     <div class="oe_structure"/>
                     <br/>
-                    <table style="border: 0px solid; width:100%">
-                        <tr>
-                            <td style="border: 0px solid; width:25% ; height:35px">
-                                <div style="width: 100%;float: left;">
-                                    <img t-attf-src="data:image/*;base64,{{o.company_id.logo}}" t-att-alt="o.company_id.name" style="width:100%; height:80px"/>
-                                </div>
-                            </td>
-                            <td style="text-align: right; border: 0px solid; width:60%">
-                                <span style="font-size:12px" t-field="o.company_id.name"/>
-                                <br/>
-                                <span style="font-size:12px">CNPJ/CPF: </span>
-                                <span style="font-size:12px" t-field="o.company_id.cnpj_cpf"/>
-                                <br/>
-                                <span style="font-size:12px" t-field="o.company_id.street_name"/>
-                                <span style="font-size:12px"> , </span>
-                                <span style="font-size:12px" t-field="o.company_id.street_number"/>
-                                <span style="font-size:12px"> - </span>
-                                <span style="font-size:12px" t-field="o.company_id.district"/>
-                                <span style="font-size:12px"> , </span>
-                                <span style="font-size:12px" t-field="o.company_id.city_id"/>
-                                <span style="font-size:12px"> , CEP: </span>
-                                <span style="font-size:12px" t-field="o.company_id.zip"/>
-                                <span style="font-size:12px"> - </span>
-                                <span style="font-size:12px" t-field="o.company_id.state_id.code"/>
-                                <br/>
-                                <span style="font-size:12px" t-field="o.company_id.phone"/>
-                                <span style="font-size:12px"> | </span>
-                                <span style="font-size:12px" t-field="o.company_id.email"/>
-                            </td>
-                        </tr>
-                    </table>
                     <br/>
                     <br/>
                     <p style="font-size:25px ; margin:1px"> Pedido Nº <span t-field="o.name"/>
@@ -121,9 +91,6 @@
                             <td style="border: 1px solid black; width:15% ; height: 35px; text-align: right; font-size: 17px">
                                 <b>VLR UNIT</b>
                             </td>
-                            <!-- <td style="border: 1px solid black; width:15% ; height: 35px; text-align: right; font-size: 17px">
-                                        <b>Impostos</b>
-                                    </td>-->
                             <td style="border: 1px solid black; width:15% ; height: 35px; text-align: right; font-size: 17px">
                                 <b>VLR TOTAL</b>
                             </td>
@@ -139,9 +106,6 @@
                                 <td style="border: 1px solid black; height: 40px; text-align:right ; font-size: 15px">
                                     <span t-field="line.price_unit"/>
                                 </td>
-                                <!-- <td name="td_taxes" class="text-right" style="border: 1px solid black; height: 40px; text-align:right ; font-size: 15px">
-                                            <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.tax_id))"/>
-                                        </td> -->
                                 <td style="border: 1px solid black; height: 40px; text-align:right ; font-size: 15px">
                                     <span t-field="line.price_subtotal"/>
                                 </td>
@@ -149,24 +113,7 @@
                         </t>
                     </table>
                     <br/>
-                    <!--<table style="border: 1px solid black; border-collapse: collapse; height: 30px; width: 51%; float: right;">
-                                <tr>
-                                    <td style="border: 1px solid black ; height:35px ;  width: 60%; text-align: left; font-size: 17px">
-                                        <p>Total sem impostos</p>
-                                    </td>
-                                    <td style="border: 1px solid black ; height:35px; text-align: right; background-color: #e6e6e6; font-size: 17px">
-                                        <span t-field="o.amount_untaxed"/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="border: 1px solid black ; height:35px ;  width: 60%; text-align: left; font-size: 17px">
-                                        <p>Impostos</p>
-                                    </td>
-                                    <td style="border: 1px solid black ; height:35px; text-align: right; background-color: #e6e6e6; font-size: 17px">
-                                        <span t-field="o.amount_tax"/>
-                                    </td>
-                                </tr>
-                            </table>-->
+
                     <table style="border: 0px solid black; border-collapse: collapse; width: 45%; float: right; background-color: #646665 ; color: #FFFFFF">
                         <tr>
                             <td style="border: 0px solid black ;  height: 40px; width: 60%; text-align: left; font-size: 19px">
@@ -181,6 +128,7 @@
                     <BR/>
                     <span t-field="o.note"/>
                 </div>
+            </main>
             </t>
         </t>
     </template>

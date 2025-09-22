@@ -55,10 +55,8 @@
                         <p class="m-0" t-field="doc.user_id"/>
                     </div>
                 </div>
-                <!-- Is there a discount on at least one line? -->
                 <t t-set="display_discount" t-value="any(l.discount for l in doc.order_line)"/>
                 <table class="table table-sm o_main_table">
-                    <!-- In case we want to repeat the header, remove "display: table-row-group" -->
                     <thead style="display: table-row-group">
                         <tr>
                             <th name="th_image_1920" class="text-left">Imagem do Produto</th>
@@ -213,7 +211,6 @@
                 - A MAQSAFETY NÃO SE RESPONSABILIZA POR QUALQUER DANO OCORRIDO DURANTE O DESLOCAMENTO;<br></br>
                 - FRETE A COMBINAR;<br></br>
                 - A EMISSÃO DA NOTA FISCAL DE RETORNO DO EQUIPAMENTO É DE RESPONSABILIDADE DO CLIENTE.<br></br>
-                <!--<p t-field="doc.note"/>-->
                 <br></br>
                 <p t-if="doc.payment_term_id.note">
                     

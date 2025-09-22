@@ -66,23 +66,21 @@ class AccountMove(models.Model):
                 date_due = prc.data_vencimento
             if date_due:
                 self.update({'invoice_date_due': date_due})
+            sign = 1                
             for prc in self.parcela_ids:
                 valor_cre = 0
                 valor_deb = 0
                 if self.move_type == "in_invoice":
                     valor_cre = prc.valor
                 if self.move_type == "out_invoice":
-                    valor_deb = prc.valor
-                sign = 1
+                    valor_deb = prc.valor    
                 for line in self.line_ids:
                     if line.account_type in ('asset_receivable', 'liability_payable'):
                         sign = 1 if line.balance > 0.0 else -1
                         conta_lancamento = line.account_id
                         line.with_context(check_move_validity=False, dynamic_unlink=True).unlink()
-                        break
                 create_method = {
                         'name': prc.numero_fatura,
-                        'debit': valor_deb,
                         'debit': valor_deb if valor_deb else 0.0,
                         'credit': -valor_cre if valor_cre else 0.0,
                         'balance': valor_deb if valor_deb else -valor_cre,

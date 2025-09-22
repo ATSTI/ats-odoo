@@ -438,7 +438,7 @@
             </field>
         </record>
         <record id="action_br_odoo_nfe_trust" model="ir.actions.act_window">
-            <field name="name">NFe Trust</field>
+            <field name="name">NFe - Odoo-Brasil</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">br_odoo.nfe</field>
             <field name="view_mode">tree,form</field>

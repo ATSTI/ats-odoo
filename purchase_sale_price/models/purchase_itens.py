@@ -39,7 +39,7 @@ class PurchaseItens(models.Model):
         index=True,
         copy=False,
         default='new',
-        track_visibility='onchange')
+        tracking=True)
 
     def save_product_changes(self):
         for l in self.purchase_lines:

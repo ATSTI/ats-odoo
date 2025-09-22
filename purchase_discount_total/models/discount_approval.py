@@ -33,7 +33,7 @@ class purchase_discount(models.Model):
         ('purchase', 'Purchases Order'),
         ('done', 'Locked'),
         ('cancel', 'Cancelled'),
-        ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', default='draft')
+        ], string='Status', readonly=True, copy=False, index=True, tracking=True, default='draft')
 
 
     def action_confirm(self):

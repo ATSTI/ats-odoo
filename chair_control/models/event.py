@@ -71,7 +71,7 @@ class EventRegistration(models.Model):
         domain="[('participant_id', '=', False), \
         ('event_id','=',event_id)]")
     pos_order_id = fields.Many2one('pos.order', string='Pedido de Venda', ondelete='cascade', copy=False, domain="[('partner_id', '=', partner_id)]")
-    readonly = fields.Boolean(string="Somente leitura", default=True)
+    readonly_field = fields.Boolean(string="Somente leitura", default=True)
 
     @api.onchange('chair_id')
     def _onchange_chair_id(self):
@@ -82,11 +82,11 @@ class EventRegistration(models.Model):
     @api.onchange('pos_order_id')
     def _onchange_pos_order_id(self):
         if self.event_id and self.pos_order_id:
-            self.readonly = True
+            self.readonly_field = True
             for lines in self.pos_order_id.lines:
                 for ev in self.event_id.event_ticket_ids:
                     if lines.product_id.id == ev.product_id.id:
-                        self.readonly = False
+                        self.readonly_field = False
 
 
     @api.model

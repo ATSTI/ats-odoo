@@ -10,8 +10,8 @@ class SaleOrder(models.Model):
 
     @api.onchange('partner_id')
     def onchange_partner_id(self):
-        result = super().onchange_partner_id()
+        # result = super().onchange_partner_id()
         if self.partner_id:
             if self.partner_id.agente_int:
                 self.intermediador = self.partner_id.agente_int
-        return result
+        # return result

@@ -38,13 +38,13 @@
         <field name="model">event.registration</field>
         <field name="inherit_id" ref="event.view_event_registration_form"/>
         <field name="arch" type="xml">
-            <field name="partner_id" position="after">
-                <field name="chair_id" attrs="{'readonly': [('readonly', '=', True)]}"/>
-                <field name="chair" invisible="1"/>
-            </field>
             <field name="sale_order_id" position="replace">
-                <field name="readonly" invisible="1"/>
+                <field name="readonly_field" invisible="1"/>
                 <field name="sale_order_id" invisible="1"/>
+            </field>
+            <field name="partner_id" position="after">
+                <!-- <field name="chair_id" attrs="{'readonly': [('readonly_field', '=', True)]}"/> -->
+                <field name="chair" invisible="1"/>
             </field>
             <xpath expr="//group[@name='utm_link']" position="before">
                 <group string="Pedidos de Venda">

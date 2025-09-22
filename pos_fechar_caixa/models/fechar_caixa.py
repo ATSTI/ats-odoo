@@ -16,7 +16,7 @@ class FecharCaixa(models.Model):
     }
     data = fields.Date(string="Data lançamento", states=READONLY_STATES, default=fields.Date.today)
     cx = fields.Many2one(
-        "res.users", string="Caixa", index=True, states=READONLY_STATES, track_visibility='onchange'
+        "res.users", string="Caixa", index=True, states=READONLY_STATES, tracking=True
     )
     sessao = fields.Many2one(
         "pos.session", 
@@ -29,14 +29,14 @@ class FecharCaixa(models.Model):
     sangria = fields.Float("Valor total das sangrias", compute="_compute_valor_sangria", readonly=True, states=READONLY_STATES)
     num_sangria = fields.Integer("Nº da sangria", default=1, states=READONLY_STATES)
     response = fields.Many2one(
-        "res.users", string="Responsavel", index=True, states=READONLY_STATES, track_visibility='onchange'
+        "res.users", string="Responsavel", index=True, states=READONLY_STATES, tracking=True
     )
     valor_falta = fields.Float("Valor falta", states=READONLY_STATES)
     valor_sobra = fields.Float("Valor sobra", states=READONLY_STATES)
     udd = fields.Float("Uso dinheiro no dia", states=READONLY_STATES)
     motivo = fields.Char("Motivo", states=READONLY_STATES)
     analise = fields.Many2one(
-        "res.users", string="Analise", index=True, states=READONLY_STATES, track_visibility='onchange'
+        "res.users", string="Analise", index=True, states=READONLY_STATES, tracking=True
     )
     env_banco = fields.Float("Envio banco", states=READONLY_STATES)
     env_caixa = fields.Float("Envio caixa geral", states=READONLY_STATES)
@@ -50,7 +50,7 @@ class FecharCaixa(models.Model):
         ],
         string="Situação",
         default="draft",
-        track_visibility='onchange',
+        tracking=True,
         readonly=True
     )
     saldo_final = fields.Float("Saldo final", states=READONLY_STATES )

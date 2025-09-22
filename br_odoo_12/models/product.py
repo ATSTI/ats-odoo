@@ -6,7 +6,7 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     type_bkp = fields.Selection(
-        [('service', u'Serviço'), ('product', 'Produto')], 'Tipo Fiscal',
+        [('service', 'Serviço'), ('product', 'Produto')], 'Tipo Fiscal',
         )
     fiscal_type_bkp = fields.Selection(
         selection=[
@@ -26,4 +26,4 @@ class ProductTemplate(models.Model):
     )
     origin_bkp = fields.Selection(ORIGEM_PROD, 'Origem', default='0')
     ncm = fields.Char(string="NCM", size=14)
-    code_servico = fields.Char(u'Código Serviço', size=16)
+    code_servico = fields.Char('Código Serviço', size=16)

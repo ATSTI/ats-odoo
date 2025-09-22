@@ -25,13 +25,4 @@
             </form>
         </field>
     </record>
-    <!-- <record id="fiscal_position_tax_form" model="ir.ui.view">
-        <field name="name">fiscal.position.tax.form</field>
-        <field name="model">account.fiscal.position.tax</field>
-        <field name="arch" type="xml">
-            <form>
-                <field name="state_ids" invisible="1"/>
-            </form>
-        </field>
-    </record> -->
 </odoo>

@@ -1,10 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-import logging
-from datetime import datetime
 from odoo import fields, models, _
 
-_logger = logging.getLogger(__name__)
 
 STATE = {'edit': [('readonly', False)]}
 
@@ -14,81 +11,81 @@ class BrOdooNfe(models.Model):
     _order = 'id desc'
 
     code = fields.Char(
-        u'Código', size=100, required=True, readonly=True, states=STATE)
+        'Código', size=100, required=True, readonly=True, states=STATE)
     name = fields.Char(
-        u'Nome', size=100, required=True, readonly=True, states=STATE)
+        'Nome', size=100, required=True, readonly=True, states=STATE)
     company_id = fields.Many2one(
-        'res.company', u'Empresa', readonly=True, states=STATE)
+        'res.company', 'Empresa', readonly=True, states=STATE)
     state = fields.Selection(
-        [('draft', u'Provisório'),
+        [('draft', 'Provisório'),
          ('edit', 'Editar'),
          ('error', 'Erro'),
          ('done', 'Enviado'),
          ('cancel', 'Cancelado'),
          ('denied', 'Denegado')],
-        string=u'State', default='draft', readonly=True, states=STATE,
-        track_visibility='always')
+        string='State', default='draft', readonly=True, states=STATE,
+        tracking=True)
     schedule_user_id = fields.Many2one(
         'res.users', string="Agendado por", readonly=True,
-        track_visibility='always')
+        tracking=True)
     tipo_operacao = fields.Selection(
         [('entrada', 'Entrada'),
          ('saida', 'Saída')],
-        string=u'Tipo de Operação', readonly=True, states=STATE)
+        string='Tipo de Operação', readonly=True, states=STATE)
     model = fields.Selection(
-        [('55', u'55 - NFe'),
-         ('65', u'65 - NFCe'),
-         ('001', u'NFS-e - Nota Fiscal Paulistana'),
-         ('002', u'NFS-e - Provedor GINFES'),
-         ('008', u'NFS-e - Provedor SIMPLISS'),
-         ('009', u'NFS-e - Provedor SUSESU'),
-         ('010', u'NFS-e Imperial - Petrópolis'),
-         ('012', u'NFS-e - Florianópolis')],
-        string=u'Modelo', readonly=True, states=STATE)
-    serie = fields.Integer(string=u'Série',)
-    serie_documento = fields.Char(string=u'Série Documento', size=6)
+        [('55', '55 - NFe'),
+         ('65', '65 - NFCe'),
+         ('001', 'NFS-e - Nota Fiscal Paulistana'),
+         ('002', 'NFS-e - Provedor GINFES'),
+         ('008', 'NFS-e - Provedor SIMPLISS'),
+         ('009', 'NFS-e - Provedor SUSES'),
+         ('010', 'NFS-e Imperial - Petrópolis'),
+         ('012', 'NFS-e - Florianópolis')],
+        string='Modelo', readonly=True, states=STATE)
+    serie = fields.Integer(string='Série',)
+    serie_documento = fields.Char(string='Série Documento', size=6)
     numero = fields.Integer(
-        string=u'Número', readonly=True, states=STATE)
+        string='Número', readonly=True, states=STATE)
     numero_controle = fields.Integer(
-        string=u'Número de Controle', readonly=True, states=STATE)
+        string='Número de Controle', readonly=True, states=STATE)
     data_agendada = fields.Date(
-        string=u'Data agendada',
+        string='Data agendada',
         readonly=True,
         default=fields.Date.today,
         states=STATE)
     data_emissao = fields.Datetime(
-        string=u'Data emissão', readonly=True, states=STATE)
+        string='Data emissão', readonly=True, states=STATE)
     data_autorizacao = fields.Char(
-        string=u'Data de autorização', size=30, readonly=True, states=STATE)
+        string='Data de autorização', size=30, readonly=True, states=STATE)
     data_fatura = fields.Datetime(
-        string=u'Data Entrada/Saída', readonly=True, states=STATE)
+        string='Data Entrada/Saída', readonly=True, states=STATE)
     ambiente = fields.Selection(
-        [('homologacao', u'Homologação'),
-         ('producao', u'Produção')],
-        string=u'Ambiente', readonly=True, states=STATE)
+        [('homologacao', 'Homologação'),
+         ('producao', 'Produção')],
+        string='Ambiente', readonly=True, states=STATE)
     finalidade_emissao = fields.Selection(
-        [('1', u'1 - Normal'),
-         ('2', u'2 - Complementar'),
-         ('3', u'3 - Ajuste'),
-         ('4', u'4 - Devolução')],
-        string=u'Finalidade', help=u"Finalidade da emissão de NFe",
+        [('1', '1 - Normal'),
+         ('2', '2 - Complementar'),
+         ('3', '3 - Ajuste'),
+         ('4', '4 - Devolução')],
+        string='Finalidade', help=u"Finalidade da emissão de NFe",
         readonly=True, states=STATE)
     #invoice_id = fields.Many2one(
-    #    'account.move', string=u'Fatura', readonly=True, states=STATE)
+    #    'account.move', string='Fatura', readonly=True, states=STATE)
     invoice_id = fields.Integer(
-        string=u'Fatura', readonly=True)
+        string='Fatura', readonly=True)
     partner_id = fields.Many2one(
-        'res.partner', string=u'Parceiro', readonly=True, states=STATE)
+        'res.partner', string='Parceiro', readonly=True, states=STATE)
     commercial_partner_id = fields.Many2one(
         'res.partner', string='Commercial Entity',
         related='partner_id.commercial_partner_id', store=True)
     partner_shipping_id = fields.Many2one(
-        'res.partner', string=u'Entrega', readonly=True, states=STATE)
+        'res.partner', string='Entrega', readonly=True, states=STATE)
     payment_term_id = fields.Many2one(
         'account.payment.term', string='Condição pagamento',
         readonly=True, states=STATE)
     fiscal_position_id = fields.Many2one(
-        'account.fiscal.position', string=u'Posição Fiscal',
+        'account.fiscal.position', string='Posição Fiscal',
         readonly=True, states=STATE)
     eletronic_item_ids = fields.One2many(
         'br_odoo.nfe.item', 'invoice_eletronic_id', string=u"Linhas",
@@ -97,28 +94,28 @@ class BrOdooNfe(models.Model):
     #     'br_odoo.nfe.event', 'invoice_eletronic_id', string=u"Eventos",
     #     readonly=True, states=STATE)
     valor_bruto = fields.Monetary(
-        string=u'Total Produtos', readonly=True, states=STATE)
+        string='Total Produtos', readonly=True, states=STATE)
     valor_frete = fields.Monetary(
-        string=u'Total Frete', readonly=True, states=STATE)
+        string='Total Frete', readonly=True, states=STATE)
     valor_seguro = fields.Monetary(
-        string=u'Total Seguro', readonly=True, states=STATE)
+        string='Total Seguro', readonly=True, states=STATE)
     valor_desconto = fields.Monetary(
-        string=u'Total Desconto', readonly=True, states=STATE)
+        string='Total Desconto', readonly=True, states=STATE)
     valor_despesas = fields.Monetary(
-        string=u'Total Despesas', readonly=True, states=STATE)
+        string='Total Despesas', readonly=True, states=STATE)
     valor_bc_icms = fields.Monetary(
         string=u"Base de Cálculo ICMS", readonly=True, states=STATE)
     valor_icms = fields.Monetary(
         string=u"Total do ICMS", readonly=True, states=STATE)
     valor_icms_deson = fields.Monetary(
-        string=u'ICMS Desoneração', readonly=True, states=STATE)
+        string='ICMS Desoneração', readonly=True, states=STATE)
     valor_bc_icmsst = fields.Monetary(
-        string=u'Total Base ST', help=u"Total da base de cálculo do ICMS ST",
+        string='Total Base ST', help=u"Total da base de cálculo do ICMS ST",
         readonly=True, states=STATE)
     valor_icmsst = fields.Monetary(
-        string=u'Total ST', readonly=True, states=STATE)
+        string='Total ST', readonly=True, states=STATE)
     valor_ii = fields.Monetary(
-        string=u'Total II', readonly=True, states=STATE)
+        string='Total II', readonly=True, states=STATE)
     valor_ipi = fields.Monetary(
         string=u"Total IPI", readonly=True, states=STATE)
     valor_pis = fields.Monetary(
@@ -163,19 +160,19 @@ class BrOdooNfe(models.Model):
         'res.currency', related='company_id.currency_id',
         string="Company Currency")
     valor_final = fields.Monetary(
-        string=u'Valor Final', readonly=True, states=STATE)
+        string='Valor Final', readonly=True, states=STATE)
 
     informacoes_legais = fields.Text(
-        string=u'Informações legais', readonly=True, states=STATE)
+        string='Informações legais', readonly=True, states=STATE)
     informacoes_complementares = fields.Text(
-        string=u'Informações complementares', readonly=True, states=STATE)
+        string='Informações complementares', readonly=True, states=STATE)
 
     codigo_retorno = fields.Char(
-        string=u'Código Retorno', readonly=True, states=STATE,
-        track_visibility='onchange')
+        string='Código Retorno', readonly=True, states=STATE,
+        tracking=True)
     mensagem_retorno = fields.Char(
-        string=u'Mensagem Retorno', readonly=True, states=STATE,
-        track_visibility='onchange')
+        string='Mensagem Retorno', readonly=True, states=STATE,
+        tracking=True)
     numero_nfe = fields.Char(
         string=u"Numero Formatado NFe", readonly=True, states=STATE)
 
@@ -193,48 +190,48 @@ class BrOdooNfe(models.Model):
     #     readonly=True, states=STATE)
     iest = fields.Char(string="IE Subst. Tributário")
     ambiente_nfe = fields.Selection(
-        [('producao', u'Produção'), ('homologacao', u'Homologação')],
+        [('producao', 'Produção'), ('homologacao', 'Homologação')],
         string=u"Ambiente NFe",
         readonly=True)
     ind_final = fields.Selection([
-        ('0', u'Não'),
-        ('1', u'Sim')
-    ], u'Consumidor Final', readonly=True, states=STATE, required=False,
-        help=u'Indica operação com Consumidor final.', default='0')
+        ('0', 'Não'),
+        ('1', 'Sim')
+    ], 'Consumidor Final', readonly=True, states=STATE, required=False,
+        help='Indica operação com Consumidor final.', default='0')
     ind_pres = fields.Selection([
-        ('0', u'Não se aplica'),
-        ('1', u'Operação presencial'),
-        ('2', u'Operação não presencial, pela Internet'),
-        ('3', u'Operação não presencial, Teleatendimento'),
-        ('4', u'NFC-e em operação com entrega em domicílio'),
-        ('5', u'Operação presencial, fora do estabelecimento'),
-        ('9', u'Operação não presencial, outros'),
-    ], u'Indicador de Presença', readonly=True, states=STATE, required=False,
-        help=u'Indicador de presença do comprador no\n'
-             u'estabelecimento comercial no momento\n'
-             u'da operação.', default='0')
+        ('0', 'Não se aplica'),
+        ('1', 'Operação presencial'),
+        ('2', 'Operação não presencial, pela Internet'),
+        ('3', 'Operação não presencial, Teleatendimento'),
+        ('4', 'NFC-e em operação com entrega em domicílio'),
+        ('5', 'Operação presencial, fora do estabelecimento'),
+        ('9', 'Operação não presencial, outros'),
+    ], 'Indicador de Presença', readonly=True, states=STATE, required=False,
+        help='Indicador de presença do comprador no\n'
+             'estabelecimento comercial no momento\n'
+             'da operação.', default='0')
     ind_dest = fields.Selection([
-        ('1', u'1 - Operação Interna'),
-        ('2', u'2 - Operação Interestadual'),
-        ('3', u'3 - Operação com exterior')],
+        ('1', '1 - Operação Interna'),
+        ('2', '2 - Operação Interestadual'),
+        ('3', '3 - Operação com exterior')],
         string=u"Indicador Destinatário", readonly=True, states=STATE)
     ind_ie_dest = fields.Selection([
-        ('1', u'1 - Contribuinte ICMS'),
-        ('2', u'2 - Contribuinte Isento de Cadastro'),
-        ('9', u'9 - Não Contribuinte')],
+        ('1', '1 - Contribuinte ICMS'),
+        ('2', '2 - Contribuinte Isento de Cadastro'),
+        ('9', '9 - Não Contribuinte')],
         string=u"Indicador IE Dest.", help=u"Indicador da IE do desinatário",
         readonly=True, states=STATE)
     tipo_emissao = fields.Selection([
-        ('1', u'1 - Emissão normal'),
-        ('2', u'2 - Contingência FS-IA, com impressão do DANFE em formulário \
+        ('1', '1 - Emissão normal'),
+        ('2', '2 - Contingência FS-IA, com impressão do DANFE em formulário \
          de segurança'),
-        ('3', u'3 - Contingência SCAN'),
-        ('4', u'4 - Contingência DPEC'),
-        ('5', u'5 - Contingência FS-DA, com impressão do DANFE em \
+        ('3', '3 - Contingência SCAN'),
+        ('4', '4 - Contingência DPEC'),
+        ('5', '5 - Contingência FS-DA, com impressão do DANFE em \
          formulário de segurança'),
-        ('6', u'6 - Contingência SVC-AN'),
-        ('7', u'7 - Contingência SVC-RS'),
-        ('9', u'9 - Contingência off-line da NFC-e')],
+        ('6', '6 - Contingência SVC-AN'),
+        ('7', '7 - Contingência SVC-RS'),
+        ('9', '9 - Contingência off-line da NFC-e')],
         string=u"Tipo de Emissão", readonly=True, states=STATE, default='1')
 
     # Transporte
@@ -247,14 +244,14 @@ class BrOdooNfe(models.Model):
          ('3', '3 - Transporte Próprio por conta do Remetente'),
          ('4', '4 - Transporte Próprio por conta do Destinatário'),
          ('9', '9 - Sem Ocorrência de Transporte')],
-        string=u'Modalidade do frete', default="9",
+        string='Modalidade do frete', default="9",
         readonly=True, states=STATE)
     transportadora_id = fields.Many2one(
         'res.partner', string=u"Transportadora", readonly=True, states=STATE)
     placa_veiculo = fields.Char(
-        string=u'Placa do Veículo', size=7, readonly=True, states=STATE)
+        string='Placa do Veículo', size=7, readonly=True, states=STATE)
     uf_veiculo = fields.Char(
-        string=u'UF da Placa', size=2, readonly=True, states=STATE)
+        string='UF da Placa', size=2, readonly=True, states=STATE)
     rntc = fields.Char(
         string="RNTC", size=20, readonly=True, states=STATE,
         help=u"Registro Nacional de Transportador de Carga")
@@ -314,13 +311,13 @@ class BrOdooNfe(models.Model):
 
     valor_icms_uf_remet = fields.Monetary(
         string=u"ICMS Remetente", readonly=True, states=STATE,
-        help=u'Valor total do ICMS Interestadual para a UF do Remetente')
+        help='Valor total do ICMS Interestadual para a UF do Remetente')
     valor_icms_uf_dest = fields.Monetary(
         string=u"ICMS Destino", readonly=True, states=STATE,
-        help=u'Valor total do ICMS Interestadual para a UF de destino')
+        help='Valor total do ICMS Interestadual para a UF de destino')
     valor_icms_fcp_uf_dest = fields.Monetary(
         string=u"Total ICMS FCP", readonly=True, states=STATE,
-        help=u'Total total do ICMS relativo Fundo de Combate à Pobreza (FCP) \
+        help='Total total do ICMS relativo Fundo de Combate à Pobreza (FCP) \
         da UF de destino')
 
     # NFC-e
@@ -358,8 +355,8 @@ class BrOdooNfeEvent(models.Model):
     _description = "Eventos de nota fiscal eletrônica"
     _order = 'id desc'
 
-    code = fields.Char(string=u'Código', readonly=True, states=STATE)
-    name = fields.Char(string=u'Mensagem', readonly=True, states=STATE)
+    code = fields.Char(string='Código', readonly=True, states=STATE)
+    name = fields.Char(string='Mensagem', readonly=True, states=STATE)
     invoice_eletronic_id = fields.Many2one(
         'br_odoo.nfe', string=u"Fatura Eletrônica",
         readonly=True, states=STATE)

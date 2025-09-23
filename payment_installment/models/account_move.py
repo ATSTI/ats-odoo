@@ -18,8 +18,7 @@ class AccountMove(models.Model):
     payment_mode_install_id = fields.Many2one(
         'account.payment.mode', string=u"Modo de pagamento")
     
-    # TODO saindo o mesmo nome para todas as parcelas
-    def action_post(self):
+    def _post(self, soft=True):
         different = False
         for prc in self.parcela_ids:
             fin = self.due_line_ids.filtered(lambda l: l.date_maturity == prc.data_vencimento)
@@ -35,7 +34,7 @@ class AccountMove(models.Model):
                     break
         if different:
             raise UserError(_(f"Parcela não foi confirmada, favor confirmar na aba PARCELAS."))
-        res = super().action_post()
+        res = super()._post(soft=soft)
         if self.parcela_ids:
             for line in self.due_line_ids:
                 if line.move_id.document_type_id:

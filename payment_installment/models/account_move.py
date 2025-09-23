@@ -36,14 +36,15 @@ class AccountMove(models.Model):
         if different:
             raise UserError(_(f"Parcela não foi confirmada, favor confirmar na aba PARCELAS."))
         res = super().action_post()
-        # import pudb;pu.db
         for line in self.due_line_ids:
             if line.move_id.document_type_id:
                 nome_parcela = line.move_id.document_number
             else:
                 nome_parcela = line.move_id.name
-            if not nome_parcela in line.name:
+            if line.name and not nome_parcela in line.name:
                 line.name = f"{nome_parcela}-{line.name}"
+            else:
+                line.name = nome_parcela
         # TODO quando confirma a primeira vez esta excluindo as parcelas
         # rotina abaixo pra evitar isso, rever
         # if len(self.due_line_ids) < len(self.parcela_ids):

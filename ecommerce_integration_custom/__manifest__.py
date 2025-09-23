@@ -3,15 +3,20 @@
 
 {
     'name': "Complementos de integração com E-Commerce's",
-    'version': '1.0',
+    'version': '16.0.1.0',
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
-    'summary': 'Esse Modulo é um complementar para os modulos Shopee e Meli e suas respectivas Integrações. + Um relatório personalizado d elista de separação',
+    'summary': 'Módulo complementar do Meli_Odoo & Shopee_Odoo',
     'description': """
+        Esse Modulo é um complementar para os modulos Shopee e Meli e suas respectivas Integrações:
+          - Um relatório personalizado de lista de separação
+          - Funções de Unificação, útil para integração
+          - Rotina de atualização dos preços Online
+          - Importação de Pedido Único (Tela e função)
     """,
-    'author': 'ATSTi',
-    'maintainer': 'Mauricio Silveira, mauricio@atsti.com.br',
+    'author': 'ATSTi Soluções',
+    'maintainer': 'Mauricio Silveira, maurs320@gmail.com',
     'website': '',
     'depends': ['account', 'sale', 'shopee_odoo', 'meli_odoo', 'auditlog'],
     'data': [

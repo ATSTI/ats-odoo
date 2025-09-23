@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="fsm_order_form_custom_account" model="ir.ui.view">
-        <field name="name">fsm.order.form.isp.account</field>
+    <record id="fsm_order_isp_form_custom_account" model="ir.ui.view">
+        <field name="name">fsm.order.isp.form.account</field>
         <field name="model">fsm.order</field>
         <field name="inherit_id" ref="fieldservice_isp_account.fsm_order_form_isp_account"/>
         <field name="arch" type="xml">
@@ -11,6 +11,15 @@
             <xpath expr="//group[field[@name='employee_timesheet_ids']]" position="attributes">
                 <attribute name="string">Fatura de Cliente</attribute>
             </xpath>
+        </field>
+    </record>
+
+    <!-- NÃO SEI SE VAI SER NECESSARIO ISSO -->
+    <!-- <record id="fsm_order_project_form_custom_account" model="ir.ui.view">
+        <field name="name">fsm.order.project.form.account</field>
+        <field name="model">fsm.order</field>
+        <field name="inherit_id" ref="fieldservice_project.view_fsm_order_project_form"/>
+        <field name="arch" type="xml">
             <xpath expr="//group[field[@name='type']]" position="replace">
                 <group invisible="1" name="fsm_order_type">
                     <field
@@ -22,15 +31,10 @@
                         groups="fieldservice.group_fsm_template"
                     />
                     <field name="priority" widget="priority" />
-                    <!-- <field
-                        name="tag_ids"
-                        widget="many2many_tags"
-                        options="{'color_field': 'color', 'no_create_edit': True}"
-                    /> -->
                 </group>
             </xpath>
         </field>
-    </record>
+    </record> -->
 
     <record id="fsm_order_kanban_view_order_by_created" model="ir.ui.view">
         <field name="name">fsm.order.kanban.order.by.create_date</field>

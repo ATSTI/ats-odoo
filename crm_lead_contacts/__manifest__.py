@@ -1,18 +1,24 @@
-# Copyright (C) 2017-19 ForgeFlow S.L. (https://www.forgeflow.com).
-# License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).
+# Copyright (C) 2025 - ATSTi
+# License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 {
-    "name": "Lead Contact",
-    "version": "15.0.1.0.1",
-    "category": "Customer Relationship Management",
-    "license": "LGPL-3",
-    "summary": "Adds a lead line in the lead/opportunity model " "in odoo",
-    "author": "ForgeFlow, Odoo Community Association (OCA)",
-    "website": "https://github.com/OCA/crm",
-    "depends": ["crm", "product"],
-    "data": [
+    'name': 'CRM - Subcontatos do Parceiro',
+    'version': '16.0.1.0',
+    'category': 'CRM',
+    'license': 'AGPL-3',
+    'sequence': 2,
+    'summary': 'Adiciona os Subcontatos do Parceiro no Lead',
+    'description': """
+        Este Módulo adiciona o campo de Subcontatos no Lead, permitindo que o Cliente traga seus Subcontatos
+    """,
+    'author': 'ATSTi Soluções',
+    'website': '',
+    'depends': ["crm", "base"],
+    'data': [
         "views/crm_lead_views.xml",
     ],
-    "installable": True,
-    "auto_install": False,
+    'installable': True,
+    'application': False,
 }
+
+

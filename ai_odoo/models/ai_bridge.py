@@ -31,10 +31,9 @@ class AiBridge(models.Model):
                 {
                     "ai_bridge_id": self.id,
                     "model_id": self.sudo().env["ir.model"]._get_id(res_model),
-                    "res_id": res_id,
                 }
             )
-            result = execution._execute(user_content)
+            result = execution._execute(user_content, res_id)
             if result:
                 return result
             if execution.state == "done":
@@ -51,45 +50,49 @@ class AiBridge(models.Model):
                 }
             }
 
-    def _prepare_payload_record(self, record=None, **kwargs):
+    def _prepare_payload_record(self, user_content=None, record=None, **kwargs):
+        # import pudb;pu.db
         """Prepare the payload to be sent to the AI system."""
         self.ensure_one()
         if not self.model_id:
             return {}
-        if record is None and self.env.context.get("sample_payload"):
-            record = self.env[self.model_id.model].search([],)
-            if not record or not record.exists():
-                return {}
+
+        # Se não veio user_content, tenta montar pelo record
+        if not user_content:
+            if record is None and self.env.context.get("sample_payload"):
+                record = self.env[self.model_id.model].search([], limit=1)
+                user_content = ""
+                if not record or not record.exists():
+                    return {}
 
         if record and self.sudo().field_ids:
-            user_content =""
-            if self.sudo().field_ids:
-                field_names = self.sudo().field_ids.mapped('name')
-                read_vals = record.read(field_names)
-                if read_vals:
-                    vals = read_vals[0]
-                    #transforma em string legivel
-                    for key, value in vals.items():
-                        user_content += f"{key}: {value}\n"
+            campos = ""
+            field_names = self.sudo().field_ids.mapped("name")
+            for modelo in record.read(field_names):
+                vals = modelo
 
-            if not user_content.strip():
-                user_content='Sem dados disponiveis do registro'
-        else:
-            channel = self.env['mail.channel'].search([('name', 'ilike', 'OpenAi')], limit=1)
-            last_message = self.env['mail.message'].search([('res_id', '=', channel.id),('author_id','!=','OdooBot')], order='id desc', limit=1) if channel else None
-            user_content = (last_message.body.replace("\n", " ") if last_message else "Sem instrução disponível.")
+                if vals:
+                    for key, value in vals.items():
+                        if isinstance(value, tuple):  # Many2one
+                            value = value[1]
+                        elif isinstance(value, bool):
+                            value = "Sim" if value else "Não"
+                        elif isinstance(value, list):
+                            value = ", ".join(str(v) for v in value)
+                        campos += f"{key}: {value}\n"
+
+            if not campos.strip():
+                campos = "Sem dados disponíveis do registro"
 
         payload = {
             "model": "gpt-4o-mini",
             "messages": [
                 {"role": "system", "content": "Você é um assistente para leads de CRM."},
-                {"role": "user", "content": user_content}
-            ]
+                {"role": "user", "content": user_content + "Dados do respectivo lead: " + campos or "Sem conteúdo"},
+            ],
         }
 
-        # self.chatOpenAi() 
         return payload
-        #falta fazer executar a ponte apos enviar a mensagem no canal
     
     def chatOpenAi(self):
         # import pudb;pudb.set_trace()
@@ -107,12 +110,12 @@ class AiBridgeExecution(models.Model):
     _inherit = "ai.bridge.execution"
 
 
-    def _execute(self, user_content,**kwargs):
+    def _execute(self, user_content, res_id,**kwargs):
         self.ensure_one()
         record = None
-        if self.res_id and self.model_id:
-            record = self.env[self.sudo().model_id.model].browse(self.res_id)
-        payload = self.ai_bridge_id._prepare_payload_record(user_content)
+        if res_id and self.model_id:
+            record = self.env[self.sudo().model_id.model].browse(res_id)
+        payload = self.ai_bridge_id._prepare_payload_record(user_content, record=record, **kwargs)
         try:
             response = requests.post(
                 self.ai_bridge_id.url,
@@ -138,7 +141,6 @@ class AiBridgeExecution(models.Model):
 
 
     def _process_response_message(self, response): #feito e funcionando
-        import pudb;pudb.set_trace()
         try:
             content = response.get("choices", [])[0].get("message", {}).get("content", "⚠️ Resposta vazia")
             channel = self.env['mail.channel'].search([('name', 'ilike', 'OpenAi')], limit=1)
@@ -146,8 +148,8 @@ class AiBridgeExecution(models.Model):
                 return {"error": "Canal 'OpenAi' não encontrado."}
 
 
-            odoo_bot_user = self.env['res.users'].search([('login', 'ilike', 'OdooBot')], limit=1)
-            author_id = odoo_bot_user.partner_id.id if odoo_bot_user else self.env.user.partner_id.id
+            odoobot = self.env['res.partner'].search([('name','ilike','odoobot'), ('active', '=', False)], limit=1)
+            author_id = odoobot.id if odoobot else self.env.user.partner_id.id
 
             msg_id = channel.message_post(
             body=content.replace("\n", "<br>"),  # evita quebras de linha no chat

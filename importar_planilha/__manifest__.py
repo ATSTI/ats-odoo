@@ -17,7 +17,7 @@
         - Relatórios de importação com detalhes de sucesso e falhas
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Mauricio Silveira, ATSTi',
+    'maintainer': 'Carlos R. Silveira, Mauricio Silveira, ATSTi',
     'website': '',
     'depends': ['partner_manual_rank',],
     'data': [

@@ -1,17 +1,27 @@
+# Copyright (C) 2025 - ATSTi
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 {
-    "name": "Brazilian Localization Sale Parent Id",
-    "summary": "Quando o pedido de venda e emitido para uma contato a fatura deve sair no nome da Empresa",
-    "category": "Localisation",
-    "license": "AGPL-3",
-    "author": "ATSTi,Odoo Community Association (OCA)",
-    "website": "",
-    "version": "16.0",
-    "depends": ["l10n_br_sale", "l10n_br_account"],
-    "data": [
+    'name': 'Sale Order - Faturamento com Cliente Pai',
+    'version': '16.0.1.0',
+    'category': 'Sales',
+    'license': 'AGPL-3',
+    'sequence': 7,
+    'summary': 'Ao gerar fatura, usa o cliente pai como destinatário e mantém referência ao filho',
+    'description': """
+        Este módulo ajusta o comportamento da geração de faturas a partir de pedidos de venda:
+        
+        - O dicionário fiscal é atualizado automaticamente através de `_prepare_br_fiscal_dict()`;
+        - Caso o cliente possua um cliente pai configurado, a fatura é emitida para o pai (`partner_id`);
+        - A referência (`ref`) da fatura é preenchida com o nome do cliente filho.
+    """,
+    'author': 'ATSTi Soluções',
+    'maintainer': 'Carlos R. Silveira, Mauricio Silveira, ATSTi',
+    'website': '',
+    'depends': ['sale_management', 'l10n_br_fiscal',],
+    'data': [
+        # Nenhum XML necessário neste módulo
     ],
-    "demo": [
-    ],
-    "installable": True,
+    'installable': True,
+    'application': False,
 }

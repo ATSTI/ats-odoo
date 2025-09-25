@@ -21,5 +21,5 @@ class FiscalDocumentLineMixinMethods(models.AbstractModel):
                         self.fiscal_type = p.value_text
                     if p.name == "icms_origin" and not self.product_id.icms_origin:
                         self.icms_origin = p.value_text
-                self._get_product_price()
+                # self._get_product_price()
                 self._onchange_fiscal_operation_id()

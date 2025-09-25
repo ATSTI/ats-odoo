@@ -7,7 +7,7 @@
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
-    'summary': 'Simplifica o cadastro de clientes',
+    'summary': 'Simplifica o cadastro de clientes versão Fiscal',
     'description': """
         Alterações na tela de cadastro de clientes para simplificar o uso.
     """,

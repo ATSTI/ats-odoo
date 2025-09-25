@@ -1,24 +1,25 @@
-# License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
+# Copyright (C) 2025 - ATSTi
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    "name": "NF-e Mensagens",
-    "summary": """
-        Adiciona mensagem de validação campos obrigatorios do cliente
-        na fatura, e deixa algumas msg de validação da nfe mais fáceis,
-        e exibe na fatura as mensagens de validaçao.
+    'name': 'NFe Error Message',
+    'version': '16.0.1.0',
+    'category': 'Localisation',
+    'license': 'AGPL-3',
+    'sequence': 5,
+    'summary': 'Quando com erro, Mostra a mensagem antes de enviar a nota',
+    'description': """
+        Este módulo mostra ao usuario possiveis erros que a nota pode ter,
+        mesmo antes de enviá-la.
+        -Mostrando mensagens especificando o erro.
     """,
-    "category": "Localisation",
-    "license": "AGPL-3",
-    "author": "ATSTi,Odoo Community Association (OCA)",
-    "website": "",
-    "version": "16.0",
-    "depends": ["l10n_br_account", "l10n_br_nfe"],
-    "data": [
+    'author': 'ATSTi Soluções',
+    'maintainer': 'Carlos R. Silveira, Mauricio Silveira, ATSTi',
+    'website': '',
+    'depends': ["l10n_br_account", "l10n_br_nfe"],
+    'data': [
         "views/account_invoice_view.xml",
     ],
-    "demo": [
-    ],
-    "installable": True,
-    "auto_install": False,
-    "maintainers": ["carlos"],
+    'installable': True,
+    'application': False,
 }

@@ -1,19 +1,23 @@
+# Copyright (C) 2025 - ATSTi
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 {
-    "name": "Brazilian Localization Accounts Patch",
-    "category": "Localisation",
-    "license": "AGPL-3",
-    "author": "ATSTi,Odoo Community Association (OCA)",
-    "website": "",
-    "version": "16.0",
-    "depends": ["l10n_br_account", "l10n_br_nfe"],
-    "data": [
+    'name': 'Documemnt - Sem Data de Saída',
+    'version': '16.0.1.0',
+    'category': 'localisation',
+    'license': 'AGPL-3',
+    'sequence': 7,
+    'summary': 'Permite deixar a data de saída vazia',
+    'description': """
+        Este módulo permite que a date de saida esteja vazia, alguns clientes precisam disso
+    """,
+    'author': 'ATSTi Soluções',
+    'maintainer': 'Carlos R. Silveira, Mauricio Silveira, ATSTi',
+    'website': '',
+    'depends': ["l10n_br_account", "l10n_br_nfe",],
+    'data': [
         "views/document_view.xml"
     ],
-    "demo": [
-    ],
-    "installable": True,
-    "auto_install": False,
-    "maintainers": ["carlos"],
+    'installable': True,
+    'application': False,
 }

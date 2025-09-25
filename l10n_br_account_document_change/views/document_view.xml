@@ -81,9 +81,9 @@
         <xpath expr="//field[@name='document_related_ids']" position="replace">
           <field name="document_related_ids" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
         </xpath>
-        <xpath expr="//field[@name='document_subsequent_ids']" position="replace">
+        <!-- <xpath expr="//field[@name='document_subsequent_ids']" position="replace">
           <field name="document_subsequent_ids" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
-        </xpath>
+        </xpath> -->
         <xpath expr="//field[@name='force_compute_delivery_costs_by_total']" position="replace">
           <field name="force_compute_delivery_costs_by_total" attrs="{'readonly': [('state_edoc', '!=', 'em_digitacao')]}" />
         </xpath>

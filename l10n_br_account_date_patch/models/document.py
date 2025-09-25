@@ -9,7 +9,7 @@ class FiscalDocument(models.Model):
     date_in_out_option = fields.Datetime(
         string="Data entrada/saída(manual)", copy=False
     )
-    # alguns clientes precisam deixar a data de saida em aberto
+    
     @api.depends("move_ids", "move_ids.date", "date_in_out_option")
     def _compute_date_in_out(self):
         if self.date_in_out_option:

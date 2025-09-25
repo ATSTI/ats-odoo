@@ -1,24 +1,24 @@
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+# Copyright (C) 2025 - ATSTi
+# License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 {
-    "name": "NFe Dados adicionais",
-    "summary": "Dados adicionas adicionado na fatura",
-    "category": "Localisation",
-    "license": "AGPL-3",
-    "author": "ATSTi",
-    "website": "https://github.com/OCA/l10n-brazil",
-    "version": "14.0.1.0.2",
-    "development_status": "Beta",
-    "depends": [
-        "l10n_br_nfe",
-        "l10n_br_account",
-        "l10n_br_delivery_nfe",
-    ],
-    "data": [
+    'name': 'NFe Dados Adicionais - Account Move',
+    'version': '16.0.1.0',
+    'category': 'localisation',
+    'license': 'AGPL-3',
+    'sequence': 7,
+    'summary': 'Trás informações da NFe para a tela da Account Move',
+    'description': """
+        Este módulo trás informações da NFe para a tela da fatura, além de simplificar a tela da nfe
+    """,
+    'author': 'ATSTi Soluções',
+    'maintainer': 'Carlos R. Silveira, Mauricio Silveira, ATSTi',
+    'website': '',
+    'depends': ["l10n_br_account", "l10n_br_fiscal",],
+    'data': [
+        "views/document_view.xml",
         "views/account_invoice_view.xml",
     ],
-    "demo": [
-    ],
-    "installable": True,
-    "auto_install": False,
+    'installable': True,
+    'application': False,
 }

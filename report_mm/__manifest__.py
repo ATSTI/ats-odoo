@@ -21,6 +21,8 @@
         'report/report_contrato_mmportas.xml',
         'report/report_orcamento_mmportas.xml',
         'report/report_ambos_mmportas.xml',
+        'report/report_contrato_stand_mmportas.xml',
+        'report/report_contrato_orcamento_stand_mmportas.xml',
         'report/report_actions.xml',
     ],
     'installable': True,

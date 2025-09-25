@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="action2_report_contrato_mmportas" model="ir.actions.report">
-        <field name="name">Contrato</field>
+        <field name="name">Contrato Concren</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">report_mm.report_contrato_mmportas</field>
@@ -9,11 +9,29 @@
         <field name="binding_model_id" ref="sale.model_sale_order"/>
     </record>
     <record id="action2_report_ambos" model="ir.actions.report">
-        <field name="name">Contrato + Orçamento</field>
+        <field name="name">Contrato Concren + Orçamento</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">report_mm.report_ambos_mmportas</field>
         <field name="report_file">report_mm.report_ambos_mmportas</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+    </record>
+
+    <record id="action2_report_contrato_stand_mmportas" model="ir.actions.report">
+        <field name="name">Contrato Stand</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">report_mm.report_contrato_stand_mmportas</field>
+        <field name="report_file">report_mm.report_contrato_stand_mmportas</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+    </record>
+
+     <record id="action2_report_contrato_orcamento_stand_mmportas" model="ir.actions.report">
+        <field name="name">Contrato Stand + Orçamento</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">report_mm.report_contrato_orcamento_stand_mmportas</field>
+        <field name="report_file">report_mm.report_contrato_orcamento_stand_mmportas</field>
         <field name="binding_model_id" ref="sale.model_sale_order"/>
     </record>
 </odoo>

@@ -14,8 +14,6 @@ from odoo import _, api, fields, models, tools
 class AiBridge(models.Model):
     _inherit = "ai.bridge"
 
-    #funcao _prepare_payload
-
     def execute_ai_bridge(self, res_model, res_id, user_content):
         self.ensure_one()
         if not self.active or (
@@ -62,11 +60,11 @@ class AiBridge(models.Model):
             if record is None and self.env.context.get("sample_payload"):
                 record = self.env[self.model_id.model].search([], limit=1)
                 user_content = ""
+                campos = ""
                 if not record or not record.exists():
                     return {}
-
+        campos = ""
         if record and self.sudo().field_ids:
-            campos = ""
             field_names = self.sudo().field_ids.mapped("name")
             for modelo in record.read(field_names):
                 vals = modelo
@@ -83,26 +81,20 @@ class AiBridge(models.Model):
 
             if not campos.strip():
                 campos = "Sem dados disponíveis do registro"
-
+        funcao = self.description if self.description else "Você é um assistente de um ERP"
+        if campos:
+            info = f"Dados da respectiva classe: {campos}"
+        else:
+            info = ""
         payload = {
             "model": "gpt-4o-mini",
             "messages": [
-                {"role": "system", "content": "Você é um assistente para leads de CRM."},
-                {"role": "user", "content": user_content + "Dados do respectivo lead: " + campos or "Sem conteúdo"},
+                {"role": "system", "content": funcao},
+                {"role": "user", "content": user_content + info or "Sem conteúdo"},
             ],
         }
 
         return payload
-    
-    def chatOpenAi(self):
-        # import pudb;pudb.set_trace()
-        openai = self.env['ai.bridge'].search([('name','ilike','openai')], limit = 1)
-        for chat in openai:
-            chat.execute_ai_bridge(res_model = 'crm.lead', res_id = 651)
-
-
-
-
     
    
 class AiBridgeExecution(models.Model):
@@ -152,23 +144,13 @@ class AiBridgeExecution(models.Model):
             author_id = odoobot.id if odoobot else self.env.user.partner_id.id
 
             msg_id = channel.message_post(
-            body=content.replace("\n", "<br>"),  # evita quebras de linha no chat
-            message_type='comment',
-            subtype_xmlid='mail.mt_comment',
-            author_id=author_id  # pode usar OdooBot se quiser
-        ).id
+                body=content.replace("\n", "<br>"),  # evita quebras de linha no chat
+                message_type='comment',
+                subtype_xmlid='mail.mt_comment',
+                author_id=author_id  # pode usar OdooBot se quiser
+            ).id
 
             return {"id": msg_id}
 
         except Exception as e:
             return {"error": str(e), "raw_response": response}
-
-
-       
-#funcao _response_message
-
-
-
-
-class AiBridgeThread(models.AbstractModel):
-    _inherit = "ai.bridge.thread"

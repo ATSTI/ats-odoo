@@ -18,11 +18,10 @@
     'author': 'ATSTi Soluções',
     'maintainer': 'Carlos R. Silveira, Mauricio Silveira, ATSTi',
     'website': '',
-    'depends': [
-        'l10n_br_fiscal',
-    ],
+    'depends': ['l10n_br_fiscal', 'l10n_br_account'],
     'data': [
-        'views/fiscal_patch_document_view.xml',
+        'views/account_invoice_view.xml',
+        'views/document_view.xml',
     ],
     'installable': True,
     'application': False,

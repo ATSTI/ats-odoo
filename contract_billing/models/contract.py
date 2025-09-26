@@ -185,17 +185,13 @@ class ContractContract(models.Model):
                             invoice.action_pdf_boleto()
 
     def _recurring_create_invoice(self, date_ref=False):
-        invoices = super()._recurring_create_invoice(date_ref)
-        # contract_billing
-        for invoice in invoices:
-            if invoice.amount_total > 0.01:
+        moves = super()._recurring_create_invoice(date_ref)
+        for move in moves:
+            if move.fiscal_document_id:
+                move.fiscal_document_id._onchange_document_serie_id()
+                move.fiscal_document_id._onchange_company_id()
+                move._onchange_invoice_line_ids()
+            if move.amount_total > 0.01:
                 #print(f"Contrato: {invoice.ref} - {invoice.partner_id.name}")
-                invoice.action_post()
-
-                # # TODO - o boleto nao pode ser aqui pois um erro em algum contrato e perde se o boleto ja feito
-                # if invoice.payment_mode_id.payment_mode_domain == "boleto":
-                #     if invoice.payment_mode_id.fixed_journal_id:
-                #         if invoice.payment_mode_id.fixed_journal_id.bank_id.code_bc == "077":
-                #             invoice.action_pdf_boleto()
-
-        return invoices
+                move.action_post()
+        return moves

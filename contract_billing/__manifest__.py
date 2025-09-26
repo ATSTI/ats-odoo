@@ -1,18 +1,16 @@
-# -*- coding: utf-8 -*-
-# © 2004-2010 OpenERP SA
 # © 2016 Carlos Silveira <crsilveira@gmail.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
     'name': 'Faturamento Contrato',
-    'version': '11.0.0.0.0',
+    'version': '14.0.0.1.0',
     'category': 'Contract Management',
     'license': 'AGPL-3',
     'author': "Carlos,"
-              "ATS,"
+              "ATSTi Soluções,"
               "",
     'website': '',
-    'depends': ['contract','contract_invoice', 'account'],
+    'depends': ['l10n_br_contract'],
     'data': [
         #'views/contract_view.xml',
         'views/email_erro_fatura.xml',

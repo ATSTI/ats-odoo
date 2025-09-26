@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
 from datetime import date, timedelta
-import base64
+from odoo.osv import expression
 #from sshtunnel import SSHTunnelForwarder
 # import odoorpc
 
@@ -185,13 +185,59 @@ class ContractContract(models.Model):
                             invoice.action_pdf_boleto()
 
     def _recurring_create_invoice(self, date_ref=False):
-        moves = super()._recurring_create_invoice(date_ref)
+        # substitui tudo pra nao passar pelo l10n_br_contract
+        # pois, temos contrato sem operacao
+        invoices_values = self._prepare_recurring_invoices_values(date_ref)
+        moves = self.env["account.move"].create(invoices_values)
+        self._add_contract_origin(moves)
+        self._invoice_followers(moves)
+        self._compute_recurring_next_date()
         for move in moves:
             if move.fiscal_document_id:
                 move.fiscal_document_id._onchange_document_serie_id()
                 move.fiscal_document_id._onchange_company_id()
                 move._onchange_invoice_line_ids()
             if move.amount_total > 0.01:
-                #print(f"Contrato: {invoice.ref} - {invoice.partner_id.name}")
                 move.action_post()
         return moves
+    
+    @api.model
+    def _cron_recurring_create(self, date_ref=False, create_type="invoice"):
+        """
+        Faturo 30 contratos por vez
+        """
+        _recurring_create_func = self._get_recurring_create_func(
+            create_type=create_type
+        )
+        if not date_ref:
+            date_ref = fields.Date.context_today(self)
+        domain = self._get_contracts_to_invoice_domain(date_ref)
+        domain = expression.AND(
+            [
+                domain,
+                [("generation_type", "=", create_type)],
+            ]
+        )
+        contracts = self.search(domain)
+        companies = set(contracts.mapped("company_id"))
+        # contract_invoice
+        # Invoice by companies, so assignation emails get correct context
+        for company in companies:
+            contracts_to_invoice = contracts.filtered(
+                lambda c: c.company_id == company
+                and (not c.date_end or c.recurring_next_date <= c.date_end)
+            ).with_company(company)
+            for ctr in contracts_to_invoice[:30]:
+                if ctr.fiscal_operation_id:
+                    for line in ctr.contract_line_ids:
+                        if not line.fiscal_operation_line_id:
+                            msg = f"Contrato {ctr.code}:{ctr.name} com linha {line.name} sem Operação Fiscal."
+                            canal = self.env['mail.channel'].search([('name', '=', 'geral')], limit=1)
+                            canal.message_post(
+                                body=(msg),
+                                message_type='comment',
+                                subtype_xmlid='mail.mt_comment',
+                            )
+                            continue
+                _recurring_create_func(ctr, date_ref)
+        return True

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="view_crm_lead_soloz_form" model="ir.ui.view">
+        <field name="name">crm.lead.form.soloz</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <group name="opportunity_partner" position="inside">
+                <field name="partner_city" />
+                <field name="partner_uf" /> 
+            </group>
+        </field>
+    </record>
+
+    <record id="view_crm_lead_soloz_tree" model="ir.ui.view">
+        <field name="name">crm.lead.tree.soloz</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_tree_view_oppor"/>
+        <field name="arch" type="xml">
+            <field name="phone" position="after">
+                <field name="partner_city" />
+                <field name="partner_uf" /> 
+            </field>
+        </field>
+    </record>
+
+</odoo>

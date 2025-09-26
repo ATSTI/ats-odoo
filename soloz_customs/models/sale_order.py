@@ -24,6 +24,18 @@ class SaleOrder(models.Model):
         readonly=True,
         invisible=True)
 
+    partner_city = fields.Char(
+        string='Cidade do Parceiro',
+        readonly=True,
+        compute="_compute_city_uf_partner"
+    )
+
+    partner_uf = fields.Char(
+        string='Estado do Parceiro',
+        readonly=True,
+        compute="_compute_city_uf_partner"
+    )
+
     @api.depends('partner_id')
     def _compute_contact_partner(self):
         for order in self:
@@ -33,6 +45,13 @@ class SaleOrder(models.Model):
                 order.contact_partner = contacts
             else:
                 order.contact_partner = [(5, 0, 0)]
+
+    @api.depends('partner_id')
+    def _compute_city_uf_partner(self):
+        for order in self:
+            if order.partner_id:
+                order.partner_city = order.partner_id.city_id.name
+                order.partner_uf = order.partner_id.state_id.code
 
     @api.depends('contact_partner')
     def _compute_contact_partner_names(self):

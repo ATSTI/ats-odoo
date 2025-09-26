@@ -17,6 +17,8 @@
         <field name="inherit_id" ref="sale.view_order_tree"/>
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
+                <field name="partner_city" />
+                <field name="partner_uf" /> 
                 <field name="contact_partner_names" optional="show"/>
             </field>
         </field>
@@ -27,6 +29,8 @@
         <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
+                <field name="partner_city" />
+                <field name="partner_uf" /> 
                 <field name="contact_partner_names" />
             </field>
         </field>

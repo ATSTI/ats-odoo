@@ -28,10 +28,11 @@
         'Mauricio Silveira<maurs320@gmail.com>',
     ],
     'depends': [
-        'base', 'sale'
+        'base', 'sale', 'crm'
     ],
     'data': [
         'views/sale_order_view.xml',
+        'views/crm_lead_view.xml',
     ],
     'demo': [],
     'installable': True,

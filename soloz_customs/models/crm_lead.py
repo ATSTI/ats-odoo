@@ -25,5 +25,8 @@ class CrmLead(models.Model):
     def _compute_city_uf_partner(self):
         for order in self:
             if order.partner_id:
-                order.partner_city = order.partner_id.city_id.name
-                order.partner_uf = order.partner_id.state_id.code
+                if order.partner_id.city_id:
+                    order.partner_city = order.partner_id.city_id.name
+                if order.partner_id.state_id:
+                    order.partner_uf = order.partner_id.state_id.code
+

@@ -12,21 +12,24 @@ class CrmLead(models.Model):
     partner_city = fields.Char(
         string='Cidade do Parceiro',
         readonly=True,
-        compute="_compute_city_uf_partner"
+        compute="_compute_city_uf_partner",
+        store=True
     )
 
     partner_uf = fields.Char(
         string='Estado do Parceiro',
         readonly=True,
-        compute="_compute_city_uf_partner"
+        compute="_compute_city_uf_partner",
+        store=True
     )
 
-    @api.depends('partner_id')
+    @api.depends('partner_id.city_id', 'partner_id.state_id')
     def _compute_city_uf_partner(self):
-        for order in self:
-            if order.partner_id:
-                if order.partner_id.city_id:
-                    order.partner_city = order.partner_id.city_id.name
-                if order.partner_id.state_id:
-                    order.partner_uf = order.partner_id.state_id.code
+        for crm in self:
+            if crm.partner_id:
+                crm.partner_city = crm.partner_id.city_id.name if crm.partner_id.city_id else ''
+                crm.partner_uf = crm.partner_id.state_id.code if crm.partner_id.state_id else ''
+            else:
+                crm.partner_city = ''
+                crm.partner_uf = ''
 

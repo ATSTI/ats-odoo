@@ -15,8 +15,8 @@
         - Ao selecionar o cliente, a operação fiscal é definida de acordo com a posição fiscal configurada.
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Carlos R. Silveira, Mauricio Silveira, ATSTi',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['account','l10n_br_fiscal',],
     'data': [
     ],

@@ -14,8 +14,8 @@
         - Relatório
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Mauricio Silveira, ATSTi',
-    'website': '',
+    'maintainer': 'Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['base', 'sale', 'l10n_br_fiscal', 'l10n_br_account',],
     'data': [
         'report/all_note_report_views.xml',

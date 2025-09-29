@@ -15,7 +15,7 @@
     """,
     'author': 'ATSTi Soluções',
     'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
-    'website': 'https://github.com/OCA/l10n-brazil',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['l10n_br_account', "l10n_br_account_discount"],
     'data': [
         'views/account_invoice_view.xml',

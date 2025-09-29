@@ -14,7 +14,8 @@
         --> Novo, Em andamento , Concluido
     """,
     'author': 'ATSTi Soluções',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ["contract"],
     'data': [
         "views/contract.xml",

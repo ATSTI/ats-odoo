@@ -1,17 +1,26 @@
-# -*- coding: utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
+# Copyright (C) 2025 - ATSTi
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 {
-    'name': 'Recibo POS customização Clube',
-    'author': 'Odoo S.A',
-    'category': 'Accounting/Localizations/Point of Sale',
-    'description': """Customização para o recibo da Clube sao pedro, pos""",
-    'license': 'LGPL-3',
+    'name': 'Recibo POS - Clube',
+    'version': '16.0.1.0.0',
+    'category': 'Point Of Sale',
+    'license': 'AGPL-3',
+    'sequence': 10,
+    'summary': 'Personalização do recibo do POS - Cliente: Clube',
+    'description': """
+        Módulo Personaliza o Recibo impresso no Ponto de Venda, o Cliente dessa customização é o Clube
+    """,
+    'author': 'ATSTi Soluções',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['point_of_sale'],
     'data': [
-        #'views/assets.xml',
     ],
     'qweb': [
         'static/src/xml/OrderReceipt.xml',
     ],
+    'installable': True,
+    'application': False,
     'auto_install': False,
 }

@@ -16,8 +16,8 @@
         - A referência (`ref`) da fatura é preenchida com o nome do cliente filho.
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Carlos R. Silveira, Mauricio Silveira, ATSTi',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['sale_management', 'l10n_br_fiscal',],
     'data': [
         # Nenhum XML necessário neste módulo

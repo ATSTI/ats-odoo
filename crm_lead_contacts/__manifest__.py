@@ -12,7 +12,8 @@
         Este Módulo adiciona o campo de Subcontatos no Lead, permitindo que o Cliente traga seus Subcontatos
     """,
     'author': 'ATSTi Soluções',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ["crm", "base"],
     'data': [
         "views/crm_lead_views.xml",

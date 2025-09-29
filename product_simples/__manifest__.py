@@ -11,8 +11,8 @@
             Esse Módulo tem finalidade de simplificar a tela de cadastro de produtos.
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Carlos Silveira, Mauricio-ATS, ATSTi',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': [
         'l10n_br_fiscal', 'product', 'product_sequence'
     ],

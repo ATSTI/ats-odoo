@@ -12,8 +12,8 @@
         Diferente do módulo da OCA/l10n-brazil , este módulo trás também as informações da Inscrição Estadual (IE) da Empresa
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Carlos R. Silveira, Mauricio Silveira, ATSTi',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['l10n_br_base',],
     'data': [
         "views/res_partner_view.xml",

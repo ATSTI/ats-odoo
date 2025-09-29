@@ -16,7 +16,7 @@
     """,
     'author': 'ATSTi Soluções',
     'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
-    'website': '',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['base', 'sale_management'],
     'data': [
         'views/sale_order_view.xml',

@@ -25,7 +25,7 @@ sem perder o controle da distribuição do desconto em cada item.
     """,
     'author': 'ATSTi Soluções',
     'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
-    'website': 'https://github.com/OCA/l10n-brazil',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': [
         'l10n_br_account',
     ],

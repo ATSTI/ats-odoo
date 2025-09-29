@@ -12,8 +12,8 @@
         Se em linhas da operação informada NCM, usar este criterio na seleção da linha
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Carlos R. Silveira, Mauricio Silveira, ATSTi',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['l10n_br_fiscal'],
     'data': [
     ],

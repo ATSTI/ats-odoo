@@ -14,8 +14,8 @@ Módulo para gerenciar desconto no valor total da compra.
         como um valor específico ou percentual
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Carlos Silveira, Mauricio-ATS, ATSTi',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': [
         'l10n_br_purchase',
         'account_discount_total',

@@ -16,8 +16,8 @@
         - +
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Mauricio Silveira, ATSTi',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['fieldservice', 'hr', 'base', 'account', 'l10n_br_fiscal', 'fieldservice_isp_account'],
     'data': [
         'views/fsm_order_view.xml',

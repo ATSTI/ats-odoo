@@ -17,8 +17,8 @@
         - Relatórios de importação com detalhes de sucesso e falhas
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Carlos R. Silveira, Mauricio Silveira, ATSTi',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['partner_manual_rank',],
     'data': [
         'security/ir.model.access.csv',

@@ -1,18 +1,19 @@
-# -*- coding: utf-8 -*-
-# © 2004-2010 OpenERP SA
-# © 2016 Carlos Silveira <crsilveira@gmail.com>
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+# Copyright (C) 2025 - ATSTi
+# License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 {
-    'name': 'Faturamento Contrato',
-    'version': '11.0.0.0.0',
+    'name': 'Faturamento do Contrato',
+    'version': '16.0.1.0',
     'category': 'Contract Management',
     'license': 'AGPL-3',
-    'author': "Carlos,"
-              "ATS,"
-              "",
+    'sequence': 2,
+    'summary': 'Permite fazer o faturamento de contratos',
+    'description': """
+        Este Módulo possibilita fazer apartir de um contrato, o seu respectivo faturamento
+    """,
+    'author': 'Carlos Silveira, Mauricio-ATS, ATSTi Soluções',
     'website': '',
-    'depends': ['contract','contract_invoice', 'account'],
+    'depends': ['l10n_br_contract','l10n_br_account'],
     'data': [
         #'views/contract_view.xml',
         'views/email_erro_fatura.xml',
@@ -20,4 +21,6 @@
         'views/account_invoice.xml'
     ],
     'installable': True,
+    'application': False,
 }
+

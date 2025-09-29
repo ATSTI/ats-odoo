@@ -34,8 +34,8 @@
         if msg:
             log(msg, level='info')        
     """,
-    'author': 'ATSTi,Odoo Community Association (OCA)',
-    'website': '',
+    'author': 'ATSTi Soluções',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ["l10n_br_fiscal", "l10n_br_account_nfe"],
     'data': [
         'views/account_move_view.xml',

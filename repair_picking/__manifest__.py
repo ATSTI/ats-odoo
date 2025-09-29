@@ -19,8 +19,8 @@
         - Garante consistência de quantidades com verificação de reservas.
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Carlos R. Silveira',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': [
         'repair',
         'stock',

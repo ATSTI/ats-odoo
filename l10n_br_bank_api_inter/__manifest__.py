@@ -16,8 +16,8 @@
         - Outras rotinas de automação bancária específicas para o banco Inter.
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Carlos R. Silveira, Mauricio Silveira, ATSTi',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': [
         'l10n_br_account_payment_order',
     ],

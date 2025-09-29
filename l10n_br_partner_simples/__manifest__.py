@@ -12,7 +12,8 @@
         Alterações na tela de cadastro de clientes para simplificar o uso.
     """,
     'author': 'ATSTi Soluções',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['l10n_br_base', 'l10n_br_fiscal', 'l10n_br_account', 'account_payment_partner' ],
     'data': [
         'views/partner_view.xml',

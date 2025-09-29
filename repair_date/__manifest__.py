@@ -12,8 +12,8 @@
         Adiciona campo data à Ordem de reparo
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Carlos Silveira, Mauricio-ATS, ATSTi',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': [
         'repair'
     ],

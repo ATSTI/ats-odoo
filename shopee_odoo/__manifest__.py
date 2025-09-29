@@ -16,8 +16,8 @@
         - Envio de notas fiscais
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
-    'website': '',
+    'maintainer': 'Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['base', 'account', 'l10n_br_fiscal', 'sale'],
     'data': [
         'security/res_groups.xml',

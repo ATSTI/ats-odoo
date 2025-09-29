@@ -136,7 +136,7 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_tree" />
         <field name="arch" type="xml">
-            <field name="cnpj_cpf" position="before">
+            <field name="vat" position="before">
                 <field name="parent_id" string="Titular" />
                 <field name="cartao" string="Cartão" />
                 <field name="age" />
@@ -146,7 +146,7 @@
             <field name="legal_name" position="attributes">
                 <attribute name="invisible">1</attribute>
             </field>
-            <field name="inscr_est" position="attributes">
+            <field name="l10n_br_ie_code" position="attributes">
                 <attribute name="invisible">1</attribute>
             </field>
             <field name="user_id" position="attributes">

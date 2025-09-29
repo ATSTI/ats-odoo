@@ -12,7 +12,8 @@
         Este Módulo adiciona novas funções para o Contrato, baseando no envio de email e datas
     """,
     'author': 'ATSTi Soluções',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['contract', 'analytic',],
     'data': [
         # "views/contract_view.xml",

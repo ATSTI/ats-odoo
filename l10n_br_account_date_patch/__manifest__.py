@@ -12,8 +12,8 @@
         Este módulo permite que a date de saida esteja vazia, alguns clientes precisam disso
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Carlos R. Silveira, Mauricio Silveira, ATSTi',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ["l10n_br_account", "l10n_br_nfe",],
     'data': [
         "views/document_view.xml"

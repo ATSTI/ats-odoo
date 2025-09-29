@@ -11,8 +11,8 @@
             Esse Módulo permite definir a margem de venda diretamente no produto.
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Carlos Silveira, Mauricio-ATS, ATSTi',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': [
         'product', 'mrp'
     ],

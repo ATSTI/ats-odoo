@@ -4,12 +4,12 @@ from odoo import fields, models
 
 
 
-class FiscalDocumentMixinFields(models.AbstractModel):
-    _inherit = "l10n_br_fiscal.document.mixin.fields"
+class FiscalDocumentMixin(models.AbstractModel):
+    _inherit = "l10n_br_fiscal.document.mixin"
 
 
     amount_icms_relief_value = fields.Monetary(
         string="ICMS Desoneracao",
-        compute="_compute_amount",
+        compute="_compute_fiscal_amount",
         store=True,
     )

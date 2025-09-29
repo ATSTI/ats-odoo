@@ -13,8 +13,8 @@
         No diario diversos(general), somente para poder gerar a NFe,
         pois, na fatura consta serviços tbém, que será gerado uma nota de serviço.
    """,
-    'author': 'ATSTi,Odoo Community Association (OCA)',
-    'website': '',
+    'author': 'ATSTi Soluções',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ["l10n_br_fiscal", "l10n_br_nfse", "l10n_br_account"],
     'data': [
         'views/account_move_view.xml',

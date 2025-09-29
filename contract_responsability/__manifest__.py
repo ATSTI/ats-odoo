@@ -14,7 +14,8 @@
         - Criação de faturas para tal responsável
     """,
     'author': 'ATSTi Soluções',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ["contract", "l10n_br_fiscal", "l10n_br_account_payment_brcobranca", "contract_recurring_date"],
     'data': [
         "views/contract_view.xml",

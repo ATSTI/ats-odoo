@@ -16,8 +16,8 @@
           - Importação de Pedido Único (Tela e função)
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Mauricio Silveira, maurs320@gmail.com',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['account', 'sale', 'shopee_odoo', 'meli_odoo', 'auditlog'],
     'data': [
         'security/ir.model.access.csv',

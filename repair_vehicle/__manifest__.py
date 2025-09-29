@@ -12,8 +12,8 @@
         para Ordem de Serviço em veículos
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Carlos Silveira, Mauricio-ATS, ATSTi',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': [
         'base', 'repair', 'stock', 'sale'
     ],

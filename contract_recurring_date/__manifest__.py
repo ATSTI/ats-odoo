@@ -14,7 +14,8 @@
         - Marcadores do contrato (fatura e venda)
     """,
     'author': 'ATSTi Soluções',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['l10n_br_account', 'contract', 'sale_management'],
     'data': [
         "views/account.xml",

@@ -12,11 +12,10 @@
         Este módulo trás informações da NFe para a tela da fatura, além de simplificar a tela da nfe
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Carlos R. Silveira, Mauricio Silveira, ATSTi',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ["l10n_br_account", "l10n_br_fiscal",],
     'data': [
-        "views/document_view.xml",
         "views/account_invoice_view.xml",
     ],
     'installable': True,

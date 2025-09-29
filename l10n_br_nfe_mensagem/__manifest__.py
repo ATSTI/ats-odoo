@@ -14,8 +14,8 @@
         -Mostrando mensagens especificando o erro.
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Carlos R. Silveira, Mauricio Silveira, ATSTi',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ["l10n_br_account", "l10n_br_nfe"],
     'data': [
         "views/account_invoice_view.xml",

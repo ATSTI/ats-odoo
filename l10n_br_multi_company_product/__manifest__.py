@@ -13,8 +13,8 @@
         - Se o Produto for de outra empresa, e não dá que está fazendo a nota
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Carlos R. Silveira, Mauricio Silveira, ATSTi',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['l10n_br_fiscal',],
     'data': [
     ],

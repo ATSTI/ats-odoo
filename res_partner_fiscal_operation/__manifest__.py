@@ -10,7 +10,8 @@
     'description': """
     """,
     'author': 'ATSTi Soluções',
-    'website': '',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['l10n_br_base','l10n_br_fiscal'],
     'data': [
         'views/partner_view.xml',

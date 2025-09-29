@@ -1,24 +1,30 @@
-# Copyright 2020 ForgeFlow S.L. (https://forgeflow.com)
+# Copyright 2025 ATSTi
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
+
 {
-    "name": "ATSti",
-    "version": "14.0.1.1.0",
-    "category": "maintenance",
-    "description" : "Cria retorno para o estoque quando a OM e concluida. \
-        IMPORTANTE: \
-            - Necessario criar um tipo de operação \
-              no inventário: Manutenção \
-              com local origem Manutenção e destino Stock. \
-            - O estágio de Concluído precisa estar marcado como 'Chamdo atendido'",
-    "author": "Mauricio, ATSTi Soluções",
-    "website": "",
-    "license": "LGPL-3",
-    "depends": ["maintenance", "maintenance_request_stage_transition"],
+    'name': 'Maintenance Request - Integração com Estoque',
+    'version': '16.0.1.0',
+    'category': 'Maintenance',
+    'license': 'LGPL-3',
+    'sequence': 12,
+    'summary': 'Integra Ordens de Manutenção com o estoque, criando movimentações automáticas',
+    'description': """
+        Este módulo amplia as Ordens de Manutenção (maintenance.request),
+        integrando-as ao módulo de Estoque (stock).
+
+        Funcionalidades:
+        - Novo campo de Origem (origin) na Ordem de Manutenção;
+        - Possibilidade de vincular um Lote (lot_id) ao equipamento em manutenção;
+        - Criação automática de movimentação de estoque ao concluir a manutenção;
+        - Mensagem automática no chatter notificando a movimentação gerada.
+    """,
+    'author': 'ATSTi Soluções',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'website': 'https://github.com/ATSTI/ats-odoo',
+    "depends": ["maintenance_request_stage_transition"],
     "data": [
         "views/maintenance_picking_views.xml",
     ],
-    "demo": [],
-    "installable": True,
-    "auto_install": False,
-    "application": False,
+    'installable': True,
+    'application': False,
 }

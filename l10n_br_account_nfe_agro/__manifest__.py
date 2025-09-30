@@ -2,14 +2,14 @@
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 {
-    'name': 'NFe Informações do Cartão',
+    'name': 'NFe Informações do Agro',
     'version': '16.0.1.0',
     'category': 'Localisation',
     'license': 'AGPL-3',
     'sequence': 9,
-    'summary': 'Insere na Nota Fiscal as informações de pagamento quando Cartão ou PiX',
+    'summary': 'Insere na Nota Fiscal as informações de agropecuario',
     'description': """
-        Este módulo permite preencher e enviar notas com informações do pagamento quando este for Cartão (Débito ou Crédito) ou Pix:
+        Este módulo permite preencher e enviar notas com informações do agropecuario:
         
         - Campos dentro da fatura para preencher ( guiaTransp / defensivo)
     """,

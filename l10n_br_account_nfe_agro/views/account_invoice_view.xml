@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="guia_transp_tree" model="ir.ui.view">
+        <field name="name">guia.transp.tree</field>
+        <field name="model">agro.guia.transp</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="nfe40_tpGuia" />
+                <field name="nfe40_UFGuia" />
+                <field name="nfe40_serieGuia" />
+                <field name="nfe40_nGuia" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="guia_transp_form" model="ir.ui.view">
+        <field name="name">guia.transp.form</field>
+        <field name="model">agro.guia.transp</field>
+        <field name="arch" type="xml">
+            <form string="Informações do GuiaTransp">
+                <sheet>
+                    <group>
+                        <field name="nfe40_tpGuia" />
+                        <field name="nfe40_UFGuia" />
+                        <field name="nfe40_serieGuia" />
+                        <field name="nfe40_nGuia" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Customer Invoice views -->
+    <record id="account_invoice_agro_form" model="ir.ui.view">
+        <field name="name">l10n_br_account.invoice.card.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form" />
+        <field name="priority">999</field>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='other_info']" position="after">
+                <page name="info_guia_transp" string="Informações do GuiaTransp"> 
+                    <field name="agro_ids" context="{'default_move_id': active_id}">
+                        <tree string="Info do GuiaTransp" editable="bottom">
+                            <field name="nfe40_tpGuia" />
+                            <field name="nfe40_UFGuia" />
+                            <field name="nfe40_serieGuia" />
+                            <field name="nfe40_nGuia" />
+                            <field name="am_id" invisible="1"/>
+                        </tree>
+                        <form>
+                            <sheet>
+                                <group string="Info do GuiaTransp">
+                                    <group>
+                                        <field name="nfe40_tpGuia" />
+                                        <field name="nfe40_UFGuia" />
+                                        <field name="nfe40_serieGuia" />
+                                        <field name="nfe40_nGuia" />
+                                    </group>
+                                </group>
+                            </sheet>
+                        </form>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

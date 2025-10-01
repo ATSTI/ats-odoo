@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="account_invoice_agro_form" model="ir.ui.view">
+        <field name="name">l10n_br_account.invoice.card.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form" />
+        <field name="priority">999</field>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='other_info']" position="after">
+                <page name="info_guia_transp" string="Informações do GuiaTransp"> 
+                    <group name="guiatransp-group" string="Guia Transito">
+                        <field name="guiatransp" />
+                        <field name="nfe40_tpGuia" />
+                        <field name="nfe40_UFGuia" />
+                        <field name="nfe40_serieGuia" />
+                        <field name="nfe40_nGuia" />
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

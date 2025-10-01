@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_defensivo_tree" model="ir.ui.view">
+        <field name="name">res.defensivo.tree</field>
+        <field name="model">res.defensivo</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="nfe_defensivo_agropecuario_id" invisible="1" />
+                <field name="nfe40_nReceituario" />
+                <field name="partner_id" />
+                <field name="nfe40_CPFRespTec" />
+            </tree>
+        </field>
+    </record>
+    <record id="res_defensivo_form" model="ir.ui.view">
+        <field name="name">res.defensivo.form</field>
+        <field name="model">res.defensivo</field>
+        <field name="arch" type="xml">
+            <form string="Defensivo Agrícola / Agrotóxico">
+                <field name="nfe_defensivo_agropecuario_id" invisible="1" />
+                <field name="nfe40_nReceituario" />
+                <field name="partner_id" />
+                <field name="nfe40_CPFRespTec" />
+            </form>
+        </field>
+    </record>
+     <record id="view_br_account_agro_invoice_form" model="ir.ui.view">
+        <field name="name">br_account_agro_invoice_form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="br_account.view_br_account_invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='other_info']" position="after">
+                <page string="Defensivo Agrícola / Agrotóxico" name="agropecuario">
+                    <field name="nfe40_defensivo" context="{'default_invoice_id': active_id}">
+                        <tree string="Defensivos" editable="bottom">
+                            <field name="nfe_defensivo_agropecuario_id" invisible="1" />
+                            <field name="nfe40_nReceituario" />
+                            <field name="partner_id" />
+                            <field name="nfe40_CPFRespTec" />
+                        </tree>
+                        <form>
+                            <sheet>
+                                <group string="Defensivo Agrícola / Agrotóxico">
+                                    <field name="nfe40_nReceituario" />
+                                    <field name="partner_id" />
+                                    <field name="nfe40_CPFRespTec" />
+                                    <field name="nfe_defensivo_agropecuario_id" invisible="1" />
+                                </group>
+                            </sheet>
+                        </form>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="res_agropecuario_tree" model="ir.ui.view">
+        <field name="name">res.agropecuario.tree</field>
+        <field name="model">nfe.40.guiatransito</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="nfe40_tpGuia" />
+                <field name="nfe40_UFGuia" />
+                <field name="nfe40_serieGuia" />
+                <field name="nfe40_nGuia" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="res_agropecuario_form" model="ir.ui.view">
+        <field name="name">res.agropecuario.form</field>
+        <field name="model">nfe.40.guiatransito</field>
+        <field name="arch" type="xml">
+            <form string="Informações do Cartão">
+                <sheet>
+                    <group>
+                        <field name="nfe40_tpGuia" />
+                        <field name="nfe40_UFGuia" />
+                        <field name="nfe40_serieGuia" />
+                        <field name="nfe40_nGuia" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>

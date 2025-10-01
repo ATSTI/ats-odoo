@@ -1,0 +1,3 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"l10n_br_account_agropecuario","dados_agropecuario","model_nfe_40_guiatransito","account.group_account_invoice",1,1,1,1
+"l10n_br_account_defensivo","dados_defensivo","model_res_defensivo","account.group_account_invoice",1,1,1,1

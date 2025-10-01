@@ -9,15 +9,14 @@ class FiscalDocumentAgro(models.Model):
 
     def _export_fields(self, xsd_fields, class_obj, export_dict):
         if "nfe40_agropecuario" in class_obj._fields:
-            import pudb;pu.db
             agropecuario = self.env['nfe.40.agropecuario'].create({})
             self.nfe40_agropecuario = agropecuario
-            for agr in self.move_ids.agro_ids:
+            if self.move_ids.guiatransp == True:
                 guia_vals = {
-                    "nfe40_tpGuia": agr.nfe40_tpGuia,
-                    "nfe40_UFGuia": agr.nfe40_UFGuia,
-                    "nfe40_serieGuia": agr.nfe40_serieGuia,
-                    "nfe40_nGuia": agr.nfe40_nGuia,
+                    "nfe40_tpGuia": self.nfe40_tpGuia,
+                    "nfe40_UFGuia": self.nfe40_UFGuia,
+                    "nfe40_serieGuia": self.nfe40_serieGuia,
+                    "nfe40_nGuia": self.nfe40_nGuia,
                 }
                 guia = self.env["nfe.40.guiatransito"].create(guia_vals) 
                 self.nfe40_agropecuario.nfe40_guiaTransito = guia

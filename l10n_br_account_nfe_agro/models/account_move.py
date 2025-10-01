@@ -2,17 +2,6 @@
 from odoo import models, _, api, fields
 from odoo.exceptions import UserError
 
-class AccountMove(models.Model):
-    _inherit = "account.move"
-    _inherits = {"l10n_br_fiscal.document": "fiscal_document_id"}
-    
-    agro_ids = fields.One2many(
-        "agro.guia.transp",
-        "am_id",
-        string='GuiaTransp',
-        copy=False,
-    )
-
 GUIATRANSITO_TPGUIA = [
     ("1", "GTA"),
     ("2", "TTA"),
@@ -53,9 +42,11 @@ TUFEMI = [
     ("TO", "TO"),
 ]
 
-class AgroGuiaTransp(models.Model):
-    _name = "agro.guia.transp"
-    _description = "Informações do GuiaTransp"
+class AccountMove(models.Model):
+    _inherit = "account.move"
+    _inherits = {"l10n_br_fiscal.document": "fiscal_document_id"}
+    
+    guiatransp = fields.Boolean('Guia Transito?')
 
     nfe40_tpGuia = fields.Selection(
         GUIATRANSITO_TPGUIA,
@@ -74,8 +65,3 @@ class AgroGuiaTransp(models.Model):
     nfe40_serieGuia = fields.Char(string="Série da Guia")
 
     nfe40_nGuia = fields.Char(string="Número da Guia", xsd_required=True)
-
-    am_id = fields.Many2one(
-        comodel_name="account.move", 
-        string="Documento"
-    )

@@ -10,7 +10,6 @@
             <xpath expr="//page[@name='other_info']" position="after">
                 <page name="info_guia_transp" string="Informações do GuiaTransp"> 
                     <group name="guiatransp-group" string="Guia Transito">
-                        <field name="guiatransp" />
                         <field name="nfe40_tpGuia" />
                         <field name="nfe40_UFGuia" />
                         <field name="nfe40_serieGuia" />

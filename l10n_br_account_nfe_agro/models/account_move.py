@@ -1,6 +1,6 @@
 
-from odoo import models, _, api, fields
-from odoo.exceptions import UserError
+from odoo import models, _, fields
+
 
 GUIATRANSITO_TPGUIA = [
     ("1", "GTA"),
@@ -45,8 +45,6 @@ TUFEMI = [
 class AccountMove(models.Model):
     _inherit = "account.move"
     _inherits = {"l10n_br_fiscal.document": "fiscal_document_id"}
-    
-    guiatransp = fields.Boolean('Guia Transito?')
 
     nfe40_tpGuia = fields.Selection(
         GUIATRANSITO_TPGUIA,

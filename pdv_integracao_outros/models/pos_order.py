@@ -321,13 +321,13 @@ class PosSession(models.Model):
                 descricao  = line['name']
                 if not prd:
                     if 'Troca' in descricao:
-                        prd = prod_obj.search([('default_code', '=', 'troca')])
+                        prd = prod_obj.search([('default_code', '=', 'troca')], limit=1)
                 if not prd:
                     prd = prod_obj.search([('name', 'ilike', line['name'])], limit=1)
                     if len(str(line['product_id'])) < 10 and not prd:
-                        prd = prod_obj.search([('id', '=', line['product_id'])])
+                        prd = prod_obj.search([('id', '=', line['product_id'])], limit=1)
                     if not prd:
-                        prd = prod_obj.search([('name', 'ilike', 'diverso')])
+                        prd = prod_obj.search([('name', 'ilike', 'diverso')], limit=1)
                         descricao = f"{descricao} - PRODUTO NAO LOCALIZADO"
                 sub_total = line['price_unit'] * line['qty']
                 if linhas == 0:

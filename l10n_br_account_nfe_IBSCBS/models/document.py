@@ -9,7 +9,6 @@ class FiscalDocumentIBSCBS(models.Model):
 
     def _export_fields(self, xsd_fields, class_obj, export_dict):
         if class_obj._name == "nfe.40.total":
-            import pudb;pu.db
             if "nfe40_IBSCBSTot" in class_obj._fields:
                 if self.move_ids.ibscbs:
                     # ibscbs_vals = {
@@ -27,7 +26,7 @@ class FiscalDocumentIBSCBS(models.Model):
                     #         },
                     #         "nfe40_vIBS": 2.26,
                     #         "nfe40_vCredPres": 0.00,
-                    #         "nfe40_vCredPresCondSus": 0.00,
+                    #         "nfe40_vCredPres": 0.00,
                     #     },
                     #     "nfe40_gCBS": {
                     #         "nfe40_vDif": 0.00,
@@ -37,7 +36,13 @@ class FiscalDocumentIBSCBS(models.Model):
                     #         "nfe40_vCredPresCondSus": 0.00,
                     #     },
                     # }
-                    self.nfe40_IBSCBSTot = self.env['nfe.40.ibscbstot'].create({})
+                    # class_obj.nfe40_IBSCBSTot = self.env['nfe.40.ibscbstot'].create({})
+                    self.nfe40_vBCIBSCBS = 2260.00
+                    self.nfe40_vIBS = 2.26
+                    self.nfe40_vCredPres = 0.00
+                    self.nfe40_vCredPres = 0.00
+                    self.nfe40_vIBSMun = 0.00
+                    self.nfe40_vCBS = 20.34
                 else:
                     export_dict["nfe40_IBSCBSTot"] = None
 

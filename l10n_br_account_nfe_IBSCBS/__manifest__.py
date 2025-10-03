@@ -18,7 +18,7 @@
     'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['l10n_br_nfe','l10n_br_nfe_spec','l10n_br_account',],
     'data': [
-        "security/ir.model.access.csv",
+        # "security/ir.model.access.csv",
         "views/account_invoice_view.xml",
     ],
     'installable': True,

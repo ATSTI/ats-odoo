@@ -22,5 +22,9 @@ class FiscalDocumentCard(models.Model):
                     self.nfe40_detPag.nfe40_card = card
                 else:
                     continue
+            if not self.move_ids.card_ids:
+                card_vals = {"nfe40_tpIntegra": '2'}
+                card = self.env["nfe.40.card"].create(card_vals)
+                self.nfe40_detPag.nfe40_card = card
 
         return super()._export_fields(xsd_fields, class_obj, export_dict)

@@ -11,6 +11,7 @@
                 <page name="info_ibscbs" string="Informações do IBSCBS"> 
                     <group name="ibscbs-group" string="IBSCBS">
                         <field name="ibscbs" />
+                        <field name="cst_ibscbs" />
                         <!-- <field name="nfe40_tpGuia" />
                         <field name="nfe40_UFGuia" />
                         <field name="nfe40_serieGuia" />

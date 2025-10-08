@@ -30,27 +30,23 @@ class DocumentLine(models.Model):
     _inherit = "l10n_br_fiscal.document.line"
 
     def _export_fields_nfe_40_ibscbs(self, xsd_fields, class_obj, export_dict):
-        for line in self.document_id.move_ids.invoice_line_ids:
-            export_dict["CST"] = line.ibscbs_cst_code[:3]
-            export_dict["cClassTrib"] = line.ibscbs_cst_code[:3] + line.ibscbs_cst_code[3:4].zfill(3)
+        if self.account_line_ids.ibscbs_cst_code:
+            export_dict["CST"] = self.account_line_ids.ibscbs_cst_code[:3]
+            export_dict["cClassTrib"] = self.account_line_ids.ibscbs_cst_code[:3] + self.account_line_ids.ibscbs_cst_code[3:4].zfill(3)
 
     def _export_fields_nfe_40_gibscbs(self, xsd_fields, class_obj, export_dict):
-        total_ibscbs = 0.0
-        for line in self.document_id.move_ids.invoice_line_ids:
-            total_ibscbs += line.ibscbs_value
-        export_dict["vBC"] = total_ibscbs       
+        export_dict["vBC"] = self.account_line_ids.amount_untaxed
+        export_dict["vIBS"] = self.account_line_ids.amount_untaxed
 
     def _export_fields_nfe_40_gibsuf(self, xsd_fields, class_obj, export_dict):
-        if self.document_id.move_ids.ibscbs:
-            export_dict["pIBSUF"] = 1.00
-            export_dict["vIBSUF"] = 1.00
+        export_dict["pIBSUF"] = self.account_line_ids.ibsuf_tax_id.percent_amount
+        export_dict["vIBSUF"] = self.account_line_ids.amount_untaxed * (self.account_line_ids.ibsuf_tax_id.percent_amount/100) if self.account_line_ids.amount_untaxed else 0.00
 
     def _export_fields_nfe_40_gibsmun(self, xsd_fields, class_obj, export_dict):
-        if self.document_id.move_ids.ibscbs:
-            export_dict["pIBSMun"] = 1.00
-            export_dict["vIBSMun"] = 1.00
+        export_dict["pIBSMun"] = self.account_line_ids.ibsmun_tax_id.percent_amount
+        export_dict["vIBSMun"] = self.account_line_ids.amount_untaxed * (self.account_line_ids.ibsmun_tax_id.percent_amount/100) if self.account_line_ids.amount_untaxed else 0.00
 
     def _export_fields_nfe_40_gcbs(self, xsd_fields, class_obj, export_dict):
         if self.document_id.move_ids.ibscbs:
-            export_dict["pCBS"] = 1.00
-            export_dict["vCBS"] = 1.00
+            export_dict["pCBS"] = self.account_line_ids.cbs_tax_id.percent_amount
+            export_dict["vCBS"] = self.account_line_ids.amount_untaxed * (self.account_line_ids.cbs_tax_id.percent_amount/100) if self.account_line_ids.amount_untaxed else 0.00

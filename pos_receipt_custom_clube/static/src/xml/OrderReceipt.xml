@@ -15,5 +15,22 @@
             <div><h3><t t-esc="receipt.name" /></h3></div>
             <div><t t-esc="receipt.date.localestring" /></div>
         </xpath>
+
+         <div>
+            <h4>Itens do Pedido:</h4>
+            ------------------------------------------------------
+            <t t-foreach="receipt.orderlines" t-as="line" t-key="line.id">
+                <b> Clube Recreativo São Pedro</b>
+               <div>
+                    Servido Por
+                    <t t-esc="receipt.cashier"/>
+                </div>
+                <div style="margin-bottom: 18px;"> 
+                    <t t-esc="line.product_name_wrapped[0]"/> <br/>
+                    Qtde.: <t t-esc="line.quantity"/>
+                    <br/>------------------------------------------------------
+                </div>
+            </t>
+        </div>
     </t>
 </templates>

@@ -6,25 +6,28 @@ from erpbrasil.base.misc import punctuation_rm
 
 class FiscalDocumentIBSCBS(models.Model):
     _inherit = "l10n_br_fiscal.document"
-
-    def _export_fields(self, xsd_fields, class_obj, export_dict):
-        if class_obj._name == "nfe.40.total":
-            if "nfe40_IBSCBSTot" in class_obj._fields:
-                if self.move_ids.ibscbs:
-                    self.nfe40_vBCIBSCBS = 2260.00
-                    self.nfe40_vIBS = 2.26
-                    self.nfe40_vIBSUF = 1.00
-                    self.nfe40_vDif = 1.00 
-                    self.nfe40_vCredPres = 1.00
-                    self.nfe40_vDevTrib = 1.00
-                    self.nfe40_vIBSMun = 1.00
-                    self.nfe40_vCBS = 20.34
-                    self.nfe40_vCredPresCondSus = 1.00
-                else:
-                    export_dict["nfe40_IBSCBSTot"] = None
-
-        return super()._export_fields(xsd_fields, class_obj, export_dict)
     
+    def _export_field(self, xsd_field, class_obj, member_spec, export_value=None):
+            vCBS = 0.0
+            vIBSUF = 0.0
+            vIBSMun = 0.0
+            for line in self.move_ids.invoice_line_ids:
+                vCBS += line.amount_untaxed * (line.cbs_tax_id.percent_amount/100) if line.amount_untaxed else 0.00
+                vIBSUF += line.amount_untaxed * (line.ibsuf_tax_id.percent_amount/100) if line.amount_untaxed else 0.00
+                vIBSMun += line.amount_untaxed * (line.ibsmun_tax_id.percent_amount/100) if line.amount_untaxed else 0.00
+            vIBS = vIBSUF + vIBSMun
+            simulated_values = {
+                "nfe40_vIBS": vIBS,
+                "nfe40_vIBSUF": vIBSUF,
+                "nfe40_vIBSMun": vIBSMun,
+                "nfe40_vCBS": vCBS,
+                "nfe40_vBCIBSCBS": vIBS + vCBS,
+            }
+
+            if xsd_field in simulated_values and getattr(self, "move_ids", None):
+                export_value = simulated_values[xsd_field]
+
+            return super()._export_field(xsd_field, class_obj, member_spec, export_value)
 
 class DocumentLine(models.Model):
     _inherit = "l10n_br_fiscal.document.line"

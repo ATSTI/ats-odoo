@@ -1,36 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
     <t t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension" owl="1">
-        <xpath expr="//img[hasclass('pos-receipt-logo')]" position="after">
-            <!-- <img class="pos-receipt-logo" t-att-src="pos.company_logo_base64" alt="Logo"/> -->
-            ------------------------------------------------------
-            <t t-if='receipt.client'>
-                <div><b>CLIENTE:</b><t t-esc='receipt.client.name'/>
-                </div>
-            </t>
-            ------------------------------------------------------
+        <xpath expr="//div[hasclass('pos-receipt')]" position="replace">
+            <div class='pos-receipt'>
+                <h4>Itens do Pedido:</h4>
+                ------------------------------------------------------
+                <t t-foreach="receipt.orderlines" t-as="line" t-key="line.id">
+                    <b> Clube Recreativo São Pedro</b>
+                    <div>
+                        Servido Por
+                        <t t-esc="receipt.cashier"/>
+                    </div>
+                    <div style="margin-bottom: 18px;"> 
+                        <t t-esc="line.product_name_wrapped[0]"/> <br/>
+                        Qtde.: <t t-esc="line.quantity"/>
+                        <br/>------------------------------------------------------
+                    </div>
+                </t>
+            </div>
         </xpath>
-
-        <xpath expr="//div[hasclass('pos-receipt-order-data')]" position="replace">
-            <div><h3><t t-esc="receipt.name" /></h3></div>
-            <div><t t-esc="receipt.date.localestring" /></div>
-        </xpath>
-
-         <div>
-            <h4>Itens do Pedido:</h4>
-            ------------------------------------------------------
-            <t t-foreach="receipt.orderlines" t-as="line" t-key="line.id">
-                <b> Clube Recreativo São Pedro</b>
-               <div>
-                    Servido Por
-                    <t t-esc="receipt.cashier"/>
-                </div>
-                <div style="margin-bottom: 18px;"> 
-                    <t t-esc="line.product_name_wrapped[0]"/> <br/>
-                    Qtde.: <t t-esc="line.quantity"/>
-                    <br/>------------------------------------------------------
-                </div>
-            </t>
-        </div>
     </t>
 </templates>

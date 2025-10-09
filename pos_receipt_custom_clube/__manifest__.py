@@ -8,7 +8,7 @@
     'author':'ATSTi Soluções',
     'depends': ['point_of_sale'],
     'data': [
-        # 'views/assets.xml',
+        'views/assets.xml',
     ],
     'qweb': [
         'static/src/xml/OrderReceipt.xml',

@@ -1,8 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <template id="assets" inherit_id="point_of_sale.assets">
         <xpath expr="." position="inside">
-            <script type="text/javascript" src="/l10n_sa_pos/static/src/lib/zxing.js"></script>
-            <script type="text/javascript" src="/l10n_sa_pos/static/src/js/OrderReceipt.js"></script>
+            <script
+                type="text/javascript"
+                src="/pos_receipt_custom_clube/static/src/js/OrderReceipt.js"
+            />
         </xpath>
     </template>
 </odoo>

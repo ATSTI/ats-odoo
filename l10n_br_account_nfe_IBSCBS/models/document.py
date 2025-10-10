@@ -1,8 +1,13 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models
-from erpbrasil.base.misc import punctuation_rm
-
+from odoo import api, fields, models
+from ..constants.fiscal import (
+    TAX_DOMAIN_IBS,
+    TAX_DOMAIN_CBS,
+    TAX_DOMAIN_IBSCBS,
+    TAX_DOMAIN_IBSUF,
+    TAX_DOMAIN_IBSMUN
+)
 
 class FiscalDocumentIBSCBS(models.Model):
     _inherit = "l10n_br_fiscal.document"
@@ -53,3 +58,42 @@ class DocumentLine(models.Model):
         if self.document_id.move_ids.ibscbs:
             export_dict["pCBS"] = self.account_line_ids.cbs_tax_id.percent_amount
             export_dict["vCBS"] = self.account_line_ids.amount_untaxed * (self.account_line_ids.cbs_tax_id.percent_amount/100) if self.account_line_ids.amount_untaxed else 0.00
+
+class FiscalDocumentLineMixin(models.AbstractModel):
+    _inherit = "l10n_br_fiscal.document.line.mixin"
+
+    ibscbs_tax_id = fields.Many2one(
+        comodel_name="l10n_br_fiscal.tax",
+        string="Tax IBS/CBS",
+        domain=[("tax_domain", "=", TAX_DOMAIN_IBSCBS)],
+    )
+
+    ibscbs_cst_id = fields.Many2one(
+        comodel_name="l10n_br_fiscal.cst",
+        string="CST IBS/CBS",
+        domain="[('cst_type', '=', fiscal_operation_type),"
+        "('tax_domain', '=', 'ibscbs')]",
+    )
+
+    ibscbs_cst_code = fields.Char(
+        related="ibscbs_cst_id.code", string="IBS/CBS CST Code", store=True
+    )
+    # ibscbs_value = fields.Monetary(string="IBS/CBS Value")
+
+    ibsuf_tax_id = fields.Many2one(
+        comodel_name="l10n_br_fiscal.tax",
+        string="Tax IBS UF",
+        domain=[("tax_domain", "=", TAX_DOMAIN_IBSUF)],
+    )
+
+    ibsmun_tax_id = fields.Many2one(
+        comodel_name="l10n_br_fiscal.tax",
+        string="Tax IBS Mun",
+        domain=[("tax_domain", "=", TAX_DOMAIN_IBSMUN)],
+    )
+
+    cbs_tax_id = fields.Many2one(
+        comodel_name="l10n_br_fiscal.tax",
+        string="Tax CBS",
+        domain=[("tax_domain", "=", TAX_DOMAIN_CBS)],
+    )

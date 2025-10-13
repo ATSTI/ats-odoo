@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_agropecuario_tree" model="ir.ui.view">
+        <field name="name">res.agropecuario.tree</field>
+        <field name="model">nfe.40.guiatransito</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="nfe40_tpGuia" />
+                <field name="nfe40_UFGuia" />
+                <field name="nfe40_serieGuia" />
+                <field name="nfe40_nGuia" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="res_agropecuario_form" model="ir.ui.view">
+        <field name="name">res.agropecuario.form</field>
+        <field name="model">nfe.40.guiatransito</field>
+        <field name="arch" type="xml">
+            <form string="Informações do Cartão">
+                <sheet>
+                    <group>
+                        <field name="nfe40_tpGuia" />
+                        <field name="nfe40_UFGuia" />
+                        <field name="nfe40_serieGuia" />
+                        <field name="nfe40_nGuia" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Customer Invoice views -->
+    <record id="account_move_agropecuario_form" model="ir.ui.view">
+        <field name="name">l10n_br_account.agro.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form" />
+        <field name="priority">999</field>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='other_info']" position="after">
+                <page name="Agropecuario" string="Informações Agropecuaria">
+                    <field name="nfe40_guiaTransito" context="{'default_move_id': active_id}">
+                        <tree string="Agropecuario" editable="bottom">
+                        <field name="nfe40_tpGuia" />
+                        <field name="nfe40_UFGuia" />
+                        <field name="nfe40_serieGuia" />
+                        <field name="nfe40_nGuia" />
+                        </tree>
+                        <form>
+                            <sheet>
+                                <group string="Agropecuario">
+                                    <group>
+                        <field name="nfe40_tpGuia" />
+                        <field name="nfe40_UFGuia" />
+                        <field name="nfe40_serieGuia" />
+                        <field name="nfe40_nGuia" />
+                                    </group>
+                                </group>
+                            </sheet>
+                        </form>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    <!-- <record id="nfe_document_agr_form_inherit" model="ir.ui.view">
+        <field name="name">l10n_br_nfe.agr.document.form.inherit</field>
+        <field name="model">l10n_br_fiscal.document</field>
+        <field name="priority">6</field>
+        <field name="inherit_id" ref="l10n_br_fiscal.document_form" />
+        <field name="arch" type="xml">
+            <page name="delivery" position="inside">
+                <field name="nfe40_guiaTransito" context="{'default_move_id': active_id}">
+                    <tree string="Agropecuario" editable="bottom">
+                        <field name="nfe40_tpGuia" />
+                        <field name="nfe40_UFGuia" />
+                        <field name="nfe40_serieGuia" />
+                        <field name="nfe40_nGuia" />
+                    </tree>
+                    <form>
+                        <sheet>
+                            <group string="Agropecuario">
+                                <group>
+                                    <field name="nfe40_tpGuia" />
+                                    <field name="nfe40_UFGuia" />
+                                    <field name="nfe40_serieGuia" />
+                                    <field name="nfe40_nGuia" />
+                                </group>
+                            </group>
+                        </sheet>
+                    </form>
+                </field>
+            </page>
+        </field>
+    </record> -->
+</odoo>

@@ -63,3 +63,35 @@ class AccountMove(models.Model):
     nfe40_serieGuia = fields.Char(string="Série da Guia")
 
     nfe40_nGuia = fields.Char(string="Número da Guia", xsd_required=True)
+
+    nfe40_defensivo = fields.One2many(
+        "res.defensivo",
+        "nfe_defensivo_agropecuario_id",
+        string='Defensivo Agrícola',
+        copy=False,
+    )
+
+
+class ResDefensivo(models.Model):
+    _name = "res.defensivo"
+    _description = "Documento Fiscal Agronômico - Defensivo Agrícola"
+
+    nfe_defensivo_agropecuario_id = fields.Many2one(
+        comodel_name="account.move", string="Documento Fiscal Agronômico",
+    )
+    nfe40_nReceituario = fields.Char(
+        string="Número do Receituário ou Receita",
+        help="Número do Receituário ou Receita do Defensivo / Agrotóxico",
+    )
+
+    partner_id = fields.Many2one(
+        comodel_name="res.partner",
+        string="Responsável Técnico",
+    )
+
+    nfe40_CPFRespTec = fields.Char(
+        related="partner_id.cnpj_cpf",
+        string="CPF",
+        help="CPF do Responsável Técnico pelo receituário",
+        store=True
+    )

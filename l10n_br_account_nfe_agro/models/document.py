@@ -20,7 +20,14 @@ class FiscalDocumentAgro(models.Model):
                 }
                 guia = self.env["nfe.40.guiatransito"].create(guia_vals) 
                 self.nfe40_agropecuario.nfe40_guiaTransito = guia
-            # else:
-                # self.nfe40_agropecuario = self.nfe40_agropecuario.nfe40_guiaTransito = False
+            elif self.move_ids.nfe40_defensivo:
+                defensivo = []
+                for rec_ids in self.invoice_id.nfe40_defensivo:
+                    rec = {
+                        'nfe40_nReceituario': rec_ids.nfe40_nReceituario,
+                        'nfe40_CPFRespTec': rec_ids.nfe40_CPFRespTec,
+                    }
+                    defensivo.append(rec)
+                self.nfe40_agropecuario.nfe40_defensivo = defensivo
 
         return super()._export_fields(xsd_fields, class_obj, export_dict)

@@ -1,4 +1,0 @@
-"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
-"access_model_partner_historico","access_partner_historico","model_partner_historico","base.group_user",1,1,1,1
-"access_model_crm_historico","access_crm_historico","model_crm_historico","base.group_user",1,1,1,1
-"access_model_lista_equipamentos","access_lista_equipamentos","model_lista_equipamentos","base.group_user",1,1,1,1

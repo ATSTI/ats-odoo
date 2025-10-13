@@ -1,2 +1,0 @@
-"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
-importar_pedido,Importar Pedido,model_importar_pedido_online,shopee_odoo.shopee_group_user,1,1,1,0

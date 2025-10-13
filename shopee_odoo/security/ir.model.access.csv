@@ -1,3 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_shopee_cf_user,shopee.user,model_shopee_config,shopee_odoo.shopee_group_user,1,0,0,0
-access_shopee_cf_manager,shopee.manager,model_shopee_config,shopee_odoo.shopee_group_manager,1,1,1,1

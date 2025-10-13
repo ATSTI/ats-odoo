@@ -1,30 +1,18 @@
-ATSTI Odoo — Branch 16.0
+ATSTI Odoo — Branch 18.0
 Descrição
 
-Este branch reúne os módulos personalizados da ATSTI para o Odoo 16.0, contemplando adaptações fiscais brasileiras, integrações, customizações de relatórios, automações, entre outros. Tem como objetivo prover funcionalidades específicas que não existem no Odoo padrão, para clientes no Brasil.
+Este branch reúne os módulos personalizados da ATSTI para o Odoo 18.0, contemplando adaptações fiscais brasileiras, integrações, customizações de relatórios, automações, entre outros. Tem como objetivo prover funcionalidades específicas que não existem no Odoo padrão, para clientes no Brasil.
 Licença
 
 GPL-3.0 – Software livre.
 GitHub
 Estrutura
 
-A árvore de módulos inclui, entre outros:
-
-    account_* — módulos relacionados à contabilidade, ajustes de faturas, descontos, vencimentos, etc.
-
-    l10n_br_* — localização brasileira: NFE, NFSe, emissão de DANFE, campos fiscais, operações por NCM, etc.
-
-    integracao_* — módulos de integração com marketplaces, sistemas de vendas, planilhas externas, etc.
-
-    pdv_integracao* — personalizações para pontos de venda.
-
-    partner_*, contract_*, etc. — customizações de parceiros, contratos, atendimento, etc.
-
 Pré-requisitos
 
-    Odoo 16.0
+    Odoo 18.0
 
-    Python (versão compatível com Odoo 16)
+    Python (versão compatível com Odoo 18)
 
     Dependências externas (bibliotecas de Python) de cada módulo (ex: para geração de NFE, XML, etc.)
 
@@ -32,9 +20,9 @@ Pré-requisitos
 
 Instalação
 
-    Clone este repositório, ramo 16.0:
+    Clone este repositório, ramo 18.0:
 
-    git clone --branch 16.0 https://github.com/ATSTI/ats-odoo.git
+    git clone --branch 18.0 https://github.com/ATSTI/ats-odoo.git
 
     Copie os módulos desejados para o diretório de add-ons/custom do seu Odoo, ou configure o caminho para incluir o diretório do repositório.
 
@@ -50,7 +38,7 @@ Como contribuir
 
     Abra issues para reportar bugs ou sugerir melhorias.
 
-    Use pull requests apontando para o branch 16.0.
+    Use pull requests apontando para o branch 18.0.
 
     Escreva testes se possível, especialmente para integrações fiscais ou que envolvem lógica de negócio sensível.
 

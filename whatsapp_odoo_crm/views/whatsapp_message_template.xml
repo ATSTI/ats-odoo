@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_whatsapp_message_template_tree" model="ir.ui.view">
+        <field name="name">whatsapp.message.template.list</field>
+        <field name="model">whatsapp.message.template</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="body"/>
+                <field name="active"/>
+                <field name="attachment_ids" widget="many2many_binary"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_whatsapp_message_template_form" model="ir.ui.view">
+        <field name="name">whatsapp.message.template.form</field>
+        <field name="model">whatsapp.message.template</field>
+        <field name="arch" type="xml">
+            <form string="WhatsApp Message Template">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="body"/>
+                        <field name="active"/>
+                        <field name="attachment_ids" widget="many2many_binary"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="action_whatsapp_message_template" model="ir.actions.act_window">
+        <field name="name">WhatsApp Templates</field>
+        <field name="res_model">whatsapp.message.template</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_whatsapp_templates"
+              name="Mensagens Prontas"
+              parent="crm.crm_menu_root"
+              action="action_whatsapp_message_template"
+              />
+</odoo>

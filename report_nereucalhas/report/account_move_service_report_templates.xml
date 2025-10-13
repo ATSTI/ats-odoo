@@ -162,7 +162,7 @@
                         </tr>
                     </table>
                     <br/>
-                    <span>----------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+                    <hr style="border: none; border-top: 1px solid #ccc; margin: 10px 0;" />
                     <br/>
                     <table style="border: 0px solid #dcdcdc; width: 50%; float: left">
                         <tr>
@@ -289,6 +289,10 @@
                             </table>
                         </div>
                     </div>
+                </div>
+                <div style="font-size: 16px; float: left; width: 45%; margin-top: 10px;word-wrap: break-word;">
+                    <strong>Observações:</strong><p/>
+                    <span t-esc="o.note or ''"/>
                 </div>
             </t>
         </t>

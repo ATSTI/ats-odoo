@@ -291,7 +291,7 @@
                     </div>
                 </div>
                 <div style="font-size: 16px; float: left; width: 45%; margin-top: 10px;word-wrap: break-word;">
-                    <strong>Observações:</strong><p/>
+                    <strong>CONDIÇÕES DE PAGAMENTO:</strong><p/>
                     <span t-esc="o.note or ''"/>
                 </div>
             </t>

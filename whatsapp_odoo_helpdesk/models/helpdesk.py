@@ -16,8 +16,9 @@ class HelpDeskTicket(models.Model):
 
         for message in messages:
            
-            if self.env.context.get('from_webhook') or self.env.context.get('from_composer'):
-                continue
+            if self.env.context.get('skip_whatsapp_send') or self.env.context.get('from_composer'):
+             continue
+
 
             ticket = self.browse(message.res_id)
             partner = ticket.partner_id

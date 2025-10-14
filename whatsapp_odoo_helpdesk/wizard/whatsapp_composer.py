@@ -112,9 +112,9 @@ class WhatsappEvolutionComposer(models.TransientModel):
 
             if record:
                 names = ', '.join(self.partner_id.mapped('name'))
-                chatter_body = _("WhatsApp message sent to %s:\n%s") % (names, self.body)
+                # chatter_body = _("WhatsApp message sent to %s:\n%s") % (names, self.body)
                 record.message_post(
-                    body=chatter_body,
+                    # body=chatter_body,
                     message_type='comment',
                     subtype_xmlid='mail.mt_note',
                     attachment_ids=self.attachment_ids.ids

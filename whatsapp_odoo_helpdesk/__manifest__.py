@@ -15,13 +15,10 @@
     'maintainer': 'OtavioAndretta, Mauricio-ATS, ATSTi',
     'website': '',
     'depends': [
-        'crm','whatsapp_evolution_base'
+        'crm','whatsapp_evolution_base','whatsapp_evolution_discuss'
     ],
     'data': [
-        # 'security/ir.model.access.csv',
-        # 'wizard/whatsapp_composer_views.xml',
-        # 'views/crm_leads.xml',
-        # 'views/whatsapp_message_template.xml'
+        "views/helpdesk_ticket_btn.xml"
 
     ],
     'installable': True,

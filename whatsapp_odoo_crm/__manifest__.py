@@ -15,7 +15,7 @@
     'maintainer': 'OtavioAndretta, Mauricio-ATS, ATSTi',
     'website': '',
     'depends': [
-        'crm','whatsapp_evolution_base'
+        'crm','whatsapp_evolution_base','whatsapp_evolution_discuss'
     ],
     'data': [
         'security/ir.model.access.csv',

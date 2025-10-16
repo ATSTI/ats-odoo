@@ -24,6 +24,7 @@
         "views/document_view.xml",
         # "views/account_invoice_view.xml",
     ],
+    "post_init_hook": "post_load_constants",
     'installable': True,
     'application': False,
 }

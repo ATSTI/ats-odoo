@@ -1,7 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import api, fields, models
-from ..constants.fiscal import (
+from odoo.addons.l10n_br_fiscal.constants.fiscal import (
     TAX_DOMAIN_IBS,
     TAX_DOMAIN_CBS,
     TAX_DOMAIN_IBSCBS,
@@ -12,7 +12,29 @@ from ..constants.fiscal import (
 class FiscalDocumentIBSCBS(models.Model):
     _inherit = "l10n_br_fiscal.document"
     
+    # BASES NOVAS PRECISAM QUE ESSES CAMPOS EXISTAM PARA PODEREM SER EXPORTAR PELO _export_field
+    # ENTÃO, MESMO QUE NÃO SEJAM USADOS DIRETAMENTE, PRECISAM SER DECLARADOS AQUI, SE NÃO NÃO ENTRARAM NA EXPORTAÇÃO
+    def _export_fields(self, xsd_fields, class_obj, export_dict):
+        if class_obj._name == "nfe.40.total":
+            import pudb;pu.db
+            if "nfe40_IBSCBSTot" in class_obj._fields:
+                self.nfe40_vBCIBSCBS = 1
+                self.nfe40_vIBS = 1
+                self.nfe40_vIBSUF = 1.00
+                self.nfe40_vDif = 1.00 
+                self.nfe40_vCredPres = 1.00
+                self.nfe40_vDevTrib = 1.00
+                self.nfe40_vIBSMun = 1.00
+                self.nfe40_vCBS = 1
+                self.nfe40_vCredPresCondSus = 1.00
+            else:
+                export_dict["nfe40_IBSCBSTot"] = None
+
+        return super()._export_fields(xsd_fields, class_obj, export_dict)
+
+    # SÓ VAI ENTRAR AQUI NO MOMENTO EM QUE OS CAMPOS EXISTEM, POR ALGUM MOTIVO, SE EU NÃO DECLARAR OS CAMPOS ACIMA, NÃO ENTRA AQUI
     def _export_field(self, xsd_field, class_obj, member_spec, export_value=None):
+        if class_obj._name == "nfe.40.total":
             vCBS = 0.0
             vIBSUF = 0.0
             vIBSMun = 0.0
@@ -28,11 +50,10 @@ class FiscalDocumentIBSCBS(models.Model):
                 "nfe40_vCBS": vCBS,
                 "nfe40_vBCIBSCBS": vIBS + vCBS,
             }
-
             if xsd_field in simulated_values and getattr(self, "move_ids", None):
                 export_value = simulated_values[xsd_field]
 
-            return super()._export_field(xsd_field, class_obj, member_spec, export_value)
+        return super()._export_field(xsd_field, class_obj, member_spec, export_value)
 
 class DocumentLine(models.Model):
     _inherit = "l10n_br_fiscal.document.line"
@@ -55,9 +76,8 @@ class DocumentLine(models.Model):
         export_dict["vIBSMun"] = self.account_line_ids.amount_untaxed * (self.account_line_ids.ibsmun_tax_id.percent_amount/100) if self.account_line_ids.amount_untaxed else 0.00
 
     def _export_fields_nfe_40_gcbs(self, xsd_fields, class_obj, export_dict):
-        if self.document_id.move_ids.ibscbs:
-            export_dict["pCBS"] = self.account_line_ids.cbs_tax_id.percent_amount
-            export_dict["vCBS"] = self.account_line_ids.amount_untaxed * (self.account_line_ids.cbs_tax_id.percent_amount/100) if self.account_line_ids.amount_untaxed else 0.00
+        export_dict["pCBS"] = self.account_line_ids.cbs_tax_id.percent_amount
+        export_dict["vCBS"] = self.account_line_ids.amount_untaxed * (self.account_line_ids.cbs_tax_id.percent_amount/100) if self.account_line_ids.amount_untaxed else 0.00
 
 class FiscalDocumentLineMixin(models.AbstractModel):
     _inherit = "l10n_br_fiscal.document.line.mixin"

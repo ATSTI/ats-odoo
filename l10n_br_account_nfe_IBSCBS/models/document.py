@@ -18,15 +18,23 @@ class FiscalDocumentIBSCBS(models.Model):
         if class_obj._name == "nfe.40.total":
             import pudb;pu.db
             if "nfe40_IBSCBSTot" in class_obj._fields:
-                self.nfe40_vBCIBSCBS = 1
-                self.nfe40_vIBS = 1
-                self.nfe40_vIBSUF = 1.00
-                self.nfe40_vDif = 1.00 
-                self.nfe40_vCredPres = 1.00
-                self.nfe40_vDevTrib = 1.00
-                self.nfe40_vIBSMun = 1.00
-                self.nfe40_vCBS = 1
-                self.nfe40_vCredPresCondSus = 1.00
+                vCBS = 0.0
+                vIBSUF = 0.0
+                vIBSMun = 0.0
+                for line in self.move_ids.invoice_line_ids:
+                    vCBS += line.amount_untaxed * (line.cbs_tax_id.percent_amount/100) if line.amount_untaxed else 0.00
+                    vIBSUF += line.amount_untaxed * (line.ibsuf_tax_id.percent_amount/100) if line.amount_untaxed else 0.00
+                    vIBSMun += line.amount_untaxed * (line.ibsmun_tax_id.percent_amount/100) if line.amount_untaxed else 0.00
+                vIBS = vIBSUF + vIBSMun
+                self.nfe40_vBCIBSCBS = vIBS + vCBS
+                self.nfe40_vIBS = vIBS
+                self.nfe40_vIBSUF = vIBSUF
+                self.nfe40_vDif = 0.00 
+                self.nfe40_vCredPres = 0.00
+                self.nfe40_vDevTrib = 0.00
+                self.nfe40_vIBSMun = vIBSMun
+                self.nfe40_vCBS = vCBS
+                self.nfe40_vCredPresCondSus = 0.00
             else:
                 export_dict["nfe40_IBSCBSTot"] = None
 
@@ -62,22 +70,40 @@ class DocumentLine(models.Model):
         if self.account_line_ids.ibscbs_cst_code:
             export_dict["CST"] = self.account_line_ids.ibscbs_cst_code[:3]
             export_dict["cClassTrib"] = self.account_line_ids.ibscbs_cst_code[:3] + self.account_line_ids.ibscbs_cst_code[3:4].zfill(3)
+        else:
+            return None
 
     def _export_fields_nfe_40_gibscbs(self, xsd_fields, class_obj, export_dict):
-        export_dict["vBC"] = self.account_line_ids.amount_untaxed
-        export_dict["vIBS"] = self.account_line_ids.amount_untaxed
+        if not self.account_line_ids.ibscbs_cst_code:
+            export_dict["vBC"] = None
+            export_dict["vIBS"] = None
+        else:
+            export_dict["vBC"] = self.account_line_ids.amount_untaxed
+            export_dict["vIBS"] = self.account_line_ids.amount_untaxed
 
     def _export_fields_nfe_40_gibsuf(self, xsd_fields, class_obj, export_dict):
-        export_dict["pIBSUF"] = self.account_line_ids.ibsuf_tax_id.percent_amount
-        export_dict["vIBSUF"] = self.account_line_ids.amount_untaxed * (self.account_line_ids.ibsuf_tax_id.percent_amount/100) if self.account_line_ids.amount_untaxed else 0.00
+        if not self.account_line_ids.ibsuf_tax_id:
+            export_dict["pIBSUF"] = None
+            export_dict["vIBSUF"] = None
+        else:
+            export_dict["pIBSUF"] = self.account_line_ids.ibsuf_tax_id.percent_amount
+            export_dict["vIBSUF"] = self.account_line_ids.amount_untaxed * (self.account_line_ids.ibsuf_tax_id.percent_amount/100) if self.account_line_ids.amount_untaxed else 0.00
 
     def _export_fields_nfe_40_gibsmun(self, xsd_fields, class_obj, export_dict):
-        export_dict["pIBSMun"] = self.account_line_ids.ibsmun_tax_id.percent_amount
-        export_dict["vIBSMun"] = self.account_line_ids.amount_untaxed * (self.account_line_ids.ibsmun_tax_id.percent_amount/100) if self.account_line_ids.amount_untaxed else 0.00
+        if not self.account_line_ids.ibsmun_tax_id:
+            export_dict["pIBSMun"] = None
+            export_dict["vIBSMun"] = None
+        else:
+            export_dict["pIBSMun"] = self.account_line_ids.ibsmun_tax_id.percent_amount
+            export_dict["vIBSMun"] = self.account_line_ids.amount_untaxed * (self.account_line_ids.ibsmun_tax_id.percent_amount/100) if self.account_line_ids.amount_untaxed else 0.00
 
     def _export_fields_nfe_40_gcbs(self, xsd_fields, class_obj, export_dict):
-        export_dict["pCBS"] = self.account_line_ids.cbs_tax_id.percent_amount
-        export_dict["vCBS"] = self.account_line_ids.amount_untaxed * (self.account_line_ids.cbs_tax_id.percent_amount/100) if self.account_line_ids.amount_untaxed else 0.00
+        if not self.account_line_ids.cbs_tax_id:
+            export_dict["pCBS"] = None
+            export_dict["vCBS"] = None
+        else:
+            export_dict["pCBS"] = self.account_line_ids.cbs_tax_id.percent_amount
+            export_dict["vCBS"] = self.account_line_ids.amount_untaxed * (self.account_line_ids.cbs_tax_id.percent_amount/100) if self.account_line_ids.amount_untaxed else 0.00
 
 class FiscalDocumentLineMixin(models.AbstractModel):
     _inherit = "l10n_br_fiscal.document.line.mixin"

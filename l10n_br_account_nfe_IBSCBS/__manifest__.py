@@ -10,7 +10,7 @@
     'summary': 'Insere na Nota Fiscal as informações de IBSCBS',
     'description': """
         Este módulo permite preencher e enviar notas com informações do IBSCBS:
-        
+        Instalação: É necessário comentar os data(csv) para instalar, depois descomentar e atualizar o módulo
         - 
     """,
     'author': 'ATSTi Soluções',
@@ -24,7 +24,7 @@
         "views/document_view.xml",
         # "views/account_invoice_view.xml",
     ],
-    "post_init_hook": "post_load_constants",
+    "post_init_hook": "post_init_hook",
     'installable': True,
     'application': False,
 }

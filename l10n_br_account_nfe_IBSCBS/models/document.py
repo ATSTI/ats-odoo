@@ -16,7 +16,6 @@ class FiscalDocumentIBSCBS(models.Model):
     # ENTÃO, MESMO QUE NÃO SEJAM USADOS DIRETAMENTE, PRECISAM SER DECLARADOS AQUI, SE NÃO NÃO ENTRARAM NA EXPORTAÇÃO
     def _export_fields(self, xsd_fields, class_obj, export_dict):
         if class_obj._name == "nfe.40.total":
-            import pudb;pu.db
             if "nfe40_IBSCBSTot" in class_obj._fields:
                 vCBS = 0.0
                 vIBSUF = 0.0
@@ -143,3 +142,15 @@ class FiscalDocumentLineMixin(models.AbstractModel):
         string="Tax CBS",
         domain=[("tax_domain", "=", TAX_DOMAIN_CBS)],
     )
+
+
+class SpecMixinExport(models.AbstractModel):
+    _inherit = "spec.mixin_export"
+    
+    def _export_many2one(self, field_name, xsd_required, class_obj=None):
+        if field_name in self._get_stacking_points().keys():
+            if field_name == "nfe40_gIBSCBS" and not self.account_line_ids.ibscbs_tax_id:
+                return None
+            if field_name == "nfe40_IBSCBS" and not self.account_line_ids.ibscbs_tax_id:
+                return None
+        return super()._export_many2one(field_name, xsd_required, class_obj=class_obj)

@@ -25,3 +25,4 @@
 "cst_ibscbs_820001","8201","Tributação em declaração de regime específico (inserido)","all","tax_group_ibscbs"
 "cst_ibs_001","001","IBS Tributação integral","out","tax_group_ibs"
 "cst_cbs_001","001","CBS Tributação integral","out","tax_group_cbs"
+"cst_ibscbs_410014","4114","Produtor Rural - Isento","out","tax_group_ibscbs"

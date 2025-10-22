@@ -18,13 +18,15 @@
     'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['l10n_br_fiscal', 'spec_driven_model', 'l10n_br_nfe','l10n_br_nfe_spec'],
     'data': [
+        # "data/account_tax_group.xml",
         "data/l10n_br_fiscal.tax.group.csv",
         "data/l10n_br_fiscal.cst.csv",
         "data/l10n_br_fiscal.tax.csv",
         "views/document_view.xml",
+        "views/res_company.xml",
         # "views/account_invoice_view.xml",
     ],
-    "post_init_hook": "post_init_hook",
+    # "post_init_hook": "post_init_hook",
     'installable': True,
     'application': False,
 }

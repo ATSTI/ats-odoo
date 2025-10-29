@@ -1,24 +1,4 @@
 # -*- coding: utf-8 -*-
-#############################################################################
-#
-#    Cybrosys Technologies Pvt. Ltd.
-#
-#    Copyright (C) 2019-TODAY Cybrosys Technologies(<https://www.cybrosys.com>).
-#    Author: Faslu Rahman(odoo@cybrosys.com)
-#
-#    You can modify it under the terms of the GNU AFFERO
-#    GENERAL PUBLIC LICENSE (AGPL v3), Version 3.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU AFFERO GENERAL PUBLIC LICENSE (AGPL v3) for more details.
-#
-#    You should have received a copy of the GNU AFFERO GENERAL PUBLIC LICENSE
-#    (AGPL v3) along with this program.
-#    If not, see <http://www.gnu.org/licenses/>.
-#
-#############################################################################
 
 from odoo import api, fields, models
 
@@ -26,71 +6,95 @@ from odoo import api, fields, models
 class AccountMove(models.Model):
     _inherit = "account.move"
 
-    discount_type = fields.Selection([('percent', 'Percentagem'), ('amount', 'Valor')], string='Tipo desconto',
-                                     readonly=True, states={'draft': [('readonly', False)]}, default='percent')
-    discount_rate = fields.Float('Total desconto', digits=(16, 2), readonly=True,
-                                 states={'draft': [('readonly', False)]})
-
-    def ajusta_valores(self):
-        for move in self:
-            if move.amount_untaxed and move.invoice_line_ids:
-                total = 0.0
-                for line in move.invoice_line_ids:
-                    total += (line.quantity * line.price_unit)
-                move.amount_discount_value = move.discount_rate
-                move.amount_total = total - move.amount_discount_value
-                move.amount_untaxed = total
-
-    @api.onchange('discount_type', 'discount_rate', 'invoice_line_ids')
-    def supply_rate(self):
-        for inv in self:
-            total = discount = discount_value = 0.0
-            for line in inv.invoice_line_ids:
-                total += (line.quantity * line.price_unit)
-            self.discount_rate = self.discount_rate
-            if inv.discount_type == 'percent':
-                for line in inv.invoice_line_ids:
-                    price_unit_discount = (
-                        line.price_unit * line.quantity * (inv.discount_rate / 100.0)
-                    )                    
-                    line.discount_value = price_unit_discount
-                    # line._onchange_price_subtotal()
-                    discount_value += line.discount_value
-            else:
-                if inv.discount_rate != 0:
-                    discount = (inv.discount_rate / total) * 100
-                else:
-                    discount = inv.discount_rate
-                for line in inv.invoice_line_ids:
-                    price_unit_discount = (
-                        line.price_unit * line.quantity * (discount / 100.0)
-                    )
-                    line.discount_value = price_unit_discount
-                    # line._onchange_price_subtotal()
-                    discount_value += line.discount_value
-            # inv._move_autocomplete_invoice_lines_values() NÃO EXISTE NA 16
-            inv.amount_untaxed = total
-            inv.amount_discount_value = discount_value
+    discount_type = fields.Selection([
+        ('percent', 'Percentagem'), ('amount', 'Valor')], 
+        string='Tipo desconto',
+        readonly=True, 
+        states={'draft': [('readonly', False)]}, 
+        default='percent'
+    )
+    discount_rate = fields.Float('Total desconto', 
+        digits=(16, 2), 
+        readonly=True,
+        states={'draft': [('readonly', False)]}
+    )
 
     def button_dummy(self):
-        self.supply_rate()
+        for inv in self:
+            inv._compute_amount()
         return True
+    
+    def _compute_amount(self):
+        super(AccountMove, self)._compute_amount()
+        for inv in self:
+            if inv.discount_type and inv.discount_rate:
+                currency = inv.currency_id or self.env.company.currency_id
+                total = sum(line.quantity * line.price_unit for line in inv.invoice_line_ids)
+                discount_value_total = 0.0
+
+                if total == 0:
+                    inv.amount_untaxed = inv.amount_discount_value = inv.amount_total = 0.0
+                    continue
+
+                # Determina tipo de desconto
+                if inv.discount_type == 'percent':
+                    discount_percent = inv.discount_rate
+                else:
+                    discount_percent = (inv.discount_rate / total) * 100 if inv.discount_rate else 0.0
+
+                for line in inv.invoice_line_ids:
+                    if not line.quantity or not line.price_unit:
+                        continue
+                    price_unit_discount = currency.round(
+                        line.price_unit * line.quantity * (discount_percent / 100.0)
+                    )
+                    line.discount_value = price_unit_discount
+                    discount_value_total += price_unit_discount
+
+                    try:
+                        line._compute_totals()
+                    except AttributeError:
+                        pass
+                inv.amount_untaxed = currency.round(total)
+                if inv.discount_type == 'amount':   
+                    if inv.discount_rate != currency.round(discount_value_total):
+                        discount_value_total = discount_value_total + inv.discount_rate - currency.round(discount_value_total)
+                else:
+                    discount_value_total = (discount_percent / 100.0) * total   
+                inv.amount_discount_value = currency.round(discount_value_total)
+                inv.amount_total = currency.round(total - discount_value_total)
+                inv.amount_residual = inv.amount_total - inv.amount_paid
+            if inv.discount_type is False or inv.discount_rate == 0.0:
+                for line in inv.invoice_line_ids:
+                    line.discount_value = 0.0
+                inv.amount_discount_value = 0.0
 
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 
     @api.model_create_multi
     def create(self, vals_list):
-        result = super(
-                    AccountMoveLine, self.with_context(create_from_move_line=True)
-                ).create(vals_list)
-        for values in vals_list:
-            for line in result:
-                if line.product_id.id == values.get("product_id") and line.price_total == values.get("price_total"):
-                    discount = values.get("discount")
-                    if discount and values.get("discount_value") and not line.discount_value:
-                        price_unit_discount = (
-                            (values.get("price_unit") * values.get("quantity")) * (discount / 100.0)
-                        )
-                        line.update({"discount_value": price_unit_discount})
-        return result
+        result = super(AccountMoveLine, self.with_context(create_from_move_line=True)).create(vals_list)
+        for values, line in zip(vals_list, result):
+            discount = values.get("discount")
+            discount_value = values.get("discount_value")
+            quantity = values.get("quantity", 0)
+            price_unit = values.get("price_unit", 0.0)
+            if discount and discount_value and not line.discount_value:
+                currency = line.currency_id or line.company_id.currency_id
+                price_unit_discount = currency.round(price_unit * quantity * (discount / 100.0))
+                line.discount_value = price_unit_discount
+
+        return result   
+    
+    @api.depends('quantity', 'discount', 'price_unit', 'tax_ids', 'currency_id')
+    def _compute_totals(self):
+        super(AccountMoveLine, self)._compute_totals()
+        for line in self:
+            if self.env.context.get('create_from_move_line'):
+                continue
+            currency = line.currency_id or line.company_id.currency_id
+            price_unit_discount = currency.round(
+                line.price_unit * line.quantity * (line.discount / 100.0)
+            )
+            line.discount_value = price_unit_discount

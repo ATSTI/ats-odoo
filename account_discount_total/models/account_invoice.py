@@ -19,6 +19,17 @@ class AccountMove(models.Model):
         states={'draft': [('readonly', False)]}
     )
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        results = super(AccountMove, self).create(vals_list)
+        for values, inv in zip(vals_list, results):
+            discount_type = values.get('discount_type')
+            discount_rate = values.get('discount_rate')
+            if discount_type and discount_rate:
+                inv.discount_type = discount_type
+                inv.discount_rate = discount_rate
+        return results
+
     def button_dummy(self):
         for inv in self:
             inv._compute_amount()

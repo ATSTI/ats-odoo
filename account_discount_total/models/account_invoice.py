@@ -72,9 +72,13 @@ class AccountMove(models.Model):
                         discount_value_total = discount_value_total + inv.discount_rate - currency.round(discount_value_total)
                 else:
                     discount_value_total = (discount_percent / 100.0) * total   
+                total_final = currency.round(total - discount_value_total)
                 inv.amount_discount_value = currency.round(discount_value_total)
-                inv.amount_total = currency.round(total - discount_value_total)
+                inv.amount_total = total_final 
                 inv.amount_residual = inv.amount_total - inv.amount_paid
+                inv.amount_total_signed = total_final
+                inv.amount_untaxed_signed = total_final
+                inv.amount_total_in_currency_signed = total_final
             if inv.discount_type is False or inv.discount_rate == 0.0:
                 for line in inv.invoice_line_ids:
                     line.discount_value = 0.0

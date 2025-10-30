@@ -101,15 +101,29 @@ class HelpdeskWhatsappWebhookController(OriginalWebhook):
                 else:
                     # Mensagem normal no chatter
                     try:
-                        ticket.with_context(skip_whatsapp_send=True).sudo().message_post(
+                        message_record = ticket.with_context(skip_whatsapp_send=True).sudo().message_post(
                             body=body,
                             message_type='comment',
                             subtype_xmlid='mail.mt_comment',
                             author_id=partner.id,
                         )
+
+                        # 🔔 Notificação realtime (Odoo 18)
+                        bus = request.env['bus.bus'].sudo()
+                        channel = f"mail.channel_{ticket.id}"
+                        payload = {
+                            'ticket_id': ticket.id,
+                            'message_id': message_record.id,
+                            'body': body,
+                            'author_name': partner.name,
+                        }
+                        bus._sendone(channel, 'whatsapp_incoming', payload)  # ✅ Odoo 18
+
+                        _logger.info("🔔 Notificação enviada para canal %s", channel)
                         _logger.info("Mensagem do partner '%s' posta no ticket #%s.", partner.name, ticket.id)
+
                     except Exception as ex:
-                        _logger.exception("Erro ao postar mensagem no ticket #%s: %s", getattr(ticket, 'id', 'N/A'), ex)
+                        _logger.exception("Erro ao postar mensagem no ticket #%s: %s", ticket.id, ex)
 
             # Chama super() para manter lógica original
             try:

@@ -8,9 +8,14 @@
                 <button name="action_close_ticket"
                         type="object"
                         string="Encerrar Ticket"
-                        class="oe_highlight"
-                        />
+                        class="oe_highlight"/>
             </xpath>
+            <xpath expr="//header/button[@name='assign_to_me']" position="replace">
+                <button name="assign_to_me"
+                        type="object"
+                        string="Atribuir a mim"/>
+            </xpath>
+
         </field>
     </record>
 </odoo>

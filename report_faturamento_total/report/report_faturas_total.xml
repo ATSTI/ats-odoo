@@ -1,21 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="report_account_fullist">
+    <?xml version="1.0"?>
+    <t t-name="field_service_custom.report_account_fullist">
         <t t-call="web.html_container">
             <div class="page" style="font-family: 'Arial', sans-serif; color: #333; font-size: 13px;">
                 
-                <!-- Cabeçalho da empresa -->
+                <!-- Cabeçalho da empresa (sempre a primeira empresa) -->
                 <div style="width:100%; border-bottom: 2px solid #004080; padding-bottom:10px; margin-bottom:20px;">
                     <div style="float:left; width:60%;">
-                        <b style="font-size:20px; color:#004080;" t-field="docs.company_id.name"/>
+                        <b style="font-size:20px; color:#004080;" t-esc="docs[0].company_id.name"/>
                         <br/>
-                        <span t-field="docs.company_id.street"/> - 
-                        <span t-field="docs.company_id.district"/><br/>
-                        <span t-field="docs.company_id.city_id.name"/>
+                        <span t-esc="docs[0].company_id.street"/> - 
+                        <span t-esc="docs[0].company_id.district"/><br/>
+                        <span t-esc="docs[0].company_id.city_id.name"/>
                     </div>
                     <div style="float:right; width:35%; text-align:right;">
-                        <img t-attf-src="data:image/*;base64,{{docs.company_id.logo}}"
-                            t-att-alt="docs.company_id.name"
+                        <img t-if="docs[0].company_id.logo"
+                            t-attf-src="data:image/*;base64,{{docs[0].company_id.logo}}"
+                            t-att-alt="docs[0].company_id.name"
                             style="max-width:150px; max-height:80px;"/>
                     </div>
                     <div style="clear:both;"></div>
@@ -30,8 +31,8 @@
                         <table style="width:100%; border:1px solid #ccc; border-collapse:collapse; margin-bottom:10px;">
                             <tr style="background-color:#f3f6fb;">
                                 <td style="border:1px solid #ccc; text-align:center; width:20%; padding:6px;">
-                                    <b>Data da Fatura</b><br/>
-                                    <span t-esc="o.invoice_date"/>
+                                    <b>Data/Hora do Serviço:</b><br/>
+                                    <span t-esc="o.fsm_order_ids.scheduled_date_start"/>
                                 </td>
                                 <td style="border:1px solid #ccc; text-align:center; width:40%; padding:6px;">
                                     <b>Cliente</b><br/>
@@ -71,10 +72,10 @@
                                             <span t-esc="round(line.quantity, 0)"/>
                                         </td>
                                         <td style="border:1px solid #ddd; text-align:right; padding:5px;">
-                                            <span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            <span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": docs[0].currency_id}'/>
                                         </td>
                                         <td style="border:1px solid #ddd; text-align:right; padding:5px;">
-                                            <span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            <span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": docs[0].currency_id}'/>
                                         </td>
                                     </tr>
                                 </t>
@@ -122,7 +123,7 @@
                                         <span t-esc="qtd"/>
                                     </td>
                                     <td style="border:1px solid #ddd; padding:6px; text-align:right;">
-                                        <span t-esc="value" t-options='{"widget": "monetary", "display_currency": docs.currency_id}'/>
+                                        <span t-esc="value" t-options='{"widget": "monetary", "display_currency": docs[0].currency_id}'/>
                                     </td>
                                 </tr>
                             </t>
@@ -132,7 +133,7 @@
                             <tr style="background-color:#f3f6fb;">
                                 <td colspan="2" style="border:1px solid #ccc; padding:8px; text-align:right;"><b>Total Geral:</b></td>
                                 <td style="border:1px solid #ccc; padding:8px; text-align:right;">
-                                    <b><span t-esc="value_t" t-options='{"widget": "monetary", "display_currency": docs.currency_id}'/></b>
+                                    <b><span t-esc="value_t" t-options='{"widget": "monetary", "display_currency": docs[0].currency_id}'/></b>
                                 </td>
                             </tr>
                         </tfoot>
@@ -140,5 +141,5 @@
                 </div>
             </div>
         </t>
-    </template>
+    </t>
 </odoo>

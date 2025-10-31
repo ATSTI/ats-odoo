@@ -66,13 +66,14 @@ class AccountMove(models.Model):
                         line._compute_totals()
                     except AttributeError:
                         pass
-                inv.amount_untaxed = currency.round(total)
+                inv.amount_price_gross = currency.round(total)
                 if inv.discount_type == 'amount':   
                     if inv.discount_rate != currency.round(discount_value_total):
                         discount_value_total = discount_value_total + inv.discount_rate - currency.round(discount_value_total)
                 else:
                     discount_value_total = (discount_percent / 100.0) * total   
                 total_final = currency.round(total - discount_value_total)
+                inv.amount_untaxed = total_final
                 inv.amount_discount_value = currency.round(discount_value_total)
                 inv.amount_total = total_final 
                 inv.amount_residual = inv.amount_total - inv.amount_paid

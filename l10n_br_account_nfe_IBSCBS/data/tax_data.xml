@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+
+    <record
+        id="tax_ibscbs_000001"
+        model="l10n_br_fiscal.tax"
+    >
+        <field name="name">"IBS/CBS Integral"</field>
+        <field name="percent_amount">1.0</field>
+        <field name="percent_reduction">0.0</field>
+        <field name="value_amount">0.0</field>
+        <field name="percent_debit_credit">0.0</field>
+        <field name="icmsst_mva_percent">0.0</field>
+        <field name="icmsst_value">0.0</field>
+        <field name="icms_base_type">0</field>
+        <field name="icmsst_base_type">4</field>
+        <field name="tax_group_id" ref="l10n_br_account_nfe_IBSCBS.tax_group_ibscbs" />
+        <field name="cst_in_id" ref="l10n_br_account_nfe_IBSCBS.cst_ibscbs_000001" />
+        <field name="cst_out_id" ref="l10n_br_account_nfe_IBSCBS.cst_ibscbs_000001" />
+    </record>
+    <record
+        id="tax_ibsuf_000001"
+        model="l10n_br_fiscal.tax"
+    >
+        <field name="name">"IBSUF Integral"</field>
+        <field name="percent_amount">0.10</field>
+        <field name="percent_reduction">0.0</field>
+        <field name="value_amount">0.0</field>
+        <field name="percent_debit_credit">0.0</field>
+        <field name="icmsst_mva_percent">0.0</field>
+        <field name="icmsst_value">0.0</field>
+        <field name="icms_base_type">0</field>
+        <field name="icmsst_base_type">4</field>
+        <field name="tax_group_id" ref="l10n_br_account_nfe_IBSCBS.tax_group_ibscbs" />
+        <field name="cst_in_id" ref="l10n_br_account_nfe_IBSCBS.cst_ibscbs_000001" />
+        <field name="cst_out_id" ref="l10n_br_account_nfe_IBSCBS.cst_ibscbs_000001" />
+    </record>
+    <record
+        id="tax_ibscbs_410014"
+        model="l10n_br_fiscal.tax"
+    >
+        <field name="name">"IBS/CBS Produtor Rural"</field>
+        <field name="percent_amount">1.0</field>
+        <field name="percent_reduction">100.0</field>
+        <field name="value_amount">0.0</field>
+        <field name="percent_debit_credit">0.0</field>
+        <field name="icmsst_mva_percent">0.0</field>
+        <field name="icmsst_value">0.0</field>
+        <field name="icms_base_type">0</field>
+        <field name="icmsst_base_type">4</field>
+        <field name="tax_group_id" ref="l10n_br_account_nfe_IBSCBS.tax_group_ibscbs" />
+        <field name="cst_in_id" ref="l10n_br_account_nfe_IBSCBS.cst_ibscbs_410014" />
+        <field name="cst_out_id" ref="l10n_br_account_nfe_IBSCBS.cst_ibscbs_410014" />
+    </record>
+</odoo>

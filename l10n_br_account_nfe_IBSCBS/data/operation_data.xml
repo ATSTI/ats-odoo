@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+
+    <record
+        id="fo_venda_venda_ibscbs"
+        model="l10n_br_fiscal.tax.definition"
+    >
+        <field
+            name="fiscal_operation_line_id"
+            ref="l10n_br_fiscal.fo_venda_venda"
+        />
+        <field name="tax_group_id" ref="l10n_br_account_nfe_IBSCBS.tax_group_ibscbs" />
+        <field name="custom_tax">True</field>
+        <field name="is_taxed">True</field>
+        <field name="tax_id" ref="l10n_br_account_nfe_IBSCBS.tax_ibscbs_000001" />
+        <field name="cst_id" ref="l10n_br_account_nfe_IBSCBS.cst_ibscbs_000001" />
+        <field name="state">approved</field>
+    </record>
+    <record
+        id="fo_venda_venda_ibsuf"
+        model="l10n_br_fiscal.tax.definition"
+    >
+        <field
+            name="fiscal_operation_line_id"
+            ref="l10n_br_fiscal.fo_venda_venda"
+        />
+        <field name="tax_group_id" ref="l10n_br_account_nfe_IBSCBS.tax_group_ibsuf" />
+        <field name="custom_tax">True</field>
+        <field name="is_taxed">True</field>
+        <field name="tax_id" ref="l10n_br_account_nfe_IBSCBS.tax_ibsuf_000001" />
+        <field name="state">approved</field>
+    </record>
+    <record
+        id="fo_venda_venda_ibsmun"
+        model="l10n_br_fiscal.tax.definition"
+    >
+        <field
+            name="fiscal_operation_line_id"
+            ref="l10n_br_fiscal.fo_venda_venda"
+        />
+        <field name="tax_group_id" ref="l10n_br_account_nfe_IBSCBS.tax_group_ibsmun" />
+        <field name="custom_tax">True</field>
+        <field name="is_taxed">True</field>
+        <field name="tax_id" ref="l10n_br_account_nfe_IBSCBS.tax_ibsmun_000001" />
+        <field name="state">approved</field>
+    </record>
+    <record
+        id="fo_venda_venda_cbs"
+        model="l10n_br_fiscal.tax.definition"
+    >
+        <field
+            name="fiscal_operation_line_id"
+            ref="l10n_br_fiscal.fo_venda_venda"
+        />
+        <field name="tax_group_id" ref="l10n_br_account_nfe_IBSCBS.tax_group_cbs" />
+        <field name="custom_tax">True</field>
+        <field name="is_taxed">True</field>
+        <field name="tax_id" ref="l10n_br_account_nfe_IBSCBS.tax_cbs_000001" />
+        <field name="state">approved</field>
+    </record>            
+</odoo>

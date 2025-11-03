@@ -16,17 +16,23 @@
     'author': 'ATSTi Soluções',
     'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
     'website': 'https://github.com/ATSTI/ats-odoo',
-    'depends': ['l10n_br_fiscal', 'spec_driven_model', 'l10n_br_nfe','l10n_br_nfe_spec'],
+    'depends': ['l10n_br_fiscal', 'spec_driven_model', 'l10n_br_nfe'],
+    #
     'data': [
+        
         # "data/account_tax_group.xml",
         "data/l10n_br_fiscal.tax.group.csv",
+        # "data/account_tax_group.xml",
+        # "data/tax_group_data.xml",
         "data/l10n_br_fiscal.cst.csv",
-        "data/l10n_br_fiscal.tax.csv",
+        # "data/l10n_br_fiscal.tax.csv",
+        # "data/operation_data.xml", -- nao usar, carrega da empresa
+        # "data/tax_data.xml",
         "views/document_view.xml",
         "views/res_company.xml",
         # "views/account_invoice_view.xml",
     ],
-    # "post_init_hook": "post_init_hook",
+    "post_init_hook": "post_init_hook",
     'installable': True,
     'application': False,
 }

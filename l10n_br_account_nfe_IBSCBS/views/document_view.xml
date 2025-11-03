@@ -31,6 +31,14 @@
                             name="cbs_tax_id"
                             options="{'no_create': True, 'no_create_edit': True}"
                         />
+                        <field name="ibscbs_base" />
+                        <field name="ibsuf_aliquota" />
+                        <field name="ibsmun_aliquota" />
+                        <field name="ibs_reduction" />
+                        <field name="ibsuf_value" />
+                        <field name="ibsmun_value" />
+                        <field name="cbs_aliquota" />
+                        <field name="cbs_reduction" />
                         <field name="cbs_value" />
                     </group>
                 </page>

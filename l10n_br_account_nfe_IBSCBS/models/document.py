@@ -63,36 +63,29 @@ TAX_DICT_VALUES = {
     "ibsuf_value": 0.00,
     "ibsuf_aliquota": 0.00,
 }
-    # "ibscbs_base": 0.00,
-    # "ibsuf_value": 0.00,
-    # "ibsmun_value": 0.00,
-    # "cbs_value": 0.00,
-    # "ibsuf_aliquota": 0.00,
-    # "ibsmun_aliquota": 0.00,
-    # "cbs_aliquota": 0.00,
 
 
 class FiscalDocumentIBSCBS(models.Model):
-    _inherit = "l10n_br_fiscal.document"
-    
+    _inherit = "l10n_br_fiscal.document"       
+
     # BASES NOVAS PRECISAM QUE ESSES CAMPOS EXISTAM PARA PODEREM SER EXPORTAR PELO _export_field
     # ENTÃO, MESMO QUE NÃO SEJAM USADOS DIRETAMENTE, PRECISAM SER DECLARADOS AQUI, SE NÃO NÃO ENTRARAM NA EXPORTAÇÃO
     def _export_fields(self, xsd_fields, class_obj, export_dict):
         if class_obj._name == "nfe.40.total":
+            
             if "nfe40_IBSCBSTot" in class_obj._fields:
                 vCBS = 0.0
                 vIBSUF = 0.0
                 vIBSMun = 0.0
                 vIBSCBS = 0.0
                 for line in self.fiscal_line_ids:
-                    # vCBS += line.amount_untaxed * (line.cbs_tax_id.percent_amount/100) if line.amount_untaxed else 0.00
-                    # vIBSUF += line.amount_untaxed * (line.ibsuf_tax_id.percent_amount/100) if line.amount_untaxed else 0.00
-                    # vIBSMun += line.amount_untaxed * (line.ibsmun_tax_id.percent_amount/100) if line.amount_untaxed else 0.00
-                    # vIBSCBS += line.amount_untaxed
+                    cst = line.ibscbs_cst_code or line.ibscbs_tax_id.cst_out_id.code
                     vCBS += line.cbs_value
                     vIBSUF += line.ibsuf_value
                     vIBSMun += line.ibsmun_value
-                    vIBSCBS += line.ibscbs_base 
+                    vIBSCBS += line.ibscbs_base
+                    if cst == '4114':
+                        vIBSCBS = 0.0
                 vIBS = vIBSUF + vIBSMun
                 self.nfe40_vBCIBSCBS = vIBSCBS
                 self.nfe40_vIBS = vIBS
@@ -108,87 +101,41 @@ class FiscalDocumentIBSCBS(models.Model):
 
         return super()._export_fields(xsd_fields, class_obj, export_dict)
 
-    # SÓ VAI ENTRAR AQUI NO MOMENTO EM QUE OS CAMPOS EXISTEM, POR ALGUM MOTIVO, SE EU NÃO DECLARAR OS CAMPOS ACIMA, NÃO ENTRA AQUI
-    # def _export_field(self, xsd_field, class_obj, member_spec, export_value=None):
-    #     if class_obj._name == "nfe.40.total":
-    #         vCBS = 0.0
-    #         vIBSUF = 0.0
-    #         vIBSMun = 0.0
-    #         vIBSCBS = 0.0
-    #         for line in self.fiscal_line_ids:
-    #             # vCBS += line.amount_untaxed * (line.cbs_tax_id.percent_amount/100) if line.amount_untaxed else 0.00
-    #             # vIBSUF += line.amount_untaxed * (line.ibsuf_tax_id.percent_amount/100) if line.amount_untaxed else 0.00
-    #             # vIBSMun += line.amount_untaxed * (line.ibsmun_tax_id.percent_amount/100) if line.amount_untaxed else 0.00
-    #             # vIBSCBS += line.amount_untaxed
-    #             vCBS += line.cbs_value
-    #             vIBSUF += line.ibsuf_value
-    #             vIBSMun += line.ibsmun_value
-    #             vIBSCBS += line.vIBSCBS 
-    #         vIBS = vIBSUF + vIBSMun
-    #         simulated_values = {
-    #             "nfe40_vIBS": vIBS,
-    #             "nfe40_vIBSUF": vIBSUF,
-    #             "nfe40_vIBSMun": vIBSMun,
-    #             "nfe40_vCBS": vCBS,
-    #             "nfe40_vBCIBSCBS": vIBSCBS,
-    #         }
-    #         if xsd_field in simulated_values and getattr(self, "move_ids", None):
-    #             export_value = simulated_values[xsd_field]
-
-    #     return super()._export_field(xsd_field, class_obj, member_spec, export_value)
 
 class DocumentLine(models.Model):
     _inherit = "l10n_br_fiscal.document.line"
 
-    # nfe40_vCBS = fields.Monetary(related="cbs_value")
-    # def _prepare_tax_ibscbs(self):
-    #     pass
-
     def _export_fields_nfe_40_ibscbs(self, xsd_fields, class_obj, export_dict):
         if self.ibscbs_tax_id or self.ibscbs_cst_code:
             cst = self.ibscbs_cst_code or self.ibscbs_tax_id.cst_out_id.code
-            export_dict["CST"] = cst[:2].zfill(3)
-            export_dict["cClassTrib"] = cst[:2].zfill(3) + cst[2:4].zfill(3)
+            # TODO fazer uma lista dos CSTs ques os grupos nao precisam ser informados como o 410
+            if cst == '4114':
+                xsd_fields.remove("nfe40_gIBSCBS")
+            export_dict["CST"] = cst[:2] + '0'
+            export_dict["cClassTrib"] = cst[:2] + '0' + cst[2:4].zfill(3)
         else:
             return None
 
-    def _export_fields_nfe_40_gibscbs(self, xsd_fields, class_obj, export_dict):
+    def _export_fields_nfe_40_gibscbs(self, xsd_fields, class_obj, export_dict):        
         if self.cbs_tax_id:
-            # ibs_uf = self.amount_untaxed * (self.ibsuf_tax_id.percent_amount/100) if self.amount_untaxed else 0.00
-            # ibs_mun = self.amount_untaxed * (self.ibsmun_tax_id.percent_amount/100) if self.amount_untaxed else 0.00
-            # cbs = self.amount_untaxed * (self.cbs_tax_id.percent_amount/100) if self.amount_untaxed else 0.00
             export_dict["vBC"] = self.ibscbs_base
             export_dict["vIBS"] = self.ibsuf_value + self.ibsmun_value
+            
 
     def _export_fields_nfe_40_gibsuf(self, xsd_fields, class_obj, export_dict):
-        if not self.ibsuf_tax_id:
-            export_dict["pIBSUF"] = None
-            export_dict["vIBSUF"] = None
-        else:
+        if self.ibsuf_tax_id:
             export_dict["pIBSUF"] = self.ibsuf_aliquota
-            # self.ibsuf_tax_id.percent_amount
             export_dict["vIBSUF"] = self.ibsuf_value
-            # self.amount_untaxed * (self.ibsuf_tax_id.percent_amount/100) if self.amount_untaxed else 0.00
 
     def _export_fields_nfe_40_gibsmun(self, xsd_fields, class_obj, export_dict):
-        if not self.ibsmun_tax_id:
-            export_dict["pIBSMun"] = None
-            export_dict["vIBSMun"] = None
-        else:
+        if self.ibsmun_tax_id:
             export_dict["pIBSMun"] = self.ibsmun_aliquota
-            # self.ibsmun_tax_id.percent_amount
             export_dict["vIBSMun"] = self.ibsmun_value
-            # self.amount_untaxed * (self.ibsmun_tax_id.percent_amount/100) if self.amount_untaxed else 0.00
 
     def _export_fields_nfe_40_gcbs(self, xsd_fields, class_obj, export_dict):
-        if not self.cbs_tax_id:
-            export_dict["pCBS"] = None
-            export_dict["vCBS"] = None
-        else:
+        if self.cbs_tax_id:
             export_dict["pCBS"] = self.cbs_aliquota
-            # self.cbs_tax_id.percent_amount
             export_dict["vCBS"] = self.cbs_value
-            # self.amount_untaxed * (self.cbs_tax_id.percent_amount/100) if self.amount_untaxed else 0.00
 
 class FiscalDocumentLineMixin(models.AbstractModel):
     _inherit = "l10n_br_fiscal.document.line.mixin"
@@ -257,10 +204,10 @@ class FiscalDocumentLineMixinMethods(models.AbstractModel):
         ibsuf_aliquota = self.ibsuf_tax_id.percent_amount if self.ibsuf_tax_id else 0.00
         base_bs = self.amount_untaxed - (self.amount_untaxed * (pRedIBS/100) if pRedIBS else 0.00)
         ibsuf_value = base_bs * (ibsuf_aliquota/100) if self.ibsuf_tax_id else 0.00
-        # import pudb;pu.db
         return {           
             "ibsuf_aliquota": ibsuf_aliquota,
             "ibsuf_value": ibsuf_value,
+            "ibs_reduction": pRedIBS,
         }
 
     def _prepare_fields_ibsmun(self, tax_dict):
@@ -271,7 +218,6 @@ class FiscalDocumentLineMixinMethods(models.AbstractModel):
         ibsmun_aliquota = self.ibsmun_tax_id.percent_amount if self.ibsmun_tax_id else 0.00
         base_bs = self.amount_untaxed - (self.amount_untaxed * (pRedIBS/100) if pRedIBS else 0.00)
         ibsmun_value = base_bs * (ibsmun_aliquota/100) if self.ibsuf_tax_id else 0.00
-        # import pudb;pu.db
         return {           
             "ibsmun_aliquota": ibsmun_aliquota,
             "ibsmun_value": ibsmun_value,
@@ -285,16 +231,14 @@ class FiscalDocumentLineMixinMethods(models.AbstractModel):
         cbs_aliquota = self.cbs_tax_id.percent_amount if self.cbs_tax_id else 0.00
         base_bs = self.amount_untaxed - (self.amount_untaxed * (pRedCBS/100) if pRedCBS else 0.00)
         cbs_value = base_bs * (cbs_aliquota/100) if self.cbs_tax_id else 0.00
-        # import pudb;pu.db
         return {           
             "cbs_aliquota": cbs_aliquota,
             "cbs_value": cbs_value,
+            "cbs_reduction": pRedCBS,
         }
 
     def _remove_all_fiscal_tax_ids(self):
         for line in self:
-            # print(line.name)
-            # print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
             to_update = {"fiscal_tax_ids": False}
             for fiscal_tax_field in FISCAL_TAX_ID_FIELDS:
                 to_update[fiscal_tax_field] = False
@@ -330,56 +274,4 @@ class FiscalDocumentLineMixinMethods(models.AbstractModel):
                 if prepared_fields:
                     to_update.update(prepared_fields)
             # Update all fields at once
-            print(to_update)
             line.update(to_update)
-
-    # def _prepare_tax_fields(self, compute_result):
-    #     # import pudb;pu.db
-    #     res = super()._prepare_tax_fields(compute_result)
-    #     if "ibscbs_base" in res:
-    #         import pudb;pu.db
-    #     if self.ibscbs_tax_id:
-    #         for tax in self.fiscal_tax_ids:
-    #             if tax.tax_domain == 'ibscbs':
-    #                 # ibscbs_cst_id = self.ibscbs_tax_id.cst_out_id.id
-    #                 # ibscbs_cst_code = self.tax_id.cst_out_id.code
-    #                 # ibscbs_tax_id = self.tax_id.id
-    #                 pRedIBS = self.ibscbs_tax_id.percent_reduction
-    #                 base_bs = self.amount_untaxed - (self.amount_untaxed * (pRedIBS/100) if pRedIBS else 0.00)
-    #                 import pudb;pu.db
-    #                 res.update({
-    #                     "ibscbs_base": base_bs,
-    #                 })
-
-                # elif fiscal_line.tax_domain == 'ibsuf':
-                #     line.ibsuf_tax_id = fiscal_line.tax_id.id
-                #     line.ibsuf_aliquota = fiscal_line.tax_id.percent_amount                    
-                # elif fiscal_line.tax_domain == 'ibsmun':
-                #     line.ibsmun_tax_id = fiscal_line.tax_id.id
-                #     line.ibsmun_aliquota = fiscal_line.tax_id.percent_amount
-                # elif fiscal_line.tax_domain == 'cbs':
-                #     line.cbs_tax_id = fiscal_line.tax_id.id
-                #     line.cbs_aliquota = fiscal_line.tax_id.percent_amount
-                #     line.pRedCBS = fiscal_line.tax_id.percent_reduction
-
-                # "ibscbs_tax_id": self.ibscbs_tax_id.id,
-                # "ibscbs_cst_id": self.ibscbs_cst_id.id,
-                # "ibsuf_tax_id": self.ibsuf_tax_id.id,
-                # "ibsmun_tax_id": self.ibsmun_tax_id.id,
-                # "cbs_tax_id": self.cbs_tax_id.id,
-
-            # print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
-            # print(tax.name)
-        # return res
-
-
-class SpecMixinExport(models.AbstractModel):
-    _inherit = "spec.mixin_export"
-    
-    def _export_many2one(self, field_name, xsd_required, class_obj=None):
-        if field_name in self._get_stacking_points().keys():
-            if field_name == "nfe40_gIBSCBS" and not self.cbs_tax_id:
-                return None
-            if field_name == "nfe40_IBSCBS" and not self.cbs_tax_id:
-                return None
-        return super()._export_many2one(field_name, xsd_required, class_obj=class_obj)

@@ -69,7 +69,12 @@ class AccountMove(models.Model):
                 inv.amount_price_gross = currency.round(total)
                 if inv.discount_type == 'amount':   
                     if inv.discount_rate != currency.round(discount_value_total):
-                        discount_value_total = discount_value_total + inv.discount_rate - currency.round(discount_value_total)
+                        discount_value_total = currency.round(discount_value_total + inv.discount_rate - discount_value_total)
+                        soma = sum(line.discount_value for line in inv.invoice_line_ids)
+                        if soma != discount_value_total:
+                            n_linhas = len(inv.invoice_line_ids)
+                            dif = (currency.round(discount_value_total - soma))
+                            inv.invoice_line_ids[n_linhas-1].discount_value += dif 
                 else:
                     discount_value_total = (discount_percent / 100.0) * total   
                 total_final = currency.round(total - discount_value_total)

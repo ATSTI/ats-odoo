@@ -12,6 +12,7 @@ class FSMOrder(models.Model):
     @api.onchange('person_id')
     def _onchange_person_id(self):
         if self.person_id:
+            self.write({'person_ids': [(6, 0, [])]})
             self.write({'person_ids': [(4, self.person_id.id)]})
             users = self.env['hr.employee']
             us = users.search([('name', '=', self.person_id.name)])
@@ -43,42 +44,52 @@ class FSMOrder(models.Model):
 
     def write(self, vals):
         res = super(FSMOrder, self).write(vals)
-        if self.person_id.name not in self.name:
-            name = ''
-            for person in self.person_ids:
-                if name == '':
-                    name = f'{person.name} -'
-                else:
-                    name = f'{name} {person.name} -'
-            self.name = f'{name} {self.name}'
-        else:
-            return res
+        for record in self:
+            if "person_ids" in vals or "person_id" in vals:
+                if record.person_ids:
+                    parts = record.name.split(" - ")
+                    old_name = parts[-1].strip() if parts else record.name
+                    names = " - ".join(person.name for person in record.person_ids)
+                    record.update({"name": f"{names} - {old_name}"})
+            if "name" in vals and not "person_id" in vals:
+                continue
+            if "scheduled_date_start" in vals or "scheduled_date_end" in vals: #Esse ultimo para ter certeza que entra aqui quando duplica
+                overlapping_orders = self.env["fsm.order"].search([
+                    ('id', '!=', record.id),
+                    ('scheduled_date_start', '<=', record.scheduled_date_end),
+                    ('scheduled_date_end', '>=', record.scheduled_date_start),
+                ])
+                current_person_ids = set(record.person_ids.ids)
+                for order in overlapping_orders:
+                    if current_person_ids & set(order.person_ids.ids):  # interseção de conjuntos
+                        raise UserError(_("Horário indisponível, já existe um evento agendado para este horário."))
+        return res
 
     @api.model_create_multi
     def create(self, vals_list):
         res = super().create(vals_list)
-        for va in vals_list:
-            if_exists = self.env["fsm.order"].search([
-                ('id', '!=', res.id),
-                ('scheduled_date_start', '<=', res.scheduled_date_end),
-                ('scheduled_date_end', '>=', res.scheduled_date_start),
-            ])
-            for ex in if_exists:
-                for person in ex.person_ids:
-                    for person2 in res.person_ids:
-                        if person.id == person2.id:
-                            raise UserError(_("Horário indisponível, já existe um evento agendado para este horário."))
-        if res.person_id:
-            name = ''
-            for person in res.person_ids:
-                if name == '':
-                    name = f'{person.name} -'
-                else:
-                    name = f'{name} {person.name} -'
-            res.name = f'{name} {res.name}'
+        if res.person_ids:
+            parts = res.name.split(" - ")
+            old_name = parts[-1].strip() if parts else res.name
+            names = " - ".join(person.name for person in res.person_ids)
+            res.update({"name": f"{names} - {old_name}"})
         res._create_calendar_event()
         return res
     
+    def action_complete(self):
+        res = super(FSMOrder, self).action_complete()
+        for record in self:
+            overlapping_orders = self.env["fsm.order"].search([
+                ('id', '!=', record.id),
+                ('scheduled_date_start', '<=', record.scheduled_date_end),
+                ('scheduled_date_end', '>=', record.scheduled_date_start),
+            ])
+            current_person_ids = set(record.person_ids.ids)
+            for order in overlapping_orders:
+                if current_person_ids & set(order.person_ids.ids):  # interseção de conjuntos
+                    raise UserError(_("Horário indisponível, já existe um evento agendado para este horário."))
+            return res
+
     def account_prepare_invoice(self):
         jrnl = self.env["account.journal"].search(
             [

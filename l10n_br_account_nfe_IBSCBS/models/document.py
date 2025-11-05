@@ -86,6 +86,7 @@ class FiscalDocumentIBSCBS(models.Model):
                     vIBSCBS += line.ibscbs_base
                     if cst == '4114':
                         vIBSCBS = 0.0
+                    #  or self.fiscal_operation_id.fiscal_type in ('return_in', 'return_out', 'other')
                 vIBS = vIBSUF + vIBSMun
                 self.nfe40_vBCIBSCBS = vIBSCBS
                 self.nfe40_vIBS = vIBS
@@ -109,6 +110,7 @@ class DocumentLine(models.Model):
         if self.ibscbs_tax_id or self.ibscbs_cst_code:
             cst = self.ibscbs_cst_code or self.ibscbs_tax_id.cst_out_id.code
             # TODO fazer uma lista dos CSTs ques os grupos nao precisam ser informados como o 410
+            #  or self.fiscal_operation_id.fiscal_type in ('return_in', 'return_out', 'other')
             if cst == '4114':
                 xsd_fields.remove("nfe40_gIBSCBS")
             export_dict["CST"] = cst[:2] + '0'

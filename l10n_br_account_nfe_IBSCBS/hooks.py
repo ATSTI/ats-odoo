@@ -76,21 +76,21 @@ def post_init_hook(cr, registry):
     for empresa in empresas:
         id_cst = ir_model_data_obj.search([
             ("module", "=", "l10n_br_account_nfe_IBSCBS"),
-            ("name", "=", "cst_ibscbs_000001"),
+            ("name", "=", "cst_ibscbs_410014"),
         ])
         id_uf_tax = ir_model_data_obj.search([
             ("module", "=", "l10n_br_account_nfe_IBSCBS"),
-            ("name", "=", "tax_ibsuf_000001"),
+            ("name", "=", "tax_ibsuf_410014"),
             ("model", "=", "l10n_br_fiscal.tax"),
         ])
         id_mun_tax = ir_model_data_obj.search([
             ("module", "=", "l10n_br_account_nfe_IBSCBS"),
-            ("name", "=", "tax_ibsmun_000001"),
+            ("name", "=", "tax_ibsmun_410014"),
             ("model", "=", "l10n_br_fiscal.tax"),
         ])
         id_cbs_tax = ir_model_data_obj.search([
             ("module", "=", "l10n_br_account_nfe_IBSCBS"),
-            ("name", "=", "tax_cbs_000001"),
+            ("name", "=", "tax_cbs_410014"),
             ("model", "=", "l10n_br_fiscal.tax"),
         ])
         

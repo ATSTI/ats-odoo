@@ -8,6 +8,9 @@ from erpbrasil.base import misc
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
+from odoo.tools.translate import _, LazyTranslate
+_lt = LazyTranslate(__name__, default_lang='pt_BR')
+
 from ..constants import (
     AVISO_FAVORECIDO,
     CODIGO_FINALIDADE_TED,
@@ -21,10 +24,10 @@ class AccountPaymentLine(models.Model):
     _inherit = "account.payment.line"
 
     PIX_TRANSFER_TYPES = [
-        ("checking", _("Checking Account (Conta Corrente)")),
-        ("saving", _("Saving Account (Conta Poupança)")),
-        ("payment", _("Prepaid Payment Account (Conta Pagamento)")),
-        ("pix_key", _("Instant Payment Key (Chave Pix)")),
+        ("checking", "Checking Account (Conta Corrente)"),
+        ("saving", "Saving Account (Conta Poupança)"),
+        ("payment", "Prepaid Payment Account (Conta Pagamento)"),
+        ("pix_key", "Instant Payment Key (Chave Pix)"),
     ]
 
     digitable_line = fields.Char(
@@ -244,7 +247,7 @@ class AccountPaymentLine(models.Model):
                 and not rec.partner_bank_id.transactional_acc_type
             ):
                 raise UserError(
-                    _(
+                    _lt(
                         "When the payment method is pix transfer, a pix key must be "
                         "informed, or the bank account with the type of account.\n"
                         f"Payment Line: {rec.name}"

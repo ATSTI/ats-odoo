@@ -8,6 +8,9 @@
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
+from odoo.tools.translate import _, LazyTranslate
+_lt = LazyTranslate(__name__, default_lang='en_US')
+
 from ..constants import BR_CODES_PAYMENT_ORDER
 
 
@@ -25,12 +28,12 @@ class AccountPaymentMode(models.Model):
     )
 
     PAYMENT_MODE_DOMAIN = [
-        ("dinheiro", _("Dinheiro")),
-        ("cheque", _("Cheque")),
-        ("pix_transfer", _("PIX Transfer")),
-        ("ted", _("TED")),
-        ("doc", _("DOC")),
-        ("boleto", _("Boleto")),
+        ("dinheiro", "Dinheiro"),
+        ("cheque", "Cheque"),
+        ("pix_transfer", "PIX Transfer"),
+        ("ted", "TED"),
+        ("doc", "DOC"),
+        ("boleto", "Boleto"),
     ]
 
     payment_mode_domain = fields.Selection(
@@ -79,7 +82,7 @@ class AccountPaymentMode(models.Model):
 
             for field in fields_forbidden_cnab:
                 raise ValidationError(
-                    _(
+                    _lt(
                         "The Payment Mode can not be used for CNAB with the field"
                         " %s active. \n Please uncheck it to continue."
                     )

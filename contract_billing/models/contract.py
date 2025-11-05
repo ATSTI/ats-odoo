@@ -140,8 +140,8 @@ class ContractContract(models.Model):
                 msg_erro = msg_erro + u'Falta CNPJ/CPF, Contratante, Endereco completo; '
             if not contrato.payment_term_id and not cli.property_payment_term_id:
                 msg_erro = msg_erro + u'Falta Condicoes de Pagamento do Cliente; '
-            if not contrato.payment_mode_id:
-                msg_erro = msg_erro + u'Falta Modo de Pagamento do Cliente; '
+            # if not contrato.payment_mode_id:
+            #     msg_erro = msg_erro + u'Falta Modo de Pagamento do Cliente; '
             #if not contrato.fiscal_position_id and not cli.property_account_position_id:
             #    msg_erro = msg_erro + u'Falta Posicao Fiscal; '
 

@@ -62,9 +62,17 @@ class AccountPaymentOrder(models.Model):
             mora["codigo"] = self.journal_id.bank_mora_type
 
         for line in self.payment_line_ids:
+            ddd = telefone = ''
+            if line.partner_id.mobile:
+                telefone = misc.punctuation_rm(line.partner_id.mobile).replace(' ','')
+                ddd = telefone[2:4]
+                telefone = telefone[4:]
             payer = User(
                 name=line.partner_id.legal_name or line.partner_id.name,
                 identifier=misc.punctuation_rm(line.partner_id.cnpj_cpf),
+                email=line.partner_id.email,
+                ddd=ddd,
+                telefone=telefone,
                 address=UserAddress(
                     streetLine1=line.partner_id.street or "",
                     streetLine2=line.partner_id.street_number or "",

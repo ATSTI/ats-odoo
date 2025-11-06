@@ -32,11 +32,10 @@ class AccountMove(models.Model):
 
     def button_dummy(self):
         for inv in self:
-            inv._compute_amount()
+            inv._compute_discounts()
         return True
-    
-    def _compute_amount(self):
-        super(AccountMove, self)._compute_amount()
+
+    def _compute_discounts(self):
         for inv in self:
             if inv.discount_type and inv.discount_rate:
                 currency = inv.currency_id or self.env.company.currency_id
@@ -54,14 +53,6 @@ class AccountMove(models.Model):
                     discount_percent = (inv.discount_rate / total) * 100 if inv.discount_rate else 0.0
 
                 for line in inv.invoice_line_ids:
-                    if not line.quantity or not line.price_unit:
-                        continue
-                    price_unit_discount = currency.round(
-                        line.price_unit * line.quantity * (discount_percent / 100.0)
-                    )
-                    line.discount_value = price_unit_discount
-                    discount_value_total += price_unit_discount
-
                     try:
                         line._compute_totals()
                     except AttributeError:
@@ -78,17 +69,18 @@ class AccountMove(models.Model):
                 else:
                     discount_value_total = (discount_percent / 100.0) * total   
                 total_final = currency.round(total - discount_value_total)
-                inv.amount_untaxed = total_final
+                inv.amount_untaxed = total
                 inv.amount_discount_value = currency.round(discount_value_total)
                 inv.amount_total = total_final 
                 inv.amount_residual = inv.amount_total - inv.amount_paid
                 inv.amount_total_signed = total_final
                 inv.amount_untaxed_signed = total_final
-                inv.amount_total_in_currency_signed = total_final
             if inv.discount_type is False or inv.discount_rate == 0.0:
                 for line in inv.invoice_line_ids:
-                    line.discount_value = 0.0
-                inv.amount_discount_value = 0.0
+                    try:
+                        line._compute_totals()
+                    except AttributeError:
+                        pass
 
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
@@ -116,6 +108,6 @@ class AccountMoveLine(models.Model):
                 continue
             currency = line.currency_id or line.company_id.currency_id
             price_unit_discount = currency.round(
-                line.price_unit * line.quantity * (line.discount / 100.0)
+                line.price_unit * line.quantity * line.discount
             )
             line.discount_value = price_unit_discount

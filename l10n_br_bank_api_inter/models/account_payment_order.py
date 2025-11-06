@@ -3,6 +3,7 @@
 
 import logging
 from datetime import datetime, timedelta
+import phonenumbers
 
 from odoo import _, models, fields
 from odoo.exceptions import UserError
@@ -64,9 +65,9 @@ class AccountPaymentOrder(models.Model):
         for line in self.payment_line_ids:
             ddd = telefone = ''
             if line.partner_id.mobile:
-                telefone = misc.punctuation_rm(line.partner_id.mobile).replace(' ','')
-                ddd = telefone[2:4]
-                telefone = telefone[4:]
+                telefone = str(phonenumbers.parse(line.partner_id.mobile, "BR").national_number)
+                ddd = telefone[0:2]
+                telefone = telefone[2:]
             payer = User(
                 name=line.partner_id.legal_name or line.partner_id.name,
                 identifier=misc.punctuation_rm(line.partner_id.cnpj_cpf),

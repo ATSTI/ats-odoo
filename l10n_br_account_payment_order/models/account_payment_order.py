@@ -153,8 +153,9 @@ class AccountPaymentOrder(models.Model):
                 # payment_line_ids.date
                 # > payment_line_ids.amount_company_currency
                 # > total_company_currency
-                with self.env.norecompute():
-                    payline.date = requested_date
+                env_no_recompute = self.env(context=dict(self.env.context, recompute=False))
+                payline = payline.with_env(env_no_recompute)
+                payline.date = requested_date
                 # Group options
                 if order.payment_mode_id.group_lines:
                     hashcode = payline.payment_line_hashcode()

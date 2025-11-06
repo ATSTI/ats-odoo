@@ -15,7 +15,6 @@ class AccountStatementImport(models.TransientModel):
 
     @api.model
     def _prepare_ofx_transaction_line(self, transaction):
-        import pudb;pu.db
         payment_ref = transaction.payee
         memo = ""
         if transaction.checknum:

@@ -21,8 +21,8 @@ import werkzeug.wrappers
 import werkzeug.wsgi
 from werkzeug.urls import url_decode, iri_to_uri
 
-path_file = '/opt/odoo/arquivos'
-path_file_return = '/opt/odoo/retornos/retorno.json'
+path_file = '/opt/odoo16/arquivos'
+path_file_return = '/opt/odoo16/retornos/retorno.json'
 
 class IntegracaoPdv(http.Controller):
 

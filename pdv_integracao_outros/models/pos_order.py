@@ -16,8 +16,8 @@ import json
 
 
 _logger = logging.getLogger(__name__)
-path_file = '/opt/odoo/arquivos'
-path_file_return = '/opt/odoo/retornos/retorno.json'
+path_file = '/opt/odoo16/arquivos'
+path_file_return = '/opt/odoo16/retornos/retorno.json'
 
 class PosSession(models.Model):
     _inherit = 'pos.session'
@@ -119,7 +119,7 @@ class PosSession(models.Model):
         ses_config_ids = ses_conf.search([])
         for cn in ses_config_ids:
             for employee in cn.employee_ids:
-                if employee.user_id.id == user:
+                if employee.user_id.id == user or user == 0:
                     return cn
         return False
 
@@ -206,6 +206,7 @@ class PosSession(models.Model):
         arquivos = sorted(fnmatch.filter(os.listdir(path_file), "ped_*.json"))
         num_arq = 1
         ses = 0
+
         for i in arquivos:
             nome_arq = i[:i.index('.')][4:]
             if num_arq == 50:
@@ -215,7 +216,8 @@ class PosSession(models.Model):
             f = open(path_file + '/' + i, mode="r")
             ped = json.load(f)
             user = ped['user_id']
-            ses_config = self.get_pos_config(user)
+            # chaplin so usa um usuario e no pedido vem todos
+            ses_config = self.get_pos_config(0)
             if not ses_config:
                 # nao encontrou um pos_config para este usuario
                 continue
@@ -227,11 +229,18 @@ class PosSession(models.Model):
                 ('name', '=', nome_arq),
                 ('session_id.config_id', '=', ses_config.id),
             ])
+            if not pedido:
+                # chaplin compativel odoo velho
+                pedido = pos.search([
+                    ('pos_reference', '=', nome_arq),
+                    ('session_id.config_id', '=', ses_config.id),
+                ])
 
             if pedido:
                 ses = pedido.session_id
                 os.remove(path_file + '/' + i)
                 continue
+
             session = self.env['pos.session']
             prt_obj = self.env['res.partner']
             prod_obj = self.env['product.product']
@@ -319,6 +328,8 @@ class PosSession(models.Model):
                     prd = prod_obj.search([('id', '=', codpro)], limit=1)
                 else:
                     prd = prod_obj.search([('default_code', '=', codpro)], limit=1)
+                if prd.default_code != line['codpro']:
+                    prd = prod_obj.search([('default_code', '=', line['codpro'])], limit=1)
                 descricao  = line['name']
                 if not prd:
                     if 'Troca' in descricao:

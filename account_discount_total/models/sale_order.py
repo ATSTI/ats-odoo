@@ -17,7 +17,7 @@ class SaleOrder(models.Model):
         invoice_vals = super(SaleOrder, self)._prepare_invoice()
         # Define desconto global
         invoice_vals['discount_type'] = 'amount'
-        if self.fiscal_operation_id:
+        if self.fiscal_operation_id and 'document_type_id' in invoice_vals:
             if invoice_vals['document_type_id'] == 40:  # Nota Fiscal de Serviço
                 lines_with_fiscal_op_line = self.order_line.filtered(
                     lambda ln: ln.fiscal_operation_line_id

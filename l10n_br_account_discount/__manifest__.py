@@ -27,6 +27,7 @@ sem perder o controle da distribuição do desconto em cada item.
     'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
     'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': [
+        'l10n_br_fiscal',
         'l10n_br_account',
     ],
     'data': [

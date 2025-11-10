@@ -108,6 +108,6 @@ class AccountMoveLine(models.Model):
                 continue
             currency = line.currency_id or line.company_id.currency_id
             price_unit_discount = currency.round(
-                line.price_unit * line.quantity * line.discount
+                line.price_unit * line.quantity * (line.discount/100)
             )
             line.discount_value = price_unit_discount

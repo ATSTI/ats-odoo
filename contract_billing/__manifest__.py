@@ -11,7 +11,7 @@
     'description': """
         Faturamento Contrato
     """,
-    'author': 'ATSTi,Odoo Community Association (OCA)',
+    'author': 'ATSTi Soluções',
     'maintainer': 'Carlos Silveira, Mauricio-ATS, ATSTi',
     'website': '',
     'depends': ['l10n_br_contract'],

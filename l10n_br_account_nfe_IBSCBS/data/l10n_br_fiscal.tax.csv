@@ -4,7 +4,6 @@
 "tax_ibsuf_410014","IBSUF Produtor","percent","0.10","100.0","tax_group_ibsuf",,,,,,"0.00","0","4",,0.0,"ibsuf"
 "tax_ibsmun_000001","IBSMun Integral","percent","0.00","0.00","tax_group_ibsmun",,,,,,"0.00","0","4",,0.0,"ibsmun"
 "tax_ibsmun_410014","IBSMun Produtor","percent","0.00","100.0","tax_group_ibsmun",,,,,,"0.00","0","4",,0.0,"ibsmun"
-"tax_ibs_000001","IBS Integral","percent","1.00","0.00","tax_group_ibs","cst_ibs_001","cst_ibs_001",,,,"0.00","0","4",,0.0,"ibs"
 "tax_cbs_000001","CBS Integral","percent","0.90","0.00","tax_group_cbs",,,,,,"0.00","0","4",,0.0,"cbs"
 "tax_cbs_410014","CBS Produtor","percent","0.90","100.0","tax_group_cbs",,,,,,"0.00","0","4",,0.0,"cbs"
 "tax_ibscbs_410014","IBS/CBS Produtor Rural","percent","0.00","0.00","tax_group_ibscbs","cst_ibscbs_410014","cst_ibscbs_410014",,,,"0.00","0","4",,0.0,"ibscbs"

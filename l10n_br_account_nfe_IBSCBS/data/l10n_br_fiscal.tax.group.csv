@@ -1,6 +1,5 @@
 "id","name","tax_domain","tax_include","tax_withholding","sequence","compute_sequence","tax_scope","partner_id:id","wh_due_day","base_with_additional_values"
 "tax_group_cbs","CBS","cbs","False","False",20,"20","federal",,,"True"
-"tax_group_ibs","IBS","ibs","False","False",20,"20","state",,,"True"
 "tax_group_ibscbs","IBSCBS","ibscbs","False","False",20,"20","other",,,"True"
 "tax_group_ibsuf","IBSUF","ibsuf","False","False",20,"20","other",,,"True"
 "tax_group_ibsmun","IBSMun","ibsmun","False","False",20,"20","other",,,"True"

@@ -2,24 +2,23 @@
 import logging
 from odoo import http
 from odoo.http import request
-from odoo.addons.whatsapp_evolution_base.controllers.webhook_controller import WhatsappWebhookController as OriginalWebhook
+from odoo.addons.whatsapp_contact_management.controllers.main import ContactWebhookController
 
 _logger = logging.getLogger(__name__)
 
-class HelpdeskWhatsappWebhookController(OriginalWebhook):
-    
+
+class HelpdeskWhatsappWebhookController(ContactWebhookController):
+    """
+    Webhook estendido para criar tickets e postar mensagens com mídia,
+    além de enviar/receber o menu inicial do Helpdesk.
+    """
+
     @http.route('/whatsapp/webhook', type='json', auth='public', methods=['POST'], csrf=False)
     def receive_webhook(self, **kwargs):
-        """
-        Webhook estendido para Helpdesk:
-        - Cria ticket se não existir
-        - Envia menu inicial via WhatsApp
-        - Processa respostas do menu
-        - Evita duplicações
-        """
         try:
             payload = request.get_json_data() or {}
             event = payload.get('event')
+
             if event != 'messages.upsert':
                 return super().receive_webhook()
 
@@ -27,7 +26,6 @@ class HelpdeskWhatsappWebhookController(OriginalWebhook):
             key = message_data.get('key', {}) or {}
             message_content = message_data.get('message', {}) or {}
 
-            # Ignora mensagens enviadas pelo próprio bot
             if key.get('fromMe'):
                 return super().receive_webhook()
 
@@ -36,16 +34,15 @@ class HelpdeskWhatsappWebhookController(OriginalWebhook):
                 _logger.info("Mensagem duplicada detectada (id=%s)", message_id)
                 return super().receive_webhook()
 
-            body = message_content.get('conversation') or message_content.get('extendedTextMessage', {}).get('text', '') or ''
             sender_jid = key.get('remoteJid') or ''
             phone_number = sender_jid.split('@')[0] if sender_jid else None
-
             if not phone_number:
-                _logger.warning("Nenhum telefone encontrado no payload")
+                _logger.warning("Nenhum número de telefone no payload.")
                 return super().receive_webhook()
 
             partner = request.env['res.partner'].sudo().search([('mobile', 'ilike', phone_number)], limit=1)
             if not partner:
+                _logger.info("Parceiro não encontrado para o número %s", phone_number)
                 return super().receive_webhook()
 
             Ticket = request.env['helpdesk.ticket'].sudo()
@@ -53,17 +50,15 @@ class HelpdeskWhatsappWebhookController(OriginalWebhook):
                 ('partner_id', '=', partner.id),
                 ('stage_id.fold', '=', False)
             ], order='id desc', limit=1)
-
-            # Se não existe ticket, cria
             if not ticket:
                 Stage = request.env['helpdesk.ticket.stage'].sudo()
                 stage_new = Stage.search([('name', 'ilike', 'novo')], limit=1)
                 if not stage_new:
-                    _logger.error("Stage 'NOVO' não encontrado")
+                    _logger.error("Stage 'Novo' não encontrado.")
                     return super().receive_webhook()
 
                 ticket_vals = {
-                    'name': f'WhatsApp: {partner.name}',
+                    'name': f'WhatsApp: {partner.name or phone_number}',
                     'partner_id': partner.id,
                     'stage_id': stage_new.id,
                     'description': "Ticket criado via WhatsApp",
@@ -75,51 +70,63 @@ class HelpdeskWhatsappWebhookController(OriginalWebhook):
                     ticket_vals['x_whatsapp_number'] = phone_number
 
                 ticket = Ticket.with_context(skip_whatsapp_auto=True).create(ticket_vals)
-                _logger.info("Novo ticket #%s criado para partner %s", ticket.id, partner.name)
+                _logger.info("Novo ticket #%s criado para %s", ticket.id, partner.name)
 
-                # Envia menu inicial
+                #envia o menu apos criar o ticket novo ( da pra chamar uma funcao so pra isso e deixar mais customizavel o modulo, nao usar so por codigo)
                 instance = request.env['whatsapp.instance'].sudo().search([('status', '=', 'connected')], limit=1)
                 if instance:
                     try:
                         instance.send_text(
                             phone_number,
-                            "Olá! Para direcionar seu atendimento, escolha uma opção:\n1️⃣ Suporte\n2️⃣ Financeiro\n3️⃣ Comercial",
+                            "Olá! 👋\nEscolha uma opção:\n1️⃣ Suporte\n2️⃣ Financeiro\n3️⃣ Comercial",
                             partner=partner
                         )
                     except Exception as ex:
                         _logger.exception("Erro ao enviar menu inicial: %s", ex)
-                
-                # Não processa a primeira mensagem do cliente como menu
+
                 return {'status': 'ok', 'message': 'Ticket criado e menu enviado'}
 
-            # Se já existe ticket e a mensagem não é vazia
-            if ticket and body.strip():
-                # Se estiver aguardando resposta do menu, processa
-                if getattr(ticket, 'x_waiting_menu_response', False):
+            #vai extrair conteudo que o cliente enviar mandar( agora esta tratando base64 e arquivos)
+            try:
+                body, attachment_ids = self._extract_message_content_and_attachments(message_content)
+            except Exception as ex:
+                _logger.exception("Falha ao extrair mídia: %s", ex)
+                body = (
+                    message_content.get('conversation')
+                    or message_content.get('extendedTextMessage', {}).get('text', '')
+                    or ''
+                )
+                attachment_ids = []
+                #ve se precisa tratar o menu, se precisar, cai no arquivo na pasta service que trata o menu e as respostas
+            if getattr(ticket, 'x_waiting_menu_response', False):
+                try:
                     service = request.env["helpdesk.whatsapp.service"].sudo()
-                    service.process_incoming_message(ticket, partner, body, phone_number)
-                else:
-                    # Mensagem normal no chatter
-                    try:
-                        ticket.with_context(skip_whatsapp_send=True).sudo().message_post(
-                            body=body,
-                            message_type='comment',
-                            subtype_xmlid='mail.mt_comment',
-                            author_id=partner.id,
-                        )
-                        _logger.info("Mensagem do partner '%s' posta no ticket #%s.", partner.name, ticket.id)
-                    except Exception as ex:
-                        _logger.exception("Erro ao postar mensagem no ticket #%s: %s", getattr(ticket, 'id', 'N/A'), ex)
+                    service.process_incoming_message(ticket, partner, body or '', phone_number)
+                except Exception as ex_service:
+                    _logger.exception("Erro ao processar resposta do menu no ticket #%s: %s", ticket.id, ex_service)
+                return {'status': 'ok', 'message': 'Menu response processed'}
+            if (body and body.strip()) or attachment_ids:
+                try:
+                    message = ticket.with_context(skip_whatsapp_send=True).sudo().message_post(
+                        body=body,
+                        message_type='comment',
+                        subtype_xmlid='mail.mt_comment',
+                        author_id=partner.id,
+                        attachment_ids=attachment_ids if attachment_ids else None #posta mensagem do cliente dentro do ticket com attachments ou nao (se tiver legenda a imagem, ela vem junto)
+                    )
+                    ticket.trigger_chatter_update(message)
+                    _logger.exception("msg postada no bus.bus")
+                except Exception as ex_post:
+                    _logger.exception("Erro ao postar mensagem no ticket #%s: %s", ticket.id, ex_post)
 
-            # Chama super() para manter lógica original
             try:
                 result = super().receive_webhook()
-            except Exception as ex:
-                _logger.exception("Erro ao chamar super(): %s", ex)
-                return {'status': 'ok', 'message': 'Processed with local changes, super() failed'}
+            except Exception as ex_super:
+                _logger.exception("Erro ao chamar super(): %s", ex_super)
+                return {'status': 'ok', 'message': 'Processed locally; super() failed'}
 
             return result or {'status': 'ok', 'message': 'Message processed'}
 
         except Exception as e:
-            _logger.error("Falha ao processar webhook do Helpdesk: %s", e, exc_info=True)
+            _logger.error("Falha geral no webhook Helpdesk: %s", e, exc_info=True)
             return {'status': 'error', 'message': str(e)}

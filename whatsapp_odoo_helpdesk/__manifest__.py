@@ -2,7 +2,7 @@
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 {
-    'name': 'Integração odoo-whatsapp',
+    'name': 'Integração odoo-whatsapp com helpdesk',
     'version': '18.0',
     'category': 'Others',
     'license': 'AGPL-3',
@@ -15,7 +15,7 @@
     'maintainer': 'OtavioAndretta, Mauricio-ATS, ATSTi',
     'website': '',
     'depends': [
-        'crm','whatsapp_evolution_base','whatsapp_evolution_discuss'
+        'helpdesk_mgmt','whatsapp_evolution_base','whatsapp_evolution_discuss'
     ],
     'data': [
         "views/helpdesk_ticket_btn.xml"

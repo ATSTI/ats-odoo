@@ -91,7 +91,7 @@ class HelpDeskTicket(models.Model):
         now = datetime.now()
         protocolo = f"{now.year:04d}{now.month:02d}{now.day:02d}{self.id}"
 
-    
+        #daria pra customizar mais de alguma forma criando menus e campos (ideia futura)
         body = (
             f"👋 Olá {partner.name}, tudo bem?\n\n"
             "Seu chamado foi finalizado com sucesso. "
@@ -203,6 +203,17 @@ class HelpDeskTicket(models.Model):
                     e,
                     exc_info=True,
                 )
+    def trigger_chatter_update(self, message):
+        """Força atualização em tempo real do chatter para este ticket."""
+        self.ensure_one()
+        bus = self.env['bus.bus'].sudo()
+        bus._sendone(
+            (self.env.cr.dbname, 'mail.record', self._name, self.id),
+            {
+                'type': 'mail.message/new',
+                'message_ids': [message.id],
+            }
+        )
 
 
     

@@ -7,13 +7,15 @@
     'category': 'Contract Management',
     'license': 'AGPL-3',
     'sequence': 2,
-    'summary': 'ATSTi Soluções',
+    'summary': 'Faturamento Contrato',
     'description': """
-        Faturamento Contrato
+        Esse módulo permite faturar contratos de forma automática,
+        gerando faturas com base nos termos e condições definidos
+        nos contratos dos clientes.
     """,
     'author': 'ATSTi Soluções',
     'maintainer': 'Carlos Silveira, Mauricio-ATS, ATSTi',
-    'website': '',
+    'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['l10n_br_contract'],
     'data': [
         #'views/contract_view.xml',

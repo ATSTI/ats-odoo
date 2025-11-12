@@ -7,11 +7,11 @@
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
-    'summary': 'ATSTi Soluções',
+    'summary': 'Odoo WhatsApp Helpdesk Integration',
     'description': """
             Integração do odoo com whatsapp no helpdesk e demais áreas do odoo
     """,
-    'author': 'ATSTi,Odoo Community Association (OCA)',
+    'author': 'ATSTi Soluções',
     'maintainer': 'OtavioAndretta, Mauricio-ATS, ATSTi',
     'website': '',
     'depends': [

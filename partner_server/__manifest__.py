@@ -3,8 +3,11 @@
 
 {
     'name': 'Informações de Servidor',
-    'version': '18.0.1.0.0',
-    'summary': 'Adiciona informações de servidor ao parceiro',
+    'version': '18.0',
+    'category': 'Others',
+    'license': 'AGPL-3',
+    'sequence': 2,
+    'summary': 'Informações de servidor ao parceiro',
     'description': """
 Informações de Servidor
 =======================
@@ -12,15 +15,9 @@ Este módulo adiciona campos e funcionalidades relacionadas a dados de servidore
 associados aos parceiros, permitindo melhor controle e rastreabilidade 
 no cadastro de clientes/fornecedores.
     """,
-    'category': 'Contacts/Custom',
     'author': 'ATSTi Soluções',
+    'maintainer': 'OtavioAndretta, Mauricio-ATS, ATSTi',
     'website': 'https://github.com/ATSTI/ats-odoo',
-    'contributors': [
-        'Carlos Silveira <carlos@atsti.com.br>',
-        'Mauricio Silveira <maurs320@gmail.com>',
-        'Otavio Andretta <otavio12257@gmail.com>'
-    ],
-    'license': 'AGPL-3',
     'depends': [
         'base',
         'nfe_integracao'
@@ -30,12 +27,6 @@ no cadastro de clientes/fornecedores.
         'views/res_partner_server_view.xml',
         'views/res_partner_view.xml',
     ],
-    'demo': [],
-    'qweb': [],
-    'images': [],
-    'sequence': 10,
     'installable': True,
     'application': False,
-    'auto_install': False,
 }
-

@@ -7,11 +7,11 @@
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
-    'summary': 'ATSTi Soluções',
+    'summary': 'Odoo Whatsapp CRM Integration',
     'description': """
             Integração do odoo com whatsapp no crm_leads e demais áreas do odoo
     """,
-    'author': 'ATSTi,Odoo Community Association (OCA)',
+    'author': 'ATSTi Soluções',
     'maintainer': 'OtavioAndretta, Mauricio-ATS, ATSTi',
     'website': '',
     'depends': [

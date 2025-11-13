@@ -39,7 +39,7 @@ class AccountMove(models.Model):
                 # necessario se precisa refazer o boleto, tipo trocou a data vencimento
                 if not move_line.codigo_solicitacao:
                     # gerar boleto
-                    payment_order_id.open2generated()
+                    payment_order_id.open2generated(move_line)
                     time.sleep(5)
                     # break
         for move_line in self.due_line_ids:

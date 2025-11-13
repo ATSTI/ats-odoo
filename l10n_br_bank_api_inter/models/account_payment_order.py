@@ -32,7 +32,7 @@ except ImportError:
 class AccountPaymentOrder(models.Model):
     _inherit = "account.payment.order"
 
-    def _generate_bank_inter_boleto_data(self):
+    def _generate_bank_inter_boleto_data(self, move_line=None):
         dados = []
         myself = User(
             name=self.company_id.legal_name,
@@ -63,7 +63,10 @@ class AccountPaymentOrder(models.Model):
             mora["codigo"] = self.journal_id.bank_mora_type
 
         for line in self.payment_line_ids:
+            if move_line and line.move_line_id.id != move_line.id:
+                continue
             ddd = telefone = ''
+            vcto = line.ml_maturity_date or line.move_line_id.date_maturity
             if line.partner_id.mobile:
                 telefone = str(phonenumbers.parse(line.partner_id.mobile, "BR").national_number)
                 ddd = telefone[0:2]
@@ -88,17 +91,17 @@ class AccountPaymentOrder(models.Model):
                 amount=line.amount_currency,
                 payer=payer,
                 issue_date=line.create_date,
-                due_date=line.ml_maturity_date,
+                due_date=vcto,
                 identifier=line.document_number,
                 instructions=[],
                 multa=multa,
                 mora=mora,
             )
-            if line.ml_maturity_date >= datetime.now().date() and not line.move_line_id.codigo_solicitacao:
+            if vcto >= datetime.now().date() and not line.move_line_id.codigo_solicitacao:
                 dados.append(slip)
         return dados
 
-    def _generate_bank_inter_boleto(self):
+    def _generate_bank_inter_boleto(self, move_line=None):
         with ArquivoCertificado(self.journal_id, "w") as (key, cert):
             token = self.generated_api_token("escrita")
             api = ApiInter(
@@ -112,7 +115,7 @@ class AccountPaymentOrder(models.Model):
                 client_environment=self.journal_id.bank_environment,
                 # token=token,
             )            
-            data = self._generate_bank_inter_boleto_data()
+            data = self._generate_bank_inter_boleto_data(move_line=move_line)
             for item in data:
                 # print(item._emissao_data())
                 resposta = api.boleto_inclui(item._emissao_data())
@@ -125,10 +128,10 @@ class AccountPaymentOrder(models.Model):
                     payment_line_id.move_line_id.codigo_solicitacao = resposta["codigoSolicitacao"]
         return False, False
 
-    def _gererate_bank_inter_api(self):
+    def _gererate_bank_inter_api(self, move_line=None):
         """Realiza a conexão com o a API do banco inter"""
         if self.payment_type == "inbound":
-            return self._generate_bank_inter_boleto()
+            return self._generate_bank_inter_boleto(move_line)
         else:
             raise NotImplementedError
 
@@ -184,7 +187,7 @@ class AccountPaymentOrder(models.Model):
                     self.journal_id.bank_token_date_read = datetime.now()
         return token
 
-    def open2generated(self):
+    def open2generated(self, move_line=None):
         self.ensure_one()
         try:
             if (
@@ -192,7 +195,7 @@ class AccountPaymentOrder(models.Model):
                 == self.env.ref("l10n_br_base.res_bank_077")
                 and self.payment_method_id.code == "240"
             ):
-                self._gererate_bank_inter_api()
+                self._gererate_bank_inter_api(move_line=move_line)
                 self.write({
                     "date_generated": fields.Date.context_today(self),
                     "state": "generated",

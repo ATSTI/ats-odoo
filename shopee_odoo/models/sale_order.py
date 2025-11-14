@@ -59,6 +59,10 @@ class SaleOrder(models.Model):
 
     def _prepare_invoice(self):
         result = super()._prepare_invoice()
+        if self.user_id.id == 58:
+            result.update({'journal_id': 22})
+        if self.user_id.id == 59:
+            result.update({'journal_id': 23})            
         result.update({
             "card_ids": [
                 (0, 0, {

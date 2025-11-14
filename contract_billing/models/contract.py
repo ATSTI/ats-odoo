@@ -2,6 +2,8 @@
 from odoo import api, fields, models, _
 from datetime import date, timedelta
 from odoo.osv import expression
+from dateutil.relativedelta import relativedelta
+from odoo.exceptions import ValidationError
 #from sshtunnel import SSHTunnelForwarder
 # import odoorpc
 
@@ -11,6 +13,8 @@ class ContractContract(models.Model):
     _inherit = 'contract.contract'
 
     email_fat = {}
+
+    interval_months = fields.Integer(string="Intervalo de Cobrança (Meses)", default=1)
 
     def relatorio_contrato_erro(self):
         """
@@ -185,21 +189,78 @@ class ContractContract(models.Model):
                             invoice.action_pdf_boleto()
 
     def _recurring_create_invoice(self, date_ref=False):
-        # substitui tudo pra nao passar pelo l10n_br_contract
-        # pois, temos contrato sem operacao
-        invoices_values = self._prepare_recurring_invoices_values(date_ref)
+        """Cria faturas recorrentes sem depender do módulo l10n_latam, ignorando contratos cancelados ou inativos"""
+        invoices_values = []
+        contracts_to_invoice = self.filtered(lambda c: c.active)
+        if not contracts_to_invoice:
+            raise ValidationError(_("O contrato deve estar ativo e não cancelado para gerar faturas."))
+        invoices_values = contracts_to_invoice._prepare_recurring_invoices_values(date_ref)
         moves = self.env["account.move"].create(invoices_values)
-        self._add_contract_origin(moves)
-        self._invoice_followers(moves)
-        self._compute_recurring_next_date()
+        contracts_to_invoice._add_contract_origin(moves)
+        contracts_to_invoice._invoice_followers(moves)
+        for contract in self:
+            if contract.active:
+                next_date = contract.recurring_next_date or contract.date_start
+                next_date += relativedelta(months=contract.interval_months or 1)
+                contract.write({"recurring_next_date": next_date})
+
         for move in moves:
-            if move.fiscal_document_id:
-                move.fiscal_document_id._onchange_document_serie_id()
-                move.fiscal_document_id._onchange_company_id()
-                move._onchange_invoice_line_ids()
-            if move.amount_total > 0.01:
+            if move.amount_total> 0.01:
+                data_venc = move.invoice_date_due
                 move.action_post()
+                if move.invoice_date_due != data_venc:
+                    move.invoice_date_due = data_venc
+
         return moves
+    
+    def _prepare_recurring_invoices_values(self, date_ref=False):
+        """Gera os valores das faturas com base nas regras de preço sem passar pelo l10n_latam"""
+        invoices_values = []
+        for contract in self:
+            if not contract.partner_id:
+                continue
+            journal = self.env['account.journal'].search([
+                ('company_id', '=', contract.company_id.id),
+                ('type', '=', 'sale'),
+                ('l10n_latam_use_documents', '=', False)
+            ], limit=1)
+            if not journal:
+                journal = self.env['account.journal'].create({
+                    'name': 'Vendas Internas (Sem Fiscal)',
+                    'code': 'INTV',
+                    'type': 'sale',
+                    'company_id': contract.company_id.id,
+                    'l10n_latam_use_documents': False,
+                })
+            invoice_date = date_ref or fields.Date.today()
+            mes_ano = invoice_date.strftime("%m/%Y")
+            # cliente = contract.partner_id.name or "Sem Cliente"
+            contrato = contract.code or str(contract.id)
+            # invoice_name = f"FATURA - {cliente} - {mes_ano} - {contrato}
+            dias_vencimento = int(self.payment_term_id.line_ids.payment_days)
+            vencimento = self.recurring_next_date.replace(day=dias_vencimento)
+            if vencimento < self.recurring_next_date:
+                vencimento = vencimento + relativedelta(months=+1)
+            mes_ano = vencimento.strftime("%m/%Y")
+            invoice_vals = {
+                "move_type": "out_invoice",
+                "partner_id": contract.partner_id.id,
+                "invoice_date": invoice_date,
+                "ref": contrato + "-" + mes_ano,
+                "company_id": contract.company_id.id,
+                "journal_id": journal.id,
+                "invoice_line_ids": [],
+                "l10n_latam_document_type_id": False,
+                "l10n_latam_document_number": False,
+                "invoice_payment_term_id": contract.payment_term_id.id,
+                "invoice_line_ids": [(0, 0, line._prepare_invoice_line()) for line in contract.contract_line_ids.filtered(lambda l: not l.is_canceled)],
+                "move_tag_ids": [(6, 0, contract.tag_ids.ids)],
+                # "name": invoice_name,
+                "old_contract_id": contract.id,
+                "invoice_date_due": vencimento,
+            }
+            invoices_values.append(invoice_vals)
+        return invoices_values
     
     @api.model
     def _cron_recurring_create(self, date_ref=False, create_type="invoice"):
@@ -227,7 +288,7 @@ class ContractContract(models.Model):
                 lambda c: c.company_id == company
                 and (not c.date_end or c.recurring_next_date <= c.date_end)
             ).with_company(company)
-            for ctr in contracts_to_invoice[:30]:
+            for ctr in contracts_to_invoice[:1]:
                 if ctr.fiscal_operation_id:
                     for line in ctr.contract_line_ids:
                         if not line.fiscal_operation_line_id:

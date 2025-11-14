@@ -136,7 +136,7 @@ class AccountMoveLine(models.Model):
             )
             if not self.own_number and self.codigo_solicitacao:
                 # buscar informacoes do boleto pegar nosso_numero
-                resposta = api.consulta_boleto(self.codigo_solicitacao)
+                resposta = api.consulta_boleto_detalhado(self.codigo_solicitacao)
                 if 'cobranca' in resposta:
                     boleto = resposta['boleto']
                     if 'pix' in resposta:

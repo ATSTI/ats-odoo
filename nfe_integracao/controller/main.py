@@ -28,6 +28,7 @@ class IntegracaoPdv(http.Controller):
 
     @http.route('/nfe', type='json', auth="user", csrf=False)
     def website_nfe(self, **kwargs):
+        import pudb;pu.db
         data = request.params
         num_nota = len(data)
         order = http.request.env['sale.order']
@@ -60,7 +61,7 @@ class IntegracaoPdv(http.Controller):
         for lista in list_cnpj:
             print (f" ---- fazendo  {cnpj} -----------")
             cnpj = lista
-            cli_ids = cliente.sudo().search([('cnpj_cpf', '=', cnpj),])
+            cli_ids = cliente.sudo().search([('vat', '=', cnpj),])
             # se cliente tem financeiro, cobranca e dele
             if cli_ids.financeiro:
                 lista_financeiro.add(cli_ids.financeiro.id)

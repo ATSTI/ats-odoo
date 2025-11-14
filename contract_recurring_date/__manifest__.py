@@ -20,8 +20,8 @@
         'sale_management',
     ],
     'data': [
-        'views/account.xml',
-        'views/sale_view.xml',
+        # 'views/account.xml',
+        # 'views/sale_view.xml',
     ],
     'installable': True,
     'application': False,

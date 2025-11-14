@@ -1,0 +1,17 @@
+<odoo>
+    <!-- Regra de acesso global para Account Move -->
+    <record id="rule_account_move_company" model="ir.rule">
+        <field name="name">Account Move - acesso por empresa</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <!-- Domínio: qualquer fatura da empresa do usuário -->
+        <field name="domain_force">[('company_id', 'in', user.company_ids.ids)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <!-- Global = True ignora regras restritivas do l10n_br_account -->
+        <field name="global" eval="True"/>
+        <!-- Grupo: todos usuários internos -->
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+</odoo>

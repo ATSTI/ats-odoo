@@ -62,7 +62,7 @@ class AccountMove(models.Model):
                 #  ocorre da linha vir vazia o que impede de entrar no FOR
                 #  abaixo causando o não preenchimento de dados usados no Boleto,
                 #  isso deve ser melhor investigado
-                self._compute_financial()
+                # self._compute_financial()
                 for index, interval in enumerate(self.due_line_ids):
                     inv_number = self.get_invoice_fiscal_number().split("/")[-1]
                     numero_documento = inv_number + "/" + str(index + 1).zfill(2)
@@ -104,7 +104,7 @@ class AccountMove(models.Model):
                             lambda x: (
                                 not x.reconciled
                                 and x.payment_mode_id.payment_order_ok
-                                and x.account_id.internal_type in ("receivable", "payable")
+                                # and x.account_id.internal_type in ("receivable", "payable")
                                 and not any(
                                     p_state in ("draft", "open", "generated")
                                     for p_state in x.payment_line_ids.mapped("state")

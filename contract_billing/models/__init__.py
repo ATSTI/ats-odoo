@@ -2,3 +2,4 @@
 from . import contract
 from . import email_einvoice
 from . import account_invoice
+from . import sale

@@ -91,11 +91,10 @@ class ContractContract(models.Model):
             # cliente = contract.partner_id.name or "Sem Cliente"
             contrato = contract.code or str(contract.id)
             # invoice_name = f"FATURA - {cliente} - {mes_ano} - {contrato}
-            dias_vencimento = self.payment_term_id.line_ids.nb_days
+            dias_vencimento = int(self.payment_term_id.line_ids.payment_days)
             vencimento = self.recurring_next_date.replace(day=dias_vencimento)
             if vencimento < self.recurring_next_date:
-                mes = vencimento.month
-                vencimento.replace(month=mes+1)
+                vencimento = vencimento + relativedelta(months=+1)
             mes_ano = vencimento.strftime("%m/%Y")
             invoice_vals = {
                 "move_type": "out_invoice",

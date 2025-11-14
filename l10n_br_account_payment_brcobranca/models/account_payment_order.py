@@ -99,6 +99,7 @@ class PaymentOrder(models.Model):
         """Returns (payment file as string, filename)"""
         self.ensure_one()
         cnab_config = self.payment_mode_id.cnab_config_id
+        import pudb;pu.db
         self.file_number = cnab_config.cnab_sequence_id.next_by_id()
 
         # see remessa fields here:

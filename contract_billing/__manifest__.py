@@ -7,11 +7,12 @@
     'category': 'Contract Management',
     'license': 'AGPL-3',
     'sequence': 2,
-    'summary': 'Faturamento Contrato',
+    'summary': 'Faturamento Contrato - ATSTi',
     'description': """
         Esse módulo permite faturar contratos de forma automática,
         gerando faturas com base nos termos e condições definidos
         nos contratos dos clientes.
+        OBS: Módulo Usado Pela ATS, com necessidades proprias
     """,
     'author': 'ATSTi Soluções',
     'maintainer': 'Carlos Silveira, Mauricio-ATS, ATSTi',
@@ -21,7 +22,8 @@
         #'views/contract_view.xml',
         'views/email_erro_fatura.xml',
         'views/email_einvoice_template.xml',
-        'views/account_invoice.xml'
+        'views/account_invoice.xml',
+        'views/sale_view.xml',
     ],
     'installable': True,
     'application': False,

@@ -10,7 +10,7 @@
     <record id="fiscal_invoice_nfe_action" model="ir.actions.act_window">
         <field name="name">NF-e</field>
         <field name="res_model">account.move</field>
-        <field name="view_mode">tree,kanban,form,pivot,graph,activity</field>
+        <field name="view_mode">list,kanban,form,pivot,graph,activity</field>
         <field eval="False" name="view_id" />
         <field
             name="domain"
@@ -49,7 +49,7 @@
     <record id="fiscal_invoice_nfse_action" model="ir.actions.act_window">
         <field name="name">NFS-e</field>
         <field name="res_model">account.move</field>
-        <field name="view_mode">tree,kanban,form,pivot,graph,activity</field>
+        <field name="view_mode">list,kanban,form,pivot,graph,activity</field>
         <field eval="False" name="view_id" />
         <field
             name="domain"
@@ -88,7 +88,7 @@
     <record id="fiscal_invoice_in_action" model="ir.actions.act_window">
         <field name="name">Incomming Document</field>
         <field name="res_model">account.move</field>
-        <field name="view_mode">tree,kanban,form,pivot,graph,activity</field>
+        <field name="view_mode">list,kanban,form,pivot,graph,activity</field>
         <field eval="False" name="view_id" />
         <field
             name="domain"
@@ -125,7 +125,7 @@
     <record id="fiscal_invoice_out_action" model="ir.actions.act_window">
         <field name="name">Outgoing Document</field>
         <field name="res_model">account.move</field>
-        <field name="view_mode">tree,kanban,form,pivot,graph,activity</field>
+        <field name="view_mode">list,kanban,form,pivot,graph,activity</field>
         <field eval="False" name="view_id" />
         <field
             name="domain"
@@ -174,7 +174,7 @@
     <record id="fiscal_invoice_all_action" model="ir.actions.act_window">
         <field name="name">All Documents</field>
         <field name="res_model">account.move</field>
-        <field name="view_mode">tree,kanban,form,pivot,graph,activity</field>
+        <field name="view_mode">list,kanban,form,pivot,graph,activity</field>
         <field eval="False" name="view_id" />
         <field name="search_view_id" ref="l10n_br_account.fiscal_invoice_search" />
         <field name="help" type="html">

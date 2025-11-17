@@ -13,6 +13,8 @@ from odoo.tools import frozendict
 
 from odoo.addons.l10n_br_fiscal.constants.fiscal import (
     DOCUMENT_ISSUER_COMPANY,
+    FINAL_CUSTOMER,
+    FINAL_CUSTOMER_NO,
     DOCUMENT_ISSUER_PARTNER,
     FISCAL_IN_OUT_ALL,
     FISCAL_OUT,
@@ -61,7 +63,6 @@ class AccountMove(models.Model):
     _fiscal_decorator_compute_blacklist = ["_compute_fiscal_amount"]
     _inherit = [
         _name,
-        "l10n_br_fiscal.document.mixin.methods",
         "l10n_br_account.decorator.mixin",
     ]
 
@@ -78,6 +79,14 @@ class AccountMove(models.Model):
     _inherits = {_fiscal_decorator_model: "fiscal_document_id"}
 
     _order = "date DESC, name DESC"
+
+    ind_final = fields.Selection(
+        selection=FINAL_CUSTOMER,
+        string="Consumidor final",
+        default=FINAL_CUSTOMER_NO,
+        store=True,
+        readonly=False,
+    )
 
     document_electronic = fields.Boolean(
         related="document_type_id.electronic",
@@ -129,7 +138,7 @@ class AccountMove(models.Model):
                 move.fiscal_document_id = False
                 bad_fiscal_doc.action_document_cancel()
 
-    @api.constrains("fiscal_document_id", "document_type_id")
+    @api.constrains("fiscal_document_id")
     def _check_fiscal_document_type(self):
         for rec in self:
             if rec.document_type_id and not rec.fiscal_document_id:

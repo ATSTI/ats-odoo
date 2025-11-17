@@ -11,6 +11,10 @@ from odoo.addons.l10n_br_fiscal.constants.fiscal import (
     TAX_BASE_TYPE_PERCENT,
     TAX_BASE_TYPE_VALUE,
     TAX_BASE_TYPE,
+    TAX_ICMS_OR_ISSQN,
+    TAX_DOMAIN_ICMS,
+    FINAL_CUSTOMER,
+    FINAL_CUSTOMER_NO,
 )
 from odoo.addons.l10n_br_fiscal.constants.icms import (
     ICMS_BASE_TYPE,
@@ -65,7 +69,7 @@ class AccountMoveLine(models.Model):
     _fiscal_decorator_compute_blacklist = ["_compute_fiscal_amounts"]
     _inherit = [
         _name,
-        "l10n_br_fiscal.document.line.mixin.methods",
+        "l10n_br_fiscal.document.line.mixin",
         "l10n_br_account.decorator.mixin",
     ]
     _inherits = {_fiscal_decorator_model: "fiscal_document_line_id"}
@@ -176,6 +180,22 @@ class AccountMoveLine(models.Model):
         help="Stores the installment number in the format 'current-total'. "
         "For example, '1-3' for the first of three installments, '2-3' for the second,"
         " and '3-3' for the last installment.",
+    )
+
+    tax_icms_or_issqn = fields.Selection(
+        selection=TAX_ICMS_OR_ISSQN,
+        string="ICMS / ISSQN",
+        default=TAX_DOMAIN_ICMS,
+        store=True,
+        readonly=False,
+    )
+
+    ind_final = fields.Selection(
+        selection=FINAL_CUSTOMER,
+        string="Consumidor final",
+        default=FINAL_CUSTOMER_NO,
+        store=True,
+        readonly=False,
     )
 
     @api.depends(

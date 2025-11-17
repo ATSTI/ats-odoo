@@ -12,6 +12,9 @@
                     widget="many2many_tags"
                     options="{'color_field': 'color'}"
                 />
+                <xpath expr="//field[@name='date_order']" position="attributes">
+                    <attribute name="groups"></attribute>
+                </xpath>
             </field>
         </field>
     </record>

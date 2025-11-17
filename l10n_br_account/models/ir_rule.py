@@ -10,8 +10,8 @@ class IrRule(models.Model):
 
         # apenas substitui quando account.move e não sudo
         if model_name == "account.move" and not self.env.su:
-            return ['|', ('fiscal_document_id', '=', False), ('fiscal_document_id', '!=', False)]
+            return [('company_id.id', 'in', self.env.companies.ids)]
         if model_name == "account.move.line" and not self.env.su:
-            return ['|', ('fiscal_document_line_id', '=', False), ('fiscal_document_line_id', '!=', False)]
+            return [('company_id.id', 'in', self.env.companies.ids)]
 
         return super()._compute_domain(model_name, mode=mode)

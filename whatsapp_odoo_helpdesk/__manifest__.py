@@ -18,8 +18,8 @@
         'helpdesk_mgmt','whatsapp_evolution_base','whatsapp_evolution_discuss','web','web_notify'
     ],
     'data': [
-        "views/helpdesk_ticket_btn.xml"
-
+        "views/helpdesk_ticket_btn.xml",
+        "views/menuitem_view.xml",
     ],
 #     "assets": {
 #     "web.assets_backend": [

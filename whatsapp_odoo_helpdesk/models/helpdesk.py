@@ -2,6 +2,7 @@ from odoo import models, api, fields
 from odoo.tools import html2plaintext
 import logging
 from datetime import timedelta, datetime
+from odoo.addons.bus.models.bus import channel_with_db, json_dump
 
 _logger = logging.getLogger(__name__)
 
@@ -71,14 +72,10 @@ class HelpDeskTicket(models.Model):
         - Envia mensagem automática via WhatsApp com protocolo
         """
         self.ensure_one()
-
-        # Buscar parceiro
         partner = self.partner_id
         if not partner or not partner.mobile:
             _logger.warning("Ticket #%s não possui partner ou número de WhatsApp.", self.id)
             return
-
-      
         stage_closed = self.env['helpdesk.ticket.stage'].sudo().search(
             [('name', 'ilike', 'concluído')], limit=1
         )
@@ -203,17 +200,21 @@ class HelpDeskTicket(models.Model):
                     e,
                     exc_info=True,
                 )
-    def trigger_chatter_update(self, message):
-        """Força atualização em tempo real do chatter para este ticket."""
+
+
+
+    def trigger_ticket_refresh(self):
         self.ensure_one()
-        bus = self.env['bus.bus'].sudo()
-        bus._sendone(
-            (self.env.cr.dbname, 'mail.record', self._name, self.id),
-            {
-                'type': 'mail.message/new',
-                'message_ids': [message.id],
-            }
-        )
 
 
-    
+
+
+
+
+
+
+
+
+
+
+

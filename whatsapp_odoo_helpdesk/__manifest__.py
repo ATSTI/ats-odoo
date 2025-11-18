@@ -15,12 +15,19 @@
     'maintainer': 'OtavioAndretta, Mauricio-ATS, ATSTi',
     'website': '',
     'depends': [
-        'helpdesk_mgmt','whatsapp_evolution_base','whatsapp_evolution_discuss'
+        'helpdesk_mgmt','whatsapp_evolution_base','whatsapp_evolution_discuss','web','web_notify'
     ],
     'data': [
         "views/helpdesk_ticket_btn.xml"
 
     ],
+#     "assets": {
+#     "web.assets_backend": [
+#         "whatsapp_odoo_helpdesk/static/src/js/whatsapp_chatter_reload.js",
+#         "whatsapp_odoo_helpdesk/static/src/js/helpdesk_realtime.js", 
+#     ],
+# },
+
     'installable': True,
     'application': False,
 }

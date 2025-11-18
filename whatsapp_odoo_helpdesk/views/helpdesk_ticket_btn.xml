@@ -10,6 +10,11 @@
                         string="Encerrar Ticket"
                         class="oe_highlight"
                         />
+                <button name="trigger_ticket_refresh"
+                        type="object"
+                        string="Teste refresh"
+                        class="oe_highlight"
+                        />
             </xpath>
         </field>
     </record>

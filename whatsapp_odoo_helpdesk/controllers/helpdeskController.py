@@ -8,10 +8,6 @@ _logger = logging.getLogger(__name__)
 
 
 class HelpdeskWhatsappWebhookController(ContactWebhookController):
-    """
-    Webhook estendido para criar tickets e postar mensagens com mídia,
-    além de enviar/receber o menu inicial do Helpdesk.
-    """
 
     @http.route('/whatsapp/webhook', type='json', auth='public', methods=['POST'], csrf=False)
     def receive_webhook(self, **kwargs):
@@ -50,6 +46,7 @@ class HelpdeskWhatsappWebhookController(ContactWebhookController):
                 ('partner_id', '=', partner.id),
                 ('stage_id.fold', '=', False)
             ], order='id desc', limit=1)
+
             if not ticket:
                 Stage = request.env['helpdesk.ticket.stage'].sudo()
                 stage_new = Stage.search([('name', 'ilike', 'novo')], limit=1)
@@ -71,22 +68,18 @@ class HelpdeskWhatsappWebhookController(ContactWebhookController):
 
                 ticket = Ticket.with_context(skip_whatsapp_auto=True).create(ticket_vals)
                 _logger.info("Novo ticket #%s criado para %s", ticket.id, partner.name)
-
-                #envia o menu apos criar o ticket novo ( da pra chamar uma funcao so pra isso e deixar mais customizavel o modulo, nao usar so por codigo)
                 instance = request.env['whatsapp.instance'].sudo().search([('status', '=', 'connected')], limit=1)
                 if instance:
                     try:
                         instance.send_text(
                             phone_number,
-                            "Olá! 👋\nEscolha uma opção:\n1️⃣ Suporte\n2️⃣ Financeiro\n3️⃣ Comercial",
+                            "Olá! 👋 Para direcionar seu atendimento, escolha uma opção:\n1️⃣ Suporte\n2️⃣ Financeiro\n3️⃣ Comercial",
                             partner=partner
                         )
                     except Exception as ex:
                         _logger.exception("Erro ao enviar menu inicial: %s", ex)
 
                 return {'status': 'ok', 'message': 'Ticket criado e menu enviado'}
-
-            #vai extrair conteudo que o cliente enviar mandar( agora esta tratando base64 e arquivos)
             try:
                 body, attachment_ids = self._extract_message_content_and_attachments(message_content)
             except Exception as ex:
@@ -97,7 +90,6 @@ class HelpdeskWhatsappWebhookController(ContactWebhookController):
                     or ''
                 )
                 attachment_ids = []
-                #ve se precisa tratar o menu, se precisar, cai no arquivo na pasta service que trata o menu e as respostas
             if getattr(ticket, 'x_waiting_menu_response', False):
                 try:
                     service = request.env["helpdesk.whatsapp.service"].sudo()
@@ -105,6 +97,7 @@ class HelpdeskWhatsappWebhookController(ContactWebhookController):
                 except Exception as ex_service:
                     _logger.exception("Erro ao processar resposta do menu no ticket #%s: %s", ticket.id, ex_service)
                 return {'status': 'ok', 'message': 'Menu response processed'}
+
             if (body and body.strip()) or attachment_ids:
                 try:
                     message = ticket.with_context(skip_whatsapp_send=True).sudo().message_post(
@@ -112,10 +105,25 @@ class HelpdeskWhatsappWebhookController(ContactWebhookController):
                         message_type='comment',
                         subtype_xmlid='mail.mt_comment',
                         author_id=partner.id,
-                        attachment_ids=attachment_ids if attachment_ids else None #posta mensagem do cliente dentro do ticket com attachments ou nao (se tiver legenda a imagem, ela vem junto)
+                        attachment_ids=attachment_ids if attachment_ids else None
                     )
-                    ticket.trigger_chatter_update(message)
-                    _logger.exception("msg postada no bus.bus")
+                    ticket.with_context(force_send_bus=True).trigger_ticket_refresh()
+                    _logger.info("Mensagem postada no ticket #%s: %s", ticket.id, body)
+
+                    if ticket.user_id and ticket.user_id.partner_id:
+                        ticket.user_id.partner_id._bus_send(
+                            "web_notify",
+                            {
+                                "type": "info",
+                                "title": "Nova mensagem no ticket",
+                                "message": f"Ticket #{ticket.name}: nova mensagem de {partner.name}",
+                                "model": "helpdesk.ticket",
+                                "params": {"ticket_id": ticket.id},
+                            },
+                        )
+                        _logger.info("Notificação enviada via bus.bus para %s", ticket.user_id.name)
+
+
                 except Exception as ex_post:
                     _logger.exception("Erro ao postar mensagem no ticket #%s: %s", ticket.id, ex_post)
 

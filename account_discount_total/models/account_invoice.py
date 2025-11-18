@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from locale import currency
 from odoo import api, fields, models
 
 
@@ -35,52 +36,57 @@ class AccountMove(models.Model):
             inv._compute_discounts()
         return True
 
+    @api.depends('discount_type', 'discount_rate', 'invoice_line_ids.price_subtotal')
     def _compute_discounts(self):
         for inv in self:
-            if inv.discount_type and inv.discount_rate:
-                currency = inv.currency_id or self.env.company.currency_id
-                total = sum(line.quantity * line.price_unit for line in inv.invoice_line_ids)
+            currency = inv.currency_id or self.env.company.currency_id
+            total = sum(line.quantity * line.price_unit for line in inv.invoice_line_ids)
+
+            # Se não existe desconto configurado
+            if not inv.discount_type or not inv.discount_rate or total == 0:
+                inv.amount_price_gross = currency.round(total)
+                inv.amount_discount_value = 0.0
+                inv.amount_untaxed = total
+                inv.amount_total = total
+                continue
+
+            # -------- Cálculo do desconto ----------
+            if inv.discount_type == 'percent':
+                discount_value_total = currency.round((inv.discount_rate / 100.0) * total)
+
+            elif inv.discount_type == 'amount':   # valor fixo
+                discount_value_total = currency.round(min(inv.discount_rate, total))  # evita desconto maior que o total
+
+            else:
                 discount_value_total = 0.0
 
-                if total == 0:
-                    inv.amount_untaxed = inv.amount_discount_value = inv.amount_total = 0.0
-                    continue
+            # -------- Distribuição do desconto entre as linhas ----------
+            # proporcional ao valor da linha
+            soma_descontos = 0.0
+            for line in inv.invoice_line_ids:
+                proporcao = (line.price_subtotal / total) if total else 0
+                desconto_linha = currency.round(discount_value_total * proporcao)
+                line.discount_value = desconto_linha
+                soma_descontos += desconto_linha
 
-                # Determina tipo de desconto
-                if inv.discount_type == 'percent':
-                    discount_percent = inv.discount_rate
-                else:
-                    discount_percent = (inv.discount_rate / total) * 100 if inv.discount_rate else 0.0
+            # Ajuste de arredondamento: joga diferença para a última linha
+            diferenca = currency.round(discount_value_total - soma_descontos)
+            if inv.invoice_line_ids and diferenca:
+                inv.invoice_line_ids[-1].discount_value += diferenca
 
-                for line in inv.invoice_line_ids:
-                    try:
-                        line._compute_totals()
-                    except AttributeError:
-                        pass
-                inv.amount_price_gross = currency.round(total)
-                if inv.discount_type == 'amount':   
-                    if inv.discount_rate != currency.round(discount_value_total):
-                        discount_value_total = currency.round(discount_value_total + inv.discount_rate - discount_value_total)
-                        soma = sum(line.discount_value for line in inv.invoice_line_ids)
-                        if soma != discount_value_total:
-                            n_linhas = len(inv.invoice_line_ids)
-                            dif = (currency.round(discount_value_total - soma))
-                            inv.invoice_line_ids[n_linhas-1].discount_value += dif 
-                else:
-                    discount_value_total = (discount_percent / 100.0) * total   
-                total_final = currency.round(total - discount_value_total)
-                inv.amount_untaxed = total
-                inv.amount_discount_value = currency.round(discount_value_total)
-                inv.amount_total = total_final 
-                inv.amount_residual = inv.amount_total - inv.amount_paid
-                inv.amount_total_signed = total_final
-                inv.amount_untaxed_signed = total_final
-            if inv.discount_type is False or inv.discount_rate == 0.0:
-                for line in inv.invoice_line_ids:
-                    try:
-                        line._compute_totals()
-                    except AttributeError:
-                        pass
+            # -------- Totais da fatura ----------
+            total_final = currency.round(total - discount_value_total)
+
+            inv.amount_price_gross = currency.round(total)
+            inv.amount_discount_value = currency.round(discount_value_total)
+            inv.amount_untaxed = currency.round(total)
+            inv.amount_total = currency.round(total_final)
+
+    def action_post(self):
+        res = super(AccountMove, self).action_post()
+        for inv in self:
+            inv._compute_discounts()
+        return res
 
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"

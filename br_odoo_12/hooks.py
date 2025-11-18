@@ -26,7 +26,7 @@ def post_init_hook(cr, registry):
     product = env["product.template"].search([])
 
     for prd in product:
-        prd.fiscal_type_bkp = prd.fiscal_type
+        prd.fiscal_type_bkp = prd.detailed_type
         prd.origin_bkp = prd.origin
         prd.ncm = prd.fiscal_classification_id.code
         prd.code_servico = prd.service_type_id.code

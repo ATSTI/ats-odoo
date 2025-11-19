@@ -230,6 +230,9 @@ class AccountMoveLine(models.Model):
                         if resultado:
                             self.bank_inter_state = "baixado"
                             self.write_off_by_api = True
+                            # deixar o payment_line como cancelado
+                            for payment_line in self.payment_line_ids:
+                                payment_line.order_id.state = "cancel"
                         user = str(self._uid) + '-' + self.env['res.users'].browse(self._uid).name
                         message = "Boleto Banco Inter cancelado: %s-%s, código: %s, usuário: %s\n, em %s." % (
                                     self.name,
@@ -238,7 +241,7 @@ class AccountMoveLine(models.Model):
                                     user,
                                     datetime.now().strftime('%d-%m-%Y %H:%M')
                         )
-                        self.move_id.message_post(body=message)                            
+                        self.move_id.message_post(body=message)
         except Exception as error:
             raise UserError(_(error))
 

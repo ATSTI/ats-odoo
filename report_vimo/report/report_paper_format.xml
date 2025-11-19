@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-
         <report
             id="report_vimo_document_id"
             string="Impressão Cupom"
@@ -10,7 +8,14 @@
             name="report_vimo.report_vimo_document"
             file="report_vimo.report_vimo_document"
         />
-
+        <report
+            id="report_codigo_barras_id"
+            string="Códigos de barras todas quantidades (PDF)"
+            model="stock.picking"
+            report_type="qweb-pdf"
+            name="report_vimo.report_codigo_barras"
+            file="report_vimo.report_codigo_barras"
+        />
         <record id="termica_paperformat_id" model="report.paperformat">
             <field name="name">Impressora Termica</field>
             <field name="default" eval="False"/> 
@@ -31,6 +36,4 @@
         <record id="report_vimo_document_id" model="ir.actions.report">
             <field name="paperformat_id" ref="report_vimo.termica_paperformat_id"/>
         </record>
-
-    </data>
 </odoo>

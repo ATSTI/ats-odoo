@@ -29,6 +29,7 @@
     'depends': ['hr', 'base', 'account', 'l10n_br_fiscal'],
     'data': [
         'report/report_vimo_document.xml',
+        'report/report_codigo_barras.xml',
         'report/report_paper_format.xml',
     ],
     'installable': True,

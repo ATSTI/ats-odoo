@@ -133,6 +133,8 @@ class AccountAnalyticAccount(models.Model):
         email_gerencia += '<table border="1" width="100%">'
         email_gerencia += '<tr><th>Cliente</th><th>Contrato</th><th>Enviado</th><th>Motivo</th></tr>'
         for inv in invoice_ids:
+            if inv.date_start and inv.date_start > data_fim:
+                continue
             ctr_email = inv.contract_id
             email_gerencia += '<tr><td>%s</td><td>%s</td>' %(ctr_email.partner_id.name, ctr_email.name)
             #if inv.contract_id.id == 601:

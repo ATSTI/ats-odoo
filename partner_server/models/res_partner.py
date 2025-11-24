@@ -42,7 +42,7 @@ class Partner(models.Model):
 class Servidor(models.Model):
     _name = 'servidores.infos'
     _description = "Informações do Servidor"
-
+    name = fields.Char("nome", compute ='_compute_name',store = True, readonly = True)
     server_name = fields.Char("Nome do Servidor")
 
     porta_ids = fields.One2many(
@@ -54,14 +54,11 @@ class Servidor(models.Model):
     )
     obs_server = fields.Text(string="Observações do Servidor")
 
-    def name_get(self):
-        result = []
+    @api.depends('server_name')
+    def _compute_name(self):
         for rec in self:
-            nome = rec.server_name or "Servidor sem nome"
-            result.append((rec.id, nome))
-        return result
-
-
+            rec.name = rec.server_name
+            
     def unlink(self):
         portas = self.env['portas.server'].search([('servidor_id', 'in', self.ids)])
         portas.unlink()
@@ -71,20 +68,21 @@ class PortaServer(models.Model):
     _name = "portas.server"
     _description = "Informações da Porta"
 
+    name = fields.Char("nome", compute ='_compute_name',store = True, readonly = True)
+
     nporta = fields.Char(string="Número da Porta", index = True)
 
     servidor_id = fields.Many2one(
         comodel_name="servidores.infos",
         string="Servidor",
     )
-
-    def name_get(self):
-        result = []
+    @api.depends("nporta", "servidor_id")
+    def _compute_name(self):
         for rec in self.filtered(lambda r: r.servidor_id):
             servidor_nome = rec.servidor_id.server_name
             descricao = f"{rec.nporta} - {servidor_nome}"
-            result.append((rec.id, descricao))
-        return result
+            rec.name = descricao
+        
         
 
 

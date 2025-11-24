@@ -1,108 +1,109 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<odoo>
+<?xml version="1.0"?>
+<t t-name="report_vimo.report_codigo_barras">
+    <t t-call="web.basic_layout">
+        <div class="page">
 
-    <template id="report_codigo_barras">
-        <t t-call="web.basic_layout">
-            <div class="page">
+            <style>
+                .etiqueta-nome {
+                    font-size: 9px;
+                    font-weight: bold;
+                    line-height: 1.1;
+                }
+                .etiqueta-preco {
+                    font-size: 10px;
+                    font-weight: bold;
+                }
+                .etiqueta-barcode-text {
+                    font-size: 8px;
+                    text-align: center;
+                }
+            </style>
 
-                <style>
-                    .etiqueta-nome {
-                        font-size: 9px;
-                        font-weight: bold;
-                        line-height: 1.1;
-                    }
-                    .etiqueta-preco {
-                        font-size: 10px;
-                        font-weight: bold;
-                    }
-                    .etiqueta-barcode-text {
-                        font-size: 8px;
-                    }
-                </style>
+            <t t-foreach="docs" t-as="picking">
+                <t t-foreach="picking.move_lines" t-as="move">
 
-                <t t-foreach="docs" t-as="picking">
-                    <t t-foreach="picking.move_lines" t-as="move">
+                    <t t-set="qty" t-value="int(move.product_uom_qty)"/>
 
-                        <t t-set="qty" t-value="int(move.product_uom_qty)"/>
+                    <t t-set="nome_produto"
+                       t-value="move.product_id.display_name.split('] ')[1]
+                                if ']' in move.product_id.display_name
+                                else move.product_id.display_name"/>
 
-                        <t t-set="nome_produto"
-                           t-value="move.product_id.display_name.split('] ')[1]
-                                    if ']' in move.product_id.display_name
-                                    else move.product_id.display_name"/>
+                    <t t-foreach="range(qty)" t-as="item">
+                        <t t-translation="off">
 
-                        <t t-foreach="range(qty)" t-as="item">
-                            <t t-translation="off">
+                            <div style="display:inline-block;
+                                        width:27mm;
+                                        height:15mm;
+                                        padding:0;
+                                        margin:0;">
 
-                                <div style="display: inline-block;
-                                            width: 27mm;
-                                            height: 15mm;
-                                            padding: 0;">
+                                <table style="border:1px solid black;
+                                              width:100%;
+                                              height:100%;
+                                              margin:0;
+                                              padding:0;
+                                              border-collapse:collapse;">
+                                    <tr>
+                                        <td style="padding:1px; text-align:left;">
+                                            <div class="etiqueta-nome">
+                                                <span t-esc="nome_produto"/>
+                                            </div>
+                                            <div class="etiqueta-preco">
+                                                R$ <span t-esc="'%.2f' % move.product_id.list_price"/>
+                                            </div>
+                                        </td>
+                                    </tr>
 
-                                    <table style="border: 1px solid black;
-                                                width: 100%;
-                                                height: 100%;
-                                                margin: 0;
-                                                padding: 0;
-                                                border-collapse: collapse;">
+                                    <t t-if="move.product_id.tracking != 'none'">
                                         <tr>
-                                            <td style="padding: 1px; text-align: left;">
-                                                <div class="etiqueta-nome">
-                                                    <span t-esc="nome_produto"/>
-                                                </div>
-                                                <div class="etiqueta-preco">
-                                                    R$ <span t-esc="move.product_id.list_price"/>
-                                                </div>
+                                            <td class="text-center" style="padding:0;">
+                                                <t t-set="lot_name"
+                                                   t-value="move.move_line_ids and
+                                                            (move.move_line_ids[0].lot_name
+                                                             or move.move_line_ids[0].lot_id.name)"/>
+
+                                                <t t-if="lot_name">
+                                                    <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
+                                                        ('Code128', lot_name, 600, 150)"
+                                                        style="width:25mm; height:8mm; display:block; margin:auto;"/>
+
+                                                    <div class="etiqueta-barcode-text"
+                                                         t-esc="lot_name"/>
+                                                </t>
+                                                <t t-else="">
+                                                    <span class="text-muted" style="font-size:8px;">Sem lote</span>
+                                                </t>
                                             </td>
                                         </tr>
+                                    </t>
 
-                                        <t t-if="move.product_id.tracking != 'none'">
-                                            <tr>
-                                                <td class="text-center" style="padding: 0;">
-                                                    <t t-set="lot_name"
-                                                       t-value="move.move_line_ids and
-                                                                (move.move_line_ids[0].lot_name
-                                                                 or move.move_line_ids[0].lot_id.name)"/>
+                                    <t t-if="move.product_id.tracking == 'none'">
+                                        <tr>
+                                            <td class="text-center" style="padding:0;">
 
-                                                    <t t-if="lot_name">
-                                                        <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
-                                                                        ('Code128', lot_name, 600, 150)"
-                                                             style="width:100%; height:4rem;"/>
-                                                        <div class="etiqueta-barcode-text" t-esc="lot_name"/>
-                                                    </t>
-                                                    <t t-else="">
-                                                        <span class="text-muted"
-                                                              style="font-size: 8px;">Sem lote</span>
-                                                    </t>
+                                                <t t-if="move.product_id.barcode">
+                                                    <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
+                                                        ('Code128', move.product_id.barcode, 600, 150)"
+                                                        style="width:25mm; height:8mm; display:block; margin:auto;"/>
 
-                                                </td>
-                                            </tr>
-                                        </t>
+                                                    <div class="etiqueta-barcode-text"
+                                                         t-esc="move.product_id.barcode"/>
+                                                </t>
 
-                                        <t t-if="move.product_id.tracking == 'none'">
-                                            <tr>
-                                                <td class="text-center" style="padding: 0;">
-                                                    <t t-if="move.product_id.barcode">
-                                                        <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
-                                                                        ('Code128', move.product_id.barcode, 600, 150)"
-                                                             style="width: 100%; height: 4rem;"/>
-                                                        <div class="etiqueta-barcode-text"
-                                                             t-esc="move.product_id.barcode"/>
-                                                    </t>
-                                                    <t t-else="">
-                                                        <span class="text-muted"
-                                                              style="font-size: 8px;">Sem código</span>
-                                                    </t>
-                                                </td>
-                                            </tr>
-                                        </t>
-                                    </table>
-                                </div>
-                            </t>
+                                                <t t-else="">
+                                                    <span class="text-muted" style="font-size:8px;">Sem código</span>
+                                                </t>
+
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </table>
+                            </div>
                         </t>
                     </t>
                 </t>
-            </div>
-        </t>
-    </template>
-
-</odoo>
+            </t>
+        </div>
+    </t>
+</t>

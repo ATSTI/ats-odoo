@@ -13,10 +13,18 @@ class HelpdeskWhatsappWebhookController(ContactWebhookController):
     def receive_webhook(self, **kwargs):
         try:
             payload = request.get_json_data() or {}
-            event = payload.get('event')
 
-            if event != 'messages.upsert':
+            event = payload.get('event')
+            message_data = payload.get('data', {}) or {}
+
+            is_message_event = (
+                event in (None, 'messages.upsert', 'messages.update', 'messages')
+                or message_data.get('message')
+            )
+
+            if not is_message_event:
                 return super().receive_webhook()
+
 
             message_data = payload.get('data', {}) or {}
             key = message_data.get('key', {}) or {}

@@ -1,39 +1,49 @@
-from odoo import models, fields,Command
+from odoo import models, fields, Command
 from odoo.exceptions import UserError
-from odoo.tools import html2plaintext
 import logging
+
 _logger = logging.getLogger(__name__)
 
 class DiscussChannel(models.Model):
     _inherit = "discuss.channel"
 
-
     def _add_members_to_whatsapp_channel(self, channel, partner, instance):
+        """Adiciona membros internos da equipe 'Suporte' + o cliente (partner)
+        ao canal do WhatsApp, evitando duplicados e validando membros existentes.
         """
-        Adiciona os membros corretos ao canal e o afixa para novos membros.
-        """
-        members_to_add = {partner}
-        if instance.user_id:
-            members_to_add.add(instance.user_id.partner_id)
-         
-        if instance.instance_type == 'company' and not instance.user_id:
-            admin_group = self.env.ref('base.group_users', raise_if_not_found=False)
-            if admin_group:
-                admin_users = self.env['res.users'].search([('groups_id', 'in', admin_group.id)])
-                for user in admin_users:
-                    members_to_add.add(user.partner_id)
+        suporte_team = self.env['helpdesk.ticket.team'].search(
+            [('name', 'ilike', 'suporte')], limit=1
+        )
+        suporte_members = set()
 
-        current_member_ids = channel.channel_member_ids.mapped('partner_id').ids
-        # Filtra apenas os parceiros que ainda não são membros do canal.
-        new_partners = [p for p in members_to_add if p.id not in current_member_ids]
+        if suporte_team:
+            if hasattr(suporte_team, "member_ids") and suporte_team.member_ids:
+                suporte_members = set(suporte_team.member_ids.mapped("partner_id"))
+            elif hasattr(suporte_team, "user_ids") and suporte_team.user_ids:
+                suporte_members = set(suporte_team.user_ids.mapped("partner_id"))
 
-        if new_partners:
-            commands = []
-            for p in new_partners:
-                # Para usuários internos, afixa o canal na criação. O contato externo não precisa disso.
-                is_internal = p.id != partner.id
-                commands.append(Command.create({'partner_id': p.id, 'is_pinned': is_internal}))
-            
-            channel.write({
-                'channel_member_ids': commands
-            })
+        all_internal_user_partners = set(
+            self.env['res.users'].search([]).mapped('partner_id')
+        )
+        valid_internal_members = suporte_members.intersection(all_internal_user_partners)
+        members_to_add = valid_internal_members | {partner}
+        existing_member_ids = set(channel.channel_member_ids.mapped('partner_id').ids)
+        new_partners = [p for p in members_to_add if p.id not in existing_member_ids]
+        if not new_partners:
+            return  
+        commands = []
+        for p in new_partners:
+            commands.append(
+                Command.create({
+                    "partner_id": p.id,
+                    "is_pinned": (p.id != partner.id),
+                })
+            )
+
+        channel.write({"channel_member_ids": commands})
+
+        _logger.info(
+            "Adicionados ao canal %s: %s",
+            channel.id,
+            ", ".join([str(p.id) for p in new_partners])
+        )

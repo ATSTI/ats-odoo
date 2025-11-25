@@ -32,6 +32,7 @@ class IntegracaoPdv(http.Controller):
         num_nota = len(data)
         order = http.request.env['sale.order']
         cliente = http.request.env['res.partner']
+        user_id = http.request.env['res.users'].browse([request.uid])
         # crio uma lista com CNPJs unicos
         lista_cnpj = set()
         lista_notas = []
@@ -82,15 +83,20 @@ class IntegracaoPdv(http.Controller):
                 ('client_order_ref', '=', mes_ano),
                 ], limit=1)
             if not order_id:
-                print ("criando pedido")
+                print ("########### - criando pedido - ############")
                 # crio o pedido
+                if cli_ids.financeiro.user_id:
+                    usuario = cli_ids.financeiro.user_id.id
+                else:
+                    usuario = user_id.id
                 vals = {
                     'partner_id': cli_ids.financeiro.id,
                     'date_order': data_pedido,
                     'origin': 'produtor',
                     'client_order_ref': mes_ano,
+                    'user_id': usuario,
                 }
-                order_id = order.sudo().create(vals)
+                order_id = order.create(vals)
                 # cnpj = '%s.%s.%s/%s-%s' %(cnpj[:2],cnpj[2:5],cnpj[5:8],cnpj[8:12],cnpj[12:14])
                 #emitente = f"{cnpj} - {lista['nome']}"
             if order_id:

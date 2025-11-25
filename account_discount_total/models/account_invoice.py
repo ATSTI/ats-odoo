@@ -81,6 +81,9 @@ class AccountMove(models.Model):
             inv.amount_discount_value = currency.round(discount_value_total)
             inv.amount_untaxed = currency.round(total)
             inv.amount_total = currency.round(total_final)
+            inv.amount_residual = currency.round(total_final)
+            inv.amount_total_signed = currency.round(total_final)
+            inv.amount_untaxed_signed = currency.round(total_final)
 
     def action_post(self):
         res = super(AccountMove, self).action_post()

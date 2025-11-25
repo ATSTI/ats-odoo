@@ -28,7 +28,6 @@ class IntegracaoPdv(http.Controller):
 
     @http.route('/nfe', type='json', auth="user", csrf=False)
     def website_nfe(self, **kwargs):
-        import pudb;pu.db
         data = request.params
         num_nota = len(data)
         order = http.request.env['sale.order']

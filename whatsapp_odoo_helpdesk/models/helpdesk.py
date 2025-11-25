@@ -41,7 +41,7 @@ class HelpDeskTicket(models.Model):
                     continue           
                 composer_vals = {
                     'partner_id': [(6, 0, [partner.id])],
-                    'body': f"{ticket.user_id.name}:\n{body}",  # adiciona o nome do responsável   
+                    'body': f"{(ticket.user_id.name or 'Equipe') if ticket.user_id else 'Equipe'}:\n{body}",
                     'attachment_ids': [(6, 0, attachments.ids)],
                     'instance_id': self.env['whatsapp.instance'].sudo().search(
                         [('status', '=', 'connected')], limit=1

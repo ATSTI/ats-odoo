@@ -217,6 +217,8 @@ class ContractContract(models.Model):
         """Gera os valores das faturas com base nas regras de preço sem passar pelo l10n_latam"""
         invoices_values = []
         for contract in self:
+            if contract.company_id.name == "ATS-TI Soluções Empresariais (Mau)":
+                continue
             if not contract.partner_id:
                 continue
             journal = self.env['account.journal'].search([
@@ -236,8 +238,11 @@ class ContractContract(models.Model):
             mes_ano = invoice_date.strftime("%m/%Y")
             # cliente = contract.partner_id.name or "Sem Cliente"
             contrato = contract.code or str(contract.id)
-            # invoice_name = f"FATURA - {cliente} - {mes_ano} - {contrato}
-            vencimento = contract.recurring_next_date
+            # invoice_name = f"FATURA - {cliente} - {mes_ano} - {contradias_vencimento = int(contract.payment_term_id.line_ids.payment_days)
+            dias_vencimento = int(contract.payment_term_id.line_ids.payment_days)
+            vencimento = contract.recurring_next_date.replace(day=dias_vencimento)
+            if vencimento <= contract.recurring_next_date:
+                vencimento = vencimento + relativedelta(months=+1)
             mes_ano = vencimento.strftime("%m/%Y")
             invoice_vals = {
                 "move_type": "out_invoice",

@@ -15,7 +15,15 @@ class HelpdeskWhatsappWebhookController(ContactWebhookController):
             payload = request.get_json_data() or {}
 
             event = payload.get('event')
-            message_data = payload.get('data', {}) or {}
+            raw_data = payload.get('data')
+
+            # Normaliza para sempre virar dict
+            if isinstance(raw_data, list):
+                message_data = raw_data[0] if raw_data else {}
+            elif isinstance(raw_data, dict):
+                message_data = raw_data
+            else:
+                message_data = {}
 
             is_message_event = (
                 event in (None, 'messages.upsert', 'messages.update', 'messages')
@@ -39,15 +47,27 @@ class HelpdeskWhatsappWebhookController(ContactWebhookController):
                 return super().receive_webhook()
 
             sender_jid = key.get('remoteJid') or ''
+            _logger.info("JID DO CARA %s", sender_jid)
             phone_number = sender_jid.split('@')[0] if sender_jid else None
             if not phone_number:
                 _logger.warning("Nenhum número de telefone no payload.")
                 return super().receive_webhook()
-
-            partner = request.env['res.partner'].sudo().search([('mobile', 'ilike', phone_number)], limit=1)
+            name_parts = message_data.get('pushName', '').split()
+            domain = []
+            for part in name_parts:
+                domain.append(('name', 'ilike', part))
+            partner = request.env['res.partner'].sudo().search(domain, limit=1)
             if not partner:
                 _logger.info("Parceiro não encontrado para o número %s", phone_number)
-                return super().receive_webhook()
+                #CRIANDO PARCEIRO AUTOMATICAMENTE
+                partner_vals = {
+                    'name': message_data.get('pushName', phone_number),
+                    'mobile': phone_number,
+                    'is_company': False,
+                }
+                partner = request.env['res.partner'].sudo().create(partner_vals)
+                _logger.info("Parceiro criado automaticamente: %s", partner.name)
+                # return super().receive_webhook() CONTINUANDO ROTINA PARA NÃO PERDER MENSAGEM
 
             Ticket = request.env['helpdesk.ticket'].sudo()
             ticket = Ticket.search([
@@ -81,10 +101,19 @@ class HelpdeskWhatsappWebhookController(ContactWebhookController):
                 _logger.info("Novo ticket #%s criado para %s", ticket.id, partner.name)
                 instance = request.env['whatsapp.instance'].sudo().search([('status', '=', 'connected')], limit=1)
                 if instance:
+                    odoo_bot = request.env.ref("base.partner_root") 
+                    msg = "Olá! 👋 Para direcionar seu atendimento, escolha uma opção:\n1️⃣ Suporte\n2️⃣ Financeiro\n3️⃣ Comercial"
+                    channel = request.env['discuss.channel'].sudo()._find_or_create_whatsapp_channel(partner, instance)
+                    channel.with_context(from_webhook=True).message_post(body=msg, 
+                            message_type='comment',
+                            subtype_id=1,  # Subtipo 'Discussão'
+                            author_id=odoo_bot.id
+                            )
+                    _logger.info("Menu inicial enviado para %s no canal de conversa", partner.name)
                     try:
                         instance.send_text(
                             phone_number,
-                            "Olá! 👋 Para direcionar seu atendimento, escolha uma opção:\n1️⃣ Suporte\n2️⃣ Financeiro\n3️⃣ Comercial",
+                            msg,
                             partner=partner
                         )
                     except Exception as ex:

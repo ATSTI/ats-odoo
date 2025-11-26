@@ -47,6 +47,7 @@ class DiscussChannel(models.Model):
         )
 
     def _notify_thread(self, message, msg_vals=False, **kwargs):
+        odoo_bot = self.env.ref("base.partner_root")
         msg_vals = msg_vals or {}
 
         original_body = html2plaintext(msg_vals.get("body", ""))

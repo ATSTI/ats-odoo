@@ -72,6 +72,7 @@ class HelpDeskTicket(models.Model):
         - Envia mensagem automática via WhatsApp com protocolo
         """
         self.ensure_one()
+        odoo_bot = self.env.ref("base.partner_root")
         partner = self.partner_id
         if not partner or not partner.mobile:
             _logger.warning("Ticket #%s não possui partner ou número de WhatsApp.", self.id)
@@ -93,6 +94,12 @@ class HelpDeskTicket(models.Model):
             f"Essa é uma mensagem automática, não precisa responder\n\n"
             f"🤖 {partner.name},seu atendimento foi finalizado com sucesso, qualquer dúvida estamos a disposição.\n\n "
             f"📄 Protocolo deste atendimento: {protocolo}"
+        )
+        channel = self.env['discuss.channel']._find_or_create_whatsapp_channel(partner, instance)
+        channel.message_post(body=body, 
+            message_type='comment',
+            subtype_id=1,  # Subtipo 'Discussão'
+            author_id=odoo_bot.id
         )
 
        
@@ -125,14 +132,13 @@ class HelpDeskTicket(models.Model):
         """
         self.write({"user_id": self.env.user.id})
         user = self.env.user
-
+        odoo_bot = self.env.ref("base.partner_root")
         for ticket in self:
             partner = ticket.partner_id
             if not partner or not partner.mobile:
                 continue
 
             try:
-             
                 body = (
                     f"👋 Olá {partner.name}, tudo bem?\n\n"
                     f"Seu chamado foi atribuído a {user.name}.\n"
@@ -143,6 +149,12 @@ class HelpDeskTicket(models.Model):
                     [("status", "=", "connected")], limit=1
                 )
                 if instance:
+                    channel = self.env['discuss.channel']._find_or_create_whatsapp_channel(partner, instance)
+                    channel.with_context(from_webhook=True).message_post(body=body, 
+                        message_type='comment',
+                        subtype_id=1,  # Subtipo 'Discussão'
+                        author_id=odoo_bot.id
+                    )
                     composer_vals = {
                         "partner_id": [(6, 0, [partner.id])],
                         "body": body,
@@ -157,8 +169,7 @@ class HelpDeskTicket(models.Model):
                         .create(composer_vals)
                     )
                     composer.sudo().action_send_message()
-
-                odoo_bot = self.env.ref("base.partner_root")  
+  
                 Channel = self.env["discuss.channel"].sudo()
                 followers = ticket.team_id.user_ids
                 for team_user in followers:

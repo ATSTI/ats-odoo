@@ -8,7 +8,7 @@ class HelpdeskWhatsappService(models.AbstractModel):
         """
         Processa respostas do menu do WhatsApp.
         """
-
+        odoo_bot = self.env.ref("base.partner_root")
         if not ticket or not partner:
             return
         menu_options = {
@@ -22,6 +22,12 @@ class HelpdeskWhatsappService(models.AbstractModel):
         if not selected:
             if instance:
                 instance.send_text(phone_number, "Opção inválida. Escolha 1️⃣, 2️⃣ ou 3️⃣.", partner=partner)
+                channel = self.env['discuss.channel']._find_or_create_whatsapp_channel(partner, instance)
+                channel.with_context(from_webhook=True).message_post(body="Opção inválida. Escolha 1️⃣, 2️⃣ ou 3️⃣.", 
+                    message_type='comment',
+                    subtype_id=1,  # Subtipo 'Discussão'
+                    author_id=odoo_bot.id
+                )
             return
         team_name = selected["team"]
         Team = self.env["helpdesk.ticket.team"].sudo()
@@ -35,7 +41,6 @@ class HelpdeskWhatsappService(models.AbstractModel):
             return
 
         ticket.message_subscribe(partner_ids=followers.mapped("partner_id").ids)
-        odoo_bot = self.env.ref("base.partner_root")
         Channel = self.env["discuss.channel"].sudo()
         for user in followers:
             user_partner = user.partner_id
@@ -61,3 +66,9 @@ class HelpdeskWhatsappService(models.AbstractModel):
                 )
         if instance:
             instance.send_text(phone_number, selected["msg"], partner=partner)
+            channel = self.env['discuss.channel'].sudo()._find_or_create_whatsapp_channel(partner, instance)
+            channel.with_context(from_webhook=True).message_post(body=selected["msg"], 
+                message_type='comment',
+                subtype_id=1,  # Subtipo 'Discussão'
+                author_id=odoo_bot.id
+            )

@@ -20,6 +20,9 @@ class HelpDeskTicket(models.Model):
         Intercepta mensagens do chatter do ticket e envia para WhatsApp
         usando whatsapp.evolution.composer, evitando duplicações e loops.
         """
+        
+        self = self.with_context(mail_notify_no_email=True)
+        
         messages = super(HelpDeskTicket, self).message_post(**kwargs)
 
         for message in messages:          

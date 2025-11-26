@@ -88,7 +88,7 @@ class HelpDeskTicket(models.Model):
       
         now = datetime.now()
         protocolo = f"{now.year:04d}{now.month:02d}{now.day:02d}{self.id}"
-
+        instance = self.env['whatsapp.instance'].sudo().search([('status', '=', 'connected')], limit=1)
         #daria pra customizar mais de alguma forma criando menus e campos (ideia futura)
         body = (
             f"Essa é uma mensagem automática, não precisa responder\n\n"
@@ -96,13 +96,11 @@ class HelpDeskTicket(models.Model):
             f"📄 Protocolo deste atendimento: {protocolo}"
         )
         channel = self.env['discuss.channel']._find_or_create_whatsapp_channel(partner, instance)
-        channel.message_post(body=body, 
+        channel.with_context(from_webhook=True).message_post(body=body, 
             message_type='comment',
             subtype_id=1,  # Subtipo 'Discussão'
             author_id=odoo_bot.id
         )
-
-       
         try:
             instance = self.env["whatsapp.instance"].sudo().search(
                 [("status", "=", "connected")], limit=1

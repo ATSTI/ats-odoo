@@ -9,7 +9,7 @@
     'sequence': 2,
     'summary': 'Adiciona pagamento para linhas do diário',
     'description': """
-    Linhas do Diário - Pagamento
+Linhas do Diário - Pagamento
 ============================
 Este módulo adiciona campos e funcionalidades relacionadas a dados de pagamento 
 associados às linhas do diário, permitindo melhor controle e rastreabilidade 

@@ -66,15 +66,22 @@ class AccountPaymentOrder(models.Model):
             if move_line and line.move_line_id.id != move_line.id:
                 continue
             ddd = telefone = ''
+            email = ''
+            if line.partner_id.email:
+                email = line.partner_id.email[:line.partner_id.email.find(';')] if line.partner_id.email.find(';') > 0 else line.partner_id.email
             vcto = line.ml_maturity_date or line.move_line_id.date_maturity
             if line.partner_id.mobile:
-                telefone = str(phonenumbers.parse(line.partner_id.mobile, "BR").national_number)
+                if line.partner_id.mobile.find('+55') == 0:
+                    telefone = line.partner_id.mobile
+                else:
+                    telefone = line.partner_id.mobile.split()[0]
+                telefone = str(phonenumbers.parse(telefone, "BR").national_number)
                 ddd = telefone[0:2]
                 telefone = telefone[2:]
             payer = User(
                 name=line.partner_id.legal_name or line.partner_id.name,
                 identifier=misc.punctuation_rm(line.partner_id.cnpj_cpf),
-                email=line.partner_id.email,
+                email=email,
                 ddd=ddd,
                 telefone=telefone,
                 address=UserAddress(

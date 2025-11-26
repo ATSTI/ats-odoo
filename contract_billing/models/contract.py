@@ -255,6 +255,7 @@ class ContractContract(models.Model):
                 "l10n_latam_document_type_id": False,
                 "l10n_latam_document_number": False,
                 "invoice_payment_term_id": contract.payment_term_id.id,
+                "payment_mode_id": contract.payment_mode_id.id,
                 "invoice_line_ids": [(0, 0, line._prepare_invoice_line()) for line in contract.contract_line_ids.filtered(lambda l: not l.is_canceled)],
                 "move_tag_ids": [(6, 0, contract.tag_ids.ids)],
                 # "name": invoice_name,

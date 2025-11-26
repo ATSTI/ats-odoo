@@ -1,5 +1,6 @@
-from odoo import models, fields, Command
+from odoo import models, fields, Command,_ as odoo_t, Command
 from odoo.exceptions import UserError
+from odoo.tools import html2plaintext
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -8,9 +9,6 @@ class DiscussChannel(models.Model):
     _inherit = "discuss.channel"
 
     def _add_members_to_whatsapp_channel(self, channel, partner, instance):
-        """Adiciona membros internos da equipe 'Suporte' + o cliente (partner)
-        ao canal do WhatsApp, evitando duplicados e validando membros existentes.
-        """
         suporte_team = self.env['helpdesk.ticket.team'].search(
             [('name', 'ilike', 'suporte')], limit=1
         )
@@ -47,3 +45,39 @@ class DiscussChannel(models.Model):
             channel.id,
             ", ".join([str(p.id) for p in new_partners])
         )
+
+    def _notify_thread(self, message, msg_vals=False, **kwargs):
+        msg_vals = msg_vals or {}
+
+        original_body = html2plaintext(msg_vals.get("body", ""))
+        author = message.author_id.name or "Equipe"
+        formatted_body = f"*{author}:*\n{original_body}"
+        msg_vals["body"] = formatted_body
+        customer_partner = next(
+            (p for p in self.channel_partner_ids if not p.user_ids),
+            None
+        )
+        partner_id = customer_partner.id if customer_partner else None
+
+        ticket = None
+        if partner_id:
+            ticket = self.env['helpdesk.ticket'].sudo().search([
+                ('partner_id', '=', partner_id),
+                ('stage_id.closed', '=', False),
+            ], limit=1)
+        if (
+            partner_id
+            and ticket
+            and not self.env.context.get("skip_whatsapp_send")
+            and not self.env.context.get("from_webhook")
+        ):
+            ticket.with_context(skip_whatsapp_send=True).sudo().message_post(
+                body=formatted_body,
+                message_type="comment",
+                subtype_xmlid="mail.mt_comment",
+            )
+
+        return super()._notify_thread(message, msg_vals, **kwargs)
+
+
+

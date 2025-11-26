@@ -65,9 +65,12 @@ class HelpdeskWhatsappWebhookController(ContactWebhookController):
                 ticket_vals = {
                     'name': f'WhatsApp: {partner.name or phone_number}',
                     'partner_id': partner.id,
+                    'partner_name': partner.name,
                     'stage_id': stage_new.id,
+                    'tag_ids': [(6, 0, partner.category_id.ids)],
                     'description': "Ticket criado via WhatsApp",
                     'x_waiting_menu_response': True,
+                    'email_cc':None,
                 }
                 if 'x_waiting_department' in Ticket._fields:
                     ticket_vals['x_waiting_department'] = True
@@ -123,7 +126,7 @@ class HelpdeskWhatsappWebhookController(ContactWebhookController):
                             "web_notify",
                             {
                                 "type": "info",
-                                "title": "Nova mensagem no ticket",
+                                "title": "Nova mensagem no ticket que voce se atribuiu",
                                 "message": f"Ticket #{ticket.name}: nova mensagem de {partner.name}",
                                 "model": "helpdesk.ticket",
                                 "params": {"ticket_id": ticket.id},

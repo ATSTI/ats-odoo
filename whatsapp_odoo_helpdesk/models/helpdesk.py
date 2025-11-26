@@ -41,7 +41,7 @@ class HelpDeskTicket(models.Model):
                     continue           
                 composer_vals = {
                     'partner_id': [(6, 0, [partner.id])],
-                    'body': f"{(ticket.user_id.name or 'Equipe') if ticket.user_id else 'Equipe'}:\n{body}",
+                    'body': f"*{(ticket.user_id.name or 'Equipe') if ticket.user_id else 'Equipe'}*:\n{body}",
                     'attachment_ids': [(6, 0, attachments.ids)],
                     'instance_id': self.env['whatsapp.instance'].sudo().search(
                         [('status', '=', 'connected')], limit=1
@@ -90,11 +90,9 @@ class HelpDeskTicket(models.Model):
 
         #daria pra customizar mais de alguma forma criando menus e campos (ideia futura)
         body = (
-            f"👋 Olá {partner.name}, tudo bem?\n\n"
-            "Seu chamado foi finalizado com sucesso. "
-            "Esta é uma mensagem automática, não é necessário responder.\n\n"
-            f"📄 Protocolo de Atendimento: {protocolo}\n"
-            "Agradecemos seu contato! 🙏"
+            f"Essa é uma mensagem automática, não precisa responder\n\n"
+            f"🤖 {partner.name},seu atendimento foi finalizado com sucesso, qualquer dúvida estamos a disposição.\n\n "
+            f"📄 Protocolo deste atendimento: {protocolo}"
         )
 
        

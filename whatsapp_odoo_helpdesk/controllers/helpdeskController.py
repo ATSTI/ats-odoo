@@ -52,17 +52,35 @@ class HelpdeskWhatsappWebhookController(ContactWebhookController):
             if not phone_number:
                 _logger.warning("Nenhum número de telefone no payload.")
                 return super().receive_webhook()
-            name_parts = message_data.get('pushName', '').split()
-            domain = []
-            for part in name_parts:
-                domain.append(('name', 'ilike', part))
-            partner = request.env['res.partner'].sudo().search(domain, limit=1)
+            # VERIFICAÇÃO DE PARCEIRO, BUSCA PELO mobile_sanitized PRIMEIRO, SE NÃO ACHAR, 
+            # PELO NOME DE FORMA MAIS INTELIGENTE POSSIVEL, COMO ULTIMA INSTÂNCIA, CRIA O PARCEIRO
+            partner = request.env['res.partner'].sudo().search([('mobile_sanitized', 'ilike', '+' + phone_number)], limit=1)
+            if partner:
+                _logger.info("Parceiro encontrado por mobile_sanitized: %s", partner.name)
+            else:
+                push_name = message_data.get('pushName', '').strip()
+                name_parts = [p for p in push_name.split() if p.lower() not in {'da', 'de', 'do', 'dos', 'das'}]
+                partner = False
+                if len(name_parts) >= 2:
+                    # Primeiro + último nome
+                    domain = [
+                        ('name', 'ilike', name_parts[0]),
+                        ('name', 'ilike', name_parts[-1]),
+                    ]
+                    partner = request.env['res.partner'].sudo().search(domain, limit=1)
+                if not partner and push_name:
+                    partner = request.env['res.partner'].sudo().search([
+                        ('name', '=ilike', push_name)
+                    ], limit=1)
+                    if partner and not partner.mobile_sanitized:
+                        partner.write({'mobile_sanitized': '+' + phone_number})
             if not partner:
                 _logger.info("Parceiro não encontrado para o número %s", phone_number)
                 #CRIANDO PARCEIRO AUTOMATICAMENTE
                 partner_vals = {
                     'name': message_data.get('pushName', phone_number),
                     'mobile': phone_number,
+                    'mobile_sanitized': '+' + phone_number,
                     'is_company': False,
                 }
                 partner = request.env['res.partner'].sudo().create(partner_vals)

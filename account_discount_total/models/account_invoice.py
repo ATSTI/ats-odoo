@@ -48,6 +48,9 @@ class AccountMove(models.Model):
                 inv.amount_discount_value = 0.0
                 inv.amount_untaxed = total
                 inv.amount_total = total
+                for line in inv.invoice_line_ids:
+                    line.discount_value = 0.0
+                    line.discount = 0.0
                 continue
 
             # -------- Cálculo do desconto ----------
@@ -63,16 +66,18 @@ class AccountMove(models.Model):
             # -------- Distribuição do desconto entre as linhas ----------
             # proporcional ao valor da linha
             soma_descontos = 0.0
-            for line in inv.invoice_line_ids:
-                proporcao = (line.price_subtotal / total) if total else 0
-                desconto_linha = currency.round(discount_value_total * proporcao)
+            base_lines = inv.invoice_line_ids.filtered(lambda line: line.display_type == 'product')
+
+            for line in base_lines:
+                proporcao = (discount_value_total / total) if total else 0
+                desconto_linha = currency.round(line.price_subtotal * proporcao)
                 line.discount_value = desconto_linha
                 soma_descontos += desconto_linha
 
             # Ajuste de arredondamento: joga diferença para a última linha
             diferenca = currency.round(discount_value_total - soma_descontos)
-            if inv.invoice_line_ids and diferenca:
-                inv.invoice_line_ids[-1].discount_value += diferenca
+            if base_lines and diferenca:
+                base_lines[-1].discount_value += diferenca
 
             # -------- Totais da fatura ----------
             total_final = currency.round(total - discount_value_total)
@@ -85,11 +90,11 @@ class AccountMove(models.Model):
             inv.amount_total_signed = currency.round(total_final)
             inv.amount_untaxed_signed = currency.round(total_final)
 
-    def action_post(self):
-        res = super(AccountMove, self).action_post()
-        for inv in self:
-            inv._compute_discounts()
-        return res
+    #def action_post(self):
+    #    res = super(AccountMove, self).action_post()
+    #    for inv in self:
+    #        inv._compute_discounts()
+    #    return res
 
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"

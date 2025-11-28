@@ -13,7 +13,7 @@ class HelpdeskWhatsappWebhookController(ContactWebhookController):
     def receive_webhook(self, **kwargs):
         try:
             payload = request.get_json_data() or {}
-
+            instance = request.env['whatsapp.instance'].sudo().search([('status', '=', 'connected')], limit=1)
             event = payload.get('event')
             raw_data = payload.get('data')
 
@@ -52,41 +52,12 @@ class HelpdeskWhatsappWebhookController(ContactWebhookController):
             if not phone_number:
                 _logger.warning("Nenhum número de telefone no payload.")
                 return super().receive_webhook()
-            # VERIFICAÇÃO DE PARCEIRO, BUSCA PELO mobile_sanitized PRIMEIRO, SE NÃO ACHAR, 
-            # PELO NOME DE FORMA MAIS INTELIGENTE POSSIVEL, COMO ULTIMA INSTÂNCIA, CRIA O PARCEIRO
-            partner = request.env['res.partner'].sudo().search([('mobile_sanitized', 'ilike', '+' + phone_number)], limit=1)
-            if partner:
-                _logger.info("Parceiro encontrado por mobile_sanitized: %s", partner.name)
-            else:
-                push_name = message_data.get('pushName', '').strip()
-                name_parts = [p for p in push_name.split() if p.lower() not in {'da', 'de', 'do', 'dos', 'das'}]
-                partner = False
-                if len(name_parts) >= 2:
-                    # Primeiro + último nome
-                    domain = [
-                        ('name', 'ilike', name_parts[0]),
-                        ('name', 'ilike', name_parts[-1]),
-                    ]
-                    partner = request.env['res.partner'].sudo().search(domain, limit=1)
-                if not partner and push_name:
-                    partner = request.env['res.partner'].sudo().search([
-                        ('name', '=ilike', push_name)
-                    ], limit=1)
-                    if partner and not partner.mobile_sanitized:
-                        partner.write({'mobile_sanitized': '+' + phone_number})
-            if not partner:
-                _logger.info("Parceiro não encontrado para o número %s", phone_number)
-                #CRIANDO PARCEIRO AUTOMATICAMENTE
-                partner_vals = {
-                    'name': message_data.get('pushName', phone_number),
-                    'mobile': phone_number,
-                    'mobile_sanitized': '+' + phone_number,
-                    'is_company': False,
-                }
-                partner = request.env['res.partner'].sudo().create(partner_vals)
-                _logger.info("Parceiro criado automaticamente: %s", partner.name)
+            
                 # return super().receive_webhook() CONTINUANDO ROTINA PARA NÃO PERDER MENSAGEM
-
+            partner = self._find_or_create_partner_from_message(instance, message_data)
+            if not partner:
+                _logger.error("Falha ao encontrar ou criar parceiro para o número %s", phone_number)
+                return super().receive_webhook()
             Ticket = request.env['helpdesk.ticket'].sudo()
             ticket = Ticket.search([
                 ('partner_id', '=', partner.id),
@@ -117,7 +88,6 @@ class HelpdeskWhatsappWebhookController(ContactWebhookController):
 
                 ticket = Ticket.with_context(skip_whatsapp_auto=True).create(ticket_vals)
                 _logger.info("Novo ticket #%s criado para %s", ticket.id, partner.name)
-                instance = request.env['whatsapp.instance'].sudo().search([('status', '=', 'connected')], limit=1)
                 if instance:
                     odoo_bot = request.env.ref("base.partner_root") 
                     msg = "Olá! 👋 Para direcionar seu atendimento, escolha uma opção:\n1️⃣ Suporte\n2️⃣ Financeiro\n3️⃣ Comercial"
@@ -196,3 +166,68 @@ class HelpdeskWhatsappWebhookController(ContactWebhookController):
         except Exception as e:
             _logger.error("Falha geral no webhook Helpdesk: %s", e, exc_info=True)
             return {'status': 'error', 'message': str(e)}
+
+    def _find_or_create_partner_from_message(self, instance, message_data):
+        """
+        CORRIGIDO: Encontra ou cria o parceiro tanto para mensagens de entrada quanto de saída.
+        """
+        key = message_data.get('key', {})
+        is_from_me = key.get('fromMe', False)
+
+        # Determina o JID do "outro" participante da conversa
+        if is_from_me:
+            # Mensagem de SAÍDA: O parceiro é o destinatário (remoteJid)
+            partner_jid = key.get('remoteJid')
+        else:
+            # Mensagem de ENTRADA: O parceiro é o remetente (participant ou remoteJid)
+            partner_jid = key.get('participant') or key.get('remoteJid')
+
+        # Se não há um JID de parceiro ou é uma mensagem de grupo genérica, não faz nada
+        if not partner_jid or '@g.us' in partner_jid:
+            return request.env['res.partner']
+            
+        # ======================= INÍCIO DA CORREÇÃO =======================
+        # Limpa o JID para remover qualquer coisa após ':' ou '@'
+        # Ex: "55123456:14@s.whatsapp.net" -> "55123456"
+        clean_jid = partner_jid.split('@')[0].split(':')[0]
+        # ======================== FIM DA CORREÇÃO =========================
+
+        Partner = request.env['res.partner'].sudo()
+        sanitized_number = ''.join(filter(str.isdigit, clean_jid))
+        
+        # VERIFICAÇÃO DE PARCEIRO, BUSCA PELO mobile_sanitized PRIMEIRO, SE NÃO ACHAR, 
+        # PELO NOME DE FORMA MAIS INTELIGENTE POSSIVEL, COMO ULTIMA INSTÂNCIA, CRIA O PARCEIRO
+        partner = Partner.search([('mobile_sanitized', 'ilike', '+' + sanitized_number)], limit=1)
+        if partner:
+            _logger.info("Parceiro encontrado por mobile_sanitized: %s", partner.name)
+            return partner
+        else:
+            push_name = message_data.get('pushName', '').strip()
+            name_parts = [p for p in push_name.split() if p.lower() not in {'da', 'de', 'do', 'dos', 'das'}]
+            partner = False
+            if len(name_parts) >= 2:
+                # Primeiro + último nome
+                domain = [
+                    ('name', 'ilike', name_parts[0]),
+                    ('name', 'ilike', name_parts[-1]),
+                ]
+                partner = request.env['res.partner'].sudo().search(domain, limit=1)
+            if not partner and push_name:
+                partner = request.env['res.partner'].sudo().search([
+                    ('name', '=ilike', push_name)
+                ], limit=1)
+                if partner and not partner.mobile_sanitized:
+                    partner.write({'mobile_sanitized': '+' + sanitized_number})
+                    return partner
+        if not partner:
+            _logger.info("Parceiro não encontrado para o número %s", sanitized_number)
+            #CRIANDO PARCEIRO AUTOMATICAMENTE
+            partner_vals = {
+                'name': message_data.get('pushName', sanitized_number),
+                'mobile': sanitized_number,
+                'mobile_sanitized': '+' + sanitized_number,
+                'is_company': False,
+            }
+            partner = Partner.create(partner_vals)
+            _logger.info("Parceiro criado automaticamente: %s", partner.name)
+            return partner

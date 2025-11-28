@@ -217,8 +217,6 @@ class ContractContract(models.Model):
         """Gera os valores das faturas com base nas regras de preço sem passar pelo l10n_latam"""
         invoices_values = []
         for contract in self:
-            if contract.company_id.name == "ATS-TI Soluções Empresariais (Mau)":
-                continue
             if not contract.partner_id:
                 continue
             journal = self.env['account.journal'].search([

@@ -35,116 +35,111 @@ class AccountMove(models.Model):
             ('state', '=', 'draft'),
             ('create_date', '>=', '2025-07-01 00:00:00')
         ],limit=50)
-        invoices = invoice_model.search([
-            ('state', '=', 'draft'),
-            ('move_type', '=', 'out_invoice')
-        ],limit=50)
+        msg_log = ''
+        for sale in quotations:
+            try:
+                sale.action_confirm()
+                msg_log += 'Confirmada: %s-%s' %(sale.name, sale.partner_id.name[:20])
+            except Exception as e:
+                log_model.create({
+                    'name': 'Cron',
+                    'type': 'server',
+                    'level': 'error',
+                    'message': 'Erro ao confirmar cotação ' + sale.name + ': ' + str(e),
+                    'path': 'action_server',
+                    'func': 'cron',
+                    'line': 0,
+                })
+            inv = invoice_model.search([
+                ('state', '=', 'draft'),
+                ('move_type', '=', 'out_invoice'),
+                ('partner_id', '=', sale.partner_id.id)
+            ],limit=1)
 
-        quotes_by_partner = {}
-        for quote in quotations:
-            pid = quote.partner_id.id
-            quotes_by_partner.setdefault(pid, []).append(quote)
+            if not inv:
+                log_model.create({
+                    'name': 'Cron',
+                    'type': 'server',
+                    'level': 'error',
+                    'message': 'Erro: SEM Fatura para cliente : ' + sale.partner_id.name,
+                    'path': 'action_server',
+                    'func': 'cron',
+                    'line': 0,
+                })
+                continue
 
-        invoices_by_partner = {}
-        for inv in invoices:
-            pid = inv.partner_id.id
-            invoices_by_partner.setdefault(pid, []).append(inv)
+            total_venda = sale.amount_total
+            multiplicador = 1
 
-        common_partner_ids = set(quotes_by_partner.keys()) & set(invoices_by_partner.keys())
+            tag_ids = [tag.id for tag in inv.move_tag_ids]
+            if 2 in tag_ids:
+                if total_venda == 1:
+                    multiplicador = 90
+                elif total_venda in [2, 3, 4, 5]:
+                    multiplicador = 70
+                else:
+                    multiplicador = 60
+            else:
+                for tag_id in tag_ids:
+                    if tag_id in multiplicadores:
+                        multiplicador = multiplicadores[tag_id]
+                        break
 
-        for pid in common_partner_ids:
-            for quote in quotes_by_partner[pid]:
-                try:
-                    quote.action_confirm()
-                    log_model.create({
-                        'name': 'Cron',
-                        'type': 'server',
-                        'level': 'info',
-                        'message': 'Cotação confirmada: ' + quote.name,
-                        'path': 'action_server',
-                        'func': 'cron',
-                        'line': 0,
-                    })
-                except Exception as e:
-                    log_model.create({
-                        'name': 'Cron',
-                        'type': 'server',
-                        'level': 'error',
-                        'message': 'Erro ao confirmar cotação ' + quote.name + ': ' + str(e),
-                        'path': 'action_server',
-                        'func': 'cron',
-                        'line': 0,
-                    })
+            total_ajustado = total_venda * multiplicador
 
-            for inv in invoices_by_partner[pid]:
-                try:
-                    sale = sale_model.search([
-                        ('partner_id', '=', pid),
-                        ('state', '=', 'sale'),
-                        ('create_date', '>=', '2025-07-01 00:00:00')
-                    ], limit=1)
+            if not inv.invoice_line_ids:
+                log_model.create({
+                    'name': 'Cron',
+                    'type': 'server',
+                    'level': 'error',
+                    'message': 'Erro sem linha de produto fatura ' + inv.name + ': ' + sale.partner_id.name,
+                    'path': 'action_server',
+                    'func': 'cron',
+                    'line': 0,
+                })
+                # raise ValueError('Fatura sem linhas para basear o produto.')
 
-                    if sale:
-                        total_venda = sale.amount_total
-                        multiplicador = 1
+            produto = inv.invoice_line_ids[0].product_id
+            conta = inv.invoice_line_ids[0].account_id
 
-                        tag_ids = [tag.id for tag in inv.move_tag_ids]
-                        if 2 in tag_ids:
-                            if total_venda == 1:
-                                multiplicador = 90
-                            elif total_venda in [2, 3, 4, 5]:
-                                multiplicador = 70
-                            else:
-                                multiplicador = 60
-                        else:
-                            for tag_id in tag_ids:
-                                if tag_id in multiplicadores:
-                                    multiplicador = multiplicadores[tag_id]
-                                    break
+            if not produto or not conta:
+                raise ValueError('Produto ou conta da linha original não encontrada.')
 
-                        total_ajustado = total_venda * multiplicador
+            try:
+                inv.write({'invoice_line_ids': [(5, 0, 0)]})
+                inv.write({
+                    'invoice_line_ids': [(0, 0, {
+                        'move_id': inv.id,
+                        'product_id': produto.id,
+                        'name': produto.name,
+                        'quantity': 1,
+                        'price_unit': total_ajustado,
+                        'account_id': conta.id,
+                    })]
+                })
+                inv._compute_amount()
+                inv.with_context(check_move_validity=False).action_post()
 
-                        if not inv.invoice_line_ids:
-                            raise ValueError('Fatura sem linhas para basear o produto.')
+                status_final = inv.state
+                msg_log += ' | Fatura: %s - %s (mult.=%s) \n' %(inv.name, status_final, str(multiplicador))
 
-                        produto = inv.invoice_line_ids[0].product_id
-                        conta = inv.invoice_line_ids[0].account_id
-
-                        if not produto or not conta:
-                            raise ValueError('Produto ou conta da linha original não encontrada.')
-
-                        inv.write({'invoice_line_ids': [(5, 0, 0)]})
-                        inv.write({
-                            'invoice_line_ids': [(0, 0, {
-                                'move_id': inv.id,
-                                'product_id': produto.id,
-                                'name': produto.name,
-                                'quantity': 1,
-                                'price_unit': total_ajustado,
-                                'account_id': conta.id,
-                            })]
-                        })
-                        inv._compute_amount()
-                        inv.with_context(check_move_validity=False).action_post()
-
-                    status_final = inv.state
-                    log_model.create({
-                        'name': 'Cron',
-                        'type': 'server',
-                        'level': 'info',
-                        'message': 'Fatura ' + inv.name + ' finalizada com status: ' + status_final + ' (mult.=' + str(multiplicador) + ')',
-                        'path': 'action_server',
-                        'func': 'cron',
-                        'line': 0,
-                    })
-
-                except Exception as e:
-                    log_model.create({
-                        'name': 'Cron',
-                        'type': 'server',
-                        'level': 'error',
-                        'message': 'Erro ao ajustar ou confirmar fatura ' + inv.name + ': ' + str(e),
-                        'path': 'action_server',
-                        'func': 'cron',
-                        'line': 0,
-                    })
+            except Exception as e:
+                log_model.create({
+                    'name': 'Cron',
+                    'type': 'server',
+                    'level': 'error',
+                    'message': 'Erro ao ajustar ou confirmar fatura ' + inv.name + ': ' + str(e),
+                    'path': 'action_server',
+                    'func': 'cron',
+                    'line': 0,
+                })
+        if msg_log:
+            log_model.create({
+                'name': 'Cron',
+                'type': 'server',
+                'level': 'info',
+                'message': msg_log,
+                'path': 'action_server',
+                'func': 'cron',
+                'line': 0,
+            })

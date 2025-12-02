@@ -263,14 +263,14 @@ class AccountMove(models.Model):
         "ind_final",
     )
     def _compute_amount(self):
-        for move in self.filtered(lambda m: m.fiscal_operation_id):
-            move._compute_fiscal_amount()
-            for line in move.line_ids:
-                if (
-                    move.is_invoice(include_receipts=True)
-                    and line.display_type == "product"
-                ):
-                    line._update_fiscal_taxes()
+        # for move in self.filtered(lambda m: m.fiscal_operation_id):
+        #     move._compute_fiscal_amount()
+        #     for line in move.line_ids:
+        #         if (
+        #             move.is_invoice(include_receipts=True)
+        #             and line.display_type == "product"
+        #         ):
+        #             line._update_fiscal_taxes()
 
         result = super()._compute_amount()
         for move in self.filtered(lambda m: m.fiscal_operation_id):
@@ -282,12 +282,12 @@ class AccountMove(models.Model):
                 lambda line: line.display_type == "product"
                 and (not line.cfop_id or line.cfop_id.finance_move)
             )
-            move.amount_untaxed = sum(inv_line_ids.mapped("amount_untaxed"))
-            move.amount_tax = sum(inv_line_ids.mapped("amount_tax"))
+            move.amount_untaxed = sum(inv_line_ids.mapped("fiscal_amount_untaxed"))
+            move.amount_tax = sum(inv_line_ids.mapped("amount_taxed"))
             move.amount_untaxed_signed = sign * sum(
-                inv_line_ids.mapped("amount_untaxed")
+                inv_line_ids.mapped("fiscal_amount_untaxed")
             )
-            move.amount_tax_signed = sign * sum(inv_line_ids.mapped("amount_tax"))
+            move.amount_tax_signed = sign * sum(inv_line_ids.mapped("amount_taxed"))
 
         return result
 

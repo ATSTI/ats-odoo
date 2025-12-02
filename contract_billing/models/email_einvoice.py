@@ -65,7 +65,7 @@ class EmailEinvoice(models.Model):
         #     ('move_type', '=','out_invoice')
         # ]
         base_domain = [
-            ('account_id.user_type_id.type', '=', 'receivable'),
+            ('account_id.account_type', '=', 'asset_receivable'),
             ('date_maturity', '=', dia_vencimento),
             ('move_id.email_send', '=', False),
             ('move_id.state', '=', 'posted'),

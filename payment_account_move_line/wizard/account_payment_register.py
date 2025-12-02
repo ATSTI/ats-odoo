@@ -8,8 +8,8 @@ class AccountPaymentRegister(models.TransientModel):
     _inherit = 'account.payment.register'
 
 
-    def _create_payment_vals_from_wizard(self):
-        payment_vals = super()._create_payment_vals_from_wizard()
+    def _create_payment_vals_from_wizard(self, first_batch_result):
+        payment_vals = super()._create_payment_vals_from_wizard(first_batch_result)
         # for line in self.line_ids:
         #     line.write({'payment_date': fields.Date.context_today(self)})
         if not self.currency_id.is_zero(self.payment_difference) and self.payment_difference_handling == 'reconcile':

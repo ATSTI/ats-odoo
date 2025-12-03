@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="discount_roof_partner_normal_form_view" model="ir.ui.view">
+            <field name="name">partner.normal.form.discount_roof</field>
+            <field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='sales_purchases']/group[@name='container_row_2']/group[@name='sale']" position="inside">
+                    <field name="roof_discount_limit" widget='percent' groups="sales_team.group_sale_manager"/>
+                </xpath>
+                <xpath expr="//page[@autofocus='autofocus']" position="attributes">
+                    <attribute name="string">Contatos &amp; Endereços</attribute>
+                </xpath>
+                <xpath expr="//page[@name='internal_notes']" position="attributes">
+                    <attribute name="string">Anotações Internas</attribute>
+                    <attribute name="autofocus">autofocus</attribute>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

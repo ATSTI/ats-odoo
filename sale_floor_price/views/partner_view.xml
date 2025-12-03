@@ -12,6 +12,7 @@
                 </xpath>
                 <xpath expr="//page[@autofocus='autofocus']" position="attributes">
                     <attribute name="string">Contatos &amp; Endereços</attribute>
+                    <attribute name="autofocus">0</attribute>
                 </xpath>
                 <xpath expr="//page[@name='internal_notes']" position="attributes">
                     <attribute name="string">Anotações Internas</attribute>

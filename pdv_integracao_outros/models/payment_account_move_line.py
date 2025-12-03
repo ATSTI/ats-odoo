@@ -94,7 +94,7 @@ class AccountPaymentRegister(models.TransientModel):
             'amount': valor,
             'payment_type': payment_type,
             'partner_type': 'customer',
-            'ref': invoices.name,
+            'ref': invoices.name + '-' + str(caixa) + '-' + str(cod_forma),
             'journal_id': journal_id.id,
             'currency_id': journal_id.company_id.currency_id.id,
             'partner_id': move_line_id.partner_id.id,

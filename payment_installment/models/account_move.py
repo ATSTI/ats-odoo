@@ -94,6 +94,7 @@ class AccountMove(models.Model):
                         'payment_mode_id': prc.payment_mode_id.id or self.payment_mode_id.id,
                 })
                 date_due = prc.data_vencimento
+                # self.payment_reference = "01"
             if date_due:
                 self.invoice_date_due = date_due
    
@@ -204,6 +205,8 @@ class AccountMove(models.Model):
                 self.parcela_ids.unlink()
             self.parcela_ids = prcs
 
+    # def copy(self, default=None):
+    #     return super(AccountMove, self.with_context(duplicando_fatura=True)).copy(default)
 
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
@@ -213,45 +216,57 @@ class AccountMoveLine(models.Model):
     # de uma unica parcela
     @api.depends("move_id", "move_id.payment_mode_id")
     def _compute_payment_mode(self):
-        if self.move_id.parcela_ids:
-            return
-        else:
-            return super()._compute_payment_mode()
+        for line in self:
+            if line.move_id.parcela_ids:
+                line.payment_mode_id = False
+            else:
+                super(AccountMoveLine, line)._compute_payment_mode()
 
     # @api.model_create_multi
     # def create(self, vals_list):
-    #     for values in vals_list:
-    #         # "amount_currency"='560.00',"amount_residual_currency"='560.00',"price_subtotal"='-560.00',"price_total"='-560.00',"price_unit"='-560.000000'
-    #         print (values)
-    #         print(f"debit: {values['debit']}, \
-    #             credit: {values['credit']}, \
-    #             amount currency: {values['amount_currency']}, \
-    #             price_subtotal: {values['price_subtotal']}, \
-    #             price_unit: {values['price_unit']} \
-    #         ")
-    #         if 'debit' in values and not values['price_unit']:
-    #             values['amount_currency'] = values['debit']
-    #             values['amount_residual_currency'] = values['debit']
-    #             values['price_unit'] = -values['debit']
-    #             values['price_subtotal'] = -values['debit']
-    #             values['price_total'] = -values['debit']
-    #     # if 'parcela_ids' in values:
-    #     #     del vals_list['parcela_ids']
-    #     #     vals_list['payment_mode_id'] = 1  
-    #     print ("=========================================")
-    #     for values in vals_list:
-    #         # "amount_currency"='560.00',"amount_residual_currency"='560.00',"price_subtotal"='-560.00',"price_total"='-560.00',"price_unit"='-560.000000'
-    #         print (values)
-    #         print(f"debit: {values['debit']}, \
-    #             credit: {values['credit']}, \
-    #             amount currency: {values['amount_currency']}, \
-    #             price_subtotal: {values['price_subtotal']}, \
-    #             price_unit: {values['price_unit']} \
-    #         ")        
-    #     result = super(
-    #         AccountMoveLine, self.with_context(create_from_move_line=True)
-    #     ).create(vals_list)     
-    #     return result
+    #     if self.env.context.get('skip_debit_merge'):
+    #         return super().create(vals_list)
+
+    #     res = super().create(vals_list)
+
+    #     if not self.env.context.get('duplicando_fatura'):
+    #         return res
+
+    #     for move in res.mapped('move_id'):
+    #         if move.state != 'draft':
+    #             continue
+    #         debit_lines = move.line_ids.filtered(lambda l: l.debit > 0 and not l.display_type)
+    #         credit_lines = move.line_ids.filtered(lambda l: l.credit > 0 and not l.display_type)
+
+    #         if not debit_lines or not credit_lines:
+    #             continue
+
+    #         total_debit = sum(debit_lines.mapped('debit'))
+    #         account_id = debit_lines[0].account_id.id
+
+    #         commands = []
+
+    #         for line in debit_lines:
+    #             commands.append((2, line.id))
+
+    #         commands.append((0, 0, {
+    #             'name': 'Débito unificado (CALCULE NOVAMENTE AS PARCELAS)',
+    #             'debit': total_debit,
+    #             'credit': 0.0,
+    #             'balance': total_debit,
+    #             'amount_currency': total_debit,
+    #             'account_id': account_id,
+    #             'currency_id': move.currency_id.id,
+    #             'partner_id': move.partner_id.id,
+    #             'display_type': False,
+    #         }))
+
+    #         with self.env.norecompute():
+    #             move.with_context(
+    #                 check_move_validity=False,
+    #                 skip_debit_merge=True
+    #             ).write({'line_ids': commands})
+    #         move._recompute_dynamic_lines()
 
 
 class InvoiceParcela(models.Model):

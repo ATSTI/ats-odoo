@@ -1,145 +1,204 @@
 <?xml version="1.0"?>
 <odoo>
     <template id="report_account_fullist">
-        <t t-call="web.html_container">
-            <div class="page" style="font-family: 'Arial', sans-serif; color: #333; font-size: 13px;">
-                
-                <!-- Cabeçalho da empresa -->
-                <div style="width:100%; border-bottom: 2px solid #004080; padding-bottom:10px; margin-bottom:20px;">
-                    <div style="float:left; width:60%;">
-                        <b style="font-size:20px; color:#004080;" t-field="docs.company_id.name"/>
-                        <br/>
-                        <span t-field="docs.company_id.street"/> - 
-                        <span t-field="docs.company_id.district"/><br/>
-                        <span t-field="docs.company_id.city_id.name"/>
-                    </div>
-                    <div style="float:right; width:35%; text-align:right;">
-                        <img t-if="docs.company_id.logo"
-                            t-attf-src="data:image/*;base64,{{docs.company_id.logo}}"
-                            t-att-alt="docs.company_id.name"
-                            style="max-width:150px; max-height:80px;"/>
-                    </div>
-                    <div style="clear:both;"></div>
+    <t t-call="web.html_container">
+        <div class="page" style="font-family: 'Arial', sans-serif; color: #333; font-size: 13px;">
+            
+            <!-- Cabeçalho da empresa -->
+            <div style="width:100%; border-bottom: 2px solid #004080; padding-bottom:10px; margin-bottom:20px;">
+                <div style="float:left; width:60%;">
+                    <b style="font-size:20px; color:#004080;" t-field="docs.company_id.name"/>
+                    <br/>
+                    <span t-field="docs.company_id.street"/> - 
+                    <span t-field="docs.company_id.district"/><br/>
+                    <span t-field="docs.company_id.city_id.name"/>
                 </div>
+                <div style="float:right; width:35%; text-align:right;">
+                    <img t-attf-src="data:image/*;base64,{{docs.company_id.logo}}" t-att-alt="docs.company_id.name" style="max-width:150px; max-height:80px;"/>
+                </div>
+                <div style="clear:both;"/>
+            </div>
 
-                <!-- Iteração por Fatura -->
-                <t t-set="total_produtos" t-value="0"/>
-                <t t-foreach="docs" t-as="o">
-                    <div style="margin-bottom:30px;page-break-inside: avoid;">
+            <!-- Iteração por Fatura -->
+            <t t-set="total_produtos" t-value="0"/>
+            <t t-foreach="docs" t-as="o">
+                <div style="margin-bottom:30px;page-break-inside: avoid;">
 
-                        <!-- Informações da Fatura -->
-                        <table style="width:100%; border:1px solid #ccc; border-collapse:collapse; margin-bottom:10px;">
-                            <tr style="background-color:#f3f6fb;">
-                                <td style="border:1px solid #ccc; text-align:center; width:20%; padding:6px;">
-                                    <b>Data da Fatura:</b><br/>
-                                    <span t-field="o.invoice_date"/>
-                                </td>
-                                <td style="border:1px solid #ccc; text-align:center; width:40%; padding:6px;">
-                                    <b>Cliente</b><br/>
-                                    <span style="font-size:14px;" t-field="o.partner_id.name"/>
-                                </td>
-                                <td style="border:1px solid #ccc; text-align:center; width:40%; padding:6px;">
-                                    <b>Pedido</b><br/>
-                                    <span style="font-size:14px;" t-field="o.name"/>
-                                </td>
-                            </tr>
-                        </table>
+                    <!-- Informações da Fatura -->
+                    <table style="width:100%; border:1px solid #ccc; border-collapse:collapse; margin-bottom:10px;">
+                        <tr style="background-color:#f3f6fb;">
+                            <td style="border:1px solid #ccc; text-align:center; width:20%; padding:6px;">
+                                <b>Data da Fatura</b><br/>
+                                <span t-esc="o.invoice_date.strftime('%d/%m/%Y')"/>
+                            </td>
+                            <td style="border:1px solid #ccc; text-align:center; width:40%; padding:6px;">
+                                <b>Cliente</b><br/>
+                                <span style="font-size:14px;" t-field="o.partner_id.name"/>
+                            </td>
+                            <td style="border:1px solid #ccc; text-align:center; width:40%; padding:6px;">
+                                <b>Pedido</b><br/>
+                                <span style="font-size:14px;" t-field="o.name"/>
+                            </td>
+                        </tr>
+                    </table>
 
-                        <!-- Tabela de Itens -->
-                        <table style="width:100%; border:1px solid #ccc; border-collapse:collapse; font-size:13px;">
-                            <thead style="background-color:#e8eef7;">
-                                <tr>
-                                    <th style="border:1px solid #ccc; padding:6px; width:5%;">Item</th>
-                                    <th style="border:1px solid #ccc; padding:6px; width:45%; text-align:left;">Produto</th>
-                                    <th style="border:1px solid #ccc; padding:6px; width:10%;">Qtd</th>
-                                    <th style="border:1px solid #ccc; padding:6px; width:20%;">Preço Unitário</th>
-                                    <th style="border:1px solid #ccc; padding:6px; width:20%;">Subtotal</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <t t-set="item" t-value="0"/>
-                                <t t-foreach="o.invoice_line_ids" t-as="line">
-                                    <t t-set="item" t-value="item + 1"/>
-                                    <t t-set="total_produtos" t-value="total_produtos + line.quantity"/>
-                                    <tr t-attf-style="background-color:#{'f9f9f9' if item % 2 == 0 else 'ffffff'};">
-                                        <td style="border:1px solid #ddd; text-align:center; padding:5px;">
-                                            <t t-esc="item"/>
-                                        </td>
-                                        <td style="border:1px solid #ddd; text-align:left; padding:5px;">
-                                            <span t-field="line.product_id.name"/>
-                                        </td>
-                                        <td style="border:1px solid #ddd; text-align:center; padding:5px;">
-                                            <span t-esc="round(line.quantity, 0)"/>
-                                        </td>
-                                        <td style="border:1px solid #ddd; text-align:right; padding:5px;">
-                                            <span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": docs.currency_id}'/>
-                                        </td>
-                                        <td style="border:1px solid #ddd; text-align:right; padding:5px;">
-                                            <span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": docs.currency_id}'/>
-                                        </td>
-                                    </tr>
-                                </t>
-                            </tbody>
-                        </table>
-                    </div>
-                </t>
-
-                <!-- Resumo Final -->
-                <div style="margin-top:40px;page-break-inside: avoid;">
-                    <h3 style="background-color:#004080; color:white; padding:8px; font-size:16px;">Resumo Geral de Produtos</h3>
-
-                    <t t-set="product" t-value="set()" />
-                    <t t-foreach="request.env['account.move.line'].search([('move_id', 'in', (docs.mapped('id')))])" t-as="prod">
-                        <t t-if="prod.product_id">
-                            <t t-set="dummy" t-value="product.add(prod.product_id)" />
-                        </t>
-                    </t>
-
-                    <t t-set="valores" t-value="[]" />
-
-                    <table style="width:100%; border:1px solid #ccc; border-collapse:collapse;">
+                    <!-- Tabela de Itens -->
+                    <table style="width:100%; border:1px solid #ccc; border-collapse:collapse; font-size:13px;">
                         <thead style="background-color:#e8eef7;">
                             <tr>
-                                <th style="border:1px solid #ccc; padding:6px; text-align:left;">Produto</th>
-                                <th style="border:1px solid #ccc; padding:6px; text-align:center;">Quantidade Total</th>
-                                <th style="border:1px solid #ccc; padding:6px; text-align:right;">Valor Total</th>
+                                <th style="border:1px solid #ccc; padding:6px; width:5%;">Item</th>
+                                <th style="border:1px solid #ccc; padding:6px; width:45%; text-align:left;">Produto</th>
+                                <th style="border:1px solid #ccc; padding:6px; width:10%;">Qtd</th>
+                                <th style="border:1px solid #ccc; padding:6px; width:20%;">Preço Unitário</th>
+                                <th style="border:1px solid #ccc; padding:6px; width:20%;">Subtotal</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <t t-foreach="product" t-as="p">
-                                <t t-set="qtd" t-value="0"/>
-                                <t t-set="value" t-value="0"/>
-                                <t t-foreach="request.env['account.move.line'].search([('move_id', 'in', docs.mapped('id')), ('product_id', '=', p.id)])" t-as="pr_line">
-                                    <t t-set="qtd" t-value="qtd + pr_line.quantity"/>
-                                    <t t-set="value" t-value="value + pr_line.price_subtotal"/>
-                                </t>
-                                <t t-set="valores" t-value="valores + [value]"/>
-
-                                <tr>
-                                    <td style="border:1px solid #ddd; padding:6px;">
-                                        <t t-esc="p.name"/>
+                            <t t-set="item" t-value="0"/>
+                            <t t-foreach="o.invoice_line_ids" t-as="line">
+                                <t t-set="item" t-value="item + 1"/>
+                                <t t-set="total_produtos" t-value="total_produtos + line.quantity"/>
+                                <tr t-attf-style="background-color:#{'f9f9f9' if item % 2 == 0 else 'ffffff'};">
+                                    <td style="border:1px solid #ddd; text-align:center; padding:5px;">
+                                        <t t-esc="item"/>
                                     </td>
-                                    <td style="border:1px solid #ddd; padding:6px; text-align:center;">
-                                        <span t-esc="qtd"/>
+                                    <td style="border:1px solid #ddd; text-align:left; padding:5px;">
+                                        <span t-field="line.product_id.name"/>
                                     </td>
-                                    <td style="border:1px solid #ddd; padding:6px; text-align:right;">
-                                        <span t-esc="value" t-options='{"widget": "monetary", "display_currency": docs.currency_id}'/>
+                                    <td style="border:1px solid #ddd; text-align:center; padding:5px;">
+                                        <span t-esc="round(line.quantity, 0)"/>
+                                    </td>
+                                    <td style="border:1px solid #ddd; text-align:right; padding:5px;">
+                                        <span t-field="line.price_unit" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                                    </td>
+                                    <td style="border:1px solid #ddd; text-align:right; padding:5px;">
+                                        <span t-field="line.price_subtotal" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
                                     </td>
                                 </tr>
                             </t>
                         </tbody>
-                        <t t-set="value_t" t-value="sum(valores)" />
-                        <tfoot>
-                            <tr style="background-color:#f3f6fb;">
-                                <td colspan="2" style="border:1px solid #ccc; padding:8px; text-align:right;"><b>Total Geral:</b></td>
-                                <td style="border:1px solid #ccc; padding:8px; text-align:right;">
-                                    <b><span t-esc="value_t" t-options='{"widget": "monetary", "display_currency": docs.currency_id}'/></b>
-                                </td>
-                            </tr>
-                        </tfoot>
                     </table>
                 </div>
+            </t>
+
+            <!-- Resumo Final -->
+            <div style="margin-top:40px;page-break-inside: avoid;">
+                <h3 style="background-color:#004080; color:white; padding:8px; font-size:16px;">Resumo Geral de Produtos</h3>
+
+                <t t-set="product" t-value="set()"/>
+                <t t-foreach="request.env['account.move.line'].search([('move_id', 'in', (docs.mapped('id')))])" t-as="prod">
+                    <t t-if="prod.product_id">
+                        <t t-set="dummy" t-value="product.add(prod.product_id)"/>
+                    </t>
+                </t>
+
+                <t t-set="valores" t-value="[]"/>
+                <t t-set="valor_residual_total" t-value="0"/>
+                <t t-set="valor_pago_total" t-value="0"/>
+
+                <table style="width:100%; border:1px solid #ccc; border-collapse:collapse;">
+                    <thead style="background-color:#e8eef7;">
+                        <tr>
+                            <th style="border:1px solid #ccc; padding:6px; text-align:left;">Produto</th>
+                            <th style="border:1px solid #ccc; padding:6px; text-align:center;">Qtd Total</th>
+                            <th style="border:1px solid #ccc; padding:6px; text-align:right;">Valor Total</th>
+                            <th style="border:1px solid #ccc; padding:6px; text-align:right;">Residual</th>
+                            <th style="border:1px solid #ccc; padding:6px; text-align:right;">Pago</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <t t-foreach="product" t-as="p">
+                            <t t-set="qtd" t-value="0"/>
+                            <t t-set="value" t-value="0"/>
+                            <t t-set="residual" t-value="0"/>
+                            <t t-set="pago" t-value="0"/>
+                            
+                            <t t-foreach="request.env['account.move.line'].search([
+                                    ('move_id', 'in', docs.mapped('id')),
+                                    ('product_id', '=', p.id)
+                                ])"
+                              t-as="pr_line">
+                            
+                                <!-- Proporção do produto na fatura -->
+                                <t t-set="proporcao"
+                                   t-value="pr_line.price_subtotal / pr_line.move_id.amount_total if pr_line.move_id.amount_total else 0"/>
+                            
+                                <!-- Residual proporcional -->
+                                <t t-set="residual"
+                                   t-value="residual + (pr_line.move_id.amount_residual * proporcao)"/>
+                            
+                                <!-- Pago proporcional -->
+                                <t t-set="pago"
+                                   t-value="pago + (pr_line.price_subtotal - (pr_line.move_id.amount_residual * proporcao))"/>
+                            
+                            </t>
+                            
+                            <!-- Somar quantidade e valor por linha normalmente -->
+                            <t t-foreach="
+                                request.env['account.move.line'].search([
+                                    ('move_id', 'in', docs.mapped('id')),
+                                    ('product_id', '=', p.id)
+                                ])
+                            " t-as="pr_line">
+                            
+                                <t t-set="qtd" t-value="qtd + pr_line.quantity"/>
+                                <t t-set="value" t-value="value + pr_line.price_subtotal"/>
+                            
+                            </t>
+
+
+                            <t t-set="valores" t-value="valores + [value]"/>
+                            <t t-set="valor_residual_total" t-value="valor_residual_total + residual"/>
+                            <t t-set="valor_pago_total" t-value="valor_pago_total + pago"/>
+
+                            <tr>
+                                <td style="border:1px solid #ddd; padding:6px;">
+                                    <t t-esc="p.name"/>
+                                </td>
+
+                                <td style="border:1px solid #ddd; padding:6px; text-align:center;">
+                                    <span t-esc="qtd"/>
+                                </td>
+
+                                <td style="border:1px solid #ddd; padding:6px; text-align:right;">
+                                    <span t-esc="value" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: docs.currency_id}"/>
+                                </td>
+
+                                <td style="border:1px solid #ddd; padding:6px; text-align:right;">
+                                    <span t-esc="residual" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: docs.currency_id}"/>
+                                </td>
+
+                                <td style="border:1px solid #ddd; padding:6px; text-align:right;">
+                                    <span t-esc="pago" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: docs.currency_id}"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+
+                    <t t-set="value_t" t-value="sum(valores)"/>
+
+                    <tfoot>
+                        <tr style="background-color:#f3f6fb;">
+                            <td colspan="2" style="border:1px solid #ccc; padding:8px; text-align:right;"><b>Total Geral:</b></td>
+                            
+                            <td style="border:1px solid #ccc; padding:8px; text-align:right;">
+                                <b><span t-esc="value_t" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: docs.currency_id}"/></b>
+                            </td>
+
+                            <td style="border:1px solid #ccc; padding:8px; text-align:right;">
+                                <b><span t-esc="valor_residual_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: docs.currency_id}"/></b>
+                            </td>
+
+                            <td style="border:1px solid #ccc; padding:8px; text-align:right;">
+                                <b><span t-esc="valor_pago_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: docs.currency_id}"/></b>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
             </div>
-        </t>
+
+        </div>
+    </t>
     </template>
 </odoo>

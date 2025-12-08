@@ -373,13 +373,13 @@ class IntegracaoPdv(http.Controller):
             ('company_id', '=', user_id.company_id.id),
         ])
         cj = http.request.env['account.journal'].search([
-            ('name', 'ilike', 'Faturas de Cliente'),
+            ('type', '=', 'sale'),
             ('company_id', '=', user_id.company_id.id),
-        ], limit=1)
-        cj_p = http.request.env['account.journal'].search([
-            ('name', 'ilike', '4-Prazo'),
-            ('company_id', '=', user_id.company_id.id),
-        ], limit=1)
+        ])
+        #cj_p = http.request.env['account.journal'].search([
+        #    ('name', 'ilike', '4-Prazo'),
+        #    ('company_id', '=', user_id.company_id.id),
+        #], limit=1)
         conta_obj = http.request.env['account.move.line']
         # adicionei o receivable abaixo acho q nao precisa deste
         #    ('account_id.reconcile','=',True),
@@ -387,9 +387,10 @@ class IntegracaoPdv(http.Controller):
             ('move_id.partner_id', '=',int(cod_cliente)), 
             ('full_reconcile_id', '=', False),
             ('company_id', '=', user_id.company_id.id),
-            ('account_internal_type', '=', 'receivable'),
+            ('account_type', '=', 'asset_receivable'),
             ('account_id', '=', cc.id),
-            ('journal_id', 'in', (cj.id,cj_p.id)),
+            ('parent_state', '=', 'posted'),
+            ('journal_id', 'in', cj._ids),
                 ('debit', '>', 0),
         ], order='date_maturity')
         #print('Diarios :' + cj.name + ',' + cj_p.name)
@@ -436,9 +437,10 @@ class IntegracaoPdv(http.Controller):
                 ('move_id.partner_id', '=',int(cod_cliente)), 
                 ('full_reconcile_id', '=', False), 
                 ('company_id', '=', user_id.company_id.id),
-                ('account_internal_type', '=', 'receivable'),
+                ('account_type', '=', 'asset_receivable'),
+                ('parent_state', '=', 'posted'),
                 ('account_id', '=', cc.id),
-                ('journal_id', 'in', (cj.id,cj_p.id)),
+                ('journal_id', 'in', cj._ids),
                 ('debit', '>', 0),
             ], order='date_maturity')        
         lista = []

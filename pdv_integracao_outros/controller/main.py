@@ -438,9 +438,8 @@ class IntegracaoPdv(http.Controller):
                 ('full_reconcile_id', '=', False), 
                 ('company_id', '=', user_id.company_id.id),
                 ('account_type', '=', 'asset_receivable'),
-                ('parent_state', '=', 'posted'),
                 ('account_id', '=', cc.id),
-                ('journal_id', 'in', cj._ids),
+                ('journal_id', 'in', (cj._ids)),
                 ('debit', '>', 0),
             ], order='date_maturity')        
         lista = []

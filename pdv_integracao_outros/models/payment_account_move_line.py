@@ -35,7 +35,7 @@ class AccountPaymentRegister(models.TransientModel):
             if ja_importou:
                 #print(cod_forma +caixa + 'X')
                 continue
-            for cx in ses.statement_ids:
+            for cx in ses:
                 if cx.journal_id.id == journal_id.id:
                     stt = cx
                     jrn = cx.journal_id
@@ -58,10 +58,12 @@ class AccountPaymentRegister(models.TransientModel):
             baixar_tudo = 'reconcile'
 
         payment_type = 'inbound'# if move_line_id.debit else 'outbound'
+
+        if payment_type == 'inbound':
+            method = journal_id.filtered('inbound_payment_method_line_ids')
+
         payment_methods = \
-            payment_type == 'inbound' and \
-            journal_id.inbound_payment_method_ids or \
-            journal_id.outbound_payment_method_ids
+            payment_type == 'inbound' and method
         payment_method_id = payment_methods and payment_methods[0] or False
         conta_juros = ''
         juros_desc = ''
@@ -132,4 +134,4 @@ class AccountPaymentRegister(models.TransientModel):
         """
         # coloco o valor no PDV como uma entrada
         # pra nao dar diferenca no caixa
-        self.lanca_sangria_reforco(journal_id, caixa, valor+juros, cod_forma, cod_forma, move_line_id.partner_id, invoices.name)
+        #self.lanca_sangria_reforco(journal_id, caixa, valor+juros, cod_forma, cod_forma, move_line_id.partner_id, invoices.name)

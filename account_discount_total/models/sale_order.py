@@ -8,9 +8,13 @@ class SaleOrder(models.Model):
     def _normalize_line_sequence(self):
         """Garante que a sequência das linhas reflita a ordem visual real"""
         for order in self:
-            for index, line in enumerate(order.order_line.sorted(key=lambda l: l.id), start=1):
-                if line.sequence != index:
-                    line.sequence = index
+            sequence = 99
+            order_lines = order.order_line
+            for line in sorted(order_lines, key=lambda l: l.id):
+                if line.sequence < 100:
+                    sequence += 1
+                    line.sequence = sequence
+
 
     def _prepare_invoice(self):
         self._normalize_line_sequence()
@@ -47,23 +51,23 @@ class SaleOrder(models.Model):
             invoice_vals['discount_rate'] = self.amount_discount_value or 0.0
         return invoice_vals
     
-    def _create_invoices(self, grouped=False, final=False, date=None):
-        res = super(SaleOrder, self)._create_invoices(grouped=False, final=False, date=None)
-        service_line_t = res.invoice_line_ids.filtered(
-            lambda l: l.product_id.detailed_type == "service"
-        )
-        if service_line_t:
-            sequence_line = service_line_t.sequence - 1
-            for move in res:
-                if any(line.product_id.detailed_type == "service" for line in move.invoice_line_ids):
-                    for lines in move.invoice_line_ids:
-                        if lines.sequence < sequence_line and lines.display_type == "line_section":
-                            lines.unlink()
-                else:
-                    for lines in move.invoice_line_ids:
-                        if lines.sequence == sequence_line:
-                            lines.unlink()
-        return res
+    # def _create_invoices(self, grouped=False, final=False, date=None):
+    #     res = super(SaleOrder, self)._create_invoices(grouped=False, final=False, date=None)
+    #     # service_line_t = res.invoice_line_ids.filtered(
+    #     #     lambda l: l.product_id.detailed_type == "service"
+    #     # )
+    #     # if service_line_t:
+    #     #     sequence_line = service_line_t.sequence - 1
+    #     #     for move in res:
+    #     #         if any(line.product_id.detailed_type == "service" for line in move.invoice_line_ids):
+    #     #             for lines in move.invoice_line_ids:
+    #     #                 if lines.sequence < sequence_line and lines.display_type == "line_section":
+    #     #                     lines.unlink()
+    #     #         else:
+    #     #             for lines in move.invoice_line_ids:
+    #     #                 if lines.sequence == sequence_line:
+    #     #                     lines.unlink()
+    #     return res
 
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"

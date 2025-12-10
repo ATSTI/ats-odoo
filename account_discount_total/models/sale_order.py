@@ -48,7 +48,7 @@ class SaleOrder(models.Model):
                     proportion = total_products / self.amount_price_gross if self.amount_price_gross else self.amount_untaxed
                     invoice_vals['discount_rate'] = self.currency_id.round(total_discount * proportion)
         else:
-            invoice_vals['discount_rate'] = self.amount_discount_value or 0.0
+            invoice_vals['discount_rate'] = self.amount_discount_value or self.discount_total or 0.0
         return invoice_vals
     
     # def _create_invoices(self, grouped=False, final=False, date=None):

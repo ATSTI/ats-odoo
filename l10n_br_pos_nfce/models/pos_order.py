@@ -13,6 +13,10 @@ _logger = logging.getLogger(__name__)
 class PosOrder(models.Model):
     _inherit = "pos.order"
 
+    def _generate_pos_order_invoice(self):
+        invoice = super()._generate_pos_order_invoice()
+        return invoice
+
     def _create_invoice(self, move_vals):
         res = super()._create_invoice(move_vals)
         for line in self.lines:
@@ -21,11 +25,6 @@ class PosOrder(models.Model):
                     if inv_line.fiscal_quantity != line.qty:
                         inv_line.write({"fiscal_quantity": line.qty})
         return res
-
-    def _generate_pos_order_invoice(self):
-        invoice = super()._generate_pos_order_invoice()
-        return invoice
-
 
     def _prepare_invoice_vals(self):
         vals = super()._prepare_invoice_vals()
@@ -49,7 +48,7 @@ class PosOrder(models.Model):
             "ind_pres": "1",
             "document_serie_id": 1,  # Série padrão NFC-e
             "partner_id": self.partner_id.id,
-            "payment_mode_id": payment_mode_id.id,
+            "payment_mode_id": payment_mode_id[0].id,
             "nfe40_vTroco": 0.0,
         }
 
@@ -118,8 +117,3 @@ class PosOrderLine(models.Model):
         #         tax_dict.update(self._prepare_nfce_fiscal_tax_ids(fiscal_map_id))
 
         return tax_dict
-
-    # def _prepare_invoice_line(self, **optional_values):
-    #     res = super()._prepare_invoice_line(**optional_values)
-    #     res["fiscal_quantity"] = self.qty
-    #     return res

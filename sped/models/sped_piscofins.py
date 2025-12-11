@@ -844,8 +844,8 @@ class SpedPisCofins(models.Model):
                 if resposta_nfe.chave_nfe[6:20] != self.limpa_formatacao(resposta_nfe.partner_id.cnpj_cpf):
                     registro_c100.COD_SIT = '08'
                 """
-                if resposta.nfe_serie:
-                    registro_c100.SER = resposta.nfe_serie[:3]
+                if resposta_nfe.serie_documento:
+                    registro_c100.SER = resposta_nfe.serie_documento
                 else:
                     registro_c100.SER = resposta.product_serie_id.code
                 if resposta.nfe_chave:

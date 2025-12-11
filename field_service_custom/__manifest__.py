@@ -37,6 +37,7 @@
         'report/report_cliente.xml',
         'report/report_lavanderia.xml',
         'report/report_faturas_total.xml',
+        'report/report_orcamento.xml',
     ],
     'installable': True,
     'application': False,

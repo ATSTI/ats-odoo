@@ -1,22 +1,13 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
-#
-#    Author: Joël Grand-Guillaume
-#    Copyright 2012 Camptocamp SA
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as
-#    published by the Free Software Foundation, either version 3 of the
-#    License, or (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU Affero General Public License for more details.
-#
-#    You should have received a copy of the GNU Affero General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
+# COMO USAR A DINAMICA PARA BLOQUEAR O USUARIO DE VER O CUSTO DO PRODUTO E
+# OCULTAR O BOTAO DE CRIAÇÃO DE FATURA E EDIÇÃO:
+# 1- DUPLICAR O GRUPO FATURAMENTOS E REMOVER A PERMISSÃO DE EDIÇÃO E CRIAÇÃO DOS ACESSOS QUE TENHAM "FATURA" ou "LINHAS DA FATURA"
+# 2- CRIAR EM IDENTIFICADORES EXTERNOS (tecnico) DO GRUPO CRIADO NO PASSO 1, O IDENTIFICADOR EXTERNO: account_move.grupo_permissao_especifica
+    # -modulo = account.account_move
+    # -identificador externo = grupo_permissao_especifica
+    # -nome do modelo = res.groups
+#  - COM ESSE PASSO E ESSE MÓDULO NÃO DEVE MAIS APARECE O CUSTO DO PRODUTO PARA OS USUÁRIOS DESSE GRUPO
 ##############################################################################
 {
     'name' : 'Floor price on product',

@@ -10,6 +10,14 @@
                 <field name="list_price" position="after">
                     <field name="floor_price_limit" widget='monetary' groups="sales_team.group_sale_manager"/>
                 </field>
+                <label for="standard_price" position="replace">
+                    <label for="standard_price" groups="!account_move.grupo_permissao_especifica"/>
+                </label>
+                <div name="standard_price_uom" position="replace">
+                    <div name="standard_price_uom" groups="!account_move.grupo_permissao_especifica">
+                        <field name="standard_price" widget="monetary" options="{'currency_field': 'cost_currency_id'}"/>
+                    </div>
+                </div>
             </field>
         </record>
     </data>

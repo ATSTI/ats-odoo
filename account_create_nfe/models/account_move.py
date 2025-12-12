@@ -5,13 +5,12 @@ from odoo.exceptions import ValidationError
 
 
 class AccountMove(models.Model):
-    _inherit = "account.move"
-    #_inherit = [
-    #    _name,
-    #    "l10n_br_fiscal.document.move.mixin",
-    #]
-    #_inherits = {"l10n_br_fiscal.document": "fiscal_document_id"}
-    #_order = "date DESC, name DESC"
+    _name = "account.move"
+    _fiscal_decorator_model = "l10n_br_fiscal.document"
+    _inherit = [
+        _name,
+        "l10n_br_account.decorator.mixin",
+    ]
 
     def _recompute_fiscal_operation_id(self, move):
         move._compute_amount()
@@ -33,6 +32,7 @@ class AccountMove(models.Model):
             ("invoice_origin", "=", self.name),
             ("state", "in", ("draft", "posted")),
         ])
+        
         if move_created:
             raise ValidationError(
                 _("Documento NFe já criado para esta fatura.")
@@ -86,7 +86,9 @@ class AccountMove(models.Model):
         move = super(AccountMove, self.with_context(create_from_move=True)).create(
             vals
         )
-        for line in self.invoice_line_ids:
+        base_lines = self.invoice_line_ids.filtered(lambda line: line.display_type == 'product')
+        import pudb;pu.db
+        for line in base_lines:
             if line.product_id.type == "service":
                 continue
             item = {}
@@ -124,17 +126,10 @@ class AccountMove(models.Model):
             item["move_id"] = move.id
             move_item = self.env["account.move.line"].create(item)
             move_item.fiscal_operation_id = move.fiscal_operation_id
-            move_item._onchange_product_id_fiscal()
-            move_item._onchange_fiscal_operation_id()
-            move_item.price_unit = line.price_unit
-            move_item.fiscal_price = line.price_unit
-        # for line in move.invoice_line_ids:
-        #     line.fiscal_operation_id = move.fiscal_operation_id
-        #     line._onchange_product_id_fiscal()
-        #     line._onchange_fiscal_operation_id()
-        #     line.price_unit = line.price_unit
-        #     line.fiscal_price = line.price_unit
-        self._recompute_fiscal_operation_id(move)
+            move_item._onchange_fiscal_taxes()
+            # move_item.price_unit = line.price_unit
+            # move_item.fiscal_price = line.price_unit
+        # self._recompute_fiscal_operation_id(move)
         self.message_post(
             body=_(
                 "<a href='#' data-oe-model='%s' data-oe-id='%s'>NFe criada diário: %s</a>"

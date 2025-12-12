@@ -14,7 +14,7 @@ class AccountMove(models.Model):
             for line in self.invoice_line_ids:
                 line.fiscal_operation_id = self.fiscal_operation_id.id
                 line._compute_all_tax()
-                line._compute_fiscal_amounts()
+                # line._compute_fiscal_amounts()
 
     @api.onchange("partner_id")
     def _onchange_partner_id_fiscal(self):

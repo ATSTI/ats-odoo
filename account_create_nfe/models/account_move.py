@@ -34,9 +34,10 @@ class AccountMove(models.Model):
         ])
         
         if move_created:
-            raise ValidationError(
-                _("Documento NFe já criado para esta fatura.")
-            )
+            return move_created.open_fiscal_document()
+            # raise ValidationError(
+            #     _("Documento NFe já criado para esta fatura.")
+            # )
         vals = {}
         vals["partner_id"] = self.partner_id.id
         document = self.env['l10n_br_fiscal.document.type'].search([
@@ -87,7 +88,6 @@ class AccountMove(models.Model):
             vals
         )
         base_lines = self.invoice_line_ids.filtered(lambda line: line.display_type == 'product')
-        import pudb;pu.db
         for line in base_lines:
             if line.product_id.type == "service":
                 continue
@@ -255,4 +255,4 @@ class AccountMove(models.Model):
             body=_(
                 "<a href='#' data-oe-model='%s' data-oe-id='%s'>NFe da Fatura %s</a>"
             ) % (self._name, self.id, self.name)
-        )        
+        )

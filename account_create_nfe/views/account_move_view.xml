@@ -11,8 +11,9 @@
                     name="action_copiar_fatura"
                     type="object"
                     attrs="{'invisible': [('document_type_id', '!=', False)]}"  
+                    icon="fa-pencil-square-o"
                 >
-                    <span>Criar NFe(produtos)</span>
+                    <span>NFe</span>
                 </button>
             </xpath>
         </field>

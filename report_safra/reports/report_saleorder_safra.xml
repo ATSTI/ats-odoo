@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <t t-name="sale.report_saleorder_document">
+            <t t-call="web.external_layout">
+                <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
+
+                <table width="100%">
+                    <tr>
+                        <td width="80%">
+                            <h5>
+                                <div t-field="doc.partner_id"
+                                    t-options="{
+                                        'widget': 'contact',
+                                        'fields': ['address', 'phone', 'name'],
+                                        'no_marker': True
+                                    }"/>
+                            </h5>
+                        </td>
+                        <td width="20%">
+                            <div>
+                                <t t-if="not (env.context.get('proforma', False) or is_pro_forma)">
+                                    <span t-if="doc.state not in ['draft','sent']">Pedido Nº:</span>
+                                    <span t-if="doc.state in ['draft','sent']">Cotação Nº:</span>
+                                </t>
+                                <t t-if="env.context.get('proforma', False) or is_pro_forma">
+                                    <span>Pro-Forma Invoice #</span>
+                                </t>
+
+                                <b><span t-field="doc.name"/></b>
+
+                                <div t-if="doc.confirmation_date and doc.state not in ['draft','sent']">
+                                    <strong>Date Ordered:</strong>
+                                    <p t-field="doc.confirmation_date" t-options="{'widget': 'date'}"/>
+                                </div>
+
+                                <div t-if="doc.date_order and doc.state in ['draft','sent']">
+                                    <strong>Quotation Date:</strong>
+                                    <p t-field="doc.date_order" t-options="{'widget': 'date'}"/>
+                                </div>
+
+                                <div t-if="doc.partner_id.cnpj_cpf">
+                                    <strong>CNPJ/CPF:</strong>
+                                    <p t-field="doc.partner_id.cnpj_cpf"/>
+                                </div>
+
+                                <div>
+                                    <strong>Vendedor:</strong>
+                                    <span t-field="doc.user_id.name"/>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="page">
+                    <div class="oe_structure"/>
+
+                    <div t-if="doc.client_order_ref">
+                        <h5>
+                            <strong>Observações:</strong>
+                            <p class="m-0" t-field="doc.client_order_ref"/>
+                        </h5>
+                        <br/>
+                    </div>
+
+                    <div t-if="doc.payment_term_id" class="col-auto mw-100 mb-2">
+                        <strong>Payment Terms:</strong>
+                        <p class="m-0" t-field="doc.payment_term_id"/>
+                    </div>
+
+                    <t t-set="display_discount" t-value="any(l.discount for l in doc.order_line)"/>
+
+                    <table class="table table-sm o_main_table">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Código</th>
+                                <th>Marca</th>
+                                <th>Un</th>
+                                <th class="text-right">Quant</th>
+                                <th class="text-right">R$ Unit</th>
+                                <th class="text-right">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="doc.order_line" t-as="line">
+                                <tr>
+                                    <td><span t-field="line.product_id.name"/></td>
+                                    <td><span t-field="line.product_id.default_code"/></td>
+                                    <td><span t-field="line.product_id.product_brand_id.name"/></td>
+                                    <td><span t-field="line.product_id.uom_id.name"/></td>
+                                    <td class="text-right"><span t-field="line.product_uom_qty"/></td>
+                                    <td class="text-right"><span t-field="line.price_unit"/></td>
+                                    <td class="text-right">
+                                        <span t-field="line.price_subtotal"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <p>
+                        Total Itens:
+                        <span t-esc="len(doc.order_line)"/>
+                    </p>
+
+                    <div class="clearfix">
+                        <div id="total" class="row">
+                            <div class="col-4 ml-auto">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Subtotal</strong></td>
+                                        <td class="text-right">
+                                            <span t-field="doc.amount_untaxed"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Total</strong></td>
+                                        <td class="text-right">
+                                            <span t-field="doc.amount_total"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p t-field="doc.note"/>
+
+                    <div t-if="doc.signature" class="mt32 ml16 mr16">
+                        <strong>Signature</strong>
+                        <img t-att-src="image_data_uri(doc.signature)"
+                            style="max-height:4cm; max-width:8cm;"/>
+                        <p t-field="doc.signed_by"/>
+                    </div>
+
+                    <br/><br/><br/>
+
+                    <div class="text-left">
+                        <p>________________________________________</p>
+                        <div t-field="doc.partner_id.name"/>
+                    </div>
+
+                    <div class="oe_structure"/>
+                </div>
+            </t>
+        </t>
+    </data>
+</odoo>

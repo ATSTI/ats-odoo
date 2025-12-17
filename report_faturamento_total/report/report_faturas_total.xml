@@ -24,7 +24,6 @@
             <t t-foreach="docs" t-as="o">
                 <div style="margin-bottom:30px;page-break-inside: avoid;">
 
-                    <!-- Informações da Fatura -->
                     <table style="width:100%; border:1px solid #ccc; border-collapse:collapse; margin-bottom:10px;">
                         <tr style="background-color:#f3f6fb;">
                             <td style="border:1px solid #ccc; text-align:center; width:20%; padding:6px;">
@@ -42,7 +41,6 @@
                         </tr>
                     </table>
 
-                    <!-- Tabela de Itens -->
                     <table style="width:100%; border:1px solid #ccc; border-collapse:collapse; font-size:13px;">
                         <thead style="background-color:#e8eef7;">
                             <tr>

@@ -28,8 +28,8 @@
                         font-weight: bold;
                         text-transform: uppercase;
                         line-height: 8px;
-                        height: 16px;
-                        max-width: 3cm;
+                        height: 16px;              /* 2 linhas */
+                        max-width: 3cm;            /* força quebra mais cedo */
                         display: inline-block;
                         overflow: hidden;
                         margin: 0 auto;
@@ -74,8 +74,8 @@
                         page-break-after: always;
                     }
 
-                    .container-etiquetas .etiqueta:nth-child(5n-1) {
-                        margin-left: 2mm;
+                    .container-etiquetas .etiqueta:nth-child(5n-2) {
+                        margin-left: 2.35mm;
                     }
                 </style>
 
@@ -103,7 +103,6 @@
                                 />
 
                                 <div class="etiqueta">
-
                                     <table style="width:100%; height:100%;">
 
                                         <tr style="height:7px;">
@@ -166,7 +165,6 @@
                                         </tr>
 
                                     </table>
-
                                 </div>
 
                                 <t t-if="contador_etiquetas % 65 == 0">

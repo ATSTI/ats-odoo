@@ -238,7 +238,7 @@ class ContractContract(models.Model):
             contrato = contract.code or str(contract.id)
             # invoice_name = f"FATURA - {cliente} - {mes_ano} - {contradias_vencimento = int(contract.payment_term_id.line_ids.payment_days)
             dias_vencimento = int(contract.payment_term_id.line_ids.payment_days)
-            vencimento = contract.recurring_next_date.replace(day=dias_vencimento)
+            vencimento = contract.recurring_next_date + relativedelta(day=dias_vencimento)
             if vencimento <= contract.recurring_next_date:
                 vencimento = vencimento + relativedelta(months=+1)
             mes_ano = vencimento.strftime("%m/%Y")

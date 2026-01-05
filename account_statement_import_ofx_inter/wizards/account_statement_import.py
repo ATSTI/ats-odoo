@@ -36,7 +36,7 @@ class AccountStatementImport(models.TransientModel):
                 prt = self.env["res.partner"].search([
                     ("name", "ilike", ref),
                     ("parent_id", "=", False)
-                ])
+                ], limit=1)
                 if prt and len(prt) > 1:
                     for partner in prt:
                         # procurar qual parceiro tem fatura no valor

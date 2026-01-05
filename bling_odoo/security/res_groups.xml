@@ -1,0 +1,17 @@
+<odoo>
+    <record id="module_bling_category" model="ir.module.category">
+        <field name="name">Bling</field>
+        <field name="sequence">17</field>
+    </record>
+    <record id="bling_group_user" model="res.groups">
+        <field name="name">Bling usuario</field>
+        <field name="category_id" ref="module_bling_category"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="shopee_group_manager" model="res.groups">
+        <field name="name">Administrator</field>
+        <field name="implied_ids" eval="[(4, ref('bling_group_user'))]"/>
+        <field name="category_id" ref="module_bling_category"/>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+</odoo>

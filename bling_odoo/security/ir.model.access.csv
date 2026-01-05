@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bling_cf_user,bling.user,model_bling_config,bling_odoo.bling_group_user,1,1,0,0
+access_bling_cf_manager,bling.manager,model_bling_config,bling_odoo.bling_group_manager,1,1,1,1

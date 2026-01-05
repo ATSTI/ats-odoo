@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <record id="bling_config_form_view" model="ir.ui.view">
+            <field name="name">bling.config.form</field>
+            <field name="model">bling.config</field>
+            <field name="mode">primary</field>
+            <field name="arch" type="xml">
+                <form string="Bling Configurações">
+                    <header>
+                        <button name="action_pega_notas_bling" string="Sincronizar NFe bling" type="object" class="btn btn-primary" groups="base.group_no_one"/>
+                        <button name="action_gera_acess_token" string="Gerar Access Token" type="object" class="btn btn-primary" groups="base.group_no_one"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="bling_id" groups="base.group_no_one"/>
+                                <field name="client_id" groups="base.group_no_one"/>
+                                <field name="client_secret" groups="base.group_no_one"/>
+                            </group>
+                            <group>
+                                <div class="o_row">
+                                    <group>
+                                        <field name="refresh_token_security" invisible='1'/>
+                                        <field name="refresh_token" groups="base.group_no_one"/>
+                                        <field name="access_token" groups="base.group_no_one"/>
+                                        <field name="expire_date_token"  groups="base.group_no_one"/>
+                                        <field name="data_nota_inicial"/>
+                                        <field name="data_nota_final"/>
+                                    </group>
+                                </div>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="bling_config_tree_view" model="ir.ui.view">
+            <field name="name">bling.config.tree</field>
+            <field name="model">bling.config</field>
+            <field eval="7" name="priority"/>
+            <field name="arch" type="xml">
+                <tree string="Contas Bling">
+                    <field name="name"/>
+                    <!-- <field name="bling_id"/> -->
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_config_bling" model="ir.actions.act_window">
+            <field name="name">Config bling</field>
+            <field name="res_model">bling.config</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+            id="bling_config_menu"
+            name="Configurações bling"
+            parent="sale.menu_sale_config"
+            groups="bling_group_user,bling_group_manager"
+            sequence="20"
+            action="action_config_bling"
+        />
+    </data>
+</odoo>

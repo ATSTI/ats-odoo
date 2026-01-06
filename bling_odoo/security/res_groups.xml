@@ -8,7 +8,7 @@
         <field name="category_id" ref="module_bling_category"/>
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
     </record>
-    <record id="shopee_group_manager" model="res.groups">
+    <record id="bling_group_manager" model="res.groups">
         <field name="name">Administrator</field>
         <field name="implied_ids" eval="[(4, ref('bling_group_user'))]"/>
         <field name="category_id" ref="module_bling_category"/>

@@ -9,7 +9,7 @@
                 <form string="Bling Configurações">
                     <header>
                         <button name="action_pega_notas_bling" string="Sincronizar NFe bling" type="object" class="btn btn-primary" groups="base.group_no_one"/>
-                        <button name="action_gera_acess_token" string="Gerar Access Token" type="object" class="btn btn-primary" groups="base.group_no_one"/>
+                        <button name="action_gerar_access_token" string="Gerar Access Token" type="object" class="btn btn-primary" groups="base.group_no_one"/>
                     </header>
                     <sheet>
                         <group>

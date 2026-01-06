@@ -10,6 +10,7 @@ import tempfile
 import time
 import hmac
 import hashlib
+import re
 
 class BlingConfig(models.Model):
     _name = 'bling.config'
@@ -51,7 +52,7 @@ class BlingConfig(models.Model):
             self.refresh_token_security = res['refresh_token']
         else:
             raise UserError("Erro ao gerar o access token;/nDetalhes: %s" % res)
-        
+
     def cron_execute_pega_faturas(self):
         lj = self.search([])
         for loja in lj:
@@ -91,26 +92,34 @@ class BlingConfig(models.Model):
             nf_list = response.json()
             for nf in nf_list['data']:
                 self.criar_pedido_bling(nf)
+        else:
+            raise UserError("Erro ao buscar as notas fiscais;/nDetalhes: %s" % response.text)
 
     def criar_pedido_bling(self, nf):
         numero_pedido = nf.get('numero')
         pedido_inf = self.busca_pedido(numero_pedido)
         parceiro = nf['contato']
-        if len(parceiro['numeroDocumento']) == 11:
-            parceiro_tipo = 'person'
-        else:
-            parceiro_tipo = 'company'
         Partner = self.env['res.partner']
+        cnpj_cpf = parceiro['numeroDocumento']
+        cnpj_cpf = re.sub(r'\D', '', cnpj_cpf)
+        if len(cnpj_cpf) == 11:
+            parceiro_tipo = 'person'
+            cnpj_cpf = self.formatar_cpf(cnpj_cpf)
+        elif len(cnpj_cpf) == 14:
+            parceiro_tipo = 'company'
+            cnpj_cpf = self.formatar_cnpj(cnpj_cpf)
+        else:
+            raise ValueError("Documento inválido: não é CPF nem CNPJ")
         pr = Partner.search([
-            ('name', '=', parceiro['nome']), 
-            ('company_type', '=', parceiro_tipo), 
-            ('cnpj_cpf', '=', parceiro['numeroDocumento'])
+            ('name', 'ilike', parceiro['nome']),
+            ('company_type', '=', parceiro_tipo),
+            ('cnpj_cpf', '=', cnpj_cpf)
         ], limit=1)
         if not pr:
             pr_vals = {
                 'name': parceiro['nome'],
                 'company_type': parceiro_tipo,
-                'cnpj_cpf': parceiro['numeroDocumento'],
+                'cnpj_cpf': cnpj_cpf,
                 'street': parceiro['endereco'].get('endereco', ''),
                 'street2': parceiro['endereco'].get('complemento', ''),
                 'city': parceiro['endereco'].get('municipio', ''),
@@ -127,24 +136,24 @@ class BlingConfig(models.Model):
             }
         so = SaleOrder.create(vals)
         so.onchange_partner_id()
-        order_line = pedido_inf.get('itens', [])
-        if len(order_line):
-            so['order_line'] = order_line
-            for line in so.order_line:
-                # preco unitario alterado no onchange
-                prd_price = line.price_unit
-                prd_name = line.name
-                line._onchange_product_id_fiscal()
-                line.write(
-                    {'price_unit': prd_price,'name': prd_name,}
-                )
-        nat_operacao = nf.get('naturezaOperacao')
-        # BUSCANDO OU CRIANDO PARCEIRO, PRODUTOS E ADICIONANDO ITENS NO PEDIDO
-        #TODO descobrir onde vai encaixar a natureza da operação, criação de fatura, teste para ver se o pedido vai criar corretamente
+        order_line = []
+        for item in pedido_inf['data']['itens']:
+            prod_id = item['produto']['id']
+            prd = self.busca_produto(prod_id)
+            line_vals = {
+                'order_id': so.id,
+                'product_id': prd.id,
+                'product_uom_qty': float(item.get('quantidade', 1.0)),
+                'price_unit': float(item.get('valor', 0.0)),
+            }
+            order_line.append((0, 0, line_vals))
+        so.write({'order_line': order_line})
+        # so.order_line.onchange_product_id()
+        # nat_operacao = nf.get('naturezaOperacao')
         return True
-    
+
     def busca_pedido(self, pedido_id):
-        url = f"https://developer.bling.com.br/api/bling/pedidos/vendas/{pedido_id}"
+        url = "https://developer.bling.com.br/api/bling/pedidos/vendas/%s" % pedido_id
         headers = {
             "accept": "application/json",
             "Authorization": "Bearer ACCESS_TOKEN_AQUI"
@@ -160,4 +169,41 @@ class BlingConfig(models.Model):
             for pedido in res['data']:
                 return pedido
         return None
+        
+    def busca_produto(self, produto_id):
+        url = "https://api.bling.com.br/Api/v3/produtos/%s" % producto_id
 
+        headers = {
+            "accept": "application/json",
+            "Authorization": "Bearer %s" % self.access_token
+        }
+
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            res = response.json()
+            prd = res['data']
+            ProductProduct = self.env['product.product']
+            prod = ProductProduct.search([
+                '|',
+                ('name', '=', prd['nome']),
+                ('default_code', '=', prd['codigo'])
+            ], limit=1)
+            if prod:
+                return prod
+            else:
+                prod_vals = {
+                    'name': prd.get('nome'),
+                    'default_code': prd.get('codigo'),
+                    'list_price': float(prd.get('preco', 0.0)),
+                    'type': 'product',
+                }
+                return ProductProduct.create(prod_vals)
+
+    def formatar_cpf(self, cpf):
+        cpf = re.sub(r'\D', '', cpf)  # remove tudo que não é número
+        return "%s.%s.%s-%s" % (cpf[:3], cpf[3:6], cpf[6:9], cpf[9:])
+
+    def formatar_cnpj(self,cnpj):
+        cnpj = re.sub(r'\D', '', cnpj)
+        return "%s.%s.%s/%s-%s" % (cnpj[:2], cnpj[2:5], cnpj[5:8], cnpj[8:12], cnpj[12:])

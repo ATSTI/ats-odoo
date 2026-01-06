@@ -130,8 +130,6 @@ class InvoiceEletronic(models.Model):
             "pais_destinatario": "Brasil",
             'fone_destinatario': re.sub('[^0-9]', '', partner.phone or ''),
             'email': self.partner_id.email or partner.email or '',
-            
-
         }
         city_prestador = self.company_id.partner_id.city_id
         prestador = {
@@ -149,7 +147,11 @@ class InvoiceEletronic(models.Model):
             'bairro': self.company_id.district or 'Sem Bairro',
             'uf': self.company_id.state_id.code,
             'cep': re.sub('[^0-9]', '', self.company_id.zip),
-            'telefone': re.sub('[^0-9]', '', self.company_id.phone or '')            
+            'telefone': re.sub('[^0-9]', '', self.company_id.phone or ''), 
+            'pais_local_prest': 'Brasil',
+            'cidade_local_prest': city_prestador.name,
+            'uf_local_prest': 'SP',
+            'codigo_nbs': '',
             
         }
 
@@ -192,7 +194,12 @@ class InvoiceEletronic(models.Model):
            
         rps = {
             'cnpj_cpf_prestador': prestador['cnpj'],         
+            'pais_local_prest': 'Brasil',
+            'cidade_local_prest': city_prestador.name,
+            'uf_local_prest': 'SP',
+            'codigo_nbs': '1.2001.10.00',
             'exterior_dest': '0',             
+            'exterior_prestacao_servico': '0',             
             'cnpj_cpf_destinatario': re.sub('[^0-9]', '',
                                partner.cnpj_cpf or ''),
             'pessoa_destinatario': 'J' if partner.is_company else 'F',
@@ -271,7 +278,9 @@ class InvoiceEletronic(models.Model):
         nfse_values = self._prepare_eletronic_invoice_values()
         #xml_enviar = xml_recepcionar_lote_rps(certificado, nfse=nfse_values)
         #base64.encodestring(
+        # print(nfse_values)
         self.xml_to_send = json.dumps(nfse_values)
+        # print(self.xml_to_send)
         self.xml_to_send_name = 'nfse-enviar-%s.json' % self.numero
         arq_temp = open('/tmp/'+str(self.numero)+'.json', "w")
         arq_temp.write(json.dumps(nfse_values))
@@ -304,15 +313,21 @@ class InvoiceEletronic(models.Model):
         return atts
 
     def _novo_token(self):
-        url = "https://wsconchal.sigissweb.com/rest/login"
-        #headers = {"Content-Type": "application/json"}
-        login = {"login": self.company_id.client_id, 
-            "senha": self.company_id.user_password}
-        # "hmlgc"
-        response = requests.post(url, json=login)
-        token = response.content
-        self.company_id.sudo().write({'token_nfse': token, 
-            'validade_token_nfse': datetime.now()})
+        url = f"https://wsconchal.sigissweb.com/rest/login"
+        headers = {
+            'content-type': 'application/json',
+            'grant_type': 'authorization_code',
+        }
+        data = {
+            'login': str(self.company_id.client_id),
+            'senha': str(self.company_id.user_password),
+        }
+        response = requests.post(url, json=data, verify=False, headers=headers)
+        token = False
+        if response.status_code == 200:
+            token = response.content
+            self.company_id.sudo().write({'token_nfse': token, 
+                'validade_token_nfse': datetime.now()})
         return token
 
     @api.multi
@@ -347,7 +362,6 @@ class InvoiceEletronic(models.Model):
         if not self.recibo_nfe:
 
             url = "https://wsconchal.sigissweb.com/rest/nfes"
-
             rps = json.loads(self.xml_to_send)
 
             #print (rps)
@@ -356,16 +370,16 @@ class InvoiceEletronic(models.Model):
             # arq_temp.close()
             # rps = json.loads(rps)
 
-            response = requests.post(url, headers=headers, json=rps)
+            response = requests.post(url, headers=headers, json=rps, verify=False)
             numero_nota = str(self.numero) #13
             serie = self.serie.code        #'E'
             if response.status_code == 200:
-                arq_temp = open('/home/ats/safradiesel/retorno.xml', "wb")
+                arq_temp = open('/opt/odoo/safradiesel/retorno.xml', "wb")
                 arq_temp.write(response.content)
                 arq_temp.close()
                 self.nfe_processada = base64.b64encode(response.content)
                 self.nfe_processada_name = "NFSe%08d.xml" % self.numero
-                tree = ET.parse('/home/ats/safradiesel/retorno.xml')
+                tree = ET.parse('/opt/odoo/safradiesel/retorno.xml')
                 root = tree.getroot()
                 for element in root.iter('numero_nf'):
                     numero_nota = element.text
@@ -381,7 +395,7 @@ class InvoiceEletronic(models.Model):
                     "AUTHORIZATION": token,
                  }
                 
-                response = requests.get(url, headers=headers)
+                response = requests.get(url, headers=headers, verify=False)
                 if response:
                     pdf = base64.b64encode(response.content)
                     nome_nota = 'nfse_%s_%s.pdf' %(str(numero_nota), serie)
@@ -399,11 +413,41 @@ class InvoiceEletronic(models.Model):
                 self.mensagem_retorno = 'Nota enviada com sucesso'
                 self.state = 'done'
                 self.numero = numero_nota
+                self.invoice_id.nfe_number_static = numero_nota
             else:
                 self.codigo_retorno = response.status_code
                 self.mensagem_retorno = response.text
                     
-
+    def baixar_pdf(self):
+        if not self.recibo_nfe:
+            return True
+        nf = self.recibo_nfe
+        numero_nota = nf[:nf.index('-')]
+        serie = nf[nf.index('-')+1:len(nf)]
+        token = self.company_id.token_nfse 
+        # enviado pegando PDF
+        url = "https://wsconchal.sigissweb.com/rest/nfes/nfimpressa/%s/serie/%s" %(
+                numero_nota, serie
+        )
+        headers = {
+                    "Content-Type": "application/pdf",
+                    "AUTHORIZATION": token,
+        }
+                
+        response = requests.get(url, headers=headers, verify=False)
+        if response:
+            pdf = base64.b64encode(response.content)
+            nome_nota = 'nfse_%s_%s.pdf' %(str(numero_nota), serie)
+            attachment_obj = self.env['ir.attachment']
+            attachment_obj.create(dict(
+                name=nome_nota,
+                datas_fname=nome_nota,
+                datas=pdf,
+                mimetype='application/pdf',
+                res_model='invoice.eletronic',
+                res_id=self.id,
+            ))
+        
     @api.multi
     def action_cancel_document(self, context=None, justificativa=None):
         if self.model not in ('002'):
@@ -456,7 +500,7 @@ class InvoiceEletronic(models.Model):
             "AUTHORIZATION": token,
         }    
         
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, verify=False)
         if response.status_code == 200:
             self.state = 'cancel'
             self.codigo_retorno = '100'

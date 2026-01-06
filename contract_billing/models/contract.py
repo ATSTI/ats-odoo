@@ -289,12 +289,12 @@ class ContractContract(models.Model):
                 lambda c: c.company_id == company
                 and (not c.date_end or c.recurring_next_date <= c.date_end)
             ).with_company(company)
-            for ctr in contracts_to_invoice[:30]:
+            for ctr in contracts_to_invoice[:10]:
                 if ctr.fiscal_operation_id:
                     for line in ctr.contract_line_ids:
                         if not line.fiscal_operation_line_id:
                             msg = f"Contrato {ctr.code}:{ctr.name} com linha {line.name} sem Operação Fiscal."
-                            canal = self.env['mail.channel'].search([('name', '=', 'geral')], limit=1)
+                            canal = self.env['discuss.channel'].search([('name', '=', 'geral')], limit=1)
                             canal.message_post(
                                 body=(msg),
                                 message_type='comment',

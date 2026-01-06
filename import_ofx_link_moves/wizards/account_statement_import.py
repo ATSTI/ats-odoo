@@ -15,7 +15,7 @@ class AccountStatementImport(models.TransientModel):
 
     @api.model
     def _prepare_ofx_transaction_line(self, transaction):
-        payment_ref = transaction.payee
+        payment_ref = payment_name = transaction.payee
         memo = ""
         if transaction.checknum:
             payment_ref += " " + transaction.checknum
@@ -31,12 +31,9 @@ class AccountStatementImport(models.TransientModel):
         if memo:
             prt = False
             if memo.find('Pix') == 0:
-                ref = memo[30:]
-                ref = ref[:len(ref)-1]
-                prt = self.env["res.partner"].search([
-                    ("name", "ilike", ref),
-                    ("parent_id", "=", False)
-                ])
+                termos = payment_name.split()[1:]  # remove 'Pix'
+                prt = self.find_partner_by_terms(termos)
+                 # se encontrar mais de um parceiro, tenta achar pela fatura no valor
                 if prt and len(prt) > 1:
                     for partner in prt:
                         # procurar qual parceiro tem fatura no valor
@@ -48,6 +45,8 @@ class AccountStatementImport(models.TransientModel):
                         ])
                         if move and len(move) == 1:
                             prt = partner
+                        if not move:
+                            prt = False
             if memo.find('Boleto') == 0:
                 ref = memo[34:]
                 ref = ref[:len(ref)-1]
@@ -68,3 +67,22 @@ class AccountStatementImport(models.TransientModel):
             if prt:
                 vals["partner_id"] = prt.id
         return vals
+
+    def find_partner_by_terms(self, termos):
+        Partner = self.env["res.partner"]
+
+        # 1️⃣ tenta com todos os termos juntos
+        for i in range(len(termos), 0, -1):
+            texto = " ".join(termos[:i])
+            res = Partner.search([("name", "ilike", texto)])
+            if res:
+                return res
+
+        # 2️⃣ fallback: qualquer termo (OR)
+        domain = []
+        for termo in termos:
+            if domain:
+                domain = ["|"] + domain
+            domain.append(("name", "ilike", termo))
+
+        return Partner.search(domain)

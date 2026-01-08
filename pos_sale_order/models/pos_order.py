@@ -212,7 +212,6 @@ class PosSession(models.Model):
 #         for pr in prod_tmpl:
 #             prd_ids.add(pr.id)
 #             #if pr.id == 9993:
-#             #    import pudb;pu.db
 #             #    x = 1
              
 #         prod_prod = self.env['product.product'].search([
@@ -234,7 +233,6 @@ class PosSession(models.Model):
 
 #         for product_id in prod_ids:
 #             #if product_id.id == 9993:
-#             #    import pudb;pu.db
 #             #    x = 1
 #             if not product_id.origin:
 #                 continue
@@ -271,7 +269,6 @@ class PosSession(models.Model):
 #                 barra = db.query(sql_bar)
 #                 up_bar = 'UPDATE PRODUTOS SET COD_BARRA = NULL WHERE COD_BARRA = \'%s\'' %(codbarra)
 #                 for sess_bar in barra:
-#                     #import pudb;pu.db
 #                     cod_p_barra = str(sess_bar[0])
 #                     if str(codp) == cod_p_barra:
 #                         up_bar = ''
@@ -317,13 +314,11 @@ class PosSession(models.Model):
 #                 try:
 #                     retorno = db.insert(insere)
 #                 except:
-#                     import pudb;pu.db
 #                     x = 0
 #                 # TODO tratar isso e enviar email
 #                 if retorno:
 #                     msg_erro += 'ERRO : %s<br>' %(retorno)
 #                     if 'ERRO' in msg_erro:
-#                         #import pudb;pu.db
 #                         x = 1
 #                     #print ('SQL %s' %str(insere))
 #             elif len(prods):
@@ -352,11 +347,9 @@ class PosSession(models.Model):
 #                     #print ('SQL erro : %s' %(altera))
 #                     msg_erro += 'ERRO : %s<br>' %(retorno)
 #                     if 'ERRO' in msg_erro:
-#                         #import pudb;pu.db
 #                         x = 1
 #         #print ('Integracao realizada com sucesso.')
 #         msg_sis += 'Integracao Finalizada.<br>'
-#         #import pudb;pu.db
 #         return msg_sis + '<br>' + msg_erro
 
 #     def cron_integra_clientes(self):

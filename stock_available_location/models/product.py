@@ -50,7 +50,6 @@ class Product(models.Model):
                 location_ids = _search_ids('stock.location', location)
             else:
                 location_ids = set(Warehouse.search([]).mapped('view_location_id').ids)
-        #import pudb;pu.db
         location_param = self.env["ir.config_parameter"].sudo().get_param("stock.available_location")
         if location_param:
            location_ids = {int(location_param)}

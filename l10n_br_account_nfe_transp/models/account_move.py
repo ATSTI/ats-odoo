@@ -176,7 +176,6 @@ class TranspFrete(models.Model):
 
     # @api.model_create_multi
     # def create(self, vals_list):
-    #     import pudb;pu.db
     #     res = super().create(vals_list)
     #     # if not res.vehicle_id and res.plate:
     #     #     vehicle = self.env["l10n_br_delivery.carrier.vehicle"].search([
@@ -194,7 +193,6 @@ class TranspFrete(models.Model):
     #     return res
  
     # def write(self, vals):
-    #     import pudb;pu.db
     #     res = super(TranspFrete,self).write(vals)
     #     # if self.am_id and self.incoterm_id:
     #     #     self.am_id.invoice_incoterm_id = self.incoterm_id.id

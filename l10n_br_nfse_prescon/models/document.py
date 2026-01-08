@@ -148,7 +148,6 @@ class PresconnfeNfse(models.AbstractModel):
             # "bairroServico": recipient.get("bairro"),
             # "cidadeServico": recipient.get("municipio"),
             # "ufServico": recipient.get("uf"),
-        # import pudb;pu.db
         valor_iss = service.get("valor_iss", 0)
         # aliquota = service.get("aliquota") * 100
         # a prefeitura define a aliquota no inicio do mes

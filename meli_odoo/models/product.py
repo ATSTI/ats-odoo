@@ -185,7 +185,7 @@ class ProducTemplate(models.Model):
             self.encontrar_item_por_sku()
         insere_meli_item = False
         if insere_meli_item == True:
-            import pudb;pu.db
+            return True
             if not self.meli_item_id:
                 variations = []
                 pp = self.env['product.product'].search([('product_tmpl_id', '=', self.id),('qty_available', '>', 0)])
@@ -227,7 +227,6 @@ class ProducTemplate(models.Model):
                 #     if va.attribute_id.name == 'Tamanho Roupas' or va.attribute_id.name == 'Tamanho Calçados':
                 #         for value in va.value_ids:
                 #REMOVIDO DO DATDA: "available_quantity":%s,\
-                import pudb;pu.db
                 headers = {
                     'Authorization': 'Bearer %s' %(self.meli_config_id.access_token),
                     'Content-Type': 'application/x-www-form-urlencoded',

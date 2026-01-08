@@ -7,7 +7,6 @@ class PurchaseOrder(models.Model):
 
     #@api.depends('purchase_itens_ref')
     #def _compute_update_price(self):
-    #    import pudb;pu.db
     #    for order in self:
     #        order.update_price_count = len(self.purchase_itens_ref)
         

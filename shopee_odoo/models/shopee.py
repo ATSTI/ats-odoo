@@ -268,7 +268,6 @@ class ShopeeConfig(models.Model):
             sale = self.env['sale.order'].create(vals)
             sale._onchange_fiscal_operation_id()
             if len(order_line):
-                import pudb;pu.db
                 sale['order_line'] = order_line
                 for line in sale.order_line:
                     # preco unitario alterado no onchange

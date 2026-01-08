@@ -69,7 +69,6 @@ class IntegracaoPdv(http.Controller):
                     'qtde_atacado', 'preco_atacado', 'name'
                 ):
                     prd_ids.add(pr.res_id)
-        # import pudb;pu.db
         if len(prd_ids):
             prod_ids = http.request.env['product.product'].sudo().search([
                 ('id','in',list(prd_ids))])
@@ -304,7 +303,6 @@ class IntegracaoPdv(http.Controller):
         for conta in conta_ids:
             #if not '4-' in conta.journal_id.name or conta.debit == 0.0:
             #    continue
-            #import pudb;pu.db
             contas = {}
             nome = conta.name.strip()
             nome = nome.replace("'"," ")

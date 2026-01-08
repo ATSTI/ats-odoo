@@ -16,7 +16,6 @@ class FiscalDocumentAgro(models.Model):
 
     # def _export_fields(self, xsd_fields, class_obj, export_dict):
     #     if class_obj._name == "nfe.40.pag":
-    #         import pudb;pu.db
     #         for agro in self.move_ids.nfe40_guiaTransito:
     #             agro_vals = {
     #                 "nfe40_tpGuia": agro.nfe40_tpGuia, # Tipo da Guia: 1 - GTA; 2 - TTA; 3 - DTA; 4 - ATV; 5 - PTV; 6 - GTV; 7 - Guia Florestal (DOF, SisFlora - PA e MT, SIAM - MG)

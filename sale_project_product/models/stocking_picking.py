@@ -11,12 +11,10 @@ class StockPicking(models.Model):
     mrp_production_count_stock = fields.Integer(string='Tarefas', related='sale_id.mrp_production_count')
 
     def action_chama_taks(self):
-        # import pudb;pu.db
         action = self.sale_id.action_view_task()
         return action
     
     def action_chama_mrp(self):
-        # import pudb;pu.db
         action = self.sale_id.action_view_mrp_production()
         return action
         

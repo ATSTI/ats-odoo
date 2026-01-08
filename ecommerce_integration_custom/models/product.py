@@ -28,7 +28,6 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     def rotina_atualiza_preco_online(self):
-        import pudb;pu.db
         hj = datetime.now()
         hj = hj - timedelta(days=5)
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
@@ -42,7 +41,6 @@ class ProductTemplate(models.Model):
                 if line.field_name in (
                     'standard_price'
                 ):
-                    import pudb;pu.db
                     prod_ids = self.env['product.template'].browse([pr.res_id])
                     if prod_ids and prod_ids.shopee:
                         prod_ids.atualiza_preco_shopee()

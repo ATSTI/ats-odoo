@@ -11,7 +11,6 @@ class Operation(models.Model):
         fiscal_type = product.fiscal_type
         icms_origin = product.icms_origin
         if product:
-            # import pudb;pu.db
             if not product.icms_origin or not product.fiscal_type:
                 prd_id = "product.template,{}".format(product.product_tmpl_id.id)
                 prd = self.env["ir.property"].sudo().search([

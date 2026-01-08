@@ -25,7 +25,6 @@ class AccountMove(models.Model):
 
 #     @api.onchange("cfop_id")
 #     def fatura_dupli(self):
-#         import pudb;pu.db
 #         if self.cfop_id.finance_move == True:
 #             self.move_id.write({"fatura_duplicata": True})
 #         else:

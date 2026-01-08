@@ -9,7 +9,6 @@ class AccountMove(models.Model):
     # isso corrige a operacao em todas as linhas da fatura
     @api.onchange("fiscal_operation_id")
     def _onchange_fiscal_operation_id(self):
-        # import pudb;pu.db
         if self.fiscal_operation_id:
             for line in self.invoice_line_ids:
                 line.fiscal_operation_id = self.fiscal_operation_id.id

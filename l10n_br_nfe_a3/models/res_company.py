@@ -31,7 +31,6 @@ class ResCompany(models.Model):
 
     @api.model
     def _get_br_ecertificate(self, only_ecnpj=False):
-        # import pudb;pu.db
         certificate = False
         if self.sudo().certificate_nfe_id or self.sudo().certificate_ecnpj_id:
             certificate = self.certificate

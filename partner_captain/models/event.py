@@ -52,4 +52,14 @@ class EventEvent(models.Model):
                     reg.suit_id = False
         return True
 
+    def color_by_situacao(self, product):
+        if not product:
+            return '#ffffff'
 
+        return {
+            'otima': '#c8f7c5',
+            'bom': '#e3f9c6',
+            'medio': '#fff3b0',
+            'ruim': '#ffd6a5',
+            'pessimo': '#ffadad',
+        }.get(product.situacao, '#ffffff')

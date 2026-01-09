@@ -1,0 +1,70 @@
+<odoo>
+    <template id="report_event_equipamentos">
+        <t t-call="web.external_layout">
+            <main class="page">
+                <h2>
+                    Evento:
+                    <span t-esc="docs[0].name"/>
+                </h2>
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Participante</th>
+                            <th>Gênero</th>
+                            <th>Peso</th>
+                            <th>Altura</th>
+                            <th>BCD</th>
+                            <th>Suit</th>
+                            <th>REG</th>
+                            <th>BAG</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="docs[0].registration_ids" t-as="reg">
+                            <tr>
+                                <td><span t-esc="reg.partner_id.name"/></td>
+                                <td><span t-esc="reg.genero or '-'"/></td>
+                                <td><span t-esc="reg.peso or '-'"/></td>
+                                <td><span t-esc="reg.altura or '-'"/></td>
+                                <td t-attf-style="background-color:#{docs.color_by_situacao(reg.bcd_id)}">
+                                    <t t-if="reg.bcd_id">
+                                        <strong t-esc="reg.bcd_id.display_name"/><br/>
+                                        <small t-esc="reg.bcd_id.situacao"/>
+                                    </t>
+                                    <t t-else="">
+                                        -
+                                    </t>
+                                </td>
+                                <td t-attf-style="background-color:#{docs.color_by_situacao(reg.suit_id)}">
+                                    <t t-if="reg.suit_id">
+                                        <strong t-esc="reg.suit_id.display_name"/><br/>
+                                        <small t-esc="reg.suit_id.situacao"/>
+                                    </t>
+                                    <t t-else="">
+                                        -
+                                    </t>
+                                </td>
+                                <td>
+                                    <t t-if="reg.reg_id">
+                                        <span t-esc="reg.reg_id.display_name"/>
+                                    </t>
+                                    <t t-else="">
+                                        -
+                                    </t>
+                                </td>
+                                <td>
+                                    <t t-if="reg.bag_id">
+                                        <span t-esc="reg.bag_id.display_name"/>
+                                    </t>
+                                    <t t-else="">
+                                        -
+                                    </t>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </main>
+        </t>
+    </template>
+</odoo>

@@ -22,7 +22,7 @@ class PartnerEquipamento(models.Model):
         ('medio', 'Médio'),
         ('ruim', 'Ruim'),
         ('pessimo', 'Péssimo'),
-    ], string='Estado')
+    ], string='Estado', compute ='_compute_estado')
 
     is_loan = fields.Boolean(string='Emprestado')
     data_entrada = fields.Date(string='Data de Entrada')
@@ -42,27 +42,20 @@ class PartnerEquipamento(models.Model):
     @api.model
     def create(self, vals):
         record = super().create(vals)
-
         if record.product_id:
             record.product_id.usado = True
-
         return record
     def write(self, vals):
         for rec in self:
             old_product = rec.product_id
-
             res = super().write(vals)
-
             new_product = rec.product_id
-
-            # Se trocou o produto
             if 'product_id' in vals:
                 if old_product and old_product != new_product:
                     old_product.usado = False
 
                 if new_product:
                     new_product.usado = True
-
             return res
     def unlink(self):
         for rec in self:
@@ -85,4 +78,26 @@ class PartnerEquipamento(models.Model):
                 rec.tipo = 'bcd'
             elif categ_name == 'SUIT':
                 rec.tipo = 'suit'
+
+    
+    @api.depends('product_id','product_id.situacao')
+    def _compute_estado(self):
+        for rec in self:
+            rec.estado = False
+            if not rec.product_id or not rec.product_id.situacao:
+                continue
+            categ_name = rec.product_id.situacao.upper()
+
+            if categ_name =='OTIMA':
+                rec.estado = 'otima'
+            elif categ_name =='BOM':
+                rec.estado ='bom'
+            elif categ_name =='MEDIO':
+                rec.estado ='medio'
+            elif categ_name =='RUIM':
+                rec.estado ='ruim'
+            elif categ_name =='PESSIMO':
+                rec.estado ='pessimo'
+
+
 

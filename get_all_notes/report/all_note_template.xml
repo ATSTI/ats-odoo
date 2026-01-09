@@ -68,6 +68,7 @@
                 <td style="text-align:left;">
                   Produtor: <t t-esc="docs and docs[0].x_company_id.name or ''"/><br/>
                   CNPJ: <t t-esc="docs and docs[0].x_company_id.cnpj_cpf or ''"/>
+                  <br/><span style="font-size:12px" t-field="docs[0].x_company_id.street_name"/><span style="font-size:12px"> , </span><span style="font-size:12px" t-field="docs[0].x_company_id.street_number"/> <span style="font-size:12px"> - </span><span style="font-size:12px" t-field="docs[0].x_company_id.street2"/><br/><span style="font-size:12px" t-field="docs[0].x_company_id.district"/><span style="font-size:12px"> , CEP: </span><span style="font-size:12px" t-field="docs[0].x_company_id.zip"/><span style="font-size:12px"> - </span><span style="font-size:12px" t-field="docs[0].x_company_id.state_id.code"/>
                 </td>
                 <td colspan="2" style="text-align:right; border-top:1px solid #000; padding-top:4px;">
                   <strong>Total do Ano:</strong>

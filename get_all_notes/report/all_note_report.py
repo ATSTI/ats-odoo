@@ -54,6 +54,12 @@ class AllNoteReport(models.Model):
         readonly=True,
     )
 
+    x_operacao_fiscal = fields.Many2one(
+        comodel_name='l10n_br_fiscal.operation',
+        string='Operação Fiscal',
+        readonly=True,
+    )
+
     def _select(self):
         return """
             SELECT
@@ -65,7 +71,8 @@ class AllNoteReport(models.Model):
                 count(fd.id) AS x_total_nota,
                 fd.amount_total AS x_valor_nota,
                 fd.amount_price_gross AS x_total_bruto,
-                CAST(fd.document_date AS DATE) AS x_data_nota
+                CAST(fd.document_date AS DATE) AS x_data_nota,
+                fd.fiscal_operation_id AS x_operacao_fiscal
         """
 
     def _from(self):
@@ -87,7 +94,8 @@ class AllNoteReport(models.Model):
                 fd.document_number,
                 fd.state_edoc,
                 fd.amount_total,
-                fd.amount_price_gross
+                fd.amount_price_gross,
+                fd.fiscal_operation_id
         """
 
     def init(self):

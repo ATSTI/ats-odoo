@@ -14,7 +14,7 @@
     'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
     'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': [
-        'l10n_br_fiscal', 'product', 'product_sequence'
+        'l10n_br_fiscal', 'product', 'product_sequence', 'product_multi_company',
     ],
     'data': [
         'views/product_view.xml',

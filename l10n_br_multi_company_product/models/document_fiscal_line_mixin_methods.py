@@ -3,8 +3,8 @@
 from odoo import _, api, models
 
 
-class FiscalDocumentLineMixinMethods(models.AbstractModel):
-    _inherit = "l10n_br_fiscal.document.line.mixin.methods"
+class FiscalDocumentLineMixin(models.AbstractModel):
+    _inherit = "l10n_br_fiscal.document.line.mixin"
 
     @api.onchange("product_id")
     def _onchange_product_id_fiscal(self):

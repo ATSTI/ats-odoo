@@ -27,10 +27,15 @@ Lista de Equipamentos, Viagens e Cursos do Cliente:
         'account',
     ],
     'data': [
+        'security/ir.model.access.csv',
         'views/partner_view.xml',
+        'views/captain_size_rule_view.xml',
         'views/product_view.xml',
+        'views/partner_equipamento_views.xml',
+        'views/event_registration.xml',
+        'views/event_view.xml',
         'views/crm_historico.xml',
-        'wizard/crm_pipeline_create_view.xml'
+        'wizard/crm_pipeline_create_view.xml',
     ],
     'demo': [],
     'installable': True,

@@ -15,6 +15,11 @@ class ResPartner(models.Model):
     peso = fields.Integer(string='Peso')
     altura = fields.Float(string='Altura')
     calcado = fields.Integer(string='Calçado')
+    nadadeira = fields.Text(string='Nadadeira')
+    genero = fields.Selection([
+        ("masculino",'Masculino'),
+        ('feminino','Feminino'),
+    ], string ='Gênero')
     contatonome = fields.Char(string='Contato Emergência')
     contatofone = fields.Char(string='Telefone Emergência')
     alergia= fields.Char(string='Alergia')
@@ -23,8 +28,28 @@ class ResPartner(models.Model):
     segurodan = fields.Char(string='Seguro DAN')
     passaporte = fields.Char(string='Passaporte')
     birthdate_date = fields.Date("Data de Nascimento")
-    	            
-       
+    equipamento_ids = fields.One2many(
+        'partner.equipamento',
+        'partner_id',
+        string='Equipamentos'
+    )
+    tem_equipamento = fields.Boolean(
+        string='Possui Equipamento próprio?'
+    )
+    bcd = fields.Text(
+        "BCD",
+        compute="_compute_tamanhos",
+        store=True
+    )
+
+    suit = fields.Text(
+        "SUIT",
+        compute="_compute_tamanhos",
+        store=True
+    )
+    bag = fields.Text(string="BAG", store=True)
+    reg = fields.Text(string="REG", store=True)
+
 
     # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
 
@@ -40,6 +65,49 @@ class ResPartner(models.Model):
     def _onchange_name(self):
         if self.name and self.company_type == "person":
             self.legal_name = self.name
+
+    @api.depends('peso', 'altura', 'genero')
+    def _compute_tamanhos(self):
+        SizeRule = self.env['captain.size.rule']
+
+        for partner in self:
+            partner.bcd = False
+            partner.suit = False
+
+            if not partner.peso or not partner.altura:
+                continue
+
+            if partner.genero not in ('masculino', 'feminino'):
+                continue
+
+            # ===== BCD =====
+            bcd_rule = SizeRule.search([
+                ('genero', '=', partner.genero),
+                ('selecao', '=', 'bcd'),
+                ('altura', '=', partner.altura),
+                ('peso', '=', partner.peso),
+            ], order='altura desc, peso desc', limit=1)
+
+            partner.bcd = bcd_rule.tamanho if bcd_rule else None
+
+            # ===== SUIT =====
+            suit_rule = SizeRule.search([
+                ('genero', '=', partner.genero),
+                ('selecao', '=', 'suit'),
+                ('altura', '=', partner.altura),
+                ('peso', '=', partner.peso),
+            ], order='altura desc, peso desc', limit=1)
+
+            partner.suit = suit_rule.tamanho if suit_rule else None
+    @api.onchange('bcd', 'suit')
+    def _onchange_normaliza_tamanho(self):
+        if self.bcd:
+            self.bcd = self.bcd.strip().lower()
+        if self.suit:
+            self.suit = self.suit.strip().lower()
+
+
+
 
 class PartnerHistorico(models.Model):
     _name = "partner.historico"

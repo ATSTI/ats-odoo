@@ -25,6 +25,52 @@ from odoo import api, fields, models
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
+    historico_id = fields.Many2one(
+        'crm.historico',
+        string='Tipo Histórico CRM'
+    )
 
-    historico_id = fields.Many2one('crm.historico', string='Tipo Historico CRM')
-    
+    situacao = fields.Selection(
+        [
+            ('otima', 'Ótima'),
+            ('bom', 'Bom'),
+            ('medio', 'Médio'),
+            ('ruim', 'Ruim'),
+            ('pessimo', 'Péssimo'),
+        ],
+        string="Situação",
+        default='bom'
+    )
+
+    modelo = fields.Text("Modelo")
+
+    tamanho_cd = fields.Selection(
+        [
+            ("jr", 'JR'),
+            ('pp', 'PP'),
+            ('p', 'P'),
+            ('pl', 'PL'),
+            ('m', 'M'),
+            ('ml', 'ML'),
+            ('g', 'G'),
+            ('xl', 'XL'),
+        ],
+        string='Tamanho CD'
+    )
+
+    tag_cd = fields.Text("Tag CD")
+    tamanho_etiqueta = fields.Text("Tamanho Etiqueta")
+
+    usado = fields.Boolean(
+        "Produto está sendo usado?",
+        default=False
+    )
+
+    tipo_suit = fields.Selection(
+        [
+            ('fina_piscina', 'FINA PISCINA'),
+            ('grossa', 'GROSSA'),
+            ('fina_mar', 'FINA MAR')
+        ],
+        string='Tipo de SUIT'
+    )

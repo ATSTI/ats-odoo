@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_partner_equipamento_tree" model="ir.ui.view">
+        <field name="name">partner.equipamento.tree</field>
+        <field name="model">partner.equipamento</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="product_id"/>
+                <field name="estado"/>
+                <field name="is_loan"/>
+                <field name="data_entrada"/>
+                <field name="data_saida"/>
+            </tree>
+        </field>
+    </record>
+
+</odoo>

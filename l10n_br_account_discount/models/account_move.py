@@ -9,7 +9,18 @@ class AccountMove(models.Model):
         string="Total do desconto",
         inverse="_inverse_amount_discount",
     )
+
+    @api.model
+    def _get_fiscal_lines_field_name(self):
+        return "fiscal_line_ids"
     
+    def _get_amount_lines(self):
+        """Get object lines instances used to compute fiscal fields"""
+        return self.mapped(self._get_fiscal_lines_field_name())
+    
+    def _get_product_amount_lines(self):
+        fiscal_line_ids = self._get_amount_lines()
+        return fiscal_line_ids.filtered(lambda line: line.product_id.type != "service")
 
     @api.onchange("amount_discount_value")
     def _onchange_amount_discount_value(self):

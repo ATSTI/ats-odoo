@@ -8,7 +8,6 @@ class FiscalDocumentLineMixin(models.AbstractModel):
 
     @api.onchange("product_id")
     def _onchange_product_id_fiscal(self):
-        super()._onchange_product_id_fiscal()
         if self.product_id:
             if not self.product_id.icms_origin or not self.product_id.fiscal_type:
                 prd_id = "product.template,{}".format(self.product_id.product_tmpl_id.id)

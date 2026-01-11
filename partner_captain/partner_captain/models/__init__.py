@@ -21,7 +21,3 @@ from . import product
 from . import sale
 from . import crm_historico
 from . import lista_equipamentos
-from . import equipamento
-from . import captain_size_rule
-from . import event_registration
-from . import event

@@ -1,4 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_partner_equipamento_user,access_partner_equipamento_user,model_partner_equipamento,base.group_user,1,1,1,1
-access_captain_size_rule_user,captain.size.rule user,model_captain_size_rule,base.group_user,1,1,1,1
-access_captain_size_rule_admin,captain.size.rule admin,model_captain_size_rule,base.group_system,1,1,1,1

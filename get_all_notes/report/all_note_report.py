@@ -60,6 +60,11 @@ class AllNoteReport(models.Model):
         readonly=True,
     )
 
+    x_data_vencimento = fields.Date(
+        string='Data de Vencimento',
+        readonly=True,
+    )
+
     def _select(self):
         return """
             SELECT
@@ -72,12 +77,14 @@ class AllNoteReport(models.Model):
                 fd.amount_total AS x_valor_nota,
                 fd.amount_price_gross AS x_total_bruto,
                 CAST(fd.document_date AS DATE) AS x_data_nota,
-                fd.fiscal_operation_id AS x_operacao_fiscal
+                fd.fiscal_operation_id AS x_operacao_fiscal,
+                am.invoice_date_due AS x_data_vencimento
         """
 
     def _from(self):
         return """
             FROM l10n_br_fiscal_document fd
+            LEFT JOIN account_move am ON am.fiscal_document_id = fd.id
         """
 
     def _where(self):
@@ -95,7 +102,8 @@ class AllNoteReport(models.Model):
                 fd.state_edoc,
                 fd.amount_total,
                 fd.amount_price_gross,
-                fd.fiscal_operation_id
+                fd.fiscal_operation_id,
+                am.invoice_date_due
         """
 
     def init(self):

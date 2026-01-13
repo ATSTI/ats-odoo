@@ -10,7 +10,7 @@
                     type="object"
                     string="Atribuir Equipamentos"
                     class="oe_highlight"
-                    attrs="{'invisible': [('tipo_evento', '!=', 'owd')]}"
+                    confirm ="Isso ira atribuir os equipamentos aos participantes e marca-los como USADOS no estoque. Deseja continuar?"
                 />
 
                 <button

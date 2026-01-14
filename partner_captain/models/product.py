@@ -74,3 +74,14 @@ class ProductTemplate(models.Model):
         ],
         string='Tipo de SUIT'
     )
+
+    is_suit = fields.Boolean(compute="_compute_is_suit", store=False)
+
+
+    @api.depends('categ_id')
+    def _compute_is_suit(self):
+        Category = self.env['product.category']
+        suit_category = Category.search([('name', '=', 'SUIT')], limit=1)
+
+        for rec in self:
+            rec.is_suit = bool(suit_category and rec.categ_id == suit_category)

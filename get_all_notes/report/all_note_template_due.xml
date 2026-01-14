@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <template id="report_all_note_template_due">
+    <t t-call="web.basic_layout">
+      <main>
+        <div class="page">
+
+          <h2 style="text-align:center;">Relatório Anual de Notas por Mês (Vencimento)</h2>
+
+          <style>
+            table { border-collapse: collapse; }
+            th, td { border: 1px solid #000; padding: 3px; }
+          </style>
+
+          <!-- ================= AGRUPAMENTO POR MÊS ================= -->
+
+          <t t-set="meses" t-value="{}"/>
+
+          <t t-foreach="docs" t-as="doc">
+            <t t-if="doc.x_data_vencimento">
+
+              <!-- yyyy-mm do vencimento -->
+              <t t-set="mes" t-value="doc.x_data_vencimento.strftime('%Y-%m')"/>
+
+              <!-- cria a chave se não existir -->
+              <t t-if="not meses.get(mes)">
+                <t t-set="dummy" t-value="meses.update({mes: []})"/>
+              </t>
+
+              <!-- adiciona o documento -->
+              <t t-set="dummy" t-value="meses[mes].append(doc)"/>
+
+            </t>
+          </t>
+
+          <!-- meses ordenados -->
+          <t t-set="meses_lista" t-value="sorted(meses.items(), key=lambda x: x[0])"/>
+
+          <!-- total do ano -->
+          <t t-set="total_ano" t-value="sum([d.x_valor_nota or 0 for d in docs])"/>
+
+          <!-- ================= CABEÇALHO ================= -->
+
+          <table width="100%" style="margin-bottom:10px;">
+            <tr>
+              <td>
+                <strong>Produtor:</strong> <t t-esc="docs[0].x_company_id.name"/><br/>
+                <strong>CNPJ:</strong> <t t-esc="docs[0].x_company_id.cnpj_cpf"/>
+              </td>
+              <td align="right">
+                <strong>Total do Ano:</strong>
+                <span t-esc="total_ano"
+                      t-options="{'widget':'monetary','display_currency':docs[0].x_company_id.currency_id}"/>
+              </td>
+            </tr>
+          </table>
+
+          <!-- ================= 2 COLUNAS ================= -->
+
+          <table width="100%">
+            <tr>
+
+              <!-- ===== COLUNA ESQUERDA ===== -->
+              <td width="50%" valign="top">
+
+                <t t-foreach="meses_lista[:6]" t-as="item">
+                  <t t-set="mes" t-value="item[0]"/>
+                  <t t-set="linhas" t-value="item[1]"/>
+
+                  <div style="border:1px solid #000; margin-bottom:8px; padding:5px;">
+
+                    <div style="text-align:center; font-weight:bold;">
+                      <t t-esc="mes"/>
+                    </div>
+
+                    <table width="100%" style="margin-bottom:5px;">
+                      <tr>
+                        <td><strong>Total:</strong> <t t-esc="len(linhas)"/></td>
+                        <td align="right">
+                          <strong>Valor:</strong>
+                          <span t-esc="sum([l.x_valor_nota for l in linhas])"
+                                t-options="{'widget':'monetary','display_currency':linhas[0].x_company_id.currency_id}"/>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <table width="100%">
+                      <tr>
+                        <th>Nota</th>
+                        <th>Valor</th>
+                      </tr>
+                      <t t-foreach="linhas" t-as="l">
+                        <tr>
+                          <td><t t-esc="l.x_numero_nota"/></td>
+                          <td align="right">
+                            <span t-field="l.x_valor_nota"
+                                  t-options="{'widget':'monetary','display_currency':l.x_company_id.currency_id}"/>
+                          </td>
+                        </tr>
+                      </t>
+                    </table>
+
+                  </div>
+                </t>
+
+              </td>
+
+              <!-- ===== COLUNA DIREITA ===== -->
+              <td width="50%" valign="top">
+
+                <t t-foreach="meses_lista[6:12]" t-as="item">
+                  <t t-set="mes" t-value="item[0]"/>
+                  <t t-set="linhas" t-value="item[1]"/>
+
+                  <div style="border:1px solid #000; margin-bottom:8px; padding:5px;">
+
+                    <div style="text-align:center; font-weight:bold;">
+                      <t t-esc="mes"/>
+                    </div>
+
+                    <table width="100%" style="margin-bottom:5px;">
+                      <tr>
+                        <td><strong>Total:</strong> <t t-esc="len(linhas)"/></td>
+                        <td align="right">
+                          <strong>Valor:</strong>
+                          <span t-esc="sum([l.x_valor_nota for l in linhas])"
+                                t-options="{'widget':'monetary','display_currency':linhas[0].x_company_id.currency_id}"/>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <table width="100%">
+                      <tr>
+                        <th>Nota</th>
+                        <th>Valor</th>
+                      </tr>
+                      <t t-foreach="linhas" t-as="l">
+                        <tr>
+                          <td><t t-esc="l.x_numero_nota"/></td>
+                          <td align="right">
+                            <span t-field="l.x_valor_nota"
+                                  t-options="{'widget':'monetary','display_currency':l.x_company_id.currency_id}"/>
+                          </td>
+                        </tr>
+                      </t>
+                    </table>
+
+                  </div>
+                </t>
+
+              </td>
+
+            </tr>
+          </table>
+
+        </div>
+      </main>
+    </t>
+  </template>
+</odoo>

@@ -3,18 +3,6 @@ from odoo import models, fields
 class EventEvent(models.Model):
     _inherit = 'event.event'
 
-    tipo_evento = fields.Selection(
-        [
-            ('owd', 'OWD'),
-            ('profundo', 'PROFUNDO'),
-            ('turismo', 'TURISMO'),
-            ('especialidades', 'ESPECIALIDADES'),
-            ('outro', 'Outro'),
-        ],
-        string="Tipo de Evento",
-        required=True
-    )
-
     def action_call_equipamentos(self):
         for event in self:
             registrations = self.env['event.registration'].search([

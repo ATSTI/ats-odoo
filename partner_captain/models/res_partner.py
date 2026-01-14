@@ -86,9 +86,9 @@ class ResPartner(models.Model):
                 ('selecao', '=', 'bcd'),
                 ('altura', '=', partner.altura),
                 ('peso', '=', partner.peso),
-            ], order='altura desc, peso desc', limit=1)
+            ], limit=1)
 
-            partner.bcd = bcd_rule.tamanho if bcd_rule else None
+            partner.bcd = bcd_rule.tamanho if bcd_rule else False
 
             # ===== SUIT =====
             suit_rule = SizeRule.search([
@@ -96,17 +96,16 @@ class ResPartner(models.Model):
                 ('selecao', '=', 'suit'),
                 ('altura', '=', partner.altura),
                 ('peso', '=', partner.peso),
-            ], order='altura desc, peso desc', limit=1)
+            ], limit=1)
 
-            partner.suit = suit_rule.tamanho if suit_rule else None
+            partner.suit = suit_rule.tamanho if suit_rule else False
+
     @api.onchange('bcd', 'suit')
     def _onchange_normaliza_tamanho(self):
         if self.bcd:
             self.bcd = self.bcd.strip().lower()
         if self.suit:
             self.suit = self.suit.strip().lower()
-
-
 
 
 class PartnerHistorico(models.Model):

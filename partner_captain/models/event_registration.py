@@ -68,6 +68,18 @@ class EventRegistration(models.Model):
         ondelete='set null'
     )
 
+    tipo_evento = fields.Selection(
+        [
+            ('owd', 'OWD'),
+            ('profundo', 'PROFUNDO'),
+            ('turismo', 'TURISMO'),
+            ('especialidades', 'ESPECIALIDADES'),
+            ('outro', 'Outro'),
+        ],
+        string="Tipo de Evento",
+        required=True
+    )
+
     def _assign_equipamentos(self):
         Product = self.env['product.product']
         Category = self.env['product.category']
@@ -81,7 +93,7 @@ class EventRegistration(models.Model):
             if not reg.event_id or not reg.partner_id:
                 continue
             partner = reg.partner_id
-            is_owd = reg.event_id.tipo_evento == 'owd'
+            is_owd = reg.tipo_evento == 'owd'
             equipamentos_proprios = partner.equipamento_ids.filtered(lambda e: not e.is_loan)
             equipamento_bcd = equipamentos_proprios.filtered(lambda e: e.tipo == 'bcd')
             if equipamento_bcd:

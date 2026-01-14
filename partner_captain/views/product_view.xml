@@ -24,7 +24,9 @@
                 <field name="modelo"/>
                 <field name="tamanho_cd"/>
                 <field name="tag_cd"/>
-                <field name="tipo_suit"/>
+                <field name="is_suit" invisible="1"/>
+                <field name="tipo_suit"
+                    attrs="{'invisible': [('is_suit', '=', False)]}"/>
                 <field name="tamanho_etiqueta"/>
                 <field name="usado"/>
             </xpath>

@@ -31,6 +31,7 @@
     ],
     'data': [
         'report/all_note_template.xml',
+        'report/all_note_template_due.xml',
         'report/all_note_report_views.xml',
         'security/ir.model.access.csv',
     ],

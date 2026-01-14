@@ -40,6 +40,13 @@
 
                 </group>
             </xpath>
+
+
+            <xpath expr="//group[@name='Equipamento']" position="after">
+                <group string="Evento" name="tipoevento">
+                      <field name='tipo_evento'/>  
+                </group>
+            </xpath>
         </field>
     </record>
 

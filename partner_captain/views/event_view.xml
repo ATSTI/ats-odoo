@@ -21,10 +21,6 @@
                     confirm="Isso irá remover TODOS os equipamentos atribuídos aos participantes e liberar os produtos. Deseja continuar?"
                 />
             </xpath>
-            <xpath expr="//field[@name='event_type_id']" position="after">
-                <field name="tipo_evento"/>
-            </xpath>
-
         </field>
     </record>
 </odoo>

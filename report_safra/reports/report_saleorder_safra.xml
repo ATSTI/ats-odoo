@@ -35,7 +35,7 @@
                                 </div>
 
                                 <div t-if="doc.date_order and doc.state in ['draft','sent']">
-                                    <strong>Quotation Date:</strong>
+                                    <strong>Data da Cotação:</strong>
                                     <p t-field="doc.date_order" t-options="{'widget': 'date'}"/>
                                 </div>
 
@@ -46,7 +46,7 @@
 
                                 <div>
                                     <strong>Vendedor:</strong>
-                                    <span t-field="doc.user_id.name"/>
+                                    <span t-field="doc.user_id.id"/>
                                 </div>
                             </div>
                         </td>
@@ -65,7 +65,7 @@
                     </div>
 
                     <div t-if="doc.payment_term_id" class="col-auto mw-100 mb-2">
-                        <strong>Payment Terms:</strong>
+                        <strong>Termos de Pagamento:</strong>
                         <p class="m-0" t-field="doc.payment_term_id"/>
                     </div>
 
@@ -76,18 +76,18 @@
                             <tr>
                                 <!-- TODO: remove in master -->
                                 <t t-set="colspan" t-value="5"/>
-                                <th name="th_description" class="text-left">Description</th>
-                                <th name="th_quantity" class="text-right">Quantity</th>
-                                <th name="th_priceunit" class="text-right">Unit Price</th>
+                                <th name="th_description" class="text-left">Descrição</th>
+                                <th name="th_quantity" class="text-right">Quant</th>
+                                <th name="th_priceunit" class="text-right">R$ Unit</th>
                                 <th name="th_discount" t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
                                     <span>Disc.(%)</span>
                                     <!-- TODO: remove in master -->
                                     <t t-set="colspan" t-value="colspan+1"/>
                                 </th>
-                                <th name="th_taxes" class="text-right">Taxes</th>
+                                <!-- <th name="th_taxes" class="text-right">Taxes</th> -->
                                 <th name="th_subtotal" class="text-right">
-                                    <t groups="account.group_show_line_subtotals_tax_excluded">Amount</t>
-                                    <t groups="account.group_show_line_subtotals_tax_included">Total Price</t>
+                                    <t groups="account.group_show_line_subtotals_tax_excluded">Subtotal</t>
+                                    <t groups="account.group_show_line_subtotals_tax_included">Subtotal</t>
                                 </th>
                             </tr>
                         </thead>
@@ -113,9 +113,9 @@
                                         <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
                                             <span t-field="line.discount"/>
                                         </td>
-                                        <td name="td_taxes" class="text-right">
+                                        <!-- <td name="td_taxes" class="text-right">
                                             <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.tax_id))"/>
-                                        </td>
+                                        </td> -->
                                         <td name="td_subtotal" class="text-right o_price_total">
                                             <span t-field="line.price_subtotal" groups="account.group_show_line_subtotals_tax_excluded"/>
                                             <span t-field="line.price_total" groups="account.group_show_line_subtotals_tax_included"/>

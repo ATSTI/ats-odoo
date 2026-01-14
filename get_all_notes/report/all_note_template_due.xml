@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <template id="report_all_note_template_due">
+    <t t-call="web.basic_layout">
+      <main>
+        <div class="page">
+          <h2 style="text-align: center;">Relatório Anual de Notas por Mês (vencimento)</h2>
+          <style>
+            .mes-container {
+              display: flex;
+              flex-wrap: wrap;
+              justify-content: space-between;
+            }
+            .mes-box {
+              width: 48%;
+              border: 1px solid #000;
+              padding: 6px;
+              margin-bottom: 8px;
+              font-size: 12px;
+            }
+            .mes-box h4 {
+              margin: 0 0 4px 0;
+              text-align: center;
+              border-bottom: 1px solid #000;
+              padding-bottom: 2px;
+            }
+            .resumo {
+              margin-bottom: 4px;
+              font-size: 10px;
+            }
+            table.mes-tabela {
+              width: 100%;
+              border-collapse: collapse;
+              font-size: 11px;
+            }
+            table.mes-tabela th,
+            table.mes-tabela td {
+              border: 1px solid #000;
+              padding: 2px 4px;
+            }
+            table.mes-tabela th {
+              text-align: left;
+              background: #f0f0f0;
+            }
+            .text-right {
+              text-align: right;
+            }
+          </style>
+          <t t-set="meses" t-value="{}"/>
+          <t t-foreach="docs" t-as="doc">
+            <t t-set="mes"
+              t-value="doc.x_data_vencimento and doc.x_data_vencimento.strftime('%Y-%m') or 'Sem data'"/>
+            <t t-if="not meses.get(mes)">
+              <t t-set="meses" t-value="dict(meses, **{mes: []})"/>
+            </t>
+            <t t-set="meses" t-value="dict(meses, **{mes: meses[mes] + [doc]})"/>
+          </t>
+
+          <t t-set="meses_lista" t-value="sorted(meses.items(), key=lambda m: m[0])"/>
+          <t t-set="total_ano" t-value="sum([doc.x_valor_nota for doc in docs])"/>
+          <h4>
+            <table style="width:100%; margin-bottom:8px; font-size:12px;">
+              <tr>
+                <td style="text-align:left;">
+                  Produtor: <t t-esc="docs and docs[0].x_company_id.name or ''"/><br/>
+                  CNPJ: <t t-esc="docs and docs[0].x_company_id.cnpj_cpf or ''"/>
+                  <br/><span style="font-size:12px" t-field="docs[0].x_company_id.street_name"/><span style="font-size:12px"> , </span><span style="font-size:12px" t-field="docs[0].x_company_id.street_number"/> <span style="font-size:12px"> - </span><span style="font-size:12px" t-field="docs[0].x_company_id.street2"/><br/><span style="font-size:12px" t-field="docs[0].x_company_id.district"/><span style="font-size:12px"> , CEP: </span><span style="font-size:12px" t-field="docs[0].x_company_id.zip"/><span style="font-size:12px"> - </span><span style="font-size:12px" t-field="docs[0].x_company_id.state_id.code"/>
+                </td>
+                <td colspan="2" style="text-align:right; border-top:1px solid #000; padding-top:4px;">
+                  <strong>Total do Ano:</strong>
+                  <span t-esc="total_ano"
+                        t-options="{'widget': 'monetary', 'display_currency': docs[0].x_company_id.currency_id}"/>
+                </td>
+              </tr>
+            </table>
+          </h4>
+          <table width="100%" style="border-collapse: collapse;">
+            <tr>
+              <td width="48%" valign="top" style="float:left;">
+                <t t-foreach="meses_lista[:6]" t-as="item">
+                  <t t-set="mes" t-value="item[0]"/>
+                  <t t-set="linhas" t-value="item[1]"/>
+                  <div style="border:1px solid #000; padding:4px; margin-bottom:8px;
+                    page-break-inside: avoid; font-size:11px;">
+                    <div style="text-align:center; font-weight:bold; margin-bottom:2px;">
+                      <t t-esc="mes"/>
+                    </div>
+                    <table style="width:100%; border-collapse:collapse; margin-bottom:4px;">
+                      <tr>
+                        <td style="border:1px solid #000; padding:2px;">
+                          <strong>Total:</strong> <t t-esc="len(linhas)"/>
+                        </td>
+                        <td style="border:1px solid #000; padding:2px; text-align:right;">
+                          <strong>Valor:</strong>
+                          <span t-esc="sum([l.x_valor_nota for l in linhas])"
+                                t-options="{'widget': 'monetary', 'display_currency': linhas[0].x_company_id.currency_id}"/>
+                        </td>
+                      </tr>
+                    </table>
+                    <table style="width:100%; border-collapse:collapse;">
+                      <thead>
+                        <tr>
+                          <th style="border:1px solid #000; padding:2px; text-align:left;">Nota</th>
+                          <th style="border:1px solid #000; padding:2px; text-align:right;">Valor</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <t t-foreach="linhas" t-as="l">
+                          <tr>
+                            <td style="border:1px solid #000; padding:2px;">
+                              <t t-esc="l.x_numero_nota"/>
+                            </td>
+                            <td style="border:1px solid #000; padding:2px; text-align:right;">
+                              <span t-field="l.x_valor_nota"
+                                    t-options="{'widget': 'monetary', 'display_currency': l.x_company_id.currency_id}"/>
+                            </td>
+                          </tr>
+                        </t>
+                      </tbody>
+                    </table>
+                  </div>
+                </t>
+              </td>
+            <td width="48%" valign="top" style="float:right;">
+                <t t-foreach="meses_lista[6:12]" t-as="item">
+                  <t t-set="mes" t-value="item[0]"/>
+                  <t t-set="linhas" t-value="item[1]"/>
+
+                  <div style="border:1px solid #000; padding:4px; margin-bottom:8px;
+                    page-break-inside: avoid; font-size:11px;">
+                    <div style="text-align:center; font-weight:bold; margin-bottom:2px;">
+                      <t t-esc="mes"/>
+                    </div>
+                    <table style="width:100%; border-collapse:collapse; margin-bottom:4px;">
+                      <tr>
+                        <td style="border:1px solid #000; padding:2px;">
+                          <strong>Total:</strong> <t t-esc="len(linhas)"/>
+                        </td>
+                        <td style="border:1px solid #000; padding:2px; text-align:right;">
+                          <strong>Valor:</strong>
+                          <span t-esc="sum([l.x_valor_nota for l in linhas])"
+                                t-options="{'widget': 'monetary', 'display_currency': linhas[0].x_company_id.currency_id}"/>
+                        </td>
+                      </tr>
+                    </table>
+                    <table style="width:100%; border-collapse:collapse;">
+                      <thead>
+                        <tr>
+                          <th style="border:1px solid #000; padding:2px; text-align:left;">Nota</th>
+                          <th style="border:1px solid #000; padding:2px; text-align:right;">Valor</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <t t-foreach="linhas" t-as="l">
+                          <tr>
+                            <td style="border:1px solid #000; padding:2px;">
+                              <t t-esc="l.x_numero_nota"/>
+                            </td>
+                            <td style="border:1px solid #000; padding:2px; text-align:right;">
+                              <span t-field="l.x_valor_nota"
+                                    t-options="{'widget': 'monetary', 'display_currency': l.x_company_id.currency_id}"/>
+                            </td>
+                          </tr>
+                        </t>
+                      </tbody>
+                    </table>
+                  </div>
+                </t>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </main>
+    </t>
+  </template>
+</odoo>

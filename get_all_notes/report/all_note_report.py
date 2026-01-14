@@ -54,6 +54,7 @@ class AllNoteReport(models.Model):
         readonly=True,
     )
 
+
     x_operacao_fiscal = fields.Many2one(
         comodel_name='l10n_br_fiscal.operation',
         string='Operação Fiscal',

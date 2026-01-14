@@ -35,6 +35,17 @@
             print_report_name="'Notas Empresas'"
         />
 
+        <report
+            id="action_report_all_note_due"
+            model="all.note.report"
+            string="Relatório Notas Empresas por Vencimento"
+            report_type="qweb-pdf"
+            name="get_all_notes.report_all_note_template_due"
+            file="get_all_notes.report_all_note_template_due"
+            print_report_name="'Notas Empresas por Vencimento'"
+        />
+
+
         <record id="all_note_report_view_tree" model="ir.ui.view">
             <field name="name">all.note.report.tree</field>
             <field name="model">all.note.report</field>

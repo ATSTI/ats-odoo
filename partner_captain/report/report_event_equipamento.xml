@@ -86,7 +86,7 @@
                                             </small>
                                             <small>
                                                 Tag CD:
-                                                <t t-esc="reg.suit_id.product_tmpl_id.tag_cd or '-'"/>
+                                                <t t-esc="reg.bcd_id.product_tmpl_id.tag_cd or '-'"/>
                                             </small>
                                         </div>
                                     </t>
@@ -106,7 +106,7 @@
                                             </small>
                                            <small>
                                             Situação:  
-                                            <t t-esc="(reg.bcd_id.situacao or '').upper()"/>
+                                            <t t-esc="(reg.suit_id.situacao or '').upper()"/>
                                             </small>
                                         </div>
                                     </t>

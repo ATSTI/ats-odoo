@@ -79,8 +79,6 @@ class ResPartner(models.Model):
 
             if partner.genero not in ('masculino', 'feminino'):
                 continue
-
-            # ===== BCD =====
             bcd_rule = SizeRule.search([
                 ('genero', '=', partner.genero),
                 ('selecao', '=', 'bcd'),
@@ -89,8 +87,6 @@ class ResPartner(models.Model):
             ], limit=1)
 
             partner.bcd = bcd_rule.tamanho if bcd_rule else False
-
-            # ===== SUIT =====
             suit_rule = SizeRule.search([
                 ('genero', '=', partner.genero),
                 ('selecao', '=', 'suit'),

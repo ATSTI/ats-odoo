@@ -6,7 +6,6 @@ class CaptainSizeRule(models.Model):
     _description = 'Tabela de Tamanhos'
 
     name = fields.Char(string="Descrição")
-
     genero = fields.Selection(
         [
             ('masculino', 'Masculino'),
@@ -14,7 +13,6 @@ class CaptainSizeRule(models.Model):
         ],
         required=True
     )
-
     selecao = fields.Selection(
         [
             ('suit', 'Suit'),
@@ -22,7 +20,6 @@ class CaptainSizeRule(models.Model):
         ],
         required=True
     )
-
     altura = fields.Float(string="Altura (cm)", required=True)
     peso = fields.Float(string="Peso (kg)", required=True)
 
@@ -41,7 +38,6 @@ class CaptainSizeRule(models.Model):
         required=True
     )
 
-    # Campos que realmente impactam o cálculo
     _CAMPOS_RELEVANTES = {
         'genero',
         'selecao',
@@ -49,11 +45,6 @@ class CaptainSizeRule(models.Model):
         'peso',
         'tamanho',
     }
-
-    # =========================================================
-    # MÉTODOS INTERNOS
-    # =========================================================
-
     def _recalcular_tamanhos_parceiros(self):
         """
         Recalcula os tamanhos de todos os parceiros.
@@ -64,11 +55,6 @@ class CaptainSizeRule(models.Model):
         partners = self.env['res.partner'].search([])
         partners._compute_tamanhos()
         self = self.with_context(captain_recalc_done=True)
-
-    # =========================================================
-    # OVERRIDES ORM
-    # =========================================================
-
     @api.model
     def create(self, vals):
         record = super().create(vals)

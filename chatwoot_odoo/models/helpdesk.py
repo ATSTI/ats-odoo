@@ -1,11 +1,22 @@
 import base64
-from odoo import models, fields, api
+import os
 import requests
 
-BASE_URL = "http://site.atsti.com.br:3000"
+from dotenv import load_dotenv
+from odoo import models, fields
+
+load_dotenv()
+
+BASE_URL = os.getenv("CHATWOOT_BASE_URL")
+API_TOKEN = os.getenv("CHATWOOT_API_TOKEN")
+ACCOUNT_ID = os.getenv("CHATWOOT_ACCOUNT_ID")
+
 HEADERS = {
-    "api_access_token": "Fv9GfZeZSuJgXhkHDeJGxFn6"
+    "api_access_token": API_TOKEN
 }
+
+if not BASE_URL or not API_TOKEN or not ACCOUNT_ID:
+    raise ValueError("Configuração Chatwoot inválida. Verifique o arquivo .env")
 
 class HelpDeskTicket(models.Model):
     _inherit = 'helpdesk.ticket'
@@ -16,24 +27,23 @@ class HelpDeskTicket(models.Model):
     )
 
     def get_conversations_resolved(self):
-        url = f"{BASE_URL}/api/v1/accounts/1/conversations"
+        url = f"{BASE_URL}/api/v1/accounts/{ACCOUNT_ID}/conversations"
         params = {
             "assignee_type": "all",
             "status": "resolved",
             "page": 1,
         }
 
-        response = requests.get(url, headers=HEADERS, params=params)
+        response = requests.get(url, headers=HEADERS, params=params, timeout=30)
         if response.status_code != 200:
             return
+
 
         data = response.json()
         conversations = data.get("data", {}).get("payload", [])
 
         for conv in conversations:
             conversation_id = conv.get("id")
-
-            # Evitar duplicar tickets
             conversa = self.env['helpdesk.ticket'].search(
                 [('chatwoot_conversation_id', '=', f"{conversation_id}2026")],
                 limit=1
@@ -45,8 +55,6 @@ class HelpDeskTicket(models.Model):
             additional = sender.get("additional_attributes", {})
             company = additional.get("company_name")
             contact = company if company else sender.get("name")
-
-            # Encontrar ou criar parceiro
             termos = contact.split()
             prt = self.find_partner_by_terms(termos)
             if not prt:
@@ -57,19 +65,16 @@ class HelpDeskTicket(models.Model):
             if len(prt) > 1:
                 prt = prt[0]
 
-            # Usuário
             assignee = conv.get("meta", {}).get("assignee", {}).get("name", "Unassigned")
             termos = assignee.split()
             user = self.env['res.users'].search([('name', 'ilike', termos[0])], limit=1)
             if not user:
                 user = self.env.ref('base.user_root')
 
-            # Time
             team = conv.get("meta", {}).get("team", {}).get("name", "Suporte")
             team_rec = self.env['helpdesk.ticket.team'].search([('name', 'ilike', team)], limit=1)
             team_id = team_rec.id if team_rec else False
 
-            # Buscar mensagens
             messages_data = self.get_message(conversation_id)
             messages = messages_data.get("payload", [])
 
@@ -77,7 +82,6 @@ class HelpDeskTicket(models.Model):
             attachments_to_create = []
 
             for msg in messages:
-                # Ignorar sistema
                 if msg.get("message_type") == 2:
                     continue
 
@@ -85,7 +89,6 @@ class HelpDeskTicket(models.Model):
                 content = msg.get("content") or ""
                 mensagem += f"\n{sender_name}: {content}\n"
 
-                # Processar anexos
                 for att in msg.get("attachments", []):
                     data_url = att.get("data_url")
                     if not data_url:
@@ -100,7 +103,6 @@ class HelpDeskTicket(models.Model):
                         'res_model': 'helpdesk.ticket',
                     })
 
-            # Criar ticket
             ticket = self.env['helpdesk.ticket'].create({
                 'name': f"Chatwoot - {contact}",
                 'description': mensagem,
@@ -110,7 +112,6 @@ class HelpDeskTicket(models.Model):
                 'team_id': team_id,
             })
 
-            # Criar anexos no Odoo
             for att in attachments_to_create:
                 att['res_id'] = ticket.id
                 self.env['ir.attachment'].create(att)
@@ -125,27 +126,25 @@ class HelpDeskTicket(models.Model):
         print("Arquivo salvo:", filename)
 
     def get_unique_conversation(self, conversation_id):
-        url_conversation = f"{BASE_URL}/api/v1/accounts/1/conversations/{conversation_id}"
+        url_conversation = f"{BASE_URL}/api/v1/accounts/{ACCOUNT_ID}/conversations/{conversation_id}"
         response_conversation = requests.get(url_conversation, headers=HEADERS)
         return response_conversation.json()
 
     def get_message(self, conversation_id):
-        url_message = f"{BASE_URL}/api/v1/accounts/1/conversations/{conversation_id}/messages"
+        url_message = f"{BASE_URL}/api/v1/accounts/{ACCOUNT_ID}/conversations/{conversation_id}/messages"
         response_message = requests.get(url_message, headers=HEADERS)
-        print("MENSAGEM")
         return response_message.json()
+
     
     def find_partner_by_terms(self, termos):
         Partner = self.env["res.partner"]
 
-        # 1️⃣ tenta com todos os termos juntos
         for i in range(len(termos), 0, -1):
             texto = " ".join(termos[:i])
             res = Partner.search([("name", "ilike", texto)])
             if res and len(res) == 1:
                 return res
 
-        # 2️⃣ fallback: qualquer termo (OR)
         domain = []
         for termo in termos:
             if domain:

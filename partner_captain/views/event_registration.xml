@@ -5,39 +5,59 @@
         <field name="model">event.registration</field>
         <field name="inherit_id" ref="event.view_event_registration_form"/>
         <field name="arch" type="xml">
-          
-            <!-- Campos do participante -->
+            <xpath expr="//header" position="inside">
+                <button
+                    name="action_limpar_equipamento"
+                    type="object"
+                    string="Limpar Equipamento"
+                    class="oe_highlight"/>
+            </xpath>
             <xpath expr="//group[@name='attendee']" position="inside">
                 <field name='genero'/>
                 <field name='peso'/>
                 <field name='altura'/>
                 <field name='calcado'/>
             </xpath>
-
-            <!-- Campos de equipamento -->
             <xpath expr="//group[@name='attendee']" position="after">
                 <group string="Equipamento" name="Equipamento">
-
                     <field name="bcd_id"
                         domain="[('categ_id.name','=','BCD')]"
-                        context="{'form_view_ref': 'product.product_template_event_form_view'}"/>
+                        context="{'form_view_ref': 'product.product_template_event_form_view'}"
+                        attrs="{'invisible': [('bcd_info','!=',False)]}"/>
+
+                    <field name="bcd_info"
+                        attrs="{'invisible': [('bcd_info','=',False)]}"
+                        readonly="1"/>
 
                     <field name="suit_id"
                         domain="[('categ_id.name','=','Suit')]"
-                        context="{'form_view_ref': 'product.product_template_event_form_view'}"/>
+                        context="{'form_view_ref': 'product.product_template_event_form_view'}"
+                        attrs="{'invisible': [('suit_info','!=',False)]}"/>
+
+                    <field name="suit_info"
+                        attrs="{'invisible': [('suit_info','=',False)]}"
+                        readonly="1"/>
 
                     <field name="nadadeira_id"
                         domain="[('categ_id.name','=','Nadadeira')]"
                         context="{'form_view_ref': 'product.product_template_event_form_view'}"/>
-
                     <field name="reg_id"
                         domain="[('categ_id.name','=','REG')]"
-                        context="{'form_view_ref': 'product.product_template_event_form_view'}"/>
+                        context="{'form_view_ref': 'product.product_template_event_form_view'}"
+                        attrs="{'invisible': [('reg_info','!=',False)]}"/>
+
+                    <field name="reg_info"
+                        attrs="{'invisible': [('reg_info','=',False)]}"
+                        readonly="1"/>
 
                     <field name="bag_id"
                         domain="[('categ_id.name','=','BAG')]"
-                        context="{'form_view_ref': 'product.product_template_event_form_view'}"/>
+                        context="{'form_view_ref': 'product.product_template_event_form_view'}"
+                        attrs="{'invisible': [('bag_info','!=',False)]}"/>
 
+                    <field name="bag_info"
+                        attrs="{'invisible': [('bag_info','=',False)]}"
+                        readonly="1"/>
                 </group>
             </xpath>
 
@@ -49,8 +69,6 @@
             </xpath>
         </field>
     </record>
-
-    <!-- Nova view de formulário para product.template com campos extras -->
     <record id="product_template_event_form_view" model="ir.ui.view">
         <field name="name">product.template.event.form</field>
         <field name="model">product.product</field>
@@ -60,10 +78,11 @@
                 <group string="Dados produto">
                     <field name="situacao"/>
                     <field name="tamanho_cd"/>
-                    <field name="tipo_suit"/>
-                    <field name="modelo"/>
-                    <field name="tag_cd"/>
                     <field name="tamanho_etiqueta"/>
+                    <field name="tag_cd"/>
+                    <field name="tipo_suit"/>
+                    <field name="tipo_reg"/>
+                    <field name="modelo"/>
                     <field name="usado"/>
                 </group>
             </xpath>

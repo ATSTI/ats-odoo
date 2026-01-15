@@ -1,0 +1,171 @@
+<odoo>
+    <template id="report_event_equipamentos_interno">
+        <t t-call="web.external_layout">
+            <main class="page">
+                <h2 style="text-align:center; margin-bottom:15px;">
+                    Relatório de Equipamentos –
+                    <span t-esc="docs[0].name"/>
+                </h2>
+
+                <style>
+                    table.equip-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 11px;
+                    }
+                    table.equip-table th {
+                        background-color: #2F4F6F;
+                        color: white;
+                        text-align: center;
+                        padding: 6px;
+                        border: 1px solid #000;
+                    }
+                    table.equip-table td {
+                        padding: 5px;
+                        border: 1px solid #000;
+                        vertical-align: middle;
+                    }
+                    table.equip-table tr:nth-child(even) {
+                        background-color: #F2F2F2;
+                    }
+                    .center {
+                        text-align: center;
+                    }
+                    .equip-box strong {
+                        font-size: 11px;
+                    }
+                    .equip-box small {
+                        font-size: 9px;
+                        display: block;
+                        color: #333;
+                    }
+                    .proprio {
+                        font-weight: bold;
+                        text-transform: uppercase;
+                    }
+                </style>
+
+                <table class="equip-table">
+                    <thead>
+                        <tr>
+                            <th>Participante</th>
+                            <th>Gênero</th>
+                            <th>Peso</th>
+                            <th>Altura</th>
+                            <th>Tipo de evento</th>
+                            <th>BCD</th>
+                            <th>Suit</th>
+                            <th>REG</th>
+                            <th>BAG</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <t t-foreach="docs[0].registration_ids" t-as="reg">
+                            <tr>
+                                <td><strong t-esc="reg.partner_id.name"/></td>
+                                <td class="center"><t t-esc="reg.genero or '-'"/></td>
+                                <td class="center"><t t-esc="reg.peso or '-'"/></td>
+                                <td class="center"><t t-esc="reg.altura or '-'"/></td>
+                                <td class="center"><t t-esc="reg.tipo_evento or '-'"/></td>
+
+                                <!-- BCD -->
+                                <td t-attf-style="background-color:#{reg.bcd_id and docs.color_by_situacao(reg.bcd_id) or ''}">
+                                    <t t-if="reg.bcd_info">
+                                        <span class="proprio">Equipamento próprio</span>
+                                    </t>
+                                    <t t-elif="reg.bcd_id">
+                                        <div class="equip-box">
+                                            <strong t-esc="reg.bcd_id.display_name"/>
+                                            <small>
+                                                Situação:
+                                                <t t-esc="(reg.bcd_id.situacao or '').upper()"/>
+                                            </small>
+                                            <small>
+                                                Tag CD:
+                                                <t t-esc="reg.bcd_id.product_tmpl_id.tag_cd or '-'"/>
+                                            </small>
+                                        </div>
+                                    </t>
+                                    <t t-else="">-</t>
+                                </td>
+
+                                <!-- SUIT -->
+                                <td t-attf-style="background-color:#{reg.suit_id and docs.color_by_situacao(reg.suit_id) or ''}">
+                                    <t t-if="reg.suit_info">
+                                        <span class="proprio">Equipamento próprio</span>
+                                    </t>
+                                    <t t-elif="reg.suit_id">
+                                        <div class="equip-box">
+                                            <strong t-esc="reg.suit_id.display_name"/>
+                                            <small>
+                                                Tipo:
+                                                <t t-esc="reg.suit_id.product_tmpl_id.tipo_suit or '-'"/>
+                                            </small>
+                                            <small>
+                                                Situação:
+                                                <t t-esc="(reg.suit_id.situacao or '').upper()"/>
+                                            </small>
+                                            <small>
+                                                Tag CD:
+                                                <t t-esc="reg.suit_id.product_tmpl_id.tag_cd or '-'"/>
+                                            </small>
+                                        </div>
+                                    </t>
+                                    <t t-else="">-</t>
+                                </td>
+
+                                <!-- REG -->
+                                <td t-attf-style="background-color:#{reg.reg_id and docs.color_by_situacao(reg.reg_id) or ''}">
+                                    <t t-if="reg.reg_info">
+                                        <span class="proprio">Equipamento próprio</span>
+                                    </t>
+                                    <t t-elif="reg.reg_id">
+                                        <div class="equip-box">
+                                            <strong t-esc="reg.reg_id.display_name"/>
+                                            <small>
+                                                Tipo:
+                                                <t t-esc="(reg.reg_id.product_tmpl_id.tipo_reg or '-').upper()"/>
+                                            </small>
+                                            <small>
+                                                Situação:
+                                                <t t-esc="(reg.reg_id.situacao or '').upper()"/>
+                                            </small>
+                                            <small>
+                                                Tag CD:
+                                                <t t-esc="(reg.reg_id.product_tmpl_id.tag_cd or '-').upper()"/>
+                                            </small>
+                                        </div>
+                                    </t>
+                                    <t t-else="">-</t>
+                                </td>
+
+                                <!-- BAG -->
+                                <td t-attf-style="background-color:#{reg.bag_id and docs.color_by_situacao(reg.bag_id) or ''}">
+                                    <t t-if="reg.bag_info">
+                                        <span class="proprio">Equipamento próprio</span>
+                                    </t>
+                                    <t t-elif="reg.bag_id">
+                                        <div class="equip-box">
+                                            <strong t-esc="reg.bag_id.display_name"/>
+                                            <small>
+                                                Situação:
+                                                <t t-esc="(reg.bag_id.situacao or '').upper()"/>
+                                            </small>
+                                            <small>
+                                                Tag CD:
+                                                <t t-esc="(reg.bag_id.product_tmpl_id.tag_cd or '-').upper()"/>
+                                            </small>
+                                        </div>
+                                    </t>
+                                    <t t-else="">-</t>
+                                </td>
+
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </main>
+        </t>
+    </template>
+</odoo>

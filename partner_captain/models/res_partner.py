@@ -50,6 +50,11 @@ class ResPartner(models.Model):
     bag = fields.Text(string="BAG", store=True)
     reg = fields.Text(string="REG", store=True)
 
+    equipamento_movimento_ids = fields.One2many(
+        'partner.equipamento.movimento',
+        'partner_id',
+        string='Movimentações de Equipamentos'
+    )
 
     # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
 
@@ -86,7 +91,7 @@ class ResPartner(models.Model):
                 ('peso', '=', partner.peso),
             ], limit=1)
 
-            partner.bcd = bcd_rule.tamanho if bcd_rule else False
+            partner.bcd = bcd_rule.tamanho.upper() if bcd_rule else False
             suit_rule = SizeRule.search([
                 ('genero', '=', partner.genero),
                 ('selecao', '=', 'suit'),
@@ -94,7 +99,7 @@ class ResPartner(models.Model):
                 ('peso', '=', partner.peso),
             ], limit=1)
 
-            partner.suit = suit_rule.tamanho if suit_rule else False
+            partner.suit = suit_rule.tamanho.upper() if suit_rule else False
 
     @api.onchange('bcd', 'suit')
     def _onchange_normaliza_tamanho(self):

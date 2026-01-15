@@ -1,4 +1,5 @@
 from odoo import fields, models, api
+from datetime import datetime
 
 class PartnerEquipamento(models.Model):
     _name = 'partner.equipamento'
@@ -10,94 +11,65 @@ class PartnerEquipamento(models.Model):
         required=True,
         ondelete='cascade'
     )
-    product_id = fields.Many2one(
-    'product.product',
-    string='Equipamento',
-    required=True,
-    domain="[('usado','=',False)]"
-)
-    estado = fields.Selection([
-        ('otima', 'Ótima'),
-        ('bom', 'Bom'),
-        ('medio', 'Médio'),
-        ('ruim', 'Ruim'),
-        ('pessimo', 'Péssimo'),
-    ], string='Estado', compute ='_compute_estado')
 
-    is_loan = fields.Boolean(string='Emprestado')
-    data_entrada = fields.Date(string='Data de Entrada')
-    data_saida = fields.Date(string='Data de Saída')
-    motivo = fields.Char(string='Motivo')
-
-    tipo = fields.Selection(
-    [
+    tipo = fields.Selection([
         ('bcd', 'BCD'),
         ('suit', 'SUIT'),
-    ],
-    string='Tipo',
-    compute='_compute_tipo',
-    store=True
-)
-    obs = fields.Text(string='Observações')
-    @api.model
-    def create(self, vals):
-        record = super().create(vals)
-        if record.product_id:
-            record.product_id.usado = True
-        return record
-    def write(self, vals):
+        ('reg', 'REG'),
+        ('bag', 'BAG'),
+    ], string='Tipo de equipamento', required=True)
+
+    obs = fields.Char(string='Observação')
+
+    # 🔥 NOVOS CAMPOS
+    dias_na_captain = fields.Integer(
+        compute='_compute_status_captain',
+        store=True
+    )
+
+    em_atraso = fields.Boolean(
+        compute='_compute_status_captain',
+        store=True
+    )
+
+    ultimo_movimento = fields.Selection(
+        [('entrada', 'Entrada'), ('saida', 'Saída')],
+        compute='_compute_status_captain',
+        store=True
+    )
+
+    def name_get(self):
+        result = []
+        tipo_dict = dict(self._fields['tipo'].selection)
+
         for rec in self:
-            old_product = rec.product_id
-            res = super().write(vals)
-            new_product = rec.product_id
-            if 'product_id' in vals:
-                if old_product and old_product != new_product:
-                    old_product.usado = False
+            tipo_label = tipo_dict.get(rec.tipo, '').upper()
+            motivo = rec.obs or 'SEM OBSERVAÇÃO'
+            nome = f'{motivo} - {tipo_label}'
+            result.append((rec.id, nome))
 
-                if new_product:
-                    new_product.usado = True
-            return res
-    def unlink(self):
-        for rec in self:
-            if rec.product_id:
-                rec.product_id.usado = False
+        return result
 
-        return super().unlink()
+    @api.depends('partner_id')
+    def _compute_status_captain(self):
+        Movimento = self.env['partner.equipamento.movimento']
 
-    @api.depends('product_id', 'product_id.categ_id')
-    def _compute_tipo(self):
-        for rec in self:
-            rec.tipo = False
+        for eq in self:
+            ultimo = Movimento.search(
+                [('equipamento_id', '=', eq.id)],
+                order='data_movimento desc',
+                limit=1
+            )
 
-            if not rec.product_id or not rec.product_id.categ_id:
-                continue
+            eq.dias_na_captain = 0
+            eq.em_atraso = False
+            eq.ultimo_movimento = False
 
-            categ_name = rec.product_id.categ_id.name.upper()
+            if ultimo:
+                eq.ultimo_movimento = ultimo.movimento
 
-            if categ_name == 'BCD':
-                rec.tipo = 'bcd'
-            elif categ_name == 'SUIT':
-                rec.tipo = 'suit'
-
-    
-    @api.depends('product_id','product_id.situacao')
-    def _compute_estado(self):
-        for rec in self:
-            rec.estado = False
-            if not rec.product_id or not rec.product_id.situacao:
-                continue
-            categ_name = rec.product_id.situacao.upper()
-
-            if categ_name =='OTIMA':
-                rec.estado = 'otima'
-            elif categ_name =='BOM':
-                rec.estado ='bom'
-            elif categ_name =='MEDIO':
-                rec.estado ='medio'
-            elif categ_name =='RUIM':
-                rec.estado ='ruim'
-            elif categ_name =='PESSIMO':
-                rec.estado ='pessimo'
-
-
-
+                if ultimo.movimento == 'entrada':
+                    delta = datetime.now() - ultimo.data_movimento
+                    dias = delta.days
+                    eq.dias_na_captain = dias
+                    eq.em_atraso = dias >= 7

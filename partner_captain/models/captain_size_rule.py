@@ -1,5 +1,5 @@
 from odoo import models, fields, api
-
+from odoo.exceptions import ValidationError
 
 class CaptainSizeRule(models.Model):
     _name = 'captain.size.rule'
@@ -45,6 +45,24 @@ class CaptainSizeRule(models.Model):
         'peso',
         'tamanho',
     }
+
+    @api.constrains('genero', 'selecao', 'altura', 'peso', 'tamanho')
+    def _check_tamanho_duplicado(self):
+        for rec in self:
+            domain = [
+                ('id', '!=', rec.id),
+                ('genero', '=', rec.genero),
+                ('selecao', '=', rec.selecao),
+                ('altura', '=', rec.altura),
+                ('peso', '=', rec.peso),
+                ('tamanho', '=', rec.tamanho),
+            ]
+
+            if self.search_count(domain) > 0:
+                raise ValidationError(
+                    "Tamanho já cadastrado para essa configuração "
+                    "(Gênero, Seleção, Altura, Peso e Tamanho)."
+                )
     def _recalcular_tamanhos_parceiros(self):
         """
         Recalcula os tamanhos de todos os parceiros.

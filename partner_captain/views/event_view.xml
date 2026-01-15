@@ -14,6 +14,14 @@
                 />
 
                 <button
+    name="action_export_equipamentos_excel"
+    type="object"
+    string="Exportar Equipamentos (Excel)"
+    class="btn-primary"
+/>
+
+
+                <button
                     name="action_limpar_equipamentos"
                     type="object"
                     string="Limpar Equipamentos"

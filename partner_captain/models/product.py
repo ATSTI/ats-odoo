@@ -78,6 +78,19 @@ class ProductTemplate(models.Model):
     is_suit = fields.Boolean(compute="_compute_is_suit", store=False)
 
 
+    tipo_reg = fields.Selection(
+        [
+            ('balanceado', 'BALANCEADO'),
+            ('console_duplo', 'CONSOLE DUPLO'),
+        ],
+        string='Tipo de REG'
+    )
+
+    is_reg = fields.Boolean(compute="_compute_is_reg", store=False)
+
+
+
+
     @api.depends('categ_id')
     def _compute_is_suit(self):
         Category = self.env['product.category']
@@ -85,3 +98,11 @@ class ProductTemplate(models.Model):
 
         for rec in self:
             rec.is_suit = bool(suit_category and rec.categ_id == suit_category)
+
+    
+    @api.depends('categ_id')
+    def _compute_is_reg(self):
+        Category = self.env['product.category']
+        reg_category = Category.search([('name', '=', 'Reguladores')], limit=1)
+        for rec in self:
+            rec.is_reg = bool(reg_category and rec.categ_id == reg_category)

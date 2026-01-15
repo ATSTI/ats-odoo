@@ -63,21 +63,30 @@
                     <group attrs="{'invisible': [('tem_equipamento', '=', False)]}">
                         <field name="equipamento_ids" mode="tree">
                             <tree editable="bottom">
-                                <field name="product_id"/>
-                                <field name="estado"/>
-                                <field name="is_loan"/>
                                 <field name="tipo"/>
-                                <field name="data_entrada"/>
-                                <field name="data_saida"/>
+                                <field name="obs"/>
                             </tree>
                         </field>
                     </group>
 
                 </page>
-            </xpath>
 
+                <page string="Movimentações de Equipamentos">
+                    <field name="equipamento_movimento_ids" nolabel="1">
+                        <tree>
+                            <field name="data_movimento"/>
+                            <field name="tipo"/>
+                            <field name="movimento"/>
+                            <field name="motivo"/>
+                            <field name="user_id"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
         </field>
     </record>
+
+    
 
         
         <!--  Partners Historico form -->

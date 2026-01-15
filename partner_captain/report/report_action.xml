@@ -1,10 +1,20 @@
 <odoo>
     <record id="action_event_equipamentos_report" model="ir.actions.report">
-        <field name="name">Relatório de Equipamentos do Evento</field>
+        <field name="name">Relatório de Equipamentos do Evento Interno</field>
         <field name="model">event.event</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">partner_captain.report_event_equipamentos</field>
-        <field name="report_file">partner_captain.report_event_equipamentos</field>
+        <field name="report_name">partner_captain.report_event_equipamentos_interno</field>
+        <field name="report_file">partner_captain.report_event_equipamentos_interno</field>
+        <field name="binding_model_id" ref="event.model_event_event"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <record id="action_event_equipamentos_reports" model="ir.actions.report">
+        <field name="name">Relatório de Equipamentos do Evento Externo</field>
+        <field name="model">event.event</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">partner_captain.report_event_equipamentos_externo</field>
+        <field name="report_file">partner_captain.report_event_equipamentos_externo</field>
         <field name="binding_model_id" ref="event.model_event_event"/>
         <field name="binding_type">report</field>
     </record>

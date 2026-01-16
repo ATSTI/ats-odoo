@@ -31,7 +31,7 @@ class EventEvent(models.Model):
         }.get(product.situacao, '#ffffff')
     
     def action_export_equipamentos_excel(self):
-
+    
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         worksheet = workbook.add_worksheet('EQUIPAMENTOS')
@@ -50,7 +50,7 @@ class EventEvent(models.Model):
 
         headers = [
             'PARTICIPANTE', 'GENERO', 'PESO', 'ALTURA',
-            'EVENTO',
+            'EVENTO', 'NADADEIRA',  # ✅ NOVA COLUNA
 
             'BCD', 'TAG BCD',
 
@@ -74,76 +74,75 @@ class EventEvent(models.Model):
                 worksheet.write(row, 2, reg.peso or '-', cell_format)
                 worksheet.write(row, 3, reg.altura or '-', cell_format)
                 worksheet.write(row, 4, (reg.tipo_evento or '-').upper(), cell_format)
-
+                worksheet.write(row, 5, (reg.nadadeira or '-').upper(), cell_format)
                 if reg.bcd_info:
-                    worksheet.write(row, 5, 'EQUIPAMENTO PRÓPRIO', cell_format)
-                    worksheet.write(row, 6, '-', cell_format)
+                    worksheet.write(row, 6, 'EQUIPAMENTO PRÓPRIO', cell_format)
+                    worksheet.write(row, 7, '-', cell_format)
                 elif reg.bcd_id:
-                    worksheet.write(row, 5, reg.bcd_id.display_name.upper(), cell_format)
+                    worksheet.write(row, 6, reg.bcd_id.display_name.upper(), cell_format)
                     worksheet.write(
-                        row, 6,
+                        row, 7,
                         (reg.bcd_id.product_tmpl_id.tag_cd or '-').upper(),
                         cell_format
                     )
                 else:
-                    worksheet.write(row, 5, '-', cell_format)
                     worksheet.write(row, 6, '-', cell_format)
+                    worksheet.write(row, 7, '-', cell_format)
+
                 if reg.suit_info:
-                    worksheet.write(row, 7, 'EQUIPAMENTO PRÓPRIO', cell_format)
-                    worksheet.write(row, 8, '-', cell_format)
+                    worksheet.write(row, 8, 'EQUIPAMENTO PRÓPRIO', cell_format)
                     worksheet.write(row, 9, '-', cell_format)
+                    worksheet.write(row, 10, '-', cell_format)
                 elif reg.suit_id:
-                    worksheet.write(row, 7, reg.suit_id.display_name.upper(), cell_format)
+                    worksheet.write(row, 8, reg.suit_id.display_name.upper(), cell_format)
                     worksheet.write(
-                        row, 8,
+                        row, 9,
                         (reg.suit_id.product_tmpl_id.tipo_suit or '-').upper(),
                         cell_format
                     )
                     worksheet.write(
-                        row, 9,
+                        row, 10,
                         (reg.suit_id.product_tmpl_id.tag_cd or '-').upper(),
                         cell_format
                     )
                 else:
-                    worksheet.write(row, 7, '-', cell_format)
                     worksheet.write(row, 8, '-', cell_format)
                     worksheet.write(row, 9, '-', cell_format)
+                    worksheet.write(row, 10, '-', cell_format)
                 if reg.reg_info:
-                    worksheet.write(row,10, 'EQUIPAMENTO PRÓPRIO', cell_format)
-                    worksheet.write(row,11, '-', cell_format)
-                    worksheet.write(row,12, '-', cell_format)
+                    worksheet.write(row, 11, 'EQUIPAMENTO PRÓPRIO', cell_format)
+                    worksheet.write(row, 12, '-', cell_format)
+                    worksheet.write(row, 13, '-', cell_format)
                 elif reg.reg_id:
-                    worksheet.write(row,10, reg.reg_id.display_name.upper(), cell_format)
+                    worksheet.write(row, 11, reg.reg_id.display_name.upper(), cell_format)
                     worksheet.write(
-                        row,11,
+                        row, 12,
                         (reg.reg_id.product_tmpl_id.tipo_reg or '-').upper(),
                         cell_format
                     )
                     worksheet.write(
-                        row,12,
+                        row, 13,
                         (reg.reg_id.product_tmpl_id.tag_cd or '-').upper(),
                         cell_format
                     )
                 else:
-                    worksheet.write(row,10, '-', cell_format)
-                    worksheet.write(row,11, '-', cell_format)
-                    worksheet.write(row,12, '-', cell_format)
+                    worksheet.write(row, 11, '-', cell_format)
+                    worksheet.write(row, 12, '-', cell_format)
+                    worksheet.write(row, 13, '-', cell_format)
                 if reg.bag_info:
-                    worksheet.write(row,13, 'EQUIPAMENTO PRÓPRIO', cell_format)
-                    worksheet.write(row,14, '-', cell_format)
+                    worksheet.write(row, 14, 'EQUIPAMENTO PRÓPRIO', cell_format)
+                    worksheet.write(row, 15, '-', cell_format)
                 elif reg.bag_id:
-                    worksheet.write(row,13, reg.bag_id.display_name.upper(), cell_format)
+                    worksheet.write(row, 14, reg.bag_id.display_name.upper(), cell_format)
                     worksheet.write(
-                        row,14,
+                        row, 15,
                         (reg.bag_id.product_tmpl_id.tag_cd or '-').upper(),
                         cell_format
                     )
                 else:
-                    worksheet.write(row,13, '-', cell_format)
-                    worksheet.write(row,14, '-', cell_format)
-
+                    worksheet.write(row, 14, '-', cell_format)
+                    worksheet.write(row, 15, '-', cell_format)
                 row += 1
-
         workbook.close()
         output.seek(0)
 

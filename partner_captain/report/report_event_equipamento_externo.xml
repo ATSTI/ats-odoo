@@ -53,13 +53,13 @@
                             <th>Peso</th>
                             <th>Altura</th>
                             <th>Evento</th>
+                            <th>Nadadeira</th>
                             <th>BCD</th>
                             <th>Suit</th>
                             <th>Regulador</th>
                             <th>Bag</th>
                         </tr>
                     </thead>
-
                     <tbody>
                         <t t-foreach="docs[0].registration_ids" t-as="reg">
                             <tr>
@@ -82,8 +82,9 @@
                                 <td class="center">
                                     <t t-esc="(reg.tipo_evento or '-').upper()"/>
                                 </td>
-
-                                <!-- BCD -->
+                                <td class="center">
+                                    <t t-esc="reg.nadadeira or '-'"/>
+                                </td>
                                 <td class="center">
                                     <t t-if="reg.bcd_info">
                                         <span class="proprio">EQUIPAMENTO PRÓPRIO</span>
@@ -97,8 +98,6 @@
                                     </t>
                                     <t t-else="">-</t>
                                 </td>
-
-                                <!-- SUIT -->
                                 <td class="center">
                                     <t t-if="reg.suit_info">
                                         <span class="proprio">EQUIPAMENTO PRÓPRIO</span>
@@ -112,8 +111,6 @@
                                     </t>
                                     <t t-else="">-</t>
                                 </td>
-
-                                <!-- REG -->
                                 <td class="center">
                                     <t t-if="reg.reg_info">
                                         <span class="proprio">EQUIPAMENTO PRÓPRIO</span>
@@ -127,8 +124,6 @@
                                     </t>
                                     <t t-else="">-</t>
                                 </td>
-
-                                <!-- BAG -->
                                 <td class="center">
                                     <t t-if="reg.bag_info">
                                         <span class="proprio">EQUIPAMENTO PRÓPRIO</span>
@@ -142,7 +137,6 @@
                                     </t>
                                     <t t-else="">-</t>
                                 </td>
-
                             </tr>
                         </t>
                     </tbody>

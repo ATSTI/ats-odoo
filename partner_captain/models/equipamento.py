@@ -11,7 +11,11 @@ class PartnerEquipamento(models.Model):
         required=True,
         ondelete='cascade'
     )
-
+    movimento_ids = fields.One2many(
+    'partner.equipamento.movimento',
+    'equipamento_id',
+    string='Movimentações'
+)
     tipo = fields.Selection([
         ('bcd', 'BCD'),
         ('suit', 'SUIT'),
@@ -20,24 +24,19 @@ class PartnerEquipamento(models.Model):
     ], string='Tipo de equipamento', required=True)
 
     obs = fields.Char(string='Observação')
-
-    # 🔥 NOVOS CAMPOS
     dias_na_captain = fields.Integer(
         compute='_compute_status_captain',
         store=True
     )
-
     em_atraso = fields.Boolean(
         compute='_compute_status_captain',
         store=True
     )
-
     ultimo_movimento = fields.Selection(
         [('entrada', 'Entrada'), ('saida', 'Saída')],
         compute='_compute_status_captain',
         store=True
     )
-
     def name_get(self):
         result = []
         tipo_dict = dict(self._fields['tipo'].selection)
@@ -50,26 +49,25 @@ class PartnerEquipamento(models.Model):
 
         return result
 
-    @api.depends('partner_id')
+    @api.depends('movimento_ids.data_movimento', 'movimento_ids.movimento')
     def _compute_status_captain(self):
-        Movimento = self.env['partner.equipamento.movimento']
-
         for eq in self:
-            ultimo = Movimento.search(
-                [('equipamento_id', '=', eq.id)],
-                order='data_movimento desc',
-                limit=1
-            )
-
             eq.dias_na_captain = 0
             eq.em_atraso = False
             eq.ultimo_movimento = False
 
-            if ultimo:
-                eq.ultimo_movimento = ultimo.movimento
+            if not eq.movimento_ids:
+                continue
 
-                if ultimo.movimento == 'entrada':
-                    delta = datetime.now() - ultimo.data_movimento
-                    dias = delta.days
-                    eq.dias_na_captain = dias
-                    eq.em_atraso = dias >= 7
+            ultimo = eq.movimento_ids.sorted(
+                key=lambda m: m.data_movimento or fields.Datetime.now(),
+                reverse=True
+            )[0]
+
+            eq.ultimo_movimento = ultimo.movimento
+
+            if ultimo.movimento == 'entrada':
+                delta = fields.Datetime.now() - ultimo.data_movimento
+                dias = delta.days
+                eq.dias_na_captain = dias
+                eq.em_atraso = dias >= 7

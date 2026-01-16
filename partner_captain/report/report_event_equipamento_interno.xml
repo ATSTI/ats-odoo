@@ -53,6 +53,7 @@
                             <th>Peso</th>
                             <th>Altura</th>
                             <th>Tipo de evento</th>
+                            <th>Nadadeira</th> <!-- NOVA COLUNA -->
                             <th>BCD</th>
                             <th>Suit</th>
                             <th>REG</th>
@@ -68,6 +69,11 @@
                                 <td class="center"><t t-esc="reg.peso or '-'"/></td>
                                 <td class="center"><t t-esc="reg.altura or '-'"/></td>
                                 <td class="center"><t t-esc="reg.tipo_evento or '-'"/></td>
+
+                                <!-- Nadadeira -->
+                                <td class="center">
+                                    <t t-esc="reg.nadadeira or '-'"/>
+                                </td>
 
                                 <!-- BCD -->
                                 <td t-attf-style="background-color:#{reg.bcd_id and docs.color_by_situacao(reg.bcd_id) or ''}">

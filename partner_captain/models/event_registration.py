@@ -37,38 +37,27 @@ class EventRegistration(models.Model):
         store=True,
         readonly=True
     )
-
-
-    nadadeira_id = fields.Many2one(
-        'product.product',
-        string="Nadadeira",
-        ondelete='set null'
-    )
-
+    nadadeira = fields.Text(string='Nadadeira', related ='partner_id.nadadeira')
     bcd_id = fields.Many2one(
         'product.product',
         string="BCD",
         ondelete='set null'
     )
-
     suit_id = fields.Many2one(
         'product.product',
         string="Suit",
         ondelete='set null'
     )
-
     bag_id = fields.Many2one(
         'product.product',
         string="BAG",
         ondelete='set null'
     )
-
     reg_id = fields.Many2one(
         'product.product',
         string="REG",
         ondelete='set null'
     )
-
     tipo_evento = fields.Selection(
         [
             ('owd', 'OWD'),
@@ -268,7 +257,7 @@ class EventRegistration(models.Model):
 
                 if not equipamento_proprio:
                     reg.bcd_id.usado = False
-                # reg.bcd_id = False
+                reg.bcd_id = False
             if reg.suit_id:
                 equipamento_proprio = PartnerEquip.search([
                     ('partner_id', '=', partner.id),
@@ -277,7 +266,7 @@ class EventRegistration(models.Model):
 
                 if not equipamento_proprio:
                     reg.suit_id.usado = False
-                # reg.suit_id = False
+                reg.suit_id = False
             if reg.reg_id:
                 equipamento_proprio = PartnerEquip.search([
                     ('partner_id', '=', partner.id),
@@ -286,7 +275,7 @@ class EventRegistration(models.Model):
 
                 if not equipamento_proprio:
                     reg.reg_id.usado = False
-                # reg.reg_id = False
+                reg.reg_id = False
             if reg.bag_id:
                 equipamento_proprio = PartnerEquip.search([
                     ('partner_id', '=', partner.id),
@@ -295,7 +284,7 @@ class EventRegistration(models.Model):
 
                 if not equipamento_proprio:
                     reg.bag_id.usado = False
-                # reg.bag_id = False
+                reg.bag_id = False
         return True
 
 

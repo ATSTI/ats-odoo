@@ -38,9 +38,7 @@
                         attrs="{'invisible': [('suit_info','=',False)]}"
                         readonly="1"/>
 
-                    <field name="nadadeira_id"
-                        domain="[('categ_id.name','=','Nadadeira')]"
-                        context="{'form_view_ref': 'product.product_template_event_form_view'}"/>
+                    <field name="nadadeira"/>
                     <field name="reg_id"
                         domain="[('categ_id.name','=','REG')]"
                         context="{'form_view_ref': 'product.product_template_event_form_view'}"

@@ -110,6 +110,7 @@ class HelpDeskTicket(models.Model):
                 'chatwoot_conversation_id': f"{conversation_id}2026",
                 'team_id': team_id,
                 'channel_id': 5,  # Suporte WhatsApp
+                'stage_id': 4,  # Concluido
             })
             if prt.id == 1:
                 ticket.partner_name = contact + " (COLOCAR PARCEIRO CORRETO)"
@@ -142,10 +143,20 @@ class HelpDeskTicket(models.Model):
         Partner = self.env['res.partner']
         prt = Partner.search(['|', ('name', 'ilike', self.remove_acentos(contact)), ('phone_sanitized', 'ilike', phone)], limit=1)
         if not prt:
-            prt = Partner.search(['|', ('name', 'ilike', contact), ('phone_sanitized', 'ilike', phone)], limit=1)
+            prt = Partner.search([('name', 'ilike', contact)], limit=1)
         if not prt:
-            contact = contact[contact.find(" - ") + 1:] if " - " in contact else contact
-            prt = Partner.search(['|', ('name', 'ilike', contact), ('phone_sanitized', 'ilike', phone)], limit=1)
+            contact_p = contact[contact.find(" - ") + 3:] if " - " in contact else contact
+            prt = Partner.search([('name', 'ilike', contact_p)], limit=1)
         if not prt:
+            termos = contact.split()
+            domain = []
+            for termo in termos:
+                if domain:
+                    domain = ["|"] + domain
+                domain.append(("name", "ilike", termo))
+            prt = Partner.search(domain)
+            if prt and len(prt) > 1 and len(prt) <= 3:
+                prt = prt[0]
+        if not prt or len(prt) > 1:
             prt = Partner.browse(1)
         return prt

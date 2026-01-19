@@ -35,6 +35,7 @@ Lista de Equipamentos, Viagens e Cursos do Cliente:
         'report/report_event_equipamento_externo.xml',
         'report/report_event_equipamento_interno.xml',
         'views/partner_equipamento_views.xml',
+        'report/captain_size_rule_html.xml',
         'views/event_registration.xml',
         'views/event_view.xml',
         'views/crm_historico.xml',

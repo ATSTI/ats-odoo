@@ -18,4 +18,6 @@
         <field name="binding_model_id" ref="event.model_event_event"/>
         <field name="binding_type">report</field>
     </record>
+
+
 </odoo>

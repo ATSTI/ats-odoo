@@ -82,6 +82,8 @@ class EventRegistration(models.Model):
         store=False
     )
 
+    obs = fields.Char("Observações")
+
     def _compute_aviso_equipamento(self):
         limite_dias = 7
         agora = fields.Datetime.now()
@@ -173,13 +175,16 @@ class EventRegistration(models.Model):
             equipamentos_proprios = partner.equipamento_ids
             if equipamentos_proprios.filtered(lambda e: e.tipo == 'bcd'):
                 reg.bcd_info = 'Equipamento próprio'
+
             elif partner.bcd and bcd_category:
                 tamanho = partner.bcd.strip().lower()
                 domain = [
                     ('categ_id', '=', bcd_category.id),
                     ('tamanho_cd', '=', tamanho),
                     ('usado', '=', False),
+                    ('situacao', '!=', 'manutencao'),
                 ]
+
                 bcd = False
                 for situacao in prioridade_situacao:
                     bcd = Product.search(domain + [('situacao', '=', situacao)], limit=1)
@@ -191,13 +196,16 @@ class EventRegistration(models.Model):
                     reg.bcd_info = False
             if equipamentos_proprios.filtered(lambda e: e.tipo == 'suit'):
                 reg.suit_info = 'Equipamento próprio'
+
             elif partner.suit and suit_category:
                 tamanho = partner.suit.strip().lower()
                 domain = [
                     ('categ_id', '=', suit_category.id),
                     ('tamanho_cd', '=', tamanho),
                     ('usado', '=', False),
+                    ('situacao', '!=', 'manutencao'),
                 ]
+
                 suit = False
                 for situacao in prioridade_situacao:
                     suit = Product.search(domain + [('situacao', '=', situacao)], limit=1)
@@ -209,20 +217,25 @@ class EventRegistration(models.Model):
                     reg.suit_info = False
             if equipamentos_proprios.filtered(lambda e: e.tipo == 'reg'):
                 reg.reg_info = 'Equipamento próprio'
+
             elif reg_category:
                 domain = [
                     ('categ_id', '=', reg_category.id),
                     ('usado', '=', False),
+                    ('situacao', '!=', 'manutencao'),
                 ]
+
                 if reg.tipo_evento == 'owd':
                     domain.append(('product_tmpl_id.tipo_reg', '=', 'console_duplo'))
                 else:
                     domain.append(('product_tmpl_id.tipo_reg', '=', 'balanceado'))
+
                 regulador = False
                 for situacao in prioridade_situacao:
                     regulador = Product.search(domain + [('situacao', '=', situacao)], limit=1)
                     if regulador:
                         break
+
                 if regulador:
                     reg.reg_id = regulador
                     regulador.usado = True
@@ -233,6 +246,7 @@ class EventRegistration(models.Model):
                 domain = [
                     ('categ_id', '=', bag_category.id),
                     ('usado', '=', False),
+                    ('situacao', '!=', 'manutencao'),
                 ]
                 bag = False
                 for situacao in prioridade_situacao:
@@ -243,6 +257,7 @@ class EventRegistration(models.Model):
                     reg.bag_id = bag
                     bag.usado = True
                     reg.bag_info = False
+
 
 
     def action_limpar_equipamento(self):

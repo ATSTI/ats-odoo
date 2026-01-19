@@ -5,3 +5,4 @@ access_captain_size_rule_admin,captain.size.rule admin,model_captain_size_rule,b
 
 access_partner_equipamento_movimento_user,access_partner_equipamento_movimento_user,model_partner_equipamento_movimento,base.group_user,1,0,0,0
 access_partner_equipamento_movimento_admin,access_partner_equipamento_movimento_admin,model_partner_equipamento_movimento,base.group_system,1,1,1,1
+

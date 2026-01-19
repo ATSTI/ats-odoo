@@ -37,6 +37,7 @@ class ProductTemplate(models.Model):
             ('medio', 'Médio'),
             ('ruim', 'Ruim'),
             ('pessimo', 'Péssimo'),
+            ('manutencao','Manutenção')
         ],
         string="Situação",
         default='bom'

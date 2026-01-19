@@ -65,6 +65,12 @@
                       <field name='tipo_evento'/>  
                 </group>
             </xpath>
+
+            <xpath expr="//group[@name='tipoevento']" position="after">
+                <group string="Observações" name="observacao">
+                      <field name='obs'/>  
+                </group>
+            </xpath>
         </field>
     </record>
     <record id="product_template_event_form_view" model="ir.ui.view">

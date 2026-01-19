@@ -4,22 +4,23 @@
         <field name="model">event.event</field>
         <field name="inherit_id" ref="event.view_event_form"/>
         <field name="arch" type="xml">
+
+            <!-- BOTÕES NO HEADER -->
             <xpath expr="//header" position="inside">
                 <button
                     name="action_call_equipamentos"
                     type="object"
                     string="Atribuir Equipamentos"
                     class="oe_highlight"
-                    confirm ="Isso ira atribuir os equipamentos aos participantes e marca-los como USADOS no estoque. Deseja continuar?"
+                    confirm="Isso irá atribuir os equipamentos aos participantes e marcá-los como USADOS no estoque. Deseja continuar?"
                 />
 
                 <button
-    name="action_export_equipamentos_excel"
-    type="object"
-    string="Exportar Equipamentos (Excel)"
-    class="btn-primary"
-/>
-
+                    name="action_export_equipamentos_excel"
+                    type="object"
+                    string="Exportar Equipamentos (Excel)"
+                    class="btn-primary"
+                />
 
                 <button
                     name="action_limpar_equipamentos"
@@ -28,6 +29,12 @@
                     class="btn-secondary"
                     confirm="Isso irá remover TODOS os equipamentos atribuídos aos participantes e liberar os produtos. Deseja continuar?"
                 />
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="replace">
+                <field name="staff_ids"
+                       widget="many2many_tags"
+                       domain="[('share','=',False)]"
+                       placeholder="Selecione os responsáveis"/>
             </xpath>
         </field>
     </record>

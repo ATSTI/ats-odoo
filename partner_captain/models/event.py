@@ -5,6 +5,13 @@ import base64
 class EventEvent(models.Model):
     _inherit = 'event.event'
 
+    staff_ids = fields.Many2many(
+        'res.users',
+        'event_staff_rel',
+        'event_id',
+        'user_id',
+        string="Staff Responsáveis"
+    )
     def action_call_equipamentos(self):
         for event in self:
             registrations = self.env['event.registration'].search([
@@ -31,7 +38,6 @@ class EventEvent(models.Model):
         }.get(product.situacao, '#ffffff')
     
     def action_export_equipamentos_excel(self):
-    
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         worksheet = workbook.add_worksheet('EQUIPAMENTOS')
@@ -48,9 +54,15 @@ class EventEvent(models.Model):
             'align': 'center',
         })
 
+        text_format = workbook.add_format({
+            'border': 1,
+            'align': 'left',
+            'text_wrap': True,
+        })
+
         headers = [
             'PARTICIPANTE', 'GENERO', 'PESO', 'ALTURA',
-            'EVENTO', 'NADADEIRA',  # ✅ NOVA COLUNA
+            'EVENTO', 'NADADEIRA',
 
             'BCD', 'TAG BCD',
 
@@ -58,12 +70,15 @@ class EventEvent(models.Model):
 
             'REGULADOR', 'TIPO REG', 'TAG REG',
 
-            'BAG', 'TAG BAG'
+            'BAG', 'TAG BAG',
+
+            'OBSERVAÇÃO'
         ]
 
         for col, header in enumerate(headers):
             worksheet.write(0, col, header, header_format)
             worksheet.set_column(col, col, 20)
+        worksheet.set_column(len(headers) - 1, len(headers) - 1, 35)
 
         row = 1
 
@@ -80,31 +95,18 @@ class EventEvent(models.Model):
                     worksheet.write(row, 7, '-', cell_format)
                 elif reg.bcd_id:
                     worksheet.write(row, 6, reg.bcd_id.display_name.upper(), cell_format)
-                    worksheet.write(
-                        row, 7,
-                        (reg.bcd_id.product_tmpl_id.tag_cd or '-').upper(),
-                        cell_format
-                    )
+                    worksheet.write(row, 7, (reg.bcd_id.product_tmpl_id.tag_cd or '-').upper(), cell_format)
                 else:
                     worksheet.write(row, 6, '-', cell_format)
                     worksheet.write(row, 7, '-', cell_format)
-
                 if reg.suit_info:
                     worksheet.write(row, 8, 'EQUIPAMENTO PRÓPRIO', cell_format)
                     worksheet.write(row, 9, '-', cell_format)
                     worksheet.write(row, 10, '-', cell_format)
                 elif reg.suit_id:
                     worksheet.write(row, 8, reg.suit_id.display_name.upper(), cell_format)
-                    worksheet.write(
-                        row, 9,
-                        (reg.suit_id.product_tmpl_id.tipo_suit or '-').upper(),
-                        cell_format
-                    )
-                    worksheet.write(
-                        row, 10,
-                        (reg.suit_id.product_tmpl_id.tag_cd or '-').upper(),
-                        cell_format
-                    )
+                    worksheet.write(row, 9, (reg.suit_id.product_tmpl_id.tipo_suit or '-').upper(), cell_format)
+                    worksheet.write(row, 10, (reg.suit_id.product_tmpl_id.tag_cd or '-').upper(), cell_format)
                 else:
                     worksheet.write(row, 8, '-', cell_format)
                     worksheet.write(row, 9, '-', cell_format)
@@ -115,16 +117,8 @@ class EventEvent(models.Model):
                     worksheet.write(row, 13, '-', cell_format)
                 elif reg.reg_id:
                     worksheet.write(row, 11, reg.reg_id.display_name.upper(), cell_format)
-                    worksheet.write(
-                        row, 12,
-                        (reg.reg_id.product_tmpl_id.tipo_reg or '-').upper(),
-                        cell_format
-                    )
-                    worksheet.write(
-                        row, 13,
-                        (reg.reg_id.product_tmpl_id.tag_cd or '-').upper(),
-                        cell_format
-                    )
+                    worksheet.write(row, 12, (reg.reg_id.product_tmpl_id.tipo_reg or '-').upper(), cell_format)
+                    worksheet.write(row, 13, (reg.reg_id.product_tmpl_id.tag_cd or '-').upper(), cell_format)
                 else:
                     worksheet.write(row, 11, '-', cell_format)
                     worksheet.write(row, 12, '-', cell_format)
@@ -134,15 +128,13 @@ class EventEvent(models.Model):
                     worksheet.write(row, 15, '-', cell_format)
                 elif reg.bag_id:
                     worksheet.write(row, 14, reg.bag_id.display_name.upper(), cell_format)
-                    worksheet.write(
-                        row, 15,
-                        (reg.bag_id.product_tmpl_id.tag_cd or '-').upper(),
-                        cell_format
-                    )
+                    worksheet.write(row, 15, (reg.bag_id.product_tmpl_id.tag_cd or '-').upper(), cell_format)
                 else:
                     worksheet.write(row, 14, '-', cell_format)
                     worksheet.write(row, 15, '-', cell_format)
+                worksheet.write(row, 16, reg.obs or '-', text_format)
                 row += 1
+
         workbook.close()
         output.seek(0)
 
@@ -160,3 +152,4 @@ class EventEvent(models.Model):
             'url': f'/web/content/{attachment.id}?download=true',
             'target': 'self',
         }
+

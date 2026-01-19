@@ -22,7 +22,6 @@ class AccountMove(models.Model):
     # @api.returns('self', lambda value: value.id)
     # def copy(self, default=None):
     #     move = super().copy(default)
-    #     import pudb;pu.db
     #     if move.is_invoice(include_receipts=True):
     #         if move.parcela_ids:
     #             move.action_confirma_parcela()

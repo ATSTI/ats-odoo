@@ -9,7 +9,6 @@ import base64
 class Conexao:
 
     def __init__(self, host, database):
-        #import pudb;pu.db
         self.connection = Database.connect(dsn=host+':' + database, \
             user='sysdba', password='masterkey')
         self.cursor = self.connection.cursor()
@@ -20,7 +19,6 @@ class Conexao:
             self.connection.commit()
             return ''
             #except:
-            ##import pudb;pu.db
             #        except Database.IntegrityError, e:
             #raise utils.IntegrityError, utils.IntegrityError(*tuple(e)+('sql: '+query,)+args), sys.exc_info()[2]
         except Database.DatabaseError, e:

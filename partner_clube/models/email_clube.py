@@ -57,7 +57,6 @@ class EmailClube(models.Model):
         #else:
         dia_vencimento = (datetime.now() + timedelta(dia_vcto)).strftime("%Y-%m-%d")
         #dia_vencimento = '2017-03-06'
-        #import pudb;pu.db
         # 03/05/2018 renata pediu pra tirar o VIP do envio
         base_domain = [
             ('date_due', '=', dia_vencimento), 
@@ -161,7 +160,6 @@ class EmailClube(models.Model):
         #    dia_vencimento = data_vcto[6:10]+'-'+data_vcto[3:5]+'-'+data_vcto[:2]
         #elif dia_vcto == 0 and data_vcto == '01-01-2001':
         # nao pode ser por data pois vai enviar vcto errado se estiver data
-        #import pudb;pu.db
         dia_vencimento = (datetime.now() + timedelta(dia_vcto)).strftime("%Y-%m-%d")
         base_domain = [('date_due', '=', dia_vencimento), ('state','=','open')]
         invoice_ids = invoice_obj.search(base_domain)

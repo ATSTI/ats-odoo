@@ -15,7 +15,6 @@ class PosOrder(models.Model):
     @api.model
     def create(self, values):
         values['amount_return'] = values['amount_total']
-        #import pudb;pu.db
         res = super(PosOrder, self).create(values)
         # atualiza estoque
         for item in res.lines:
@@ -32,7 +31,6 @@ class PosOrder(models.Model):
             codigo = item.product_id.default_code
             estoque_loja = self.estoque_loja(
             item.product_id.item_id, item.product_id.variant_id)
-            #import pudb;pu.db
             if int(estoque) < estoque_loja:
                 self.atualiza_estoque_loja(
                     item.product_id.item_id, 
@@ -55,7 +53,6 @@ class PosOrder(models.Model):
         return url
 
     def verifica_novo_cadastro(self):
-        #import pudb;pu.db
         ultimo_prod = self.env['product.product'].search([
             ('item_id','!=', False),
             ], order='item_id desc', limit=1)
@@ -95,7 +92,6 @@ class PosOrder(models.Model):
 
     def estoque_loja(self, cod_item, cod_variant):
         # consulta estoque Nuvemshop
-        #import pudb;pu.db
         link = '%s%s/variants/%s' %(
                 self.nuvem_url(),
                 str(cod_item),str(cod_variant))
@@ -109,7 +105,6 @@ class PosOrder(models.Model):
 
     def atualiza_estoque_loja(self, id_item, id_variant, estoque):
         # atualiza o estoque na Nuvemshop
-        #import pudb;pu.db
         prod = """{"id": %s, "stock":  %s, "product_id": %s}""" %(
             id_variant, str(int(estoque)), id_item)
         link = '%s%s/variants/%s' %(  
@@ -130,7 +125,6 @@ class PosOrder(models.Model):
         # pega o estoque atual de cada item
         # procura o estoque na nuvemshop
         # se maior q o estoque atual entao tem q diminuir
-        #import pudb;pu.db
         data_ant = '%s-%s-%s 01:00:00' %(
             fields.date.today().year, 
             fields.date.today().month,
@@ -156,7 +150,6 @@ class PosOrder(models.Model):
                  cod_barra = item.product_id.barcode
                  codigo = item.product_id.default_code
                  #estoque_loja = self.estoque_loja(item.product_id.item_id, item.product_id.variant_id)
-                 #import pudb;pu.db
                  #if int(estoque) < estoque_loja:
                  self.atualiza_estoque_loja(item.product_id.item_id, item.product_id.variant_id, estoque)
         return True

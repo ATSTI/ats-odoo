@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-  <template id="report_all_note_template">
+  <template id="report_all_note_template_due">
     <t t-call="web.basic_layout">
       <main>
         <div class="page">
-          <h2 style="text-align: center;">Relatório Anual de Notas por Mês</h2>
-
-          <!-- CSS para tabelas menores com borda -->
+          <h2 style="text-align: center;">Relatório Anual de Notas por Mês (vencimento)</h2>
           <style>
             .mes-container {
               display: flex;
@@ -48,11 +46,10 @@
               text-align: right;
             }
           </style>
-
-          <!-- Agrupa os documentos por mês -->
           <t t-set="meses" t-value="{}"/>
           <t t-foreach="docs" t-as="doc">
-            <t t-set="mes" t-value="doc.x_mes"/>
+            <t t-set="mes"
+              t-value="doc.x_data_vencimento and doc.x_data_vencimento.strftime('%Y-%m') or 'Sem data'"/>
             <t t-if="not meses.get(mes)">
               <t t-set="meses" t-value="dict(meses, **{mes: []})"/>
             </t>
@@ -61,7 +58,6 @@
 
           <t t-set="meses_lista" t-value="sorted(meses.items(), key=lambda m: m[0])"/>
           <t t-set="total_ano" t-value="sum([doc.x_valor_nota for doc in docs])"/>
-
           <h4>
             <table style="width:100%; margin-bottom:8px; font-size:12px;">
               <tr>
@@ -78,26 +74,17 @@
               </tr>
             </table>
           </h4>
-
-          <!-- Tabela de layout em duas colunas -->
           <table width="100%" style="border-collapse: collapse;">
             <tr>
-              <!-- COLUNA ESQUERDA -->
               <td width="48%" valign="top" style="float:left;">
-
                 <t t-foreach="meses_lista[:6]" t-as="item">
                   <t t-set="mes" t-value="item[0]"/>
                   <t t-set="linhas" t-value="item[1]"/>
-
                   <div style="border:1px solid #000; padding:4px; margin-bottom:8px;
                     page-break-inside: avoid; font-size:11px;">
-
-                    <!-- Linha 1: Mês -->
                     <div style="text-align:center; font-weight:bold; margin-bottom:2px;">
                       <t t-esc="mes"/>
                     </div>
-
-                    <!-- Linha 2: Totais (duas colunas) -->
                     <table style="width:100%; border-collapse:collapse; margin-bottom:4px;">
                       <tr>
                         <td style="border:1px solid #000; padding:2px;">
@@ -110,8 +97,6 @@
                         </td>
                       </tr>
                     </table>
-
-                    <!-- Linhas: Nota | Valor -->
                     <table style="width:100%; border-collapse:collapse;">
                       <thead>
                         <tr>
@@ -133,28 +118,19 @@
                         </t>
                       </tbody>
                     </table>
-
                   </div>
-
                 </t>
               </td>
-
-              <!-- COLUNA DIREITA -->
             <td width="48%" valign="top" style="float:right;">
-
                 <t t-foreach="meses_lista[6:12]" t-as="item">
                   <t t-set="mes" t-value="item[0]"/>
                   <t t-set="linhas" t-value="item[1]"/>
 
                   <div style="border:1px solid #000; padding:4px; margin-bottom:8px;
                     page-break-inside: avoid; font-size:11px;">
-
-                    <!-- Linha 1: Mês -->
                     <div style="text-align:center; font-weight:bold; margin-bottom:2px;">
                       <t t-esc="mes"/>
                     </div>
-
-                    <!-- Linha 2: Totais (duas colunas) -->
                     <table style="width:100%; border-collapse:collapse; margin-bottom:4px;">
                       <tr>
                         <td style="border:1px solid #000; padding:2px;">
@@ -167,8 +143,6 @@
                         </td>
                       </tr>
                     </table>
-
-                    <!-- Linhas: Nota | Valor -->
                     <table style="width:100%; border-collapse:collapse;">
                       <thead>
                         <tr>
@@ -190,9 +164,7 @@
                         </t>
                       </tbody>
                     </table>
-
                   </div>
-
                 </t>
               </td>
             </tr>

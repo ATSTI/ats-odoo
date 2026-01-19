@@ -65,7 +65,6 @@ class ImovelAlugarvender(models.TransientModel):
         # search_invoice = move.search(
         #                 [('ref', '=', vals['ref']), ('partner_id', '=', vals['partner_id'])], limit=1)
 
-        # import pudb;pu.db
         invoice = move.create(vals)
         if invoice:
             product_id = product.search([

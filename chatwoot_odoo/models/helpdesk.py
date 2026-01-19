@@ -1,6 +1,8 @@
 import base64
 import os
+import re
 import requests
+import unicodedata
 
 from dotenv import load_dotenv
 from odoo import models, fields
@@ -52,24 +54,14 @@ class HelpDeskTicket(models.Model):
                 continue
 
             sender = conv.get("meta", {}).get("sender", {})
-            additional = sender.get("additional_attributes", {})
-            company = additional.get("company_name")
+            company = sender.get("additional_attributes", {}).get("company_name")
             contact = company if company else sender.get("name")
-            termos = contact.split()
-            prt = self.find_partner_by_terms(termos)
-            if not prt:
-                prt = self.env['res.partner'].create({
-                    'name': contact,
-                    'phone': sender.get("phone_number"),
-                })
-            if len(prt) > 1:
-                prt = prt[0]
-
-            assignee = conv.get("meta", {}).get("assignee", {}).get("name", "Unassigned")
+            phone = sender.get("phone_number").replace("+", "")
+            prt = self.get_partner(contact, phone)
+            
+            assignee = self.get_unique_conversation(conversation_id).get("meta", {}).get("assignee", {}).get("name", "Unassigned")
             termos = assignee.split()
             user = self.env['res.users'].search([('name', 'ilike', termos[0])], limit=1)
-            if not user:
-                user = self.env.ref('base.user_root')
 
             team = conv.get("meta", {}).get("team", {}).get("name", "Suporte")
             team_rec = self.env['helpdesk.ticket.team'].search([('name', 'ilike', team)], limit=1)
@@ -79,15 +71,20 @@ class HelpDeskTicket(models.Model):
             messages = messages_data.get("payload", [])
 
             mensagem = ""
+            user_name = ""
             attachments_to_create = []
 
             for msg in messages:
+                content = msg.get("content") or ""
                 if msg.get("message_type") == 2:
-                    continue
+                    if not user and content:
+                        match = re.search(r"resolvida por\s+(.*)$", content, re.IGNORECASE)
+                        if match:
+                            user_name = match.group(1).strip()
+                            continue
 
                 sender_name = msg.get("sender", {}).get("name", "Sistema")
-                content = msg.get("content") or ""
-                mensagem += f"\n{sender_name}: {content}\n"
+                mensagem += f"{sender_name}: {content}<br/>"
 
                 for att in msg.get("attachments", []):
                     data_url = att.get("data_url")
@@ -96,13 +93,15 @@ class HelpDeskTicket(models.Model):
 
                     filename = data_url.split("/")[-1]
                     file_content = requests.get(data_url, headers=HEADERS).content
-                    mensagem += f"\n[Anexo: {filename}]\n"
+                    mensagem += f"[Anexo: {filename}]<br/>"
                     attachments_to_create.append({
                         'name': filename,
                         'datas': base64.b64encode(file_content),
                         'res_model': 'helpdesk.ticket',
                     })
-
+            user = self.env['res.users'].search([('name', 'ilike', user_name)], limit=1) if user_name else user
+            if not user:
+                user = self.env.ref('base.user_root')
             ticket = self.env['helpdesk.ticket'].create({
                 'name': f"Chatwoot - {contact}",
                 'description': mensagem,
@@ -110,20 +109,16 @@ class HelpDeskTicket(models.Model):
                 'user_id': user.id,
                 'chatwoot_conversation_id': f"{conversation_id}2026",
                 'team_id': team_id,
+                'channel_id': 5,  # Suporte WhatsApp
             })
+            if prt.id == 1:
+                ticket.partner_name = contact + " (COLOCAR PARCEIRO CORRETO)"
+            else:
+                ticket._onchange_partner_id()
 
             for att in attachments_to_create:
                 att['res_id'] = ticket.id
                 self.env['ir.attachment'].create(att)
-
-    def download_file(self, data_url, filename):
-        response = requests.get(data_url, headers=HEADERS)
-        response.raise_for_status()
-
-        with open(filename, "wb") as f:
-            f.write(response.content)
-
-        print("Arquivo salvo:", filename)
 
     def get_unique_conversation(self, conversation_id):
         url_conversation = f"{BASE_URL}/api/v1/accounts/{ACCOUNT_ID}/conversations/{conversation_id}"
@@ -135,20 +130,22 @@ class HelpDeskTicket(models.Model):
         response_message = requests.get(url_message, headers=HEADERS)
         return response_message.json()
 
-    
-    def find_partner_by_terms(self, termos):
-        Partner = self.env["res.partner"]
+    def remove_acentos(self, texto):
+        if not texto:
+            return texto
+        return ''.join(
+            c for c in unicodedata.normalize('NFKD', texto)
+            if not unicodedata.combining(c)
+        )
 
-        for i in range(len(termos), 0, -1):
-            texto = " ".join(termos[:i])
-            res = Partner.search([("name", "ilike", texto)])
-            if res and len(res) == 1:
-                return res
-
-        domain = []
-        for termo in termos:
-            if domain:
-                domain = ["|"] + domain
-            domain.append(("name", "ilike", termo))
-
-        return Partner.search(domain)
+    def get_partner(self, contact, phone):
+        Partner = self.env['res.partner']
+        prt = Partner.search(['|', ('name', 'ilike', self.remove_acentos(contact)), ('phone_sanitized', 'ilike', phone)], limit=1)
+        if not prt:
+            prt = Partner.search(['|', ('name', 'ilike', contact), ('phone_sanitized', 'ilike', phone)], limit=1)
+        if not prt:
+            contact = contact[contact.find(" - ") + 1:] if " - " in contact else contact
+            prt = Partner.search(['|', ('name', 'ilike', contact), ('phone_sanitized', 'ilike', phone)], limit=1)
+        if not prt:
+            prt = Partner.browse(1)
+        return prt

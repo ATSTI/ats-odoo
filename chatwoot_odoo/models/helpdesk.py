@@ -58,10 +58,6 @@ class HelpDeskTicket(models.Model):
             contact = company if company else sender.get("name")
             phone = sender.get("phone_number").replace("+", "")
             prt = self.get_partner(contact, phone)
-            
-            assignee = self.get_unique_conversation(conversation_id).get("meta", {}).get("assignee", {}).get("name", "Unassigned")
-            termos = assignee.split()
-            user = self.env['res.users'].search([('name', 'ilike', termos[0])], limit=1)
 
             team = conv.get("meta", {}).get("team", {}).get("name", "Suporte")
             team_rec = self.env['helpdesk.ticket.team'].search([('name', 'ilike', team)], limit=1)
@@ -73,15 +69,22 @@ class HelpDeskTicket(models.Model):
             mensagem = ""
             user_name = ""
             attachments_to_create = []
+            messages_type_1 = [msg for msg in messages if msg.get("message_type") == 1]
 
             for msg in messages:
                 content = msg.get("content") or ""
+
+                if messages_type_1 and messages_type_1[len(messages_type_1)-1] == msg:
+                    ignore = re.search(r"Ou digite \"encerrar\" para finalizar o atendimento", content, re.IGNORECASE)
+                    if ignore:
+                        return True
+
                 if msg.get("message_type") == 2:
-                    if not user and content:
+                    if not user_name and content:
                         match = re.search(r"resolvida por\s+(.*)$", content, re.IGNORECASE)
                         if match:
                             user_name = match.group(1).strip()
-                            continue
+                    continue
 
                 sender_name = msg.get("sender", {}).get("name", "Sistema")
                 mensagem += f"{sender_name}: {content}<br/>"

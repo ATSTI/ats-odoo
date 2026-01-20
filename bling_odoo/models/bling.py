@@ -148,7 +148,24 @@ class BlingConfig(models.Model):
             }
             order_line.append((0, 0, line_vals))
         so.write({'order_line': order_line})
-        # so.order_line.onchange_product_id()
+        so.action_confirm()
+        for line in so.order_line:
+            line.product_id_change()
+            availability = line._onchange_product_id_check_availability()
+            if availability.get('warning'):
+                so.message_post(
+                    subject="Aviso de Estoque",
+                    body="Você planeja vender %s %s de %s mas só tem %s disponível em estoque. <br/> Cancelando as outras etapas" % (line.product_uom_qty, line.product_uom.name, line.product_id.name, line.product_id.qty_available),
+                )
+                return True
+        for picking in so.picking_ids:
+            if picking.state == "cancel":
+                continue
+            picking.action_assign()
+            picking.button_validate()
+            if picking.state == 'assigned':
+                picking.action_done()
+        so.action_invoice_create()
         # nat_operacao = nf.get('naturezaOperacao')
         return True
 

@@ -19,6 +19,7 @@ Lista de Equipamentos, Viagens e Cursos do Cliente:
     'license': 'AGPL-3',
     'contributors': [
         'Carlos Silveira<carlos@atsti.com.br>',
+        'Otávio Andretta<otavio12257@gmail.com>',
     ],
     'depends': [
         'l10n_br_base',

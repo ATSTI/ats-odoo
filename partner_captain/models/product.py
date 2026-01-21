@@ -84,7 +84,7 @@ class ProductTemplate(models.Model):
             ('balanceado', 'BALANCEADO'),
             ('console_duplo', 'CONSOLE DUPLO'),
         ],
-        string='Tipo de REG'
+        string='Tipo de REG' , required = True
     )
 
     is_reg = fields.Boolean(compute="_compute_is_reg", store=False)

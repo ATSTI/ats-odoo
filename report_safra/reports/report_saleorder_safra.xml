@@ -132,6 +132,12 @@
                                             </td>
                                         </tr>
                                         <tr>
+                                            <td><strong>Desconto Total</strong></td>
+                                            <td class="text-right">
+                                                <span t-field="doc.total_desconto"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <td><strong>Total</strong></td>
                                             <td class="text-right">
                                                 <span t-field="doc.amount_total"/>

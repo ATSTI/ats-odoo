@@ -107,7 +107,6 @@ class OperationLine(models.Model):
             self._build_mapping_result(mapping_result, tax_definition)
 
         # 5 From CFOP
-        # import pudb;pu.db
         for tax_definition in mapping_result[
             "cfop"
         ].tax_definition_ids.map_tax_definition(
@@ -122,11 +121,13 @@ class OperationLine(models.Model):
             service_type=service_type,
         ):
             self._build_mapping_result(mapping_result, tax_definition)
-
         if mapping_result["cfop"].tax_classification_id:
-            mapping_result["tax_classification"] = mapping_result[
-                "cfop"
-            ].tax_classification_id
+            if mapping_result["cfop"].tax_classification_id.code == "000000":
+                mapping_result["tax_classification"] = None
+            else:
+                mapping_result["tax_classification"] = mapping_result[
+                    "cfop"
+                ].tax_classification_id
 
         # 6 From Partner Profile
         for (

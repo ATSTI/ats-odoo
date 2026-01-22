@@ -56,6 +56,17 @@ class ResPartner(models.Model):
         string='Movimentações de Equipamentos'
     )
 
+    def write(self, vals):
+        if 'equipamento_ids' in vals:
+            for command in vals['equipamento_ids']:
+                # (2, id) = remover linha
+                # (3, id) = remover vínculo
+                if command[0] in (2, 3):
+                    self.env['partner.equipamento'].browse(command[1]).unlink()
+
+        return super().write(vals)
+
+
     # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
 
 

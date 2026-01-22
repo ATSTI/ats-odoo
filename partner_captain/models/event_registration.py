@@ -264,7 +264,10 @@ class EventRegistration(models.Model):
         PartnerEquip = self.env['partner.equipamento']
         for reg in self:
             partner = reg.partner_id
-            if reg.bcd_id:
+            if reg.bcd_info == 'Equipamento próprio':
+                reg.bcd_info = False
+
+            elif reg.bcd_id:
                 equipamento_proprio = PartnerEquip.search([
                     ('partner_id', '=', partner.id),
                     ('tipo', '=', 'bcd'),
@@ -273,7 +276,10 @@ class EventRegistration(models.Model):
                 if not equipamento_proprio:
                     reg.bcd_id.usado = False
                 reg.bcd_id = False
-            if reg.suit_id:
+            if reg.suit_info == 'Equipamento próprio':
+                reg.suit_info = False
+
+            elif reg.suit_id:
                 equipamento_proprio = PartnerEquip.search([
                     ('partner_id', '=', partner.id),
                     ('tipo', '=', 'suit'),
@@ -282,7 +288,10 @@ class EventRegistration(models.Model):
                 if not equipamento_proprio:
                     reg.suit_id.usado = False
                 reg.suit_id = False
-            if reg.reg_id:
+            if reg.reg_info == 'Equipamento próprio':
+                reg.reg_info = False
+
+            elif reg.reg_id:
                 equipamento_proprio = PartnerEquip.search([
                     ('partner_id', '=', partner.id),
                     ('tipo', '=', 'reg'),
@@ -291,7 +300,10 @@ class EventRegistration(models.Model):
                 if not equipamento_proprio:
                     reg.reg_id.usado = False
                 reg.reg_id = False
-            if reg.bag_id:
+            if reg.bag_info == 'Equipamento próprio':
+                reg.bag_info = False
+
+            elif reg.bag_id:
                 equipamento_proprio = PartnerEquip.search([
                     ('partner_id', '=', partner.id),
                     ('tipo', '=', 'bag'),

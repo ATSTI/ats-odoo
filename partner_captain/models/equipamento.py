@@ -55,19 +55,22 @@ class PartnerEquipamento(models.Model):
             eq.dias_na_captain = 0
             eq.em_atraso = False
             eq.ultimo_movimento = False
-
             if not eq.movimento_ids:
                 continue
-
             ultimo = eq.movimento_ids.sorted(
                 key=lambda m: m.data_movimento or fields.Datetime.now(),
                 reverse=True
             )[0]
-
             eq.ultimo_movimento = ultimo.movimento
-
             if ultimo.movimento == 'entrada':
                 delta = fields.Datetime.now() - ultimo.data_movimento
                 dias = delta.days
                 eq.dias_na_captain = dias
                 eq.em_atraso = dias >= 7
+
+    def write(self, vals):
+        if 'movimento_ids' in vals:
+            for command in vals['movimento_ids']:
+                if command[0] == 2:
+                    self.env['partner.equipamento.movimento'].browse(command[1]).unlink()
+        return super().write(vals)

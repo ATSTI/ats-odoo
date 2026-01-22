@@ -59,7 +59,7 @@ class CaptainSizeRule(models.Model):
             if self.search_count(domain) > 0:
                 raise ValidationError(
                     "Tamanho já cadastrado para essa configuração "
-                    "(Gênero, Seleção, Altura, Peso e Tamanho)."
+                    "(Gênero, Seleção, Altura, Peso)."
                 )
     def _recalcular_tamanhos_parceiros(self):
         """

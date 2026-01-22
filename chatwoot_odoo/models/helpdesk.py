@@ -59,7 +59,9 @@ class HelpDeskTicket(models.Model):
             phone = sender.get("phone_number").replace("+", "")
             prt = self.get_partner(contact, phone)
 
-            team = conv.get("meta", {}).get("team", {}).get("name", "Suporte")
+            team = conv.get("meta", {}).get("team", {}).get("name")
+            if team != "suporte":
+                continue
             team_rec = self.env['helpdesk.ticket.team'].search([('name', 'ilike', team)], limit=1)
             team_id = team_rec.id if team_rec else False
 

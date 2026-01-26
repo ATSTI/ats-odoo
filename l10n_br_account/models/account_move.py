@@ -168,10 +168,7 @@ class AccountMove(models.Model):
         ):
             tax_totals_node.set("attrs", "{'invisible': True}")
 
-        if view_type == "form" and (
-            self.user_has_groups("l10n_br_account.group_line_fiscal_detail")
-            or self.env.context.get("force_line_fiscal_detail")
-        ):
+        if view_type == "form" and self.env.context.get("force_line_fiscal_detail"):
             for sub_tree_node in arch.xpath("//field[@name='invoice_line_ids']/tree"):
                 sub_tree_node.attrib["editable"] = ""
 

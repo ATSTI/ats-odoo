@@ -121,7 +121,7 @@ class EventRegistration(models.Model):
             return
 
         limite_dias = 1
-        agora = fields.Datetime.now()
+        hoje = fields.Date.today()
         avisos = []
 
         movimentos = self.env['partner.equipamento.movimento'].search([
@@ -130,6 +130,9 @@ class EventRegistration(models.Model):
         ])
 
         for mov in movimentos:
+            if not mov.data_movimento:
+                continue
+
             saida = self.env['partner.equipamento.movimento'].search([
                 ('equipamento_id', '=', mov.equipamento_id.id),
                 ('movimento', '=', 'saida'),
@@ -137,10 +140,12 @@ class EventRegistration(models.Model):
             ], limit=1)
 
             if not saida:
-                dias = (agora - mov.data_movimento).days
+                data_entrada = mov.data_movimento.date()
+                dias = (hoje - data_entrada).days
+
                 if dias >= limite_dias:
                     avisos.append(
-                        f"{mov.equipamento_id.display_name} — {dias} dias na Captain. Cliente ainda não retirou o equipamento"
+                        f"{mov.equipamento_id.display_name} — {dias} dia(s) na Captain. Cliente ainda não retirou o equipamento"
                     )
 
         if avisos:
@@ -153,6 +158,7 @@ class EventRegistration(models.Model):
             }
         else:
             self.obs = None
+
 
 
 

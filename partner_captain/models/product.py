@@ -29,7 +29,8 @@ class ProductTemplate(models.Model):
         'crm.historico',
         string='Tipo Histórico CRM'
     )
-
+    
+    tamanho_etiqueta = fields.Text("Tamanho Etiqueta")
     situacao = fields.Selection(
     [
         ('otima', 'Ótima'),

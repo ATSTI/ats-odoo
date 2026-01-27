@@ -31,17 +31,19 @@ class ProductTemplate(models.Model):
     )
 
     situacao = fields.Selection(
-        [
-            ('otima', 'Ótima'),
-            ('bom', 'Bom'),
-            ('medio', 'Médio'),
-            ('ruim', 'Ruim'),
-            ('pessimo', 'Péssimo'),
-            ('manutencao','Manutenção')
-        ],
-        string="Situação",
-        default='bom'
-    )
+    [
+        ('otima', 'Ótima'),
+        ('bom', 'Bom'),
+        ('medio', 'Médio'),
+        ('ruim', 'Ruim'),
+        ('pessimo', 'Péssimo'),
+        ('manutencao', 'Manutenção')
+    ],
+    string="Situação",
+    default='bom',
+    tracking=True
+)
+
 
     modelo = fields.Text("Modelo")
 
@@ -60,7 +62,6 @@ class ProductTemplate(models.Model):
     )
 
     tag_cd = fields.Text("Tag CD")
-    tamanho_etiqueta = fields.Text("Tamanho Etiqueta")
 
     usado = fields.Boolean(
         "Produto está sendo usado?",
@@ -82,9 +83,11 @@ class ProductTemplate(models.Model):
     tipo_reg = fields.Selection(
         [
             ('balanceado', 'BALANCEADO'),
-            ('console_duplo', 'CONSOLE DUPLO'),
+            ('console_duplo', 'NÃO BALANCEADO/CONSOLE DUPLO'),
+            ('nao_balanceado', 'NÃO BALANCEADO'),
+
         ],
-        string='Tipo de REG' , required = True
+        string='Tipo de REG'
     )
 
     is_reg = fields.Boolean(compute="_compute_is_reg", store=False)

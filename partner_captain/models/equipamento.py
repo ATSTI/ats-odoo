@@ -66,7 +66,7 @@ class PartnerEquipamento(models.Model):
                 delta = fields.Datetime.now() - ultimo.data_movimento
                 dias = delta.days
                 eq.dias_na_captain = dias
-                eq.em_atraso = dias >= 7
+                eq.em_atraso = dias >= 1
 
     def write(self, vals):
         if 'movimento_ids' in vals:

@@ -120,7 +120,7 @@ class EventRegistration(models.Model):
         if not self.partner_id:
             return
 
-        limite_dias = 7
+        limite_dias = 1
         agora = fields.Datetime.now()
         avisos = []
 
@@ -144,12 +144,15 @@ class EventRegistration(models.Model):
                     )
 
         if avisos:
+            self.obs = " | ".join(avisos)
             return {
                 'warning': {
                     'title': 'Equipamento não retirado',
                     'message': '\n'.join(avisos)
                 }
             }
+        else:
+            self.obs = None
 
 
 
@@ -157,10 +160,10 @@ class EventRegistration(models.Model):
         Product = self.env['product.product']
         Category = self.env['product.category']
 
-        bcd_category = Category.search([('name', '=', 'BCD')], limit=1)
-        suit_category = Category.search([('name', '=', 'SUIT')], limit=1)
-        reg_category = Category.search([('name', '=', 'Reguladores')], limit=1)
-        bag_category = Category.search([('name', '=', 'BAG')], limit=1)
+        bcd_category = Category.search([('name', '=', 'BCD - operacao')], limit=1) #mudar pra bcd - operacao e assim por diante aqui na inteligencia do modulo
+        suit_category = Category.search([('name', '=', 'SUIT - operacao')], limit=1)
+        reg_category = Category.search([('name', '=', 'REG - operacao')], limit=1)
+        bag_category = Category.search([('name', '=', 'BAG - operacao')], limit=1)
 
         prioridade_situacao = ['otima', 'bom', 'medio', 'ruim', 'pessimo']
 
@@ -182,7 +185,9 @@ class EventRegistration(models.Model):
                     ('categ_id', '=', bcd_category.id),
                     ('tamanho_cd', '=', tamanho),
                     ('usado', '=', False),
-                    ('situacao', '!=', 'manutencao'),
+                    ('situacao', '!=', 'manutencao'), 
+                    ('sale_ok', '!=', True), 
+                    ('purchase_ok', '!=', True), 
                 ]
 
                 bcd = False
@@ -204,6 +209,8 @@ class EventRegistration(models.Model):
                     ('tamanho_cd', '=', tamanho),
                     ('usado', '=', False),
                     ('situacao', '!=', 'manutencao'),
+                    ('sale_ok', '!=', True), 
+                    ('purchase_ok', '!=', True), 
                 ]
 
                 suit = False
@@ -223,12 +230,14 @@ class EventRegistration(models.Model):
                     ('categ_id', '=', reg_category.id),
                     ('usado', '=', False),
                     ('situacao', '!=', 'manutencao'),
+                    ('sale_ok', '!=', True), 
+                    ('purchase_ok', '!=', True), 
                 ]
 
                 if reg.tipo_evento == 'owd':
                     domain.append(('product_tmpl_id.tipo_reg', '=', 'console_duplo'))
                 else:
-                    domain.append(('product_tmpl_id.tipo_reg', '=', 'balanceado'))
+                    domain.append(('product_tmpl_id.tipo_reg', 'in', ['balanceado','nao_balanceado'] ))
 
                 regulador = False
                 for situacao in prioridade_situacao:
@@ -247,6 +256,8 @@ class EventRegistration(models.Model):
                     ('categ_id', '=', bag_category.id),
                     ('usado', '=', False),
                     ('situacao', '!=', 'manutencao'),
+                    ('sale_ok', '!=', True), 
+                    ('purchase_ok', '!=', True), 
                 ]
                 bag = False
                 for situacao in prioridade_situacao:

@@ -34,7 +34,7 @@
                             </td>
 
                             <td width="50%" style="vertical-align: top;">
-                                <strong>STAFF RESPONSÁVEL</strong><br/>
+                                <strong>STAFFs RESPONSÁVEL</strong><br/>
                                 <t t-if="docs[0].staff_ids">
                                     <t t-foreach="docs[0].staff_ids" t-as="staff">
                                         <span t-esc="staff.name"/><br/>

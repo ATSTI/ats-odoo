@@ -85,9 +85,6 @@ class EventEvent(models.Model):
         for event in self:
             for reg in event.registration_ids:
                 worksheet.write(row, 0, (reg.partner_id.name or '').upper(), cell_format)
-                worksheet.write(row, 1, (reg.genero or '-').upper(), cell_format)
-                worksheet.write(row, 2, reg.peso or '-', cell_format)
-                worksheet.write(row, 3, reg.altura or '-', cell_format)
                 worksheet.write(row, 4, (reg.tipo_evento or '-').upper(), cell_format)
                 worksheet.write(row, 5, (reg.nadadeira or '-').upper(), cell_format)
                 if reg.bcd_info:

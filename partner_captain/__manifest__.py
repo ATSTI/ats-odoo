@@ -11,6 +11,8 @@ Lista de Equipamentos, Viagens e Cursos do Cliente:
     Estes itens podem ser inseridos direto no cadastro do cliente ou
     serao inseridos pelo pedido de venda, quando o pedido de venda
     for Confirmado com itens do Tipo acima.
+    Evento: Nova logica adicionada, atribuição de equipamentos para participantes do evento
+    seguindo regra de negócio (OWD, situação, equipamentos próprios), relatorios, tabela visual HTML interativa, entre diversas funcionalidades.
     """,
     'version': '1.0',
     'category': 'Localisation',
@@ -26,6 +28,7 @@ Lista de Equipamentos, Viagens e Cursos do Cliente:
         'product',
         'sale',
         'account',
+        'event'
     ],
     'data': [
         'security/ir.model.access.csv',

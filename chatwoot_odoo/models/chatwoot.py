@@ -1,0 +1,116 @@
+import base64
+import requests
+import requests
+import tempfile
+import os
+from odoo import models, fields
+
+class ChatwootInstance(models.Model):
+    _name = 'chatwoot.instance'
+    _description = 'Chatwoot Instance'
+
+    base_url = fields.Char(
+        string="Base URL",
+        help="URL base do Chatwoot"
+    )
+
+    api_token = fields.Char(
+        string="API Token",
+        help="Token de acesso à API do Chatwoot"
+    )
+    account_id = fields.Char(
+        string="Account ID",
+        default="1",
+        help="ID da conta do Chatwoot"
+    )
+
+    def get_contact_id(self, phone_number, partner):
+        url = f"{self.base_url}/api/v1/accounts/{self.account_id}/contacts/search"
+        params = {
+            "q": phone_number,
+            "page": 1,
+        }
+        headers = {
+            "api_access_token": self.api_token
+        }
+        response = requests.get(url, headers=headers, params=params)
+        data = response.json()
+        contacts = data.get("payload", [])
+        if contacts:
+            return contacts[0].get("id")
+        else:
+            payload = {
+                "name": partner.name,
+                "phone_number": phone_number
+            }
+            create_response = requests.post(
+                f"{self.base_url}/api/v1/accounts/{self.account_id}/contacts",
+                json=payload,
+                headers=headers
+            )
+            created_data = create_response.json()
+            return created_data.get("data", {}).get("id")
+
+    def create_new_conversation(self, phone_number, partner):
+        #TODO Ainda não sei como tratar a conversa, ideias: Busca pela conversa aberta para aquele contato ou
+        # criar uma nova conversa sempre e fecha-la depois de enviar a mensagem, o que obriga o user a enviar tudo que for necessário de uma vez só.
+        url = f"{self.base_url}/api/v1/accounts/{self.account_id}/conversations"
+        payload = {
+            "contact_id": self.get_contact_id(phone_number, partner),
+            "source_id": phone_number,
+            "inbox_id": 5,
+            "team_id": 1,
+            "message": {
+                "content": f"Olá {partner.name}!",
+            }
+        }
+        headers = {
+            "api_access_token": self.api_token,
+            "Content-Type": "application/json"
+        }
+        response = requests.post(url, json=payload, headers=headers)
+        return response.json()
+
+    def send_text(self, conversation_id, message):
+        url = f"{self.base_url}/api/v1/accounts/{self.account_id}/conversations/{conversation_id}/messages"
+        payload = {
+            "content": message,
+        }
+        headers = {
+            "api_access_token": self.api_token,
+        }
+        response = requests.post(url, json=payload, headers=headers, timeout=30)
+        return response.json()
+
+    def send_chatwoot_attachment(self, conversation_id, attachment, message=None):
+        """
+        attachment: record ir.attachment
+        """
+        file_content = base64.b64decode(attachment.datas)
+        with tempfile.NamedTemporaryFile(delete=False) as tmp:
+            tmp.write(file_content)
+            tmp_path = tmp.name
+        url = f"{self.base_url}/api/v1/accounts/{self.account_id}/conversations/{conversation_id}/messages"
+        headers = {
+            "api_access_token": self.api_token
+        }
+        files = {
+            "attachments[]": (
+                attachment.name or "arquivo",
+                open(tmp_path, "rb"),
+                attachment.mimetype or "application/octet-stream"
+            )
+        }
+        data = {}
+        if message:
+            data["content"] = message
+        response = requests.post(
+            url,
+            headers=headers,
+            data=data,
+            files=files,
+            timeout=30,
+        )
+        response.raise_for_status()
+        os.unlink(tmp_path)
+        return response.json()

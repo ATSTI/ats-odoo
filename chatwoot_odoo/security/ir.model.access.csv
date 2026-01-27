@@ -1,3 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_servidores_infos_user,servidores.infos.user,model_servidores_infos,base.group_user,1,1,1,1
-access_portas_server_user,portas.server.user,model_portas_server,base.group_user,1,1,1,1
+access_chatwoot_user,access_chatwoot_user,model_chatwoot_instance,base.group_user,1,1,1,1
+access_chatwoot_manager,access_chatwoot_manager,model_chatwoot_instance,base.group_system,1,1,1,1

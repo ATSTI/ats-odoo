@@ -10,7 +10,6 @@
     'summary': 'Integração Odoo com Chatwoot',
     'description': """
 Integração Odoo com Chatwoot
-=======================
 Este módulo adiciona campos e funcionalidades relacionadas a dados de conversas 
 associadas ao helpdesk, permitindo registro de conversas do Chatwoot como tickets no Odoo.
     """,
@@ -18,11 +17,12 @@ associadas ao helpdesk, permitindo registro de conversas do Chatwoot como ticket
     'maintainer': 'Mauricio-ATS, ATSTi',
     'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': [
-        'base',
+        'base_setup',
         'helpdesk_mgmt'
     ],
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
+        'views/chatwoot_view.xml',
         'views/helpdesk_view.xml',
     ],
     'installable': True,

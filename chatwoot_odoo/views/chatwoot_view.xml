@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="view_chatwoot_instance_list" model="ir.ui.view">
+        <field name="name">chatwoot.instance.list</field>
+        <field name="model">chatwoot.instance</field>
+        <field name="priority" eval="16"/>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="base_url"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_chatwoot_instance_form" model="ir.ui.view">
+        <field name="name">chatwoot.instance.form</field>
+        <field name="model">chatwoot.instance</field>
+        <field name="priority" eval="16"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="base_url"/>
+                        <field name="api_token"/>
+                        <field name="account_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_menu_chatwoot_conf" model="ir.actions.act_window">
+        <field name="name">Chatwoot Config</field>
+        <field name="res_model">chatwoot.instance</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem
+        id="menu_chatwoot"
+        name="Chatwoot"
+        parent="base.menu_custom"
+        sequence="99"
+    />
+    
+    <menuitem
+        id="menu_chatwoot_conf"
+        name="Chatwoot Config"
+        parent="menu_chatwoot"
+        action="action_menu_chatwoot_conf"
+        sequence="99"
+    />
+</odoo>

@@ -1,24 +1,10 @@
 import base64
-import os
 import re
 import requests
 import unicodedata
 
-from dotenv import load_dotenv
 from odoo import models, fields
 
-load_dotenv()
-
-BASE_URL = os.getenv("CHATWOOT_BASE_URL")
-API_TOKEN = os.getenv("CHATWOOT_API_TOKEN")
-ACCOUNT_ID = os.getenv("CHATWOOT_ACCOUNT_ID")
-
-HEADERS = {
-    "api_access_token": API_TOKEN
-}
-
-if not BASE_URL or not API_TOKEN or not ACCOUNT_ID:
-    raise ValueError("Configuração Chatwoot inválida. Verifique o arquivo .env")
 
 class HelpDeskTicket(models.Model):
     _inherit = 'helpdesk.ticket'
@@ -28,15 +14,25 @@ class HelpDeskTicket(models.Model):
         help="ID da conversa associada no Chatwoot"
     )
 
+    chatwoot_id = fields.Many2one(
+        'chatwoot.instance', 
+        string="Instância",
+        domain=[('account_id', '=', "1")],
+    )
+
     def get_conversations_resolved(self):
-        url = f"{BASE_URL}/api/v1/accounts/{ACCOUNT_ID}/conversations"
+        self.chatwoot_id = self.env['chatwoot.instance'].search(["account_id", "=", "1"], limit=1)
+        url = f"{self.chatwoot_id.base_url}/api/v1/accounts/{self.chatwoot_id.account_id}/conversations"
+        headers = {
+            "api_access_token": self.chatwoot_id.api_token
+        }
         params = {
             "assignee_type": "all",
             "status": "resolved",
             "page": 1,
         }
 
-        response = requests.get(url, headers=HEADERS, params=params, timeout=30)
+        response = requests.get(url, headers=headers, params=params, timeout=30)
         if response.status_code != 200:
             return
 
@@ -97,7 +93,7 @@ class HelpDeskTicket(models.Model):
                         continue
 
                     filename = data_url.split("/")[-1]
-                    file_content = requests.get(data_url, headers=HEADERS).content
+                    file_content = requests.get(data_url, headers=headers).content
                     mensagem += f"[Anexo: {filename}]<br/>"
                     attachments_to_create.append({
                         'name': filename,
@@ -127,13 +123,19 @@ class HelpDeskTicket(models.Model):
                 self.env['ir.attachment'].create(att)
 
     def get_unique_conversation(self, conversation_id):
-        url_conversation = f"{BASE_URL}/api/v1/accounts/{ACCOUNT_ID}/conversations/{conversation_id}"
-        response_conversation = requests.get(url_conversation, headers=HEADERS)
+        url_conversation = f"{self.chatwoot_id.base_url}/api/v1/accounts/{self.chatwoot_id.account_id}/conversations/{conversation_id}"
+        headers = {
+            "api_access_token": self.chatwoot_id.api_token
+        }
+        response_conversation = requests.get(url_conversation, headers=headers)
         return response_conversation.json()
 
     def get_message(self, conversation_id):
-        url_message = f"{BASE_URL}/api/v1/accounts/{ACCOUNT_ID}/conversations/{conversation_id}/messages"
-        response_message = requests.get(url_message, headers=HEADERS)
+        url_message = f"{self.chatwoot_id.base_url}/api/v1/accounts/{self.chatwoot_id.account_id}/conversations/{conversation_id}/messages"
+        headers = {
+            "api_access_token": self.chatwoot_id.api_token
+        }
+        response_message = requests.get(url_message, headers=headers)
         return response_message.json()
 
     def remove_acentos(self, texto):

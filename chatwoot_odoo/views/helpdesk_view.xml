@@ -8,6 +8,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='channel_id']" position="after">
                 <field name="chatwoot_conversation_id"/>
+                <field name="chatwoot_id" groups="base.group_no_one"/>
             </xpath>
         </field>
     </record>

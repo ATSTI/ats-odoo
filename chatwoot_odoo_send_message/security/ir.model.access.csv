@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_chatwoot_message_template_user,access_chatwoot_message_template_user,model_chatwoot_message_template,base.group_user,1,1,1,1
+access_chatwoot_composer,access_chatwoot_composer,model_chatwoot_composer,base.group_user,1,1,1,1

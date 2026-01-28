@@ -26,8 +26,6 @@
         Permite controle de vendas 'fiado'. Também adiciona um botão de Dados adicionais que é impresso junto do recibo não fiscal do PDV
     """,
     "category": "Point of Sale",
-    "author": "Você",
-    "website": "https://seusite.com",
     "license": "AGPL-3",
     "depends": ["point_of_sale",'account','sale','product'],
     'contributors': [

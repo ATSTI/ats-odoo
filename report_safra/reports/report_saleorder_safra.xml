@@ -45,7 +45,7 @@
 
                                     <div>
                                         <strong>Vendedor:</strong>
-                                        <span t-field="doc.user_id.name"/>
+                                        <span t-field="doc.user_id.id"/>
                                     </div>
                                 </div>
                             </td>
@@ -164,5 +164,12 @@
                     </div>
                 </t>
             </xpath>
+    </template>
+    <template id="external_layout_inherit_custom" inherit_id="web.external_layout_background">
+        <xpath expr="//div[contains(@class,'float-left company_address')]" position="inside">
+            <t t-if="company.cnpj_cpf">
+                <span t-field="company.cnpj_cpf">
+            </t>
+        </xpath>
     </template>
 </odoo>

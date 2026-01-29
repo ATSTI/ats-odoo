@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+from dateutil.relativedelta import relativedelta
 
 class ChatwootComposer(models.TransientModel):
     _name = 'chatwoot.composer'
@@ -69,8 +70,8 @@ class ChatwootComposer(models.TransientModel):
     res_id = fields.Integer('Related Document ID')
 
     @api.model
-    def default_get(self, fields):
-        res = super(ChatwootComposer, self).default_get(fields)
+    def default_get(self, fields_x):
+        res = super(ChatwootComposer, self).default_get(fields_x)
 
         if self.env.context.get('active_model') and self.env.context.get('active_id'):
             res['model'] = self.env.context['active_model']
@@ -83,11 +84,21 @@ class ChatwootComposer(models.TransientModel):
             if hasattr(record, 'partner_id') and record.partner_id:
                 partner_ids = record.partner_id.ids
                 res['partner_id'] = [(6, 0, partner_ids)]
-            partner = res['res_id'].partner_id.id if res['model'] == 'crm.lead' else res['res_id']
+            if res['model'] == 'crm.lead':
+                partner = self.env['crm.lead'].browse(res['res_id']).partner_id.id
+            else:
+                partner = res['res_id']
+
+            today = fields.Date.context_today(self)
+            start_last_month = (today.replace(day=1) - relativedelta(months=1))
+            end_month = today.replace(day=1) + relativedelta(months=1)
+            
             invoices = self.env['account.move'].search([
                 ("partner_id", "=", partner),
                 ("payment_state", "=", "not_paid"),
-                ("invoice_date", ">=", "2025-12-01") #pegar do Mês correto
+                ("invoice_date", ">=", start_last_month),
+                ("invoice_date", "<", end_month),
+                ("move_type", "=", "out_invoice"),
             ])
             for inv in invoices:
                 if not inv.attachment_ids:

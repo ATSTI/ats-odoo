@@ -20,7 +20,7 @@ odoo.define('pdv_fiado.pos_extra_note_button', function(require) {
     Order.prototype.set_extra_note = function(note) {
         this.extra_note = note ? String(note) : '';
         this.trigger('change', this); // força atualização do estado
-    };
+    };  
 
     Order.prototype.get_extra_note = function() {
         return this.extra_note || '';
@@ -49,9 +49,6 @@ odoo.define('pdv_fiado.pos_extra_note_button', function(require) {
         return receipt;
     };
 
-    // =====================================================
-    // Botão Dados Adicionais no PaymentScreen
-    // =====================================================
 
     const PosPaymentScreenExtra = (PaymentScreen) => class extends PaymentScreen {
         render() {

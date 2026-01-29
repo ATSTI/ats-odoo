@@ -51,7 +51,7 @@ class ChatwootInstance(models.Model):
             created_data = create_response.json()
             return created_data.get("data", {}).get("id")
 
-    def create_new_conversation(self, phone_number, partner, status, team_id, message=None):
+    def create_new_conversation(self, phone_number, partner, team_id, assignee_id, message=None):
         #TODO Ainda não sei como tratar a conversa, ideias: Busca pela conversa aberta para aquele contato ou
         # criar uma nova conversa sempre e fecha-la depois de enviar a mensagem, o que obriga o user a enviar tudo que for necessário de uma vez só.
         url = f"{self.base_url}/api/v1/accounts/{self.account_id}/conversations"
@@ -62,9 +62,9 @@ class ChatwootInstance(models.Model):
             "contact_id": self.get_contact_id(phone_number, partner),
             "source_id": phone_number,
             "inbox_id": 5,
-            "team_id": team_id,
-            "assignee_id": 1,
-            "status": status,
+            "team_id": int(team_id),
+            "assignee_id": int(assignee_id),
+            "status": "open",
             "message": {
                 "content": content,
             }
@@ -76,6 +76,22 @@ class ChatwootInstance(models.Model):
         response = requests.post(url, json=payload, headers=headers)
         return response.json()
     
+    def get_unique_conversation(self, conversation_id):
+        url_conversation = f"{self.base_url}/api/v1/accounts/{self.account_id}/conversations/{conversation_id}"
+        headers = {
+            "api_access_token": self.api_token
+        }
+        response_conversation = requests.get(url_conversation, headers=headers)
+        return response_conversation.json()
+
+    def get_message(self, conversation_id):
+        url_message = f"{self.base_url}/api/v1/accounts/{self.account_id}/conversations/{conversation_id}/messages"
+        headers = {
+            "api_access_token": self.api_token
+        }
+        response_message = requests.get(url_message, headers=headers)
+        return response_message.json()
+
     def set_resolved_conversation(self, conversation_id):
         url = f"{self.base_url}/api/v1/accounts/{self.account_id}/conversations/{conversation_id}/toggle_status"
         payload = {
@@ -132,4 +148,17 @@ class ChatwootInstance(models.Model):
         )
         response.raise_for_status()
         os.unlink(tmp_path)
+        return response.json()
+    
+    def add_label_to_conversation(self, conversation_id):
+        url = f"{self.base_url}/api/v1/accounts/{self.account_id}/conversations/{conversation_id}/labels"
+        payload = {
+            "labels": [
+                "start_conversation"
+            ]
+        }
+        headers = {
+            "api_access_token": self.api_token,
+        }
+        response = requests.post(url, json=payload, headers=headers, timeout=30)
         return response.json()

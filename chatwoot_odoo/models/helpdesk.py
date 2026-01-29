@@ -21,10 +21,10 @@ class HelpDeskTicket(models.Model):
     )
 
     def get_conversations_resolved(self):
-        self.chatwoot_id = self.env['chatwoot.instance'].search(["account_id", "=", "1"], limit=1)
-        url = f"{self.chatwoot_id.base_url}/api/v1/accounts/{self.chatwoot_id.account_id}/conversations"
+        self.chatwoot_id = chatwoot_id = self.env['chatwoot.instance'].search([("account_id", "=", "1")], limit=1)
+        url = f"{chatwoot_id.base_url}/api/v1/accounts/{chatwoot_id.account_id}/conversations"
         headers = {
-            "api_access_token": self.chatwoot_id.api_token
+            "api_access_token": chatwoot_id.api_token
         }
         params = {
             "assignee_type": "all",
@@ -61,7 +61,7 @@ class HelpDeskTicket(models.Model):
             team_rec = self.env['helpdesk.ticket.team'].search([('name', 'ilike', team)], limit=1)
             team_id = team_rec.id if team_rec else False
 
-            messages_data = self.get_message(conversation_id)
+            messages_data = chatwoot_id.get_message(conversation_id)
             messages = messages_data.get("payload", [])
 
             mensagem = ""
@@ -121,22 +121,6 @@ class HelpDeskTicket(models.Model):
             for att in attachments_to_create:
                 att['res_id'] = ticket.id
                 self.env['ir.attachment'].create(att)
-
-    def get_unique_conversation(self, conversation_id):
-        url_conversation = f"{self.chatwoot_id.base_url}/api/v1/accounts/{self.chatwoot_id.account_id}/conversations/{conversation_id}"
-        headers = {
-            "api_access_token": self.chatwoot_id.api_token
-        }
-        response_conversation = requests.get(url_conversation, headers=headers)
-        return response_conversation.json()
-
-    def get_message(self, conversation_id):
-        url_message = f"{self.chatwoot_id.base_url}/api/v1/accounts/{self.chatwoot_id.account_id}/conversations/{conversation_id}/messages"
-        headers = {
-            "api_access_token": self.chatwoot_id.api_token
-        }
-        response_message = requests.get(url_message, headers=headers)
-        return response_message.json()
 
     def remove_acentos(self, texto):
         if not texto:

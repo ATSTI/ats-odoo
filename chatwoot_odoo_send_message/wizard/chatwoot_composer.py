@@ -19,11 +19,42 @@ class ChatwootComposer(models.TransientModel):
         string="Mensagem a ser enviada", 
         required=True
     )
+
     chatwoot_id = fields.Many2one(
         'chatwoot.instance', 
         string="Instância", 
         domain=[('account_id', '=', "1")],
     )
+    chatwoot_user = fields.Selection(
+        selection=[
+            ('1', 'Carlos'),
+            ('3', 'Otavio Andretta'),
+            ('5', 'Guilherme Carvalho'),
+            ('6', 'Nil'),
+            ('7', 'Daniel Carvalho'),
+            ('8', 'Felipe'),
+            ('9', 'Manoel'),
+            ('10', 'Mauricio Silveira'),
+        ],
+        string="Usuário Chatwoot"
+    )
+    chatwoot_team = fields.Selection(
+        selection=[
+            ('1', 'Suporte'),
+            ('34', 'Financeiro'),
+            ('35', 'Comercial'),
+            ('36', 'ATS'),
+        ],
+        string="Time Chatwoot"
+    )
+    chatwoot_status = fields.Selection(
+        selection=[
+            ('open', 'Manter Aberta'),
+            ('resolved', 'Enviar e Finalizar'),
+        ],
+        string="Status"
+    )
+
     attachment_ids = fields.Many2many(
         'ir.attachment', 
         string="Anexos"
@@ -52,6 +83,20 @@ class ChatwootComposer(models.TransientModel):
             if hasattr(record, 'partner_id') and record.partner_id:
                 partner_ids = record.partner_id.ids
                 res['partner_id'] = [(6, 0, partner_ids)]
+            partner = res['res_id'].partner_id.id if res['model'] == 'crm.lead' else res['res_id']
+            invoices = self.env['account.move'].search([
+                ("partner_id", "=", partner),
+                ("payment_state", "=", "not_paid"),
+                ("invoice_date", ">=", "2025-12-01") #pegar do Mês correto
+            ])
+            for inv in invoices:
+                if not inv.attachment_ids:
+                    attachment = self.env['mail.mail'].search([
+                        ('res_id', '=', inv.id)
+                    ]).attachment_ids
+                else:
+                    attachment = inv.attachment_ids
+                res['attachment_ids'] = [(6, 0, attachment.ids)]
 
         instance = self.env['chatwoot.instance'].search([('account_id', '=', '1')], limit=1)
         if instance:
@@ -100,7 +145,7 @@ class ChatwootComposer(models.TransientModel):
         try:
             for partner in self.partner_id:
                 phone_number = f"{partner.phone_sanitized}"
-                conversation_id = self.chatwoot_id.create_new_conversation(phone_number, partner, "open", 1)
+                conversation_id = self.chatwoot_id.create_new_conversation(phone_number, partner, self.chatwoot_team, self.chatwoot_user)
                 if conversation_id:
                     conversation_id = conversation_id['id']
                 else:
@@ -116,6 +161,9 @@ class ChatwootComposer(models.TransientModel):
                         self.chatwoot_id.send_chatwoot_attachment(conversation_id, attachment)
                 else:
                     self.chatwoot_id.send_text(conversation_id, self.body)
+                if self.chatwoot_status == "resolved":
+                    self.chatwoot_id.add_label_to_conversation(conversation_id)
+                    self.chatwoot_id.set_resolved_conversation(conversation_id)
 
             if record:
                 names = ', '.join(self.partner_id.mapped('name'))

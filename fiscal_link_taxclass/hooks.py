@@ -53,6 +53,8 @@ def post_init_hook(cr, registry):
             cfop.tax_classification_id = Tax.search([('code', '=', '000000')], limit=1).id
         elif cfop.code in ['5902', '6902'] and not cfop.tax_classification_id:
             cfop.tax_classification_id = Tax.search([('code', '=', '410999')], limit=1).id
+        elif cfop.code in ['6109'] and not cfop.tax_classification_id:
+            cfop.tax_classification_id = Tax.search([('code', '=', '200022')], limit=1).id
         _logger.info(
             "Updated CFOP %s to use tax classification",
             cfop.code

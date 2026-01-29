@@ -4,6 +4,7 @@
             <script type="text/javascript" src="/pdv_fiado/static/src/js/OrderReceipt.js"></script>
             <script type="text/javascript" src="/pdv_fiado/static/src/js/pos_custom_button.js"></script>
             <script type="text/javascript" src="/pdv_fiado/static/src/js/order.js"></script>
+            <script type="text/javascript" src="/pdv_fiado/static/src/js/NfceFooterReceipt.js"></script>
         </xpath>
     </template>
 </odoo>

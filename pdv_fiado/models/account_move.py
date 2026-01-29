@@ -3,6 +3,8 @@ from odoo import models, api, fields
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
+    pos_extra_note = fields.Char('Dados adicionais (POS)')
+
     @api.model
     def create_fiado_from_pos(self, partner_id, order_lines, amount_paid):
 

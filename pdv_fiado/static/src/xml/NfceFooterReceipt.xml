@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-inherit="l10n_br_pos_nfce.NfceFooterReceipt" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('consumerInfo')]" position="inside">
+            <t t-if="order.extra_note">
+                <div class="pos-receipt" style="margin-top: 20px;">
+                    <div style="font-size: 18px; font-weight: bold;">
+                        CPF:
+                    </div>
+                    <div style="font-size: 18px; margin-top: 5px;">
+                        <t t-esc="order.extra_note"/>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </t>
+</templates>

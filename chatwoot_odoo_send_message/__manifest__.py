@@ -22,6 +22,7 @@
         'wizard/chatwoot_composer_views.xml',
         'views/crm_leads.xml',
         'views/partner_view.xml',
+        'views/move_view.xml',
         'views/chatwoot_message_template.xml'
     ],
     'installable': True,

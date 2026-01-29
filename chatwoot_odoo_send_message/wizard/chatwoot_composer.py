@@ -84,30 +84,28 @@ class ChatwootComposer(models.TransientModel):
             if hasattr(record, 'partner_id') and record.partner_id:
                 partner_ids = record.partner_id.ids
                 res['partner_id'] = [(6, 0, partner_ids)]
-            if res['model'] == 'crm.lead':
-                partner = self.env['crm.lead'].browse(res['res_id']).partner_id.id
-            else:
-                partner = res['res_id']
-
-            today = fields.Date.context_today(self)
-            start_last_month = (today.replace(day=1) - relativedelta(months=1))
-            end_month = today.replace(day=1) + relativedelta(months=1)
-            
-            invoices = self.env['account.move'].search([
-                ("partner_id", "=", partner),
-                ("payment_state", "=", "not_paid"),
-                ("invoice_date", ">=", start_last_month),
-                ("invoice_date", "<", end_month),
-                ("move_type", "=", "out_invoice"),
-            ])
-            for inv in invoices:
-                if not inv.attachment_ids:
-                    attachment = self.env['mail.mail'].search([
-                        ('res_id', '=', inv.id)
-                    ]).attachment_ids
-                else:
-                    attachment = inv.attachment_ids
-                res['attachment_ids'] = [(6, 0, attachment.ids)]
+            # Somente pelo faturamento vai trazer as faturas abertas;
+            if res['model'] == 'account.move':
+                partner = self.env['account.move'].browse(res['res_id']).partner_id.id
+                today = fields.Date.context_today(self)
+                start_last_month = (today.replace(day=1) - relativedelta(months=1))
+                end_month = today.replace(day=1) + relativedelta(months=1)
+                
+                invoices = self.env['account.move'].search([
+                    ("partner_id", "=", partner),
+                    ("payment_state", "=", "not_paid"),
+                    ("invoice_date", ">=", start_last_month),
+                    ("invoice_date", "<", end_month),
+                    ("move_type", "=", "out_invoice"),
+                ])
+                for inv in invoices:
+                    if not inv.attachment_ids:
+                        attachment = self.env['mail.mail'].search([
+                            ('res_id', '=', inv.id)
+                        ]).attachment_ids
+                    else:
+                        attachment = inv.attachment_ids
+                    res['attachment_ids'] = [(6, 0, attachment.ids)]
 
         instance = self.env['chatwoot.instance'].search([('account_id', '=', '1')], limit=1)
         if instance:

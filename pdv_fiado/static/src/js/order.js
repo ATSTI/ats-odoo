@@ -50,6 +50,39 @@ odoo.define('pdv_fiado.pos_extra_note_button', function(require) {
     };
 
 
+    function validarCPF(cpf) {
+    if (!cpf) return false;
+
+    cpf = cpf.replace(/[^\d]+/g, '');
+
+    if (cpf.length !== 11) return false;
+    if (/^(\d)\1+$/.test(cpf)) return false; // todos dígitos iguais
+
+    let soma = 0;
+    let resto;
+
+    for (let i = 1; i <= 9; i++) {
+        soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+    }
+
+    resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(cpf.substring(9, 10))) return false;
+
+    soma = 0;
+    for (let i = 1; i <= 10; i++) {
+        soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+    }
+
+    resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(cpf.substring(10, 11))) return false;
+
+    return true;
+}
+
+
+
     const PosPaymentScreenExtra = (PaymentScreen) => class extends PaymentScreen {
         render() {
             super.render();
@@ -89,14 +122,41 @@ odoo.define('pdv_fiado.pos_extra_note_button', function(require) {
                     const order = this.currentOrder;
 
                     const { confirmed, payload } = await this.showPopup('TextInputPopup', {
-                        title: 'Dados adicionais',
+                        title: 'CPF na nota',
                         body: 'Informe o CPF ou observações do cliente:',
                         startingValue: order.get_extra_note(),
                     });
 
                     if (confirmed) {
-                        order.set_extra_note(payload || '');
+                        const valor = (payload || '').trim();
+                        const somenteNumeros = valor.replace(/[^\d]+/g, '');
+
+                        if (somenteNumeros.length === 11) {
+                            if (!validarCPF(somenteNumeros)) {
+                                await this.showPopup('ErrorPopup', {
+                                    title: 'CPF inválido',
+                                    body: 'O CPF informado não é válido. Verifique e tente novamente.',
+                                });
+                                return;
+                            }
+
+                            const client = order.get_client();
+                            if (!client) {
+                                await this.showPopup('ErrorPopup', {
+                                    title: 'Cliente não selecionado',
+                                    body: 'Selecione um cliente para informar CPF.',
+                                });
+                                return;
+                            }
+
+                            client.vat = somenteNumeros;
+                            order.set_client(client);
+                        }
+
+                        order.set_extra_note(valor);
                     }
+
+
                 });
 
                 container.appendChild(buttonExtra);

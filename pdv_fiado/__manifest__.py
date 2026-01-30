@@ -36,7 +36,6 @@
     ],
    'qweb': [
         'static/src/xml/OrderReceipt.xml',
-        # 'static/src/xml/NfceFooterReceipt.xml',
     ],
     "installable": True,
     "application": False,

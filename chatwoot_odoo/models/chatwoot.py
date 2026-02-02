@@ -1,7 +1,7 @@
 import base64
 import requests
-import requests
-import tempfile
+import io
+import mimetypes
 import os
 from odoo import models, fields
 
@@ -118,27 +118,38 @@ class ChatwootInstance(models.Model):
         return response.json()
 
     def send_chatwoot_attachment(self, conversation_id, attachment, message=None):
-        """
-        attachment: record ir.attachment
-        """
         file_content = base64.b64decode(attachment.datas)
-        with tempfile.NamedTemporaryFile(delete=False) as tmp:
-            tmp.write(file_content)
-            tmp_path = tmp.name
+        file_stream = io.BytesIO(file_content)
+
+        filename = attachment.name or "arquivo"
+
+        if "." not in filename:
+            filename += ".pdf"
+
+        mimetype = attachment.mimetype
+        if not mimetype:
+            mimetype, _ = mimetypes.guess_type(filename)
+
+        if not mimetype:
+            mimetype = "application/pdf"
+
         url = f"{self.base_url}/api/v1/accounts/{self.account_id}/conversations/{conversation_id}/messages"
         headers = {
             "api_access_token": self.api_token
         }
+
         files = {
             "attachments[]": (
-                attachment.name or "arquivo",
-                open(tmp_path, "rb"),
-                attachment.mimetype or "application/octet-stream"
+                filename,
+                file_stream,
+                mimetype
             )
         }
+
         data = {}
         if message:
             data["content"] = message
+
         response = requests.post(
             url,
             headers=headers,
@@ -147,9 +158,8 @@ class ChatwootInstance(models.Model):
             timeout=30,
         )
         response.raise_for_status()
-        os.unlink(tmp_path)
         return response.json()
-    
+
     def add_label_to_conversation(self, conversation_id):
         url = f"{self.base_url}/api/v1/accounts/{self.account_id}/conversations/{conversation_id}/labels"
         payload = {

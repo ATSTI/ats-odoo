@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_request_itens_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <div class="page">
+
+                    <!-- CABEÇALHO -->
+                    <table style="width:100%; margin-bottom:10px;">
+                        <tr>
+                            <td style="width:30%;">
+                                <img t-if="doc.company_id.logo"
+                                     t-attf-src="data:image/png;base64,#{doc.company_id.logo}"
+                                     style="max-height:80px;"/>
+                            </td>
+                            <td style="width:70%; text-align:right;">
+                                <strong t-field="doc.company_id.name"/><br/>
+                                <span t-field="doc.company_id.street"/> 
+                                <span t-field="doc.company_id.number"/> – 
+                                <span t-field="doc.company_id.district"/><br/>
+                                CEP: <span t-field="doc.company_id.zip"/> – 
+                                <span t-field="doc.company_id.city_id.name"/> / 
+                                <span t-field="doc.company_id.state_id.code"/><br/>
+                                Fone: <span t-field="doc.company_id.phone"/>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <hr/>
+
+                    <!-- TÍTULO -->
+                    <h3 style="text-align:center; margin:10px 0;">
+                        Requisição de Materiais do Estoque
+                    </h3>
+
+                    <!-- ITENS SOLICITADOS -->
+                    <h4>Itens Solicitados</h4>
+                    <t t-set="request_count" t-value="len(doc.material_request_line_ids)"/>
+                    <table class="table table-sm" style="width:100%; border-collapse:collapse;">
+                        <thead>
+                            <tr style="background:#f0f0f0;">
+                                <th style="border:1px solid #000; width:400px;">Item</th>
+                                <th style="border:1px solid #000; width:80px;">Qtd</th>
+                                <th style="border:1px solid #000; width:400px;">Observação</th>
+                                <th style="border:1px solid #000; width:200px;">Requisitante</th>
+                                <th style="border:1px solid #000; width:80px;">Data de Requisição</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-if="request_count &lt; 3">
+                                <t t-foreach="range(3 - request_count)" t-as="i">
+                                    <tr>
+                                        <td style="border:1px solid #000; height: 20px;"></td>
+                                        <td style="border:1px solid #000; height: 20px;"></td>
+                                        <td style="border:1px solid #000; height: 20px;"></td>
+                                        <td style="border:1px solid #000; height: 20px;"></td>
+                                        <td style="border:1px solid #000; height: 20px;"></td>
+                                    </tr>
+                                </t>
+                            </t>
+                            <t t-foreach="doc.material_request_line_ids" t-as="line">
+                                <tr>
+                                    <td style="border:1px solid #000;">
+                                        <span t-field="line.item"/>
+                                    </td>
+                                    <td style="border:1px solid #000; text-align:center;">
+                                        <span t-field="line.quantidade"/>
+                                    </td>
+                                    <td style="border:1px solid #000;">
+                                        <span t-field="line.obs"/>
+                                    </td>
+                                    <td style="border:1px solid #000;">
+                                        <span t-field="line.who_req"/>
+                                    </td>
+                                    <td style="border:1px solid #000; text-align:center;">
+                                        <span t-field="line.date_req"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <br/>
+
+                    <!-- DEVOLUÇÃO -->
+                    <h4>Devolução</h4>
+                    <t t-set="devolution_count" t-value="len(doc.material_devolution_line_ids)"/>
+                    <table style="width:100%; border-collapse:collapse;">
+                        <thead>
+                            <tr style="background:#f0f0f0;">
+                                <th style="border:1px solid #000; width:400px;">Item</th>
+                                <th style="border:1px solid #000; width:80px;">Qtd</th>
+                                <th style="border:1px solid #000; width:400px;">Observação</th>
+                                <th style="border:1px solid #000; width:200px;">Restintuinte</th>
+                                <th style="border:1px solid #000; width:80px;">Data de Devolução</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-if="devolution_count &lt; 3">
+                                <t t-foreach="range(3 - devolution_count)" t-as="i">
+                                    <tr>
+                                        <td style="border:1px solid #000; height: 20px;"></td>
+                                        <td style="border:1px solid #000; height: 20px;"></td>
+                                        <td style="border:1px solid #000; height: 20px;"></td>
+                                        <td style="border:1px solid #000; height: 20px;"></td>
+                                        <td style="border:1px solid #000; height: 20px;"></td>
+                                    </tr>
+                                </t>
+                            </t>
+                            <t t-foreach="doc.material_devolution_line_ids" t-as="line">
+                                <tr>
+                                    <td style="border:1px solid #000;">
+                                        <span t-field="line.item"/>
+                                    </td>
+                                    <td style="border:1px solid #000; text-align:center;">
+                                        <span t-field="line.quantidade"/>
+                                    </td>
+                                    <td style="border:1px solid #000;">
+                                        <span t-field="line.obs"/>
+                                    </td>
+                                    <td style="border:1px solid #000;">
+                                        <span t-field="line.who_devol"/>
+                                    </td>
+                                    <td style="border:1px solid #000; text-align:center;">
+                                        <span t-field="line.date_devol"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <br/><br/>
+
+                    <!-- ASSINATURAS -->
+                    <table style="width:100%; margin-top:40px;">
+                        <tr>
+                            <td style="width:50%; text-align:center;">
+                                _______________________________<br/>
+                                Requisitante
+                            </td>
+                            <td style="width:50%; text-align:center;">
+                                _______________________________<br/>
+                                Estoque
+                            </td>
+                        </tr>
+                    </table>
+
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

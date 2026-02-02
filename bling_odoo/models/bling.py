@@ -62,7 +62,7 @@ class BlingConfig(models.Model):
         if self.expire_date_token and self.expire_date_token < datetime.now():
             self.action_gerar_access_token()
             # print("TOKEN GERADO")
-        url = "https://developer.bling.com.br/api/bling/nfe"
+        url = "https://api.bling.com.br/Api/v3/nfe"
         headers = {
             "accept": "application/json",
             "Authorization": "Bearer %s" % self.access_token
@@ -129,51 +129,56 @@ class BlingConfig(models.Model):
                 'email': parceiro.get('email', ''),
             }
             pr = Partner.create(pr_vals)
-        SaleOrder = self.env['sale.order']
+        Invoice = self.env['account.invoice']
+        nat_odoo = self.get_nat_operation(self, nf['naturezaOperacao']['id'])
+        fiscal_position = self.env['account.fiscal.position'].search([("name", "ilike", nat_odoo)])
         vals={
-                "name": self.env['ir.sequence'].next_by_code('sale.order'),
+                "name": "Bling - " + self.env['ir.sequence'].next_by_code('account.move'),
                 "partner_id": pr.id,
+                "fiscal_position_id": fiscal_position.id,
             }
-        so = SaleOrder.create(vals)
-        so.onchange_partner_id()
-        order_line = []
+        inv = Invoice.create(vals)
+        inv.onchange_partner_id()
+        invoice_line = []
         for item in pedido_inf['data']['itens']:
             prod_id = item['produto']['id']
             prd = self.busca_produto(prod_id)
             line_vals = {
-                'order_id': so.id,
+                'move_id': inv.id,
                 'product_id': prd.id,
                 'product_uom_qty': float(item.get('quantidade', 1.0)),
                 'price_unit': float(item.get('valor', 0.0)),
             }
-            order_line.append((0, 0, line_vals))
-        so.write({'order_line': order_line})
-        so.action_confirm()
-        for line in so.order_line:
+            invoice_line.append((0, 0, line_vals))
+        inv.write({'invoice_line_ids': invoice_line})
+        inv.action_confirm()
+        for line in inv.invoice_line_ids:
             line.product_id_change()
-            availability = line._onchange_product_id_check_availability()
-            if availability.get('warning'):
-                so.message_post(
-                    subject="Aviso de Estoque",
-                    body="Você planeja vender %s %s de %s mas só tem %s disponível em estoque. <br/> Cancelando as outras etapas" % (line.product_uom_qty, line.product_uom.name, line.product_id.name, line.product_id.qty_available),
-                )
-                return True
-        for picking in so.picking_ids:
-            if picking.state == "cancel":
-                continue
-            picking.action_assign()
-            picking.button_validate()
-            if picking.state == 'assigned':
-                picking.action_done()
-        so.action_invoice_create()
-        # nat_operacao = nf.get('naturezaOperacao')
+        inv.action_invoice_open()
         return True
-
-    def busca_pedido(self, pedido_id):
-        url = "https://developer.bling.com.br/api/bling/pedidos/vendas/%s" % pedido_id
+    
+    def get_nat_operation(self, operacao):
+        url = "https://api.bling.com.br/Api/v3/naturezas-operacoes"
+        params = {
+            "pagina": 1,
+            "limite": 100,
+            "situacao": 1,
+        }
         headers = {
             "accept": "application/json",
-            "Authorization": "Bearer ACCESS_TOKEN_AQUI"
+            "Authorization": "Bearer %s" %self.access_token,
+        }
+        response = requests.get(url, headers=headers, params=params, timeout=30)
+        data = response.json()['data']
+        for nat in data:
+            if nat['id'] == operacao:
+                return nat['descricao']
+
+    def busca_pedido(self, pedido_id):
+        url = "https://api.bling.com.br/Api/v3/pedidos/vendas/%s" % pedido_id
+        headers = {
+            "accept": "application/json",
+            "Authorization": "Bearer %s" %self.access_token
         }
 
         response = requests.get(
@@ -188,7 +193,7 @@ class BlingConfig(models.Model):
         return None
         
     def busca_produto(self, produto_id):
-        url = "https://api.bling.com.br/Api/v3/produtos/%s" % producto_id
+        url = "https://api.bling.com.br/Api/v3/produtos/%s" % produto_id
 
         headers = {
             "accept": "application/json",

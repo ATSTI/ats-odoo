@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report 
+            id="action_report_request_itens"
+            string="Requisição de Materiais"
+            model="repair.order" 
+            report_type="qweb-pdf"
+            file="safra_custom.report_request_itens_template" 
+            name="safra_custom.report_request_itens_template" 
+        />
+    </data>
+</odoo>

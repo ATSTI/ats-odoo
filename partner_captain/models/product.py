@@ -92,9 +92,7 @@ class ProductTemplate(models.Model):
     )
 
     is_reg = fields.Boolean(compute="_compute_is_reg", store=False)
-
-
-
+    show_tamanho_cd = fields.Boolean(compute="_compute_show_tamanho")
 
     @api.depends('categ_id')
     def _compute_is_suit(self):
@@ -107,7 +105,16 @@ class ProductTemplate(models.Model):
     
     @api.depends('categ_id')
     def _compute_is_reg(self):
-        Category = self.env['product.category']
-        reg_category = Category.search([('name', '=', 'Reguladores')], limit=1)
+       for rec in self:
+            nome = (rec.categ_id.name or '').lower()
+            rec.is_reg = nome not in ['reg - operacao']
+
+    
+
+    @api.depends('categ_id')
+    def _compute_show_tamanho(self):
         for rec in self:
-            rec.is_reg = bool(reg_category and rec.categ_id == reg_category)
+            nome = (rec.categ_id.name or '').lower()
+            rec.show_tamanho_cd = nome not in ['reg - operacao', 'bag - operacao']
+
+

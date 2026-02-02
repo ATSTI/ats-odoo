@@ -6,12 +6,14 @@ class EventEvent(models.Model):
     _inherit = 'event.event'
 
     staff_ids = fields.Many2many(
-        'res.users',
-        'event_staff_rel',
-        'event_id',
-        'user_id',
-        string="Staff Responsáveis"
-    )
+    'res.partner',
+    'event_staff_partner_rel',  # ← novo nome
+    'event_id',
+    'partner_id',
+    string="Staff Responsáveis"
+)
+
+
     def action_call_equipamentos(self):
         for event in self:
             registrations = self.env['event.registration'].search([

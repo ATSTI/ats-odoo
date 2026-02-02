@@ -33,7 +33,6 @@
             <xpath expr="//field[@name='user_id']" position="replace">
                 <field name="staff_ids"
                        widget="many2many_tags"
-                       domain="[('share','=',False)]"
                        placeholder="Selecione os responsáveis"/>
             </xpath>
         </field>

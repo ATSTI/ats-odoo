@@ -140,7 +140,7 @@ class ChatwootComposer(models.TransientModel):
             self.body = self.template_id.body
             if self.template_id.attachment_ids:
                 self.attachment_ids = [(6, 0, self.template_id.attachment_ids.ids)]
-            else:
+            if not self.attachment_ids:
                 self.attachment_ids = [(5, 0, 0)]  # remove anexos caso template não tenha
 
     def action_send_message(self):

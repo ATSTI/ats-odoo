@@ -56,7 +56,11 @@ class ChatwootInstance(models.Model):
                 headers=headers
             )
             created_data = create_response.json()
-            return created_data.get("data", {}).get("id")
+            id = created_data.get("payload", {}).get("contact", {}).get("id")
+            if id:
+                return id
+            else:
+                raise Exception(f"Impossivel Criar Contato no Chatwoot") 
 
     def create_new_conversation(self, phone_number, partner, team_id, assignee_id, message=None):
         #TODO Ainda não sei como tratar a conversa, ideias: Busca pela conversa aberta para aquele contato ou

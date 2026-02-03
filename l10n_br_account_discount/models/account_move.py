@@ -51,7 +51,7 @@ class AccountMove(models.Model):
                 )
             else:
                 amount_total = sum(
-                    record._get_product_amount_lines().mapped("price_subtotal")
+                    record._get_product_amount_lines().mapped("fiscal_amount_total")
                 )
                 if len(record._get_product_amount_lines()) == 1:
                     for line in record._get_product_amount_lines():

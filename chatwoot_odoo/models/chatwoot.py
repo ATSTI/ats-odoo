@@ -14,6 +14,13 @@ class ChatwootInstance(models.Model):
         help="URL base do Chatwoot"
     )
 
+    code = fields.Char(
+    string="Código Técnico",
+    required=True,
+    help="Chave usada para mapear o usuário no selection"
+)
+    name = fields.Char(required=True)
+
     api_token = fields.Char(
         string="API Token",
         help="Token de acesso à API do Chatwoot"

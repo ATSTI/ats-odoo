@@ -22,6 +22,8 @@
                 <sheet>
                     <group>
                         <field name="base_url"/>
+                        <field name="code"/>
+                        <field name="name" />
                         <field name="api_token"/>
                         <field name="account_id"/>
                     </group>

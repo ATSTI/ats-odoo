@@ -16,5 +16,5 @@
 #
 ##############################################################################
 
-from . import chatwoot
 from . import helpdesk
+from . import chatwoot

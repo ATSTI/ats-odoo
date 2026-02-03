@@ -188,3 +188,20 @@ class ChatwootComposer(models.TransientModel):
             raise UserError(_("Failed to send WhatsApp message: %s") % e)
 
         return {'type': 'ir.actions.act_window_close'}
+    
+    @api.onchange('chatwoot_user')
+    def _onchange_chatwoot_user(self):
+        if not self.chatwoot_user:
+            self.chatwoot_id = False
+            return
+
+        instance = self.env['chatwoot.instance'].search(
+            [('code', '=', self.chatwoot_user)],
+            limit=1
+        )
+
+        if not instance:
+            raise UserError("Instância Chatwoot não encontrada para este usuário")
+
+        self.chatwoot_id = instance.id
+

@@ -7,7 +7,9 @@
         <field name="type">list</field>
         <field name="arch" type="xml">
             <list>
-                <field name="base_url"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="api_token"/>
             </list>
         </field>
     </record>

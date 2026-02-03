@@ -77,9 +77,9 @@ class ChatwootComposer(models.TransientModel):
             res['model'] = self.env.context['active_model']
             res['res_id'] = self.env.context['active_id']
             record = self.env[res['model']].browse(res['res_id'])
-            if res['model'] == 'res.partner' and not record.phone_sanitized:
+            if res['model'] == 'res.partner' and not record.mobile:
                 raise UserError(_("Este Contato deve ter um número de telefone válido"))
-            if res['model'] == 'crm.lead' and not record.partner_id.phone_sanitized:
+            if res['model'] == 'crm.lead' and not record.partner_id.mobile:
                 raise UserError(_("O Contato do Lead deve ter um número de telefone válido"))
             if hasattr(record, 'partner_id') and record.partner_id:
                 partner_ids = record.partner_id.ids

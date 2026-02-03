@@ -5,7 +5,7 @@
         <field name="model">chatwoot.instance</field>
         <field name="inherit_id" ref="chatwoot_odoo.view_chatwoot_instance_list"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='base_url']" position="after">
+            <xpath expr="//field[@name='api_token']" position="after">
                 <field name="activity_due_days"/>
             </xpath>
         </field>

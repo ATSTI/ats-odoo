@@ -34,83 +34,11 @@
                     <b attrs="{'invisible': ['&amp;', ('parent_id', '!=', False), ('type', '!=', False)]}">Endereço</b>
                 </span>
             </xpath>
+            <xpath expr="//page[@autofocus='autofocus']" position="attributes">
+                <attribute name="string">Contatos &amp; Endereços</attribute>
+                <attribute name="autofocus">0</attribute>
+            </xpath>
             <xpath expr="//div[@class='o_address_format']" position="replace">
-                <div class="oe_read_only">
-                    <table>
-                        <field
-                            name="zip"
-                            placeholder="CEP..."
-                            style="width: 70%"
-                            class="o_address_zip"
-                        />
-                        <button
-                            name="zip_search"
-                            type="object"
-                            attrs="{'invisible': [('country_id', '!=', %(base.br)d)]}"
-                            class="btn-sm btn-link mb4 fa fa-search oe_edit_only"
-                            aria-label="Pesquisar CEP"
-                            title="Pesquisar CEP"
-                        />
-                    </table>
-                    <table style="width: 90%">
-                        <field
-                            name="street_name"
-                            placeholder="Rua..."
-                            class="o_address_street"
-                        />
-                    </table>
-                    <table style="width: 90%">
-                        <field
-                            name="street_number"
-                            placeholder="Número..."
-                            class="o_address_street"
-                        />
-                    </table>
-                    <table style="width: 90%">
-                        <field
-                            name="street2"
-                            placeholder="Complemento..."
-                            class="o_address_street"
-                        />
-                    </table>
-                    <table style="width: 90%">
-                        <field
-                            name="district"
-                            placeholder="Bairro..."
-                            class="o_address_street"
-                        />
-                    </table>
-                    <field
-                        name="state_id"
-                        domain="[('country_id', '=', country_id)]"
-                        placeholder="Estado..."
-                        style="width: 45%"
-                        class="o_address_state"
-                        options='{"no_open": True, "no_create": True}'
-                    />
-                    <field
-                        name="city_id"
-                        placeholder="Cidade..."
-                        style="width: 50%"
-                        class="o_address_city"
-                        options='{"no_open": True, "no_create": True}'
-                        attrs="{'invisible': [('country_id', '!=', %(base.br)d)]}"
-                    />
-                    <field
-                        name="city"
-                        placeholder="Cidade..."
-                        style="background-color: #d2d2ff; width: 50%"
-                        class="o_address_city"
-                        force_save="True"
-                        attrs="{'invisible': [('country_id', '=', %(base.br)d)]}"
-                    />
-                    <field
-                        name="country_id"
-                        placeholder="País..."
-                        class="o_address_country"
-                        options='{"no_open": True, "no_create": True}'
-                    />
-                </div>
                 <div class="oe_edit_only">
                     <table>
                         <field
@@ -200,6 +128,8 @@
                             <field name="ind_ie_dest" force_save="1" attrs="{'readonly': [('fiscal_profile_id', '!=', False)]}" />
                             <field name="tax_framework" string="Tipo empresa" force_save="1" attrs="{'readonly': [('fiscal_profile_id', '!=', False)]}" />
                             <field name="ind_final" />
+                            <field name="l10n_br_im_code" />
+                            <field name="l10n_br_isuf_code" />
                         </group>
                     </group>
                 </page>
@@ -209,8 +139,8 @@
                     <group name="container_row_2">
                         <group string="Vendas" name="sale" priority="1">
                             <field name="user_id" domain="[('share', '=', False)]"/>
-                            <field string="Condições de Pagamento" name="property_payment_term_id" widget="selection" groups="account.group_account_invoice,account.group_account_readonly"/>
-                            <field string="Modo de Pagamento do Cliente" name="customer_payment_mode_id" widget="selection" groups="account.group_account_invoice,account.group_account_readonly"/>
+                            <field string="Condições de Pagamento" name="property_payment_term_id" groups="account.group_account_invoice,account.group_account_readonly"/>
+                            <field string="Modo de Pagamento do Cliente" name="customer_payment_mode_id" groups="account.group_account_invoice,account.group_account_readonly"/>
                         </group>
                     </group>
                     <group name="misc" string="Diversos">
@@ -221,8 +151,8 @@
                         <field name="property_account_payable_id"/>
                     </group>
                     <group string="Compras" name="purchase" priority="2">
-                        <field string="Condições de pagamento" name="property_supplier_payment_term_id" widget="selection" groups="account.group_account_invoice,account.group_account_readonly"/>
-                        <field string="Modo de Pagamento do Fornecedor" name="supplier_payment_mode_id" widget="selection" groups="account.group_account_invoice,account.group_account_readonly"/>
+                        <field string="Condições de pagamento" name="property_supplier_payment_term_id" groups="account.group_account_invoice,account.group_account_readonly"/>
+                        <field string="Modo de Pagamento do Fornecedor" name="supplier_payment_mode_id" groups="account.group_account_invoice,account.group_account_readonly"/>
                     </group>
                     <group name="internal_notes" string="Anotações Internas">
                         <field name="comment" placeholder="Internal note..."/>
@@ -247,6 +177,27 @@
                     class="o_address_zip"
                     required="True"
                 />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="l10n_br_base_res_partner_code_fields" model="ir.ui.view">
+        <field name="name">l10n_br_base.res.partner.code.fields</field>
+        <field name="model">res.partner</field>
+        <field name="priority">9999</field>
+        <field name="inherit_id" ref="l10n_br.br_partner_tax_fields_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='l10n_br_cpf_code']" position="attributes">
+                <attribute name="attrs">{'invisible': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='l10n_br_ie_code']" position="attributes">
+                <attribute name="attrs">{'invisible': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='l10n_br_im_code']" position="attributes">
+                <attribute name="attrs">{'invisible': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='l10n_br_isuf_code']" position="attributes">
+                <attribute name="attrs">{'invisible': True}</attribute>
             </xpath>
         </field>
     </record>

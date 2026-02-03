@@ -20,7 +20,7 @@
             <xpath expr="//page[@name='general_information']" position="replace">
                 <page name="general_information" string="Informações Gerais">
                     <group>
-                        <group>
+                        <group >
                             <field name="detailed_type" />
                             <field name="company_ids" 
                                 groups="base.group_multi_company"
@@ -32,7 +32,7 @@
                             <field name="default_code" string="Código" class="oe_read_only" attrs="{'invisible': [('product_variant_count', '&gt;=', 1)]}"/>
                             <field name="barcode" attrs="{'invisible': [('product_variant_count', '&gt;', 1)]}"/>
                         </group>
-                        <group>
+                        <group >
                             <field name="list_price" attrs="{'invisible': [('product_variant_count', '&gt;', 1)]}"/>
                             <field name="standard_price" attrs="{'invisible': [('product_variant_count', '&gt;', 1)]}"/>
                             <field name="uom_id" attrs="{'invisible': [('product_variant_count', '&gt;', 1)]}"/>
@@ -44,18 +44,19 @@
                             <field name="product_variant_id" invisible="1"/>
                             <field name="active" invisible="1"/>
                         </group>
-                    </group>
-                    <group name="fiscal" string="Fiscal" groups="l10n_br_fiscal.group_user">
-                        <group>                        
-                            <field name="fiscal_type" required="1"/>
+                        <!-- <separator string="Fiscal"/> -->
+                        <group name="fiscal" groups="l10n_br_fiscal.group_user" >
+                            <!-- <group>                         -->
+                            <field name="fiscal_type" required="1" string="Tipo Fiscal do Produto"/>
                             <field name="icms_origin" attrs="{'required': [('fiscal_type', '!=', '09')], 'invisible': [('fiscal_type', '=', '09')]}"/>
                             <field name="ncm_id" required="1" options="{'no_create': True, 'no_create_edit': True}"/>
                         </group>
-                        <group>
-                            <field name="tax_icms_or_issqn" required="1"/>
-                            <field name="fiscal_genre_id" required="1" options="{'no_create': True, 'no_create_edit': True}"/>
+                        <group name="fiscal2" groups="l10n_br_fiscal.group_user" >
+                            <field name="tax_icms_or_issqn" required="1" string="Imposto ICMS-ISSQN"/>
+                            <field name="fiscal_genre_id" required="1" options="{'no_create': True, 'no_create_edit': True}" string="Gênero Fiscal"/>
                             <field name="cest_id" attrs="{'invisible': [('fiscal_type', '=', '09')]}" options="{'no_create': True, 'no_create_edit': True}"/>
                         </group>
+                        <!-- </group> -->
                     </group>
                 </page>
             </xpath>

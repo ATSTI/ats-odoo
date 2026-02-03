@@ -13,7 +13,7 @@
                         <field name="chatwoot_user" />
                         <field name="chatwoot_team" />
                         <field name="chatwoot_status" />                         
-                        <field name="template_id" options="{'no_create': True, 'no_create_edit': True}"/>                        
+                        <field name="template_id" />                        
                         <field name="body"/>                         
                         <field name="attachment_ids" widget="many2many_binary"/>
                         <field name="model" invisible="1"/>

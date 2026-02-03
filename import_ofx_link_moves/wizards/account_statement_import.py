@@ -59,7 +59,7 @@ class AccountStatementImport(models.TransientModel):
                 prt = aml.partner_id
                 if not prt:
                     prt = self.find_partner(payment_name, float(transaction.amount))
-                    if len(prt) > 1:
+                    if prt and len(prt) > 1:
                         prt = self.choose_best_partner(prt, payment_name.split())
             if prt:
                 vals["partner_id"] = prt.id
@@ -104,7 +104,7 @@ class AccountStatementImport(models.TransientModel):
         Lines = self.env["account.move.line"]
         termos = self.normalize(payment_name).split()
 
-        prt = Partner.search([("name", "ilike", " ".join(termos))])
+        prt = Partner.search(["|", ("legal_name", "ilike", " ".join(termos)), ("legal_name", "ilike", payment_name)])
         if prt and len(prt) == 1:
             if prt.parent_id and Lines.search([("partner_id", "=", prt.parent_id.id)]):
                 return prt.parent_id
@@ -131,7 +131,7 @@ class AccountStatementImport(models.TransientModel):
                 ])
                 moves = lines.mapped("move_id")
                 if len(moves) == 1:
-                    return pr
+                    return partner
 
         if len(partners) == 1:
             return partners
@@ -142,7 +142,7 @@ class AccountStatementImport(models.TransientModel):
                 name += " " + termo
             else:
                 name = termo
-            domain = [("name", "ilike", name)]
+            domain = [("legal_name", "ilike", name)]
             prt = Partner.search(domain)
             if prt and len(prt) < 4:
                 if self.choose_best_partner(prt, termos) and len(prt) > 1:   

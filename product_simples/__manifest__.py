@@ -3,7 +3,7 @@
 
 {
     'name': 'Cadastro de produto simplificado',
-    'version': '16.0',
+    'version': '16.0.1.0.0',
     'category': 'Product',
     'license': 'AGPL-3',
     'summary': 'simplificação do cadastro de produtos',

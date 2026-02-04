@@ -11,7 +11,6 @@ class PosOrder(models.Model):
 
         order = self.browse(res)
 
-        # só aplica para NFC-e
         if order.document_type != MODELO_FISCAL_NFCE:
             return res
 
@@ -19,39 +18,25 @@ class PosOrder(models.Model):
         if not move:
             return res
 
-        # posta a fatura se necessário
         if move.state == "draft":
             move.action_post()
 
-        # se já está paga, sai
+        # já pago → sai
         if move.amount_residual == 0:
             return res
 
-        # cria pagamentos baseados nos pagamentos do POS
-        for pos_payment in order.payment_ids:
-            journal = pos_payment.payment_method_id.journal_id
-            if not journal:
-                continue
+        # 🔹 reconciliar linhas de pagamento do POS com a fatura
+        receivable_lines = move.line_ids.filtered(
+            lambda l: l.account_internal_type == "receivable" and not l.reconciled
+        )
 
-            pay_vals = {
-                "payment_type": "inbound",
-                "partner_type": "customer",
-                "partner_id": move.partner_id.id,
-                "amount": pos_payment.amount,
-                "journal_id": journal.id,
-                "payment_method_id": self.env.ref(
-                    "account.account_payment_method_manual_in"
-                ).id,
-                "ref": move.name,
-            }
+        pos_payment_lines = order.account_move.line_ids.filtered(
+            lambda l: l.account_internal_type == "receivable" and not l.reconciled
+        )
 
-            payment = self.env["account.payment"].create(pay_vals)
-            payment.action_post()
+        lines = receivable_lines | pos_payment_lines
 
-            lines = (move.line_ids + payment.line_ids).filtered(
-                lambda l: l.account_id == payment.destination_account_id
-                and not l.reconciled
-            )
+        if lines:
             lines.reconcile()
 
         return res

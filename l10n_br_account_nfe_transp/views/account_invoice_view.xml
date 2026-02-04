@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Customer Invoice views -->
+    <record id="account_invoice_transp_form" model="ir.ui.view">
+        <field name="name">l10n_br_account.invoice.transp.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="l10n_br_account.invoice_form" />
+        <field name="priority">399</field>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='other_info']" position="after">
+                <page name="transp_frete" string="Transporte/Frete" >
+                    <group
+                        name="nfe_transport"
+                        attrs="{'invisible': [('document_type', 'not in', ['55', '65'])]}"
+                    >
+                        <field name="incoterm_id" />
+                        <field name="carrier_id" />
+                        <field name="nfe40_modFrete" />
+                        <field name="nfe40_transporta" readonly="0" />
+                    </group>
+                    <group attrs="{'invisible': [('nfe40_idDest', '!=', '3')]}">
+                        <field name="nfe40_idDest" invisible="1" />
+                        <field name="nfe40_UFSaidaPais" />
+                        <field name="nfe40_xLocExporta" />
+                        <field name="nfe40_xLocDespacho" />
+                    </group>
+                    <group
+                        name="nfe_vol"
+                        attrs="{'invisible': [('document_type', 'not in', ['55', '65'])]}"
+                    >
+                        <field name="nfe40_vol" />
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

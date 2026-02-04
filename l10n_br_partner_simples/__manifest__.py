@@ -3,7 +3,7 @@
 
 {
     'name': 'Cadastro de Cliente simplificado',
-    'version': '1.0',
+    "version": "16.0.0.0.1",
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
@@ -14,7 +14,7 @@
     'author': 'ATSTi Soluções',
     'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
     'website': 'https://github.com/ATSTI/ats-odoo',
-    'depends': ['l10n_br_base', 'l10n_br_fiscal', 'l10n_br_account', 'account_payment_partner' ],
+    'depends': ['l10n_br_base', 'l10n_br_zip', 'l10n_br_fiscal', 'l10n_br_account', 'account_payment_partner' ],
     'data': [
         'views/partner_view.xml',
     ],

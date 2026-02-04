@@ -34,25 +34,30 @@
                     </h3>
 
                     <!-- ITENS SOLICITADOS -->
-                    <h4>Itens Solicitados</h4>
+                    <h5>Itens Solicitados</h5>
                     <t t-set="request_count" t-value="len(doc.material_request_line_ids)"/>
+                    <table style="width:100%">
+                        <thead>
+                            <th style="width:5%; text-align:left">Observação: </th>
+                            <td style="width:45%; text-align:left"> <span t-field="doc.obs_req" /> </td>
+                            <th style="width:10%; text-align:left">Requisitante:</th>
+                            <td style="width:30%; text-align:left"> <span t-field="doc.who_req" /> </td>
+                            <th style="width:10%; text-align:left">Data de Requisição:</th>
+                            <td style="width:10%; text-align:left"> <span t-field="doc.date_req" /> </td>
+                        </thead>
+                    </table>
                     <table class="table table-sm" style="width:100%; border-collapse:collapse;">
                         <thead>
                             <tr style="background:#f0f0f0;">
                                 <th style="border:1px solid #000; width:400px;">Item</th>
                                 <th style="border:1px solid #000; width:80px;">Qtd</th>
-                                <th style="border:1px solid #000; width:400px;">Observação</th>
-                                <th style="border:1px solid #000; width:200px;">Requisitante</th>
-                                <th style="border:1px solid #000; width:80px;">Data de Requisição</th>
+                                
                             </tr>
                         </thead>
                         <tbody>
                             <t t-if="request_count &lt; 3">
                                 <t t-foreach="range(3 - request_count)" t-as="i">
                                     <tr>
-                                        <td style="border:1px solid #000; height: 20px;"></td>
-                                        <td style="border:1px solid #000; height: 20px;"></td>
-                                        <td style="border:1px solid #000; height: 20px;"></td>
                                         <td style="border:1px solid #000; height: 20px;"></td>
                                         <td style="border:1px solid #000; height: 20px;"></td>
                                     </tr>
@@ -66,15 +71,6 @@
                                     <td style="border:1px solid #000; text-align:center;">
                                         <span t-field="line.quantidade"/>
                                     </td>
-                                    <td style="border:1px solid #000;">
-                                        <span t-field="line.obs"/>
-                                    </td>
-                                    <td style="border:1px solid #000;">
-                                        <span t-field="line.who_req"/>
-                                    </td>
-                                    <td style="border:1px solid #000; text-align:center;">
-                                        <span t-field="line.date_req"/>
-                                    </td>
                                 </tr>
                             </t>
                         </tbody>
@@ -83,25 +79,29 @@
                     <br/>
 
                     <!-- DEVOLUÇÃO -->
-                    <h4>Devolução</h4>
+                    <h5>Devolução</h5>
                     <t t-set="devolution_count" t-value="len(doc.material_devolution_line_ids)"/>
+                    <table style="width:100%">
+                        <thead>
+                            <th style="width:5%; text-align:left">Observação: </th>
+                            <td style="width:45%; text-align:left"> <span t-field="doc.obs_devol" /> </td>
+                            <th style="width:10%; text-align:left">Restintuinte:</th>
+                            <td style="width:30%; text-align:left"> <span t-field="doc.who_devol" /> </td>
+                            <th style="width:10%; text-align:left">Data de Devolução:</th>
+                            <td style="width:10%; text-align:left"> <span t-field="doc.date_devol" /> </td>
+                        </thead>
+                    </table>
                     <table style="width:100%; border-collapse:collapse;">
                         <thead>
                             <tr style="background:#f0f0f0;">
                                 <th style="border:1px solid #000; width:400px;">Item</th>
                                 <th style="border:1px solid #000; width:80px;">Qtd</th>
-                                <th style="border:1px solid #000; width:400px;">Observação</th>
-                                <th style="border:1px solid #000; width:200px;">Restintuinte</th>
-                                <th style="border:1px solid #000; width:80px;">Data de Devolução</th>
                             </tr>
                         </thead>
                         <tbody>
                             <t t-if="devolution_count &lt; 3">
                                 <t t-foreach="range(3 - devolution_count)" t-as="i">
                                     <tr>
-                                        <td style="border:1px solid #000; height: 20px;"></td>
-                                        <td style="border:1px solid #000; height: 20px;"></td>
-                                        <td style="border:1px solid #000; height: 20px;"></td>
                                         <td style="border:1px solid #000; height: 20px;"></td>
                                         <td style="border:1px solid #000; height: 20px;"></td>
                                     </tr>
@@ -114,15 +114,6 @@
                                     </td>
                                     <td style="border:1px solid #000; text-align:center;">
                                         <span t-field="line.quantidade"/>
-                                    </td>
-                                    <td style="border:1px solid #000;">
-                                        <span t-field="line.obs"/>
-                                    </td>
-                                    <td style="border:1px solid #000;">
-                                        <span t-field="line.who_devol"/>
-                                    </td>
-                                    <td style="border:1px solid #000; text-align:center;">
-                                        <span t-field="line.date_devol"/>
                                     </td>
                                 </tr>
                             </t>

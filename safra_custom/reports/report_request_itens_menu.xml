@@ -3,8 +3,8 @@
     <data>
         <report 
             id="action_report_request_itens"
-            string="Requisição de Materiais"
-            model="repair.order" 
+            string="Transação de Materiais"
+            model="itens.transacao" 
             report_type="qweb-pdf"
             file="safra_custom.report_request_itens_template" 
             name="safra_custom.report_request_itens_template" 

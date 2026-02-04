@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="itens_tree_view" model="ir.ui.view">
+            <field name="name">ites.transacao.tree</field>
+            <field name="model">itens.transacao</field>
+            <field name="mode">primary</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" />
+                    <field name="who_req" />
+                    <field name="date_req"/>
+                    <field name="who_devol" />
+                    <field name="date_devol" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="itens_form_view" model="ir.ui.view">
+            <field name="name">ites.transacao.form</field>
+            <field name="model">itens.transacao</field>
+            <field name="mode">primary</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group string="Itens Solicitados">
+                            <field name="obs_req"/>
+                            <field name="who_req"/>
+                            <field name="date_req"/>
+                            <field name="material_request_line_ids">
+                                <tree editable="bottom" delete="true">
+                                    <field name="item" width="300"/>
+                                    <field name="quantidade" width="80"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <group string="Devoluções">
+                            <field name="obs_devol"/>
+                            <field name="who_devol"/>
+                            <field name="date_devol"/>
+                            <field name="material_devolution_line_ids">
+                                <tree editable="bottom" delete="true">
+                                    <field name="item" width="300"/>
+                                    <field name="quantidade" width="80"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_itens_transacao" model="ir.actions.act_window">
+            <field name="name">Transação de Itens</field>
+            <field name="res_model">itens.transacao</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Crie seu primeiro registro.
+                </p>
+            </field>
+        </record>
+
+        <menuitem
+            id="itens_transacao_menu_root"
+            name="Transação de Materiais Internos"
+            action="action_itens_transacao"
+            sequence="37"
+            web_icon="safra_custom,static/description/icon.png"
+        />
+
+    </data>
+</odoo>

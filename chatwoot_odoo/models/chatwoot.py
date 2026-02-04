@@ -131,8 +131,11 @@ class ChatwootInstance(models.Model):
 
         filename = attachment.name or "arquivo"
 
-        if "." not in filename:
-            filename += ".pdf"
+        name, ext = os.path.splitext(filename)
+
+        # Se não tiver extensão ou for estranha, força PDF
+        if not ext or ext.lower() not in ['.pdf', '.xml', '.jpg', '.png', '.txt']:
+            filename = f"{filename}.pdf"
 
         mimetype = attachment.mimetype
         if not mimetype:

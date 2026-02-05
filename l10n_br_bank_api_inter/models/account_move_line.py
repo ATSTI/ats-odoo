@@ -132,11 +132,11 @@ class AccountMoveLine(models.Model):
                 client_id=self.journal_payment_mode_id.bank_client_id,
                 client_secret=self.journal_payment_mode_id.bank_secret_id,
                 client_environment=self.journal_payment_mode_id.bank_environment,
-                token=token,
+                # token=token,
             )
             if not self.own_number and self.codigo_solicitacao:
                 # buscar informacoes do boleto pegar nosso_numero
-                resposta = api.consulta_boleto(self.codigo_solicitacao)
+                resposta = api.consulta_boleto_detalhado(self.codigo_solicitacao)
                 if 'cobranca' in resposta:
                     boleto = resposta['boleto']
                     if 'pix' in resposta:
@@ -224,15 +224,12 @@ class AccountMoveLine(models.Model):
                             client_id=self.journal_payment_mode_id.bank_client_id,
                             client_secret=self.journal_payment_mode_id.bank_secret_id,
                             client_environment=self.journal_payment_mode_id.bank_environment,
-                            token=token,
+                            # token=token,
                         )                      
                         resultado = api.boleto_baixa(self.codigo_solicitacao, codigo_baixa)
                         if resultado:
                             self.bank_inter_state = "baixado"
                             self.write_off_by_api = True
-                            # deixar o payment_line como cancelado
-                            for payment_line in self.payment_line_ids:
-                                payment_line.order_id.state = "cancel"
                         user = str(self._uid) + '-' + self.env['res.users'].browse(self._uid).name
                         message = "Boleto Banco Inter cancelado: %s-%s, código: %s, usuário: %s\n, em %s." % (
                                     self.name,
@@ -241,7 +238,7 @@ class AccountMoveLine(models.Model):
                                     user,
                                     datetime.now().strftime('%d-%m-%Y %H:%M')
                         )
-                        self.move_id.message_post(body=message)
+                        self.move_id.message_post(body=message)                            
         except Exception as error:
             raise UserError(_(error))
 
@@ -262,10 +259,10 @@ class AccountMoveLine(models.Model):
                         client_id=self.journal_payment_mode_id.bank_client_id,
                         client_secret=self.journal_payment_mode_id.bank_secret_id,
                         client_environment=self.journal_payment_mode_id.bank_environment,
-                        token=token,
+                        # token=token,
                     )
                     if self.codigo_solicitacao:
-                        resposta = api.consulta_boleto(
+                        resposta = api.consulta_boleto_detalhado(
                             codigo_solicitacao=self.codigo_solicitacao
                         )
                         if resposta:

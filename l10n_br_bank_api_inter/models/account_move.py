@@ -25,7 +25,7 @@ class AccountMove(models.Model):
             payment_order_id = False
             if not move.payment_mode_id or not move.partner_bank_id:
                 raise UserError(_("Sem modo de pagamento ou Banco destinatário"))
-            for move_line in move.financial_move_line_ids:
+            for move_line in move.due_line_ids:
                 if payment_order_id:
                     break
                 for order in move_line.payment_line_ids:
@@ -35,14 +35,14 @@ class AccountMove(models.Model):
                     break
             if not payment_order_id:
                 raise UserError(_("Ordem de débito cancelada, recrie a Ordem de débito (Botão: Add to debit order)."))
-            for move_line in move.financial_move_line_ids:
+            for move_line in move.due_line_ids:
                 # necessario se precisa refazer o boleto, tipo trocou a data vencimento
                 if not move_line.codigo_solicitacao:
                     # gerar boleto
-                    payment_order_id.open2generated()
+                    payment_order_id.open2generated(move_line)
                     time.sleep(5)
                     # break
-        for move_line in self.financial_move_line_ids:
+        for move_line in self.due_line_ids:
             if move_line.codigo_solicitacao and not move_line.pdf_boleto_id:
                 try:
                     move_line.generate_pdf_boleto()
@@ -62,8 +62,8 @@ class AccountMove(models.Model):
                 #  ocorre da linha vir vazia o que impede de entrar no FOR
                 #  abaixo causando o não preenchimento de dados usados no Boleto,
                 #  isso deve ser melhor investigado
-                self._compute_financial()
-                for index, interval in enumerate(self.financial_move_line_ids):
+                # self._compute_financial()
+                for index, interval in enumerate(self.due_line_ids):
                     inv_number = self.get_invoice_fiscal_number().split("/")[-1]
                     numero_documento = inv_number + "/" + str(index + 1).zfill(2)
 
@@ -104,7 +104,7 @@ class AccountMove(models.Model):
                             lambda x: (
                                 not x.reconciled
                                 and x.payment_mode_id.payment_order_ok
-                                and x.account_id.internal_type in ("receivable", "payable")
+                                # and x.account_id.internal_type in ("receivable", "payable")
                                 and not any(
                                     p_state in ("draft", "open", "generated")
                                     for p_state in x.payment_line_ids.mapped("state")

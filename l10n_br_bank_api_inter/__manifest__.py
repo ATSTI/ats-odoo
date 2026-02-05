@@ -2,25 +2,24 @@
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 {
-    'name': 'Brasil – Integração API Banco Inter',
-    'version': '14.0.1.0.0',
-    'category': 'Accounting',
+    'name': 'Banco Inter - Integração com a API',
+    'version': '16.0',
+    'category': 'Others',
     'license': 'AGPL-3',
-    'sequence': 10,
-    'summary': 'Integra integração com APIs bancárias (inter) para pagamentos e conciliações no Brasil',
+    'sequence': 2,
+    'summary': 'Banco Inter - Integração com a API',
     'description': """
-        Este módulo adiciona funcionalidade de integração com APIs do banco “Inter” para:
-        - Consulta de transações bancárias via API;
-        - Importação automática de extratos;
-        - Conciliação automática entre lançamentos financeiros e movimentos bancários;
-        - Outras rotinas de automação bancária específicas para o banco Inter.
+Banco Inter - Integração com a API
+Funcionalidades:
+    - Geração de boletos via API do Banco Inter
+    - Baixa automática de boletos via API do Banco Inter
+Como usar:
+    - Payment Mode precisa ser CNAB 240 para o Banco Inter
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'maintainer': 'Carlos Silveira, Mauricio-ATS, ATSTi',
     'website': 'https://github.com/ATSTI/ats-odoo',
-    'depends': [
-        'l10n_br_account_payment_order',
-    ],
+    'depends': ['l10n_br_account_payment_order'],
     'data': [
         "security/ir.model.access.csv",
         "views/account_move.xml",
@@ -43,6 +42,4 @@
     },
     'installable': True,
     'application': False,
-    'auto_install': False,
-
 }

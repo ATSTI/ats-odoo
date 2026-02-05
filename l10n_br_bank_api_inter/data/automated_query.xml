@@ -2,15 +2,14 @@
 <odoo>
     <data noupdate="1">
         <record id="schedule_action_bank_inter" model="ir.cron">
-                <field name="name">Banco Inter Consulta Boleto</field>
-                <field name="model_id" ref="model_account_move_line" />
-                <field name="state">code</field>
-                <field name="code">model.all_search_bank_slip()</field>
-                <field name="user_id" ref="base.user_root" />
-                <field name='interval_number'>1</field>
-                <field name='interval_type'>days</field>
-                <field name="numbercall">-1</field>
-                <field name="doall" eval="False" />
+            <field name="name">Account: Post draft entries with auto_post enabled and accounting date up to today</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="nextcall" eval="(DateTime.now().replace(hour=2, minute=0) + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+            <field name="model_id" ref="model_account_move_line"/>
+            <field name="code">model.all_search_bank_slip()</field>
+            <field name="state">code</field>
         </record>
     </data>
 </odoo>
+    

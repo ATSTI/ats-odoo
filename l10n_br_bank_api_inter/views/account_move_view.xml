@@ -12,7 +12,7 @@
                     type="object"
                     string="Imprimir Boleto"
                     class="btn-primary"
-                    attrs="{'invisible': ['|', ('state', '!=', 'posted'), ('payment_method_code', 'not in', ('240', '400', '500', 'electronic'))]}"
+                    invisible="state != 'posted' or payment_method_code not in []'240', '400', '500', 'electronic']"
                 />
             </button>
         </field>

@@ -13,7 +13,7 @@
                     name="action_pdf_boleto"
                     type="object"
                     string="Imprimir Boletos"
-                    attrs="{'invisible': [('state', '!=', 'posted')]}"
+                    invisible="state != 'posted'"
                 />
             </button>
         </field>

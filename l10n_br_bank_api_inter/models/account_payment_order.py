@@ -126,6 +126,9 @@ class AccountPaymentOrder(models.Model):
             for item in data:
                 # print(item._emissao_data())
                 resposta = api.boleto_inclui(item._emissao_data())
+                if resposta.get("erro"):
+                    erro = self.generate_error_message(resposta)
+                    raise UserError(f"{erro}")
                 # print(resposta)
                 payment_line_id = self.payment_line_ids.filtered(
                     lambda line: line.document_number == item._identifier
@@ -211,4 +214,31 @@ class AccountPaymentOrder(models.Model):
             else:
                 return super().open2generated()
         except Exception as error:
-            raise UserError(_(error))
+            raise UserError(str(error))
+
+    def generate_error_message(self, data):
+        messages = []
+
+        title = data.get("title")
+        detail = data.get("detail")
+
+        if title:
+            messages.append(title)
+
+        if detail:
+            messages.append(detail)
+
+        violacoes = data.get("violacoes", [])
+        for v in violacoes:
+            razao = v.get("razao")
+
+            if razao:
+                messages.append(
+                    f"\n• {razao}"
+                )
+
+        erro = "\n".join(messages).strip()
+        message = 'ERRO: %s' % (
+            erro,
+        )
+        return message

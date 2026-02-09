@@ -1,0 +1,50 @@
+    <odoo>
+
+    <template id="pos_product_sales_template">
+        <t t-call="web.external_layout">
+            <main>
+            <div class="page">
+
+                <h2>Relatório POS — Últimos 30 dias</h2>
+
+                <p>
+                    <strong>Produto:</strong>
+                    <span t-field="doc.product_id.display_name"/>
+                </p>
+
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Pedido</th>
+                            <th>Qtd</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr t-foreach="lines" t-as="l">
+
+                            <td><span t-esc="l.order_id.date_order"/></td>
+                            <td><span t-esc="l.order_id.name"/></td>
+                            <td><span t-esc="l.qty"/></td>
+
+                            <td>
+                                <span t-esc="l.price_subtotal_incl"
+                                    t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+
+                        </tr>
+                    </tbody>
+
+                </table>
+
+                <p><strong>Total vendido:</strong> <t t-esc="total_qty"/></p>
+                <p><strong>Total faturado:</strong> <t t-esc="total_value"/></p>
+                
+            </div>
+            </main>
+        </t>
+    </template>
+
+    </odoo>

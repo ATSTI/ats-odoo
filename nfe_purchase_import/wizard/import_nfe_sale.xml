@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record model="ir.ui.view" id="view_wizard_import_sale_nfe">
+        <field name="name">wizard.import.nfe.sale.form</field>
+        <field name="model">wizard.import.nfe.sale</field>
+        <field name="arch" type="xml">
+            <form string="Importar compra">
+                <group>
+                    <field name="nfe_xml"/>
+                    <field name="fiscal_position_id" domain="['|', ('fiscal_type', '=', None), ('fiscal_type', '=', 'saida')]"/>
+                    <field name="payment_term_id" />
+                    <field name="confirma" readonly="1"/>
+                    <button name="checa_produtos" string="Checar" type="object" attrs="{'invisible':[('confirma','!=',False)]}"/>
+                </group>
+                <group>
+                    <field name="not_found_product" mode="tree,kanban" attrs="{'invisible':[('confirma','!=',True)]}">
+                        <form string="Produtos não encontrados(deixe em branco para criar um novo)">
+                            <group>
+                                <field name="name"/>
+                                <field name="product_id"/>
+                            </group>
+                        </form>
+                        <tree string="Produtos não encontrados(deixe em branco para criar um novo)" editable="bottom">
+                            <field name="name"/>
+                            <field name="product_id"/>
+                        </tree>
+                    </field>
+                </group>
+                <footer>
+                    <button name="action_import_nfe_sale"
+                        string="Importar" type="object"
+                        class="oe_highlight" attrs="{'invisible':[('confirma','!=',True)]}" />
+                    <button string="Cancelar" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_import_nfe_sale_wizard" model="ir.actions.act_window">
+        <field name="name">Importar NFe</field>
+        <field name="res_model">wizard.import.nfe.sale</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_nfe_sale_import"
+              name="Importar NFe Vendas"
+              parent="sale.menu_sale_config"
+              action="action_import_nfe_sale_wizard"
+              sequence="15" />
+
+</odoo>

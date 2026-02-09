@@ -18,8 +18,6 @@ class PosOrder(models.Model):
             data = payload.get("data", {})
             cpf_raw = data.get("extra_note")
 
-            _logger.warning("CPF RAW recebido do POS: %s", cpf_raw)
-
             if not cpf_raw:
                 continue
 
@@ -27,30 +25,16 @@ class PosOrder(models.Model):
 
             order = self.browse(result["id"])
 
-            _logger.warning(
-                "Aplicando CPF no pedido %s -> %s",
-                order.pos_reference,
-                cpf,
-            )
+            _logger.warning("CPF aplicado na NFC-e: %s", cpf)
 
-            # ✅ campo usado pelo XML NFC-e
+            # ✅ grava só no pedido fiscal
             if hasattr(order, "customer_tax_id"):
                 order.customer_tax_id = cpf
-                _logger.warning("customer_tax_id gravado")
 
-            # ✅ salva no partner também (garantia DANFE)
-            if order.partner_id:
-                if hasattr(order.partner_id, "cnpj_cpf"):
-                    order.partner_id.cnpj_cpf = cpf
-                    _logger.warning("partner.cnpj_cpf gravado")
-                else:
-                    order.partner_id.vat = cpf
-                    _logger.warning("partner.vat gravado")
+            if hasattr(order, "cnpj_cpf"):
+                order.cnpj_cpf = cpf
 
-            # opcional — manter seu campo custom
             if hasattr(order, "extra_note"):
                 order.extra_note = cpf
 
-        _logger.warning("=== CPF HOOK FINALIZADO ===")
-
-        return res
+     return res

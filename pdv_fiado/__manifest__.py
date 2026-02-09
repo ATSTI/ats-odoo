@@ -27,7 +27,7 @@
     """,
     "category": "Point of Sale",
     "license": "AGPL-3",
-    "depends": ["point_of_sale",'account','sale','product'],
+    "depends": ["point_of_sale",'account','sale','product','l10n_br_pos_nfce',],
     'contributors': [
         'Otávio Andretta<otavio12257@gmail.com>',
     ],

@@ -1,0 +1,11 @@
+<odoo>
+<record id="report_pos_product_sales"
+        model="ir.actions.report">
+
+    <field name="name">Relatório POS Produto</field>
+    <field name="model">pos.product.report.wizard</field>
+    <field name="report_type">qweb-pdf</field>
+    <field name="report_name">pos_produtos_report.pos_product_sales_template</field>
+
+</record>
+</odoo>

@@ -1,0 +1,41 @@
+<odoo>
+
+    <record id="view_pos_product_report_wizard" model="ir.ui.view">
+        <field name="name">pos.product.report.wizard.form</field>
+        <field name="model">pos.product.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Relatório POS por Produto">
+                <group>
+                    <field name="product_id"/>
+                </group>
+
+                <footer>
+                    <button string="Gerar relatorio vendas"
+                            type="object"
+                            name="action_print_report"
+                            class="btn-primary"/>
+                    <button string="Cancelar" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_pos_product_report_wizard"
+            model="ir.actions.act_window">
+
+        <field name="name">Relatório por Produto</field>
+        <field name="res_model">pos.product.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+
+    </record>
+
+    <menuitem
+        id="menu_pos_product_sales_report"
+        name="Vendas por Produto (30 dias)"
+        parent="point_of_sale.menu_point_rep"
+        action="action_pos_product_report_wizard"
+        groups="point_of_sale.group_pos_manager"
+        sequence="50"/>
+
+</odoo>

@@ -14,7 +14,7 @@
                 <group
                     name="bank_inter"
                     string="Bank Inter API"
-                    invisible="type != 'bank' or bank_code_bc != '077'"
+                    attrs="{'invisible': ['|', ('type', '!=', 'bank'),('bank_code_bc', '!=', '077')]}"
                 >
                     <field name="bank_inter_cert" />
                     <field name="bank_inter_key" />

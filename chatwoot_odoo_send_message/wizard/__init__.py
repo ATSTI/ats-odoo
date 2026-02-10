@@ -1,1 +1,0 @@
-from . import chatwoot_composer

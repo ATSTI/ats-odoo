@@ -37,14 +37,6 @@ odoo.define('pdv_fiado.pos_extra_note_button', function(require) {
         const note = this.extra_note || '';
         json.extra_note = note;
 
-        const cpf = note.replace(/\D/g, '');
-
-        // ✅ campos usados pelo XML NFC-e
-        json.customer_tax_id = cpf ? String(cpf) : '';
-        json.cnpj_cpf = cpf ? String(cpf) : '';
-
-        console.log("CPF enviado na NFC-e:", cpf);
-
         return json;
     };
 

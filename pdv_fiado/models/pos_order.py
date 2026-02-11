@@ -4,39 +4,34 @@ import re
 
 _logger = logging.getLogger(__name__)
 
+
 class PosOrder(models.Model):
     _inherit = "pos.order"
 
     @api.model
     def create_from_ui(self, orders, draft=False):
-        _logger.warning("=== CPF HOOK create_from_ui ENTROU ===")
 
-        # Chama o método original para criar os pedidos
         res = super().create_from_ui(orders, draft)
-        import pudb;pudb.set_trace()
+
         for payload, result in zip(orders, res):
-            data = payload.get("data", {})
-            cpf_raw = data.get("extra_note")  # do POS JS
+            cpf_raw = payload.get("data", {}).get("extra_note")
 
             if not cpf_raw:
                 continue
 
-            cpf = re.sub(r"\D", "", cpf_raw)  
+            cpf = re.sub(r"\D", "", cpf_raw)
+
+            if not cpf:
+                continue
 
             order = self.browse(result["id"])
-            _logger.warning("CPF aplicado no pedido POS: %s", cpf)
 
-            if hasattr(order, "customer_tax_id"):
-                order.customer_tax_id = cpf
-            if hasattr(order, "cnpj_cpf"):
-                order.cnpj_cpf = cpf
-            if hasattr(order, "extra_note"):
-                order.extra_note = cpf
-
-            if order.invoice_id:
-                invoice = order.invoice_id
-                if hasattr(invoice, "cpf_consumidor"):
-                    invoice.cpf_consumidor = cpf
-                    _logger.warning("CPF aplicado na fatura: %s", cpf)
+            if "cnpj_cpf" in order._fields:
+                order.sudo().write({"cnpj_cpf": cpf})
+                _logger.warning("CPF salvo no pedido POS: %s", cpf)
+            else:
+                _logger.warning("Campo cnpj_cpf não existe no pos.order")
 
         return res
+
+    

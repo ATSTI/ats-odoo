@@ -85,7 +85,7 @@ class EventRegistration(models.Model):
     obs = fields.Char("Observações")
 
     def _compute_aviso_equipamento(self):
-        limite_dias = 7
+        limite_dias = 1
         agora = fields.Datetime.now()
         Movimento = self.env['partner.equipamento.movimento']
         for reg in self:

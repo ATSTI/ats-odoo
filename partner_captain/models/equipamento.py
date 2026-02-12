@@ -49,8 +49,6 @@ class PartnerEquipamento(models.Model):
 
         return result
 
-    from odoo import fields, models, api
-
     @api.depends('movimento_ids.data_movimento', 'movimento_ids.movimento')
     def _compute_status_captain(self):
         hoje = fields.Date.today()
@@ -75,7 +73,7 @@ class PartnerEquipamento(models.Model):
                 dias = (hoje - data_mov).days
 
                 eq.dias_na_captain = dias
-                eq.em_atraso = dias >= 1  # ⚠️ aviso já no dia seguinte
+                eq.em_atraso = dias >= 1 
 
 
     def write(self, vals):

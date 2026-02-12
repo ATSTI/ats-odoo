@@ -95,29 +95,59 @@ class ResPartner(models.Model):
 
             if partner.genero not in ('masculino', 'feminino'):
                 continue
+
+            # margens de segurança
+            peso_ref = partner.peso + 3
+            altura_ref = partner.altura + 2
+
+            # ---------- BCD ----------
             bcd_rule = SizeRule.search([
                 ('genero', '=', partner.genero),
                 ('selecao', '=', 'bcd'),
-                ('altura', '=', partner.altura),
-                ('peso', '=', partner.peso),
-            ], limit=1)
+                ('altura', '>=', altura_ref),
+                ('peso', '>=', peso_ref),
+            ],
+                order='altura asc, peso asc',
+                limit=1
+            )
 
-            partner.bcd = bcd_rule.tamanho.upper() if bcd_rule else False
+            if not bcd_rule:
+                #sem margem
+                bcd_rule = SizeRule.search([
+                    ('genero', '=', partner.genero),
+                    ('selecao', '=', 'bcd'),
+                    ('altura', '>=', partner.altura),
+                    ('peso', '>=', partner.peso),
+                ],
+                    order='altura asc, peso asc',
+                    limit=1
+                )
+
+            partner.bcd = bcd_rule.tamanho if bcd_rule else False
+
+            # ---------- SUIT ----------
             suit_rule = SizeRule.search([
                 ('genero', '=', partner.genero),
                 ('selecao', '=', 'suit'),
-                ('altura', '=', partner.altura),
-                ('peso', '=', partner.peso),
-            ], limit=1)
+                ('altura', '>=', altura_ref),
+                ('peso', '>=', peso_ref),
+            ],
+                order='altura asc, peso asc',
+                limit=1
+            )
 
-            partner.suit = suit_rule.tamanho.upper() if suit_rule else False
+            if not suit_rule:
+                suit_rule = SizeRule.search([
+                    ('genero', '=', partner.genero),
+                    ('selecao', '=', 'suit'),
+                    ('altura', '>=', partner.altura),
+                    ('peso', '>=', partner.peso),
+                ],
+                    order='altura asc, peso asc',
+                    limit=1
+                )
 
-    @api.onchange('bcd', 'suit')
-    def _onchange_normaliza_tamanho(self):
-        if self.bcd:
-            self.bcd = self.bcd.strip().lower()
-        if self.suit:
-            self.suit = self.suit.strip().lower()
+            partner.suit = suit_rule.tamanho if suit_rule else False
 
 
 class PartnerHistorico(models.Model):

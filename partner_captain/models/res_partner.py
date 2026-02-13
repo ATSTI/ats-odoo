@@ -86,6 +86,9 @@ class ResPartner(models.Model):
     def _compute_tamanhos(self):
         SizeRule = self.env['captain.size.rule']
 
+        ALTURA_TOL = 10  # cm aceitáveis acima
+        PESO_TOL = 10    # kg aceitáveis acima
+
         for partner in self:
             partner.bcd = False
             partner.suit = False
@@ -96,38 +99,56 @@ class ResPartner(models.Model):
             if partner.genero not in ('masculino', 'feminino'):
                 continue
 
-            # se altura estiver em metros → converter pra cm
+            # --- normalização metros → cm ---
             altura = partner.altura * 100 if partner.altura < 3 else partner.altura
-
             peso = partner.peso
 
-            # margens
             peso_ref = peso + 3
             altura_ref = altura + 2
 
             def buscar_tamanho(selecao):
-                rule = SizeRule.search([
+
+                # 1️⃣ match direto com tolerância
+                domain = [
                     ('genero', '=', partner.genero),
                     ('selecao', '=', selecao),
                     ('altura', '>=', altura),
                     ('peso', '>=', peso),
-                ], order='altura asc, peso asc', limit=1)
+                    ('altura', '<=', altura + ALTURA_TOL),
+                    ('peso', '<=', peso + PESO_TOL),
+                ]
+
+                rule = SizeRule.search(
+                    domain,
+                    order='altura asc, peso asc',
+                    limit=1
+                )
 
                 if rule:
                     return rule
 
-                return SizeRule.search([
+                # 2️⃣ fallback com pequena margem + tolerância
+                domain_ref = [
                     ('genero', '=', partner.genero),
                     ('selecao', '=', selecao),
                     ('altura', '>=', altura_ref),
                     ('peso', '>=', peso_ref),
-                ], order='altura asc, peso asc', limit=1)
+                    ('altura', '<=', altura_ref + ALTURA_TOL),
+                    ('peso', '<=', peso_ref + PESO_TOL),
+                ]
+
+                return SizeRule.search(
+                    domain_ref,
+                    order='altura asc, peso asc',
+                    limit=1
+                )
 
             bcd_rule = buscar_tamanho('bcd')
             suit_rule = buscar_tamanho('suit')
 
             partner.bcd = bcd_rule.tamanho if bcd_rule else False
             partner.suit = suit_rule.tamanho if suit_rule else False
+
 
 
 

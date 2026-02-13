@@ -86,9 +86,8 @@ class ResPartner(models.Model):
     def _compute_tamanhos(self):
         SizeRule = self.env['captain.size.rule']
 
-        ALTURA_TOL = 10  # cm aceitáveis acima
-        PESO_TOL = 10    # kg aceitáveis acima
-
+        ALTURA_TOL = 10  
+        PESO_TOL = 10    
         for partner in self:
             partner.bcd = False
             partner.suit = False
@@ -99,7 +98,7 @@ class ResPartner(models.Model):
             if partner.genero not in ('masculino', 'feminino'):
                 continue
 
-            # --- normalização metros → cm ---
+        
             altura = partner.altura * 100 if partner.altura < 3 else partner.altura
             peso = partner.peso
 
@@ -108,7 +107,6 @@ class ResPartner(models.Model):
 
             def buscar_tamanho(selecao):
 
-                # 1️⃣ match direto com tolerância
                 domain = [
                     ('genero', '=', partner.genero),
                     ('selecao', '=', selecao),
@@ -127,7 +125,6 @@ class ResPartner(models.Model):
                 if rule:
                     return rule
 
-                # 2️⃣ fallback com pequena margem + tolerância
                 domain_ref = [
                     ('genero', '=', partner.genero),
                     ('selecao', '=', selecao),

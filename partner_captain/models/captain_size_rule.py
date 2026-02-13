@@ -36,7 +36,6 @@ class CaptainSizeRule(models.Model):
         required=True
     )
 
-
     _CAMPOS_RELEVANTES = {
         'genero',
         'selecao',
@@ -44,6 +43,18 @@ class CaptainSizeRule(models.Model):
         'peso',
         'tamanho',
     }
+
+    def _normalizar_altura_vals(self, vals):
+        if 'altura' in vals and vals['altura']:
+            if vals['altura'] < 3:
+                vals['altura'] = vals['altura'] * 100
+        return vals
+
+    @api.onchange('altura')
+    def _onchange_altura(self):
+        if self.altura and self.altura < 3:
+            self.altura = self.altura * 100
+
 
     @api.constrains('genero', 'selecao', 'altura', 'peso', 'tamanho')
     def _check_tamanho_duplicado(self):
@@ -61,28 +72,41 @@ class CaptainSizeRule(models.Model):
                     "Tamanho já cadastrado para essa configuração "
                     "(Gênero, Seleção, Altura, Peso)."
                 )
+
+
     def _recalcular_tamanhos_parceiros(self):
-        """
-        Recalcula os tamanhos de todos os parceiros.
-        Executa apenas uma vez por transação.
-        """
         if self.env.context.get('captain_recalc_done'):
             return
-        partners = self.env['res.partner'].search([])
+
+        generos = self.mapped('genero')
+
+        partners = self.env['res.partner'].with_context(
+            captain_recalc_done=True
+        ).search([
+            ('genero', 'in', generos),
+            ('peso', '!=', False),
+            ('altura', '!=', False),
+        ])
+
         partners._compute_tamanhos()
-        self = self.with_context(captain_recalc_done=True)
+
     @api.model
     def create(self, vals):
-        record = super().create(vals)
-        record._recalcular_tamanhos_parceiros()
-        return record
+        vals = self._normalizar_altura_vals(vals)
+        rec = super().create(vals)
+        rec._recalcular_tamanhos_parceiros()
+        return rec
 
     def write(self, vals):
+        vals = self._normalizar_altura_vals(vals)
         res = super().write(vals)
+
         if self._CAMPOS_RELEVANTES.intersection(vals.keys()):
             self._recalcular_tamanhos_parceiros()
+
         return res
 
     def unlink(self):
         res = super().unlink()
         self._recalcular_tamanhos_parceiros()
+        return res

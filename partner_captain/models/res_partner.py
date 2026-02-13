@@ -96,58 +96,39 @@ class ResPartner(models.Model):
             if partner.genero not in ('masculino', 'feminino'):
                 continue
 
-            # margens de segurança
-            peso_ref = partner.peso + 3
-            altura_ref = partner.altura + 2
+            # se altura estiver em metros → converter pra cm
+            altura = partner.altura * 100 if partner.altura < 3 else partner.altura
 
-            # ---------- BCD ----------
-            bcd_rule = SizeRule.search([
-                ('genero', '=', partner.genero),
-                ('selecao', '=', 'bcd'),
-                ('altura', '>=', altura_ref),
-                ('peso', '>=', peso_ref),
-            ],
-                order='altura asc, peso asc',
-                limit=1
-            )
+            peso = partner.peso
 
-            if not bcd_rule:
-                #sem margem
-                bcd_rule = SizeRule.search([
+            # margens
+            peso_ref = peso + 3
+            altura_ref = altura + 2
+
+            def buscar_tamanho(selecao):
+                rule = SizeRule.search([
                     ('genero', '=', partner.genero),
-                    ('selecao', '=', 'bcd'),
-                    ('altura', '>=', partner.altura),
-                    ('peso', '>=', partner.peso),
-                ],
-                    order='altura asc, peso asc',
-                    limit=1
-                )
+                    ('selecao', '=', selecao),
+                    ('altura', '>=', altura),
+                    ('peso', '>=', peso),
+                ], order='altura asc, peso asc', limit=1)
+
+                if rule:
+                    return rule
+
+                return SizeRule.search([
+                    ('genero', '=', partner.genero),
+                    ('selecao', '=', selecao),
+                    ('altura', '>=', altura_ref),
+                    ('peso', '>=', peso_ref),
+                ], order='altura asc, peso asc', limit=1)
+
+            bcd_rule = buscar_tamanho('bcd')
+            suit_rule = buscar_tamanho('suit')
 
             partner.bcd = bcd_rule.tamanho if bcd_rule else False
-
-            # ---------- SUIT ----------
-            suit_rule = SizeRule.search([
-                ('genero', '=', partner.genero),
-                ('selecao', '=', 'suit'),
-                ('altura', '>=', altura_ref),
-                ('peso', '>=', peso_ref),
-            ],
-                order='altura asc, peso asc',
-                limit=1
-            )
-
-            if not suit_rule:
-                suit_rule = SizeRule.search([
-                    ('genero', '=', partner.genero),
-                    ('selecao', '=', 'suit'),
-                    ('altura', '>=', partner.altura),
-                    ('peso', '>=', partner.peso),
-                ],
-                    order='altura asc, peso asc',
-                    limit=1
-                )
-
             partner.suit = suit_rule.tamanho if suit_rule else False
+
 
 
 class PartnerHistorico(models.Model):

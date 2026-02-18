@@ -132,7 +132,7 @@ class AccountMoveLine(models.Model):
                 client_id=self.journal_payment_mode_id.bank_client_id,
                 client_secret=self.journal_payment_mode_id.bank_secret_id,
                 client_environment=self.journal_payment_mode_id.bank_environment,
-                # token=token,
+                token=token,
             )
             if not self.own_number and self.codigo_solicitacao:
                 # buscar informacoes do boleto pegar nosso_numero
@@ -224,7 +224,7 @@ class AccountMoveLine(models.Model):
                             client_id=self.journal_payment_mode_id.bank_client_id,
                             client_secret=self.journal_payment_mode_id.bank_secret_id,
                             client_environment=self.journal_payment_mode_id.bank_environment,
-                            # token=token,
+                            token=token,
                         )                      
                         resultado = api.boleto_baixa(self.codigo_solicitacao, codigo_baixa)
                         if resultado:
@@ -259,7 +259,7 @@ class AccountMoveLine(models.Model):
                         client_id=self.journal_payment_mode_id.bank_client_id,
                         client_secret=self.journal_payment_mode_id.bank_secret_id,
                         client_environment=self.journal_payment_mode_id.bank_environment,
-                        # token=token,
+                        token=token,
                     )
                     if self.codigo_solicitacao:
                         resposta = api.consulta_boleto_detalhado(

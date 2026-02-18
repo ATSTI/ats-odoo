@@ -120,7 +120,7 @@ class AccountPaymentOrder(models.Model):
                 client_id=self.journal_id.bank_client_id,
                 client_secret=self.journal_id.bank_secret_id,
                 client_environment=self.journal_id.bank_environment,
-                # token=token,
+                token=token,
             )            
             data = self._generate_bank_inter_boleto_data(move_line=move_line)
             for item in data:
@@ -183,9 +183,9 @@ class AccountPaymentOrder(models.Model):
                     client_id=self.journal_id.bank_client_id,
                     client_secret=self.journal_id.bank_secret_id,
                     client_environment=self.journal_id.bank_environment,
-                    # token=None,
+                    token=None,
                 )
-                token = api._prepare_token()
+                token = api._prepare_token(tipo)
                 if tipo == "escrita":
                     self.journal_id.bank_token = token
                     self.journal_id.bank_token_date = datetime.now()

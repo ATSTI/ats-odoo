@@ -63,6 +63,10 @@ class WizardImportNfe(models.TransientModel):
         city = self.env['res.city'].search([
             ('ibge_code', '=', ibge)])
         fone = getattr(emit.enderEmit, 'fone', '')
+        if hasattr(emit.enderEmit, 'xCpl'):
+            xCpl = emit.enderEmit.xCpl
+        else:
+            xCpl = ''
         vals = {
             "name": emit.xFant,
             "legal_name": emit.xNome,
@@ -71,7 +75,7 @@ class WizardImportNfe(models.TransientModel):
             "zip":emit.enderEmit.CEP,
             "street_name":emit.enderEmit.xLgr,
             "street_number":emit.enderEmit.nro,
-            "street2":emit.enderEmit.xCpl,
+            "street2":xCpl,
             "district":emit.enderEmit.xBairro,
             "city_id":city.id,
             "state_id":city.state_id.id,
@@ -94,9 +98,12 @@ class WizardImportNfe(models.TransientModel):
         emit = nfe.NFe.infNFe.emit
         partner_doc = emit.CNPJ if hasattr(emit, 'CNPJ') else emit.CPF
         partner_doc = str(partner_doc)
+        # cnpj_partner = f"{partner_doc[:2]}.{partner_doc[2:5]}.{partner_doc[5:8]}/{partner_doc[8:12]}-{partner_doc[12:14]}"
         # partner_doc = self.arruma_cpf_cnpj(partner_doc)
         partner = self.env['res.partner'].search([
-            ('cnpj_cpf_stripped', '=', partner_doc)])
+            ('cnpj_cpf_stripped', 'like', partner_doc),
+        ], limit=1)
+        
         if not partner:
             if self.cadastra_fornecedor:
                 partner = self.incluir_fornecedor(emit)

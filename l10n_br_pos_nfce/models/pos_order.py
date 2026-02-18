@@ -81,6 +81,7 @@ class PosOrderLine(models.Model):
                     nbs=self.product_id.nbs_id,
                     cest=self.product_id.cest_id,
                     city_taxation_code=self.product_id.city_taxation_code_ids,
+                    national_taxation_code=self.env['l10n_br_fiscal.national.taxation.code'],
                     service_type=self.product_id.service_type_id,
                     ind_final=self.order_id.partner_id.ind_final,
                 )

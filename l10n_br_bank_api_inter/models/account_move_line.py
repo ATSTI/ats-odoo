@@ -170,9 +170,9 @@ class AccountMoveLine(models.Model):
 
                 datas = api.boleto_pdf(self.codigo_solicitacao)
 
-                if datas.get("erro"):
+                if isinstance(datas, dict) and "erro" in datas:
                     erro = self.generate_error_message(datas)
-                    raise UserError(f"{erro}")
+                    raise UserError(erro)
 
                 datas_json = json.loads(datas.decode("utf-8"))
 

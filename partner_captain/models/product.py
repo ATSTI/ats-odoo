@@ -105,9 +105,10 @@ class ProductTemplate(models.Model):
     
     @api.depends('categ_id')
     def _compute_is_reg(self):
-       for rec in self:
-            nome = (rec.categ_id.name or '').lower()
-            rec.is_reg = nome not in ['reg - operacao']
+        for rec in self:
+            nome = (rec.categ_id.name or '').strip().lower()
+            rec.is_reg = nome == 'reg - operacao'
+
 
     
 

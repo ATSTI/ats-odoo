@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_rslabsource_document">
+        <t t-call="web.external_layout">
+            <t t-foreach="docs" t-as="o">
+                <main>
+                <div class="page">
+
+                    <!-- HEADER -->
+                    <div class="row mb-4">
+
+                        <!-- LOGO -->
+                        <div class="col-6">
+                            <img t-if="o.company_id.logo"
+                                 t-att-src="'data:image/png;base64,%s' % o.company_id.logo"
+                                 style="max-height:90px;"/>
+                        </div>
+
+                        <!-- EMPRESA -->
+                        <div class="col-6 text-right" style="font-size:12px;">
+                            <strong style="font-size:16px;" t-field="o.company_id.name"/>
+                            <br/>
+                            <span style ='font-size:14px;'> www.rslabsource.com.br</span>
+                            <br/><br/>
+                            CNPJ: <span t-field="o.company_id.cnpj_cpf"/>
+                            <br/>
+                            <span t-field="o.company_id.street"/>
+                            <br/>
+                            <span t-field="o.company_id.city"/> -
+                            <span t-field="o.company_id.state_id.code"/>
+                            <br/>
+                            CEP: <span t-field="o.company_id.zip"/>
+                        </div>
+
+                    </div>
+
+                    <!-- TÍTULO -->
+                    <h2 style="margin: 20px 0;">
+                        Orçamento Nº <span t-field="o.name"/>
+                    </h2>
+
+                    <!-- CLIENTE -->
+                    <div style="margin-bottom:25px;">
+                        <h4><strong>Informações do Cliente</strong></h4>
+
+                        <div style="font-size:13px;">
+                            <strong t-field="o.partner_id.name"/>
+                            <br/>
+                            <t t-if="o.partner_id.phone">
+                                Telefone: <span t-field="o.partner_id.phone"/>
+                                <br/>
+                            </t>
+                            <t t-if="o.partner_id.email">
+                                Email:
+                                <span t-field="o.partner_id.email"/>
+                            </t>
+                        </div>
+                    </div>
+
+                    <!-- ITENS -->
+                    <h4 style="margin-bottom:10px;">Itens do Orçamento</h4>
+
+                    <table class="table table-sm o_main_table"
+                           style="font-size:12px;">
+                        <thead style="background:#2f4b6c; color:white;">
+                            <tr>
+                                <th>Código</th>
+                                <th>Descrição</th>
+                                <th>Prazo de Entrega</th>
+                                <th class="text-center">Quant.</th>
+                                <th class="text-right">Unit.</th>
+                                <th class="text-right">Valor Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="o.order_line" t-as="line">
+                                <td>
+                                    <span t-field="line.product_id.default_code"/>
+                                </td>
+                                <td>
+                                    <span t-field="line.name"/>
+                                </td>
+                                <td>
+                                    <span>45 dias</span>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="line.product_uom_qty"/>
+                                </td>
+                                <td class="text-right">
+                                    <span t-field="line.price_unit"/>
+                                </td>
+                                <td class="text-right">
+                                    <span t-field="line.price_subtotal"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- TOTAIS -->
+                    <div class="row mt-3">
+                        <div class="col-7"/>
+                        <div class="col-5">
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>Subtotal:</strong></td>
+                                    <td class="text-right">
+                                        <span t-field="o.amount_untaxed"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Total:</strong></td>
+                                    <td class="text-right">
+                                        <strong t-field="o.amount_total"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- VENCIMENTOS -->
+                    <div style="margin-top:35px;">
+                        <h4 style="margin-bottom:10px;">
+                            <strong>Vencimentos À Vista</strong>
+                        </h4>
+
+                        <table class="table table-sm"
+                            style="width:420px; font-size:13px; border:1px solid #dee2e6;">
+
+                            <thead style="background:#f2f2f2;">
+                                <tr>
+                                    <th style="width:33%;">Parcela</th>
+                                    <th style="width:33%;">Vencimento</th>
+                                    <th class="text-right" style="width:34%;">Valor</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+
+                                    <td>
+                                        <t t-if="o.commitment_date">
+                                            <span t-field="o.commitment_date"/>
+                                        </t>
+                                        <t t-else="">
+                                            <span t-field="o.expected_date"/>
+                                        </t>
+                                    </td>
+
+                                    <td class="text-right">
+                                        <strong t-field="o.amount_total"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                    <!-- OUTRAS INFORMAÇÕES -->
+                    <div style="margin-top:30px; font-size:12px; line-height:1.5;">
+                        <h4><strong>Outras Informações</strong></h4>
+
+                        <p>
+                            Orçamento - incluído em:
+                            <span t-field="o.create_date"/>
+                        </p>
+
+                        <p>
+                            Previsão de Faturamento:
+                            <t t-if="o.create_date">
+                                <t t-set="fat_date" t-value="o.create_date + relativedelta(days=45)"/>
+                                <span t-esc="fat_date.strftime('%d/%m/%Y')"/>
+                                (45 dias)
+                            </t>
+                        </p>
+
+                        <p>
+                            O preço inclui o COA com as seguintes análises: HPLC, LC/MS, HRMN, TGA e IR.
+                            Todos os Padrões são da Marca Chemicea - ISO 17034 / ISO 17025.
+                        </p>
+
+                        <p>
+                            <strong>Notas:</strong> Valores válidos para pedido de todos os itens deste orçamento.
+                            Para itens separados, por favor solicitar nova cotação.
+                        </p>
+
+                        <p>
+                            Obs. Os prazos de entrega estão no limite máximo.
+                            Temos como rotina antecipar a entrega dos prazos previamente estipulados.
+                        </p>
+
+                        <p>
+                            <strong>Condições Gerais:</strong><br/>
+                            - Prazo de entrega: 45 dias<br/>
+                            - Valores em dólares americanos, porém será faturado em REAIS utilizando taxa PTAX do dia anterior ao faturamento (valores com todos os impostos e taxas inclusos)<br/>
+                            - Frete: CIF<br/>
+                            - Pagamento: No dia do faturamento<br/>
+                            - Validade da proposta: 20 dias
+                        </p>
+
+                        <p>
+                            <strong>Dados Bancários:</strong><br/>
+                            RS LabSource Suprimentos Analíticos Ltda.<br/>
+                            Santander (033): Ag 0237 - Conta Corrente: 13002427-7
+                        </p>
+
+                        <p>
+                            No ato do recebimento do Pedido de Compras do cliente, a RS LabSource enviará confirmação
+                            de recebimento, aceite e nosso Pedido de Vendas com data prevista para entrega do material.
+                            O não recebimento do pedido do nosso cliente implica no não processamento do Pedido de Vendas RS LabSource.
+                        </p>
+
+                        <p>
+                            A RS LabSource não se responsabiliza caso o fabricante do padrão não encontre a rota de síntese.
+                        </p>
+
+                        <p>
+                            Antes da confirmação de compra, por favor verifique se os produtos cotados estão de acordo com suas exigências.
+                        </p>
+
+                        <p>
+                            Desde já agradecemos a oportunidade e aguardamos retorno.
+                        </p>
+                        <!-- <p t-esc='o.note'>
+
+                        </p> -->
+                    </div>
+
+                </div>
+            </main>
+
+            </t>
+        </t>
+    </template>
+</odoo>

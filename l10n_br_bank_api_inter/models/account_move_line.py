@@ -131,7 +131,7 @@ class AccountMoveLine(models.Model):
 
         try:
             with ArquivoCertificado(order_id.journal_id, "w") as (key, cert):
-                token = order_id.generated_api_token("escrita")
+                token = order_id.generated_api_token("leitura")
                 api = ApiInter(
                     cert=(cert, key),
                     conta_corrente=(

@@ -116,56 +116,83 @@ class AccountMoveLine(models.Model):
         """
         if self.own_number and self.pdf_boleto_id:
             return
-        # order_id = self.payment_line_ids[0].order_id
-        for order in self.payment_line_ids:
-            if order.order_id.state != "cancel":
-                order_id = order.order_id
-                payment_line = order
-        token = order_id.generated_api_token("leitura")
-        with ArquivoCertificado(order_id.journal_id, "w") as (key, cert):
-            api = ApiInter(
-                cert=(cert, key),
-                conta_corrente=(
-                    order_id.company_partner_bank_id.acc_number
-                    + order_id.company_partner_bank_id.acc_number_dig
-                ),
-                client_id=self.journal_payment_mode_id.bank_client_id,
-                client_secret=self.journal_payment_mode_id.bank_secret_id,
-                client_environment=self.journal_payment_mode_id.bank_environment,
-                token=token,
-            )
-            if not self.own_number and self.codigo_solicitacao:
-                # buscar informacoes do boleto pegar nosso_numero
-                resposta = api.consulta_boleto_detalhado(self.codigo_solicitacao)
-                if 'cobranca' in resposta:
-                    boleto = resposta['boleto']
-                    if 'pix' in resposta:
-                        pix = resposta['pix']
-                        self.pix_copiaecola = pix['pixCopiaECola']
-                        self.pix_txid = pix['txid']
 
-                    payment_line.digitable_line = boleto["linhaDigitavel"]
-                    payment_line.barcode = boleto["codigoBarras"]
-                    if 'nossoNumero' in boleto:
-                        self.own_number = boleto["nossoNumero"]
-                        payment_line.own_number = boleto["nossoNumero"]
-            if not self.codigo_solicitacao:
-                self.move_id.action_pdf_boleto()
-            datas = api.boleto_pdf(self.codigo_solicitacao)
-            datas_json = json.loads(datas.decode("utf-8"))
-            boleto_nome = self.move_id.partner_id.name
-            boleto_nome = '_'.join(boleto_nome.split())
-            self.pdf_boleto_id = self.env["ir.attachment"].create(
-                {
-                    "name": (boleto_nome),
-                    "res_model": 'account.move',
-                    "res_id": self.move_id.id,
-                    "datas": datas_json["pdf"],
-                    "mimetype": "application/pdf",
-                    "type": "binary",
+        payment_line = False
+        order_id = False
 
-                }
-            )
+        for line in self.payment_line_ids:
+            if line.order_id.state != "cancel":
+                payment_line = line
+                order_id = line.order_id
+                break
+
+        if not order_id:
+            raise UserError(_("Nenhum pedido válido encontrado para gerar o boleto."))
+
+        try:
+            with ArquivoCertificado(order_id.journal_id, "w") as (key, cert):
+                token = order_id.generated_api_token("leitura")
+                api = ApiInter(
+                    cert=(cert, key),
+                    conta_corrente=(
+                        order_id.company_partner_bank_id.acc_number
+                        + order_id.company_partner_bank_id.acc_number_dig
+                    ),
+                    client_id=self.journal_payment_mode_id.bank_client_id,
+                    client_secret=self.journal_payment_mode_id.bank_secret_id,
+                    client_environment=self.journal_payment_mode_id.bank_environment,
+                    token=token,
+                )
+
+                # Buscar dados do boleto
+                if not self.own_number and self.codigo_solicitacao:
+                    resposta = api.consulta_boleto_detalhado(self.codigo_solicitacao)
+
+                    if resposta.get("erro"):
+                        erro = self.generate_error_message(resposta)
+                        raise UserError(f"{erro}")
+
+                    boleto = resposta.get("boleto")
+                    pix = resposta.get("pix")
+
+                    if pix:
+                        self.pix_copiaecola = pix.get("pixCopiaECola")
+                        self.pix_txid = pix.get("txid")
+
+                    if boleto:
+                        payment_line.digitable_line = boleto.get("linhaDigitavel")
+                        payment_line.barcode = boleto.get("codigoBarras")
+
+                        if boleto.get("nossoNumero"):
+                            self.own_number = boleto["nossoNumero"]
+                            payment_line.own_number = boleto["nossoNumero"]
+
+                if not self.codigo_solicitacao:
+                    self.move_id.action_pdf_boleto()
+
+                datas = api.boleto_pdf(self.codigo_solicitacao)
+
+                if isinstance(datas, dict) and "erro" in datas:
+                    erro = self.generate_error_message(datas)
+                    raise UserError(erro)
+
+                datas_json = json.loads(datas.decode("utf-8"))
+
+                boleto_nome = "_".join(self.move_id.partner_id.name.split())
+
+                self.pdf_boleto_id = self.env["ir.attachment"].create(
+                    {
+                        "name": boleto_nome,
+                        "res_model": "account.move",
+                        "res_id": self.move_id.id,
+                        "datas": datas_json["pdf"],
+                        "mimetype": "application/pdf",
+                        "type": "binary",
+                    }
+                )
+
+        except UserError as error:
+            raise UserError(f"Erro ao gerar PDF do boleto:\n{error}")
 
     def print_pdf_boleto(self):
         """
@@ -227,6 +254,9 @@ class AccountMoveLine(models.Model):
                             token=token,
                         )                      
                         resultado = api.boleto_baixa(self.codigo_solicitacao, codigo_baixa)
+                        if resultado.get("erro"):
+                            erro = self.generate_error_message(resultado)
+                            raise UserError(f"{erro}")
                         if resultado:
                             self.bank_inter_state = "baixado"
                             self.write_off_by_api = True
@@ -238,7 +268,9 @@ class AccountMoveLine(models.Model):
                                     user,
                                     datetime.now().strftime('%d-%m-%Y %H:%M')
                         )
-                        self.move_id.message_post(body=message)                            
+                        self.move_id.message_post(body=message)
+        except UserError:
+            raise
         except Exception as error:
             raise UserError(_(error))
 
@@ -265,6 +297,10 @@ class AccountMoveLine(models.Model):
                         resposta = api.consulta_boleto_detalhado(
                             codigo_solicitacao=self.codigo_solicitacao
                         )
+                        
+                        if resposta.get("erro"):
+                            erro = self.generate_error_message(resposta)
+                            raise UserError(f"{erro}")
                         if resposta:
                             parser.parse(resposta)
                             message = "Consulta Banco Inter boleto, retorno: %s\n, alterado em %s." % (
@@ -317,6 +353,8 @@ class AccountMoveLine(models.Model):
                                     move_id.post()
                                     (move_id.line_ids[0] + self).reconcile()
                             self.bank_inter_state = resposta["cobranca"]["situacao"].lower()
+        except UserError:
+            raise
         except Exception as error:
             raise UserError(_(error))
 
@@ -374,3 +412,30 @@ class AccountMoveLine(models.Model):
                 vals["discount_value"] = self.env.context.get("discount_value")
 
         return vals
+    
+    def generate_error_message(self, data):
+        messages = []
+
+        title = data.get("title")
+        detail = data.get("detail")
+
+        if title:
+            messages.append(title)
+
+        if detail:
+            messages.append(detail)
+
+        violacoes = data.get("violacoes", [])
+        for v in violacoes:
+            razao = v.get("razao")
+
+            if razao:
+                messages.append(
+                    f"\n• {razao}"
+                )
+
+        erro = "\n".join(messages).strip()
+        message = 'ERRO: %s' % (
+            erro,
+        )
+        return message

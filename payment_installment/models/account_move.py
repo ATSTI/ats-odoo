@@ -36,16 +36,27 @@ class AccountMove(models.Model):
             raise UserError(_(f"Parcela não foi confirmada, favor confirmar na aba PARCELAS."))
         res = super()._post(soft=soft)
         if self.parcela_ids:
-            for line in self.due_line_ids:
-                if line.move_id.document_type_id:
-                    nome_parcela = line.move_id.document_number
-                else:
-                    nome_parcela = line.move_id.name
-                if line.name and not nome_parcela in line.name:
-                    line.name = f"{nome_parcela}-{line.name}"
-                else:
-                    line.name = nome_parcela
+            self.update_payment_term_number()
         return res
+
+    # isso aqui da l10n_br_account esta limpando o payment_term_number
+    def update_payment_term_number(self):
+        payment_term_lines = self.line_ids.filtered(
+            lambda line: line.display_type == "payment_term"
+        )
+        payment_term_lines_sorted = payment_term_lines.sorted(
+            key=lambda line: line.date_maturity
+        )
+        
+        number = self.document_number if self.document_type_id else self.name
+        for idx, line in enumerate(payment_term_lines_sorted, start=1):
+            if len(payment_term_lines_sorted) > 1:
+                line.with_context(skip_invoice_sync=True).write(
+                    {
+                        "payment_term_number": f"{idx}-{len(payment_term_lines_sorted)}",
+                        "name": f"{number}/{str(idx).zfill(2)}-{len(payment_term_lines_sorted)}"
+                    }
+                )
 
     def action_confirma_parcela(self):
         valor_total = 0
@@ -177,6 +188,7 @@ class AccountMoveLine(models.Model):
             return
         else:
             return super()._compute_payment_mode()
+
 
 class InvoiceParcela(models.Model):
     _name = 'invoice.parcela'

@@ -131,6 +131,7 @@ class AccountMoveLine(models.Model):
 
         try:
             with ArquivoCertificado(order_id.journal_id, "w") as (key, cert):
+                token = order_id.generated_api_token("leitura")
                 api = ApiInter(
                     cert=(cert, key),
                     conta_corrente=(
@@ -140,6 +141,7 @@ class AccountMoveLine(models.Model):
                     client_id=self.journal_payment_mode_id.bank_client_id,
                     client_secret=self.journal_payment_mode_id.bank_secret_id,
                     client_environment=self.journal_payment_mode_id.bank_environment,
+                    token=token,
                 )
 
                 # Buscar dados do boleto
@@ -249,7 +251,7 @@ class AccountMoveLine(models.Model):
                             client_id=self.journal_payment_mode_id.bank_client_id,
                             client_secret=self.journal_payment_mode_id.bank_secret_id,
                             client_environment=self.journal_payment_mode_id.bank_environment,
-                            # token=token,
+                            token=token,
                         )                      
                         resultado = api.boleto_baixa(self.codigo_solicitacao, codigo_baixa)
                         if resultado.get("erro"):
@@ -278,7 +280,7 @@ class AccountMoveLine(models.Model):
             for order in self.payment_line_ids:
                 if order.order_id.state == "cancel":
                     continue
-                # token = order.order_id.generated_api_token("leitura")
+                token = order.order_id.generated_api_token("leitura")
                 with ArquivoCertificado(order.order_id.journal_id, "w") as (key, cert):
                     api = ApiInter(
                         cert=(cert, key),
@@ -289,7 +291,7 @@ class AccountMoveLine(models.Model):
                         client_id=self.journal_payment_mode_id.bank_client_id,
                         client_secret=self.journal_payment_mode_id.bank_secret_id,
                         client_environment=self.journal_payment_mode_id.bank_environment,
-                        # token=token,
+                        token=token,
                     )
                     if self.codigo_solicitacao:
                         resposta = api.consulta_boleto_detalhado(

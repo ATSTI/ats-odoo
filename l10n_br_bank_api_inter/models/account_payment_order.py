@@ -203,7 +203,7 @@ class AccountPaymentOrder(models.Model):
             if (
                 self.company_partner_bank_id.bank_id
                 == self.env.ref("l10n_br_base.res_bank_077")
-                and self.payment_method_id.code == "240"
+                and self.payment_method_id.code == "electronic"
             ):
                 self._gererate_bank_inter_api(move_line=move_line)
                 self.write({

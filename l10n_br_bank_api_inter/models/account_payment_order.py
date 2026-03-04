@@ -208,9 +208,14 @@ class AccountPaymentOrder(models.Model):
                 self._gererate_bank_inter_api(move_line=move_line)
                 self.write({
                     "date_generated": fields.Date.context_today(self),
-                    "state": "generated",
+                    "state": "uploaded",
                     "generated_user_id": self._uid,
                 })
+                # necessario para nao tentar criar payment_order como se fosse arquivo retorno
+                for line in self.payment_line_ids:
+                    if line.matched_credit_ids:
+                        for rec_line in line.move_line_id.matched_credit_ids:
+                            rec_line.already_send_cnab = True
             else:
                 return super().open2generated()
         except Exception as error:

@@ -55,7 +55,7 @@ class AccountMove(models.Model):
         if (
             self.partner_bank_id.bank_id
             == self.env.ref("l10n_br_base.res_bank_077")
-            and self.payment_mode_id.payment_method_id.code == "electronic"
+            and self.payment_mode_id.payment_method_id.code == "240"
             ):
                 # TODO - apesar do campo financial_move_line_ids ser do tipo
                 #  compute esta sendo preciso chamar o metodo porque as vezes

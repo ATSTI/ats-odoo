@@ -1,65 +1,96 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>    
     <template id="report_saleorder_safra" inherit_id="sale.report_saleorder_document">
-                <xpath expr="//t[@t-call='web.external_layout']" position="replace">
-                <t t-call="web.external_layout">
-                <div style="height: 38mm;"></div>
-                    <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
-                    <table width="100%">
-                        <tr>
-                            <td width="80%">
-                                <div t-field="doc.partner_id"
-                                    t-options="{
-                                        'widget': 'contact',
-                                        'fields': ['name','address','phone'],
-                                        'no_marker': True
-                                    }"/>
-                            </td>
-                            <td width="20%">
-                                <div>
-                                    <t t-if="not (env.context.get('proforma', False) or is_pro_forma)">
-                                        <span t-if="doc.state not in ['draft','sent']">Pedido Nº:</span>
-                                        <span t-if="doc.state in ['draft','sent']">Cotação Nº:</span>
-                                    </t>
-                                    <t t-if="env.context.get('proforma', False) or is_pro_forma">
-                                        <span>Pro-Forma Invoice</span>
-                                    </t>
+        <xpath expr="//t[@t-call='web.external_layout']" position="replace">
+            <t t-call="web.external_layout">
 
-                                    <b><span t-field="doc.name"/></b>
+                <style>
+                    .o_main_table {
+                        page-break-inside: auto;
+                    }
+                    .o_main_table thead {
+                        display: table-header-group;
+                    }
+                    .o_main_table tr {
+                        page-break-inside: avoid;
+                        page-break-after: auto;
+                    }
+                </style>
 
-                                    <div t-if="doc.confirmation_date and doc.state not in ['draft','sent']">
-                                        <strong>Data do Pedido:</strong>
-                                        <p t-field="doc.confirmation_date" t-options="{'widget':'date'}"/>
-                                    </div>
+                <div style="height: 38mm;"/>
 
-                                    <div t-if="doc.date_order and doc.state in ['draft','sent']">
-                                        <strong>Data da Cotação:</strong>
-                                        <p t-field="doc.date_order" t-options="{'widget':'date'}"/>
-                                    </div>
+                <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
 
-                                    <div t-if="doc.partner_id.cnpj_cpf">
-                                        <strong>CNPJ/CPF:</strong>
-                                        <p t-field="doc.partner_id.cnpj_cpf"/>
-                                    </div>
+                <table width="100%">
+                    <tr>
+                        <td width="80%">
+                            <div t-field="doc.partner_id"
+                                 t-options="{
+                                     'widget': 'contact',
+                                     'fields': ['name','address','phone'],
+                                     'no_marker': True
+                                 }"/>
+                        </td>
+                        <td width="20%">
+                            <div>
+                                <t t-if="not (env.context.get('proforma', False) or is_pro_forma)">
+                                    <span t-if="doc.state not in ['draft','sent']">Pedido Nº:</span>
+                                    <span t-if="doc.state in ['draft','sent']">Cotação Nº:</span>
+                                </t>
+                                <t t-if="env.context.get('proforma', False) or is_pro_forma">
+                                    <span>Pro-Forma Invoice</span>
+                                </t>
 
-                                    <div>
-                                        <strong>Vendedor:</strong>
-                                        <span t-field="doc.user_id.id"/>
-                                    </div>
+                                <b><span t-field="doc.name"/></b>
+
+                                <div t-if="doc.confirmation_date and doc.state not in ['draft','sent']">
+                                    <strong>Data do Pedido:</strong>
+                                    <p t-field="doc.confirmation_date" t-options="{'widget':'date'}"/>
                                 </div>
-                            </td>
-                        </tr>
-                    </table>
-                    <div class="page">
-                        <div t-if="doc.client_order_ref">
-                            <strong>Observações:</strong>
-                            <p class="m-0" t-field="doc.client_order_ref"/>
-                            <br/>
-                        </div>
-                        <div t-if="doc.payment_term_id">
-                            <strong>Termos de Pagamento:</strong>
-                            <p class="m-0" t-field="doc.payment_term_id"/>
-                        </div>
+
+                                <div t-if="doc.date_order and doc.state in ['draft','sent']">
+                                    <strong>Data da Cotação:</strong>
+                                    <p t-field="doc.date_order" t-options="{'widget':'date'}"/>
+                                </div>
+
+                                <div t-if="doc.partner_id.cnpj_cpf">
+                                    <strong>CNPJ/CPF:</strong>
+                                    <p t-field="doc.partner_id.cnpj_cpf"/>
+                                </div>
+
+                                <div>
+                                    <strong>Vendedor:</strong>
+                                    <span t-field="doc.user_id.name"/>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="page">
+
+                    <div t-if="doc.client_order_ref">
+                        <strong>Observações:</strong>
+                        <p class="m-0" t-field="doc.client_order_ref"/>
+                        <br/>
+                    </div>
+
+                    <div t-if="doc.payment_term_id">
+                        <strong>Termos de Pagamento:</strong>
+                        <p class="m-0" t-field="doc.payment_term_id"/>
+                    </div>
+
+                    <!-- 🔥 linhas válidas -->
+                    <t t-set="lines" t-value="[l for l in doc.order_line if not l.display_type]"/>
+
+                    <!-- 🔥 PAGINAÇÃO AUTOMÁTICA -->
+                    <t t-foreach="range(0, len(lines), 28)" t-as="i">
+
+                        <t t-if="i != 0">
+                            <div style="page-break-before: always;"></div>
+                            <div style="height: 38mm;"/>
+                        </t>
+
                         <table class="table table-sm o_main_table">
                             <thead>
                                 <tr>
@@ -72,103 +103,74 @@
                                     <th class="text-right">Montante</th>
                                 </tr>
                             </thead>
+
                             <tbody class="sale_tbody">
-                                <t t-foreach="doc.order_line" t-as="line">
-                                    <tr t-if="not line.display_type">
-                                        <td>
-                                            <span t-esc="line.product_id.name"/>
-
-                                        </td>
-
-                                        <td>
-                                            <span t-field="line.product_id.default_code"/>
-                                        </td>
-
-                                        <td>
-                                            <span t-field="line.product_id.product_brand_id.name"/>
-                                        </td>
-
-                                        <td class="text-center">
-                                            <span t-field="line.product_uom.name"/>
-                                        </td>
-
-                                        <td class="text-right">
-                                            <span t-field="line.product_uom_qty"/>
-                                        </td>
-
-                                        <td class="text-right">
-                                            <span t-field="line.price_unit"/>
-                                        </td>
-
-                                        <td class="text-right">
-                                            <span t-field="line.price_subtotal"/>
-                                        </td>
-                                    </tr>
-                                    <tr t-if="line.display_type == 'line_section'">
-                                        <td colspan="7" class="font-weight-bold bg-200">
-                                            <span t-field="line.name"/>
-                                        </td>
-                                    </tr>
-                                    <tr t-if="line.display_type == 'line_note'">
-                                        <td colspan="7" class="font-italic">
-                                            <span t-field="line.name"/>
-                                        </td>
+                                <t t-foreach="lines[i:i+28]" t-as="line">
+                                    <tr>
+                                        <td><span t-esc="line.product_id.name"/></td>
+                                        <td><span t-field="line.product_id.default_code"/></td>
+                                        <td><span t-field="line.product_id.product_brand_id.name"/></td>
+                                        <td class="text-center"><span t-field="line.product_uom.name"/></td>
+                                        <td class="text-right"><span t-field="line.product_uom_qty"/></td>
+                                        <td class="text-right"><span t-field="line.price_unit"/></td>
+                                        <td class="text-right"><span t-field="line.price_subtotal"/></td>
                                     </tr>
                                 </t>
                             </tbody>
                         </table>
-                        <p>
-                            <strong>Total de Itens:</strong>
-                            <span t-esc="len(doc.order_line)"/>
-                        </p>
-                        <div class="clearfix">
-                            <div class="row">
-                                <div class="col-4 ml-auto">
-                                    <table class="table table-sm">
-                                        <tr>
-                                            <td><strong>Subtotal</strong></td>
-                                            <td class="text-right">
-                                                <span t-field="doc.amount_untaxed"/>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Desconto Total</strong></td>
-                                            <td class="text-right">
-                                                <span t-field="doc.total_desconto"/>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Total</strong></td>
-                                            <td class="text-right">
-                                                <span t-field="doc.amount_total"/>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
+
+                    </t>
+
+                    <p>
+                        <strong>Total de Itens:</strong>
+                        <span t-esc="len(doc.order_line)"/>
+                    </p>
+
+                    <div class="clearfix">
+                        <div class="row">
+                            <div class="col-4 ml-auto">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Subtotal</strong></td>
+                                        <td class="text-right">
+                                            <span t-field="doc.total_bruto"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Desconto Total</strong></td>
+                                        <td class="text-right">
+                                            <span t-field="doc.total_desconto"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Total</strong></td>
+                                        <td class="text-right">
+                                            <span t-field="doc.amount_total"/>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
-                        <p t-field="doc.note"/>
-                        <div t-if="doc.signature" class="mt32">
-                            <strong>Assinatura</strong><br/>
-                            <img t-att-src="image_data_uri(doc.signature)"
-                                style="max-height:4cm; max-width:8cm;"/>
-                            <p t-field="doc.signed_by"/>
-                        </div>
-
-                        <br/><br/>
-
-                        <div>
-                            <p>________________________________________</p>
-                            <div t-field="doc.partner_id.name"/>
-                        </div>
                     </div>
-                </t>
-            </xpath>
-    </template>
-    <template id="external_layout_inherit_custom" inherit_id="web.external_layout_background">
-        <xpath expr="//div[contains(@class,'float-left company_address')]" position="inside">
-            <t t-if="company.cnpj_cpf">
-                <span t-field="company.cnpj_cpf">
+
+                    <p t-field="doc.note"/>
+
+                    <div t-if="doc.signature" class="mt32">
+                        <strong>Assinatura</strong><br/>
+                        <img t-att-src="image_data_uri(doc.signature)"
+                             style="max-height:4cm; max-width:8cm;"/>
+                        <p t-field="doc.signed_by"/>
+                    </div>
+
+                    <br/><br/>
+
+                    <div>
+                        <p>________________________________________</p>
+                        <div t-field="doc.partner_id.name"/>
+                    </div>
+
+                </div>
+
             </t>
         </xpath>
     </template>

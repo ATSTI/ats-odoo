@@ -60,7 +60,7 @@
 
                                 <div>
                                     <strong>Vendedor:</strong>
-                                    <span t-field="doc.user_id.name"/>
+                                    <span t-field="doc.user_id.id"/>
                                 </div>
                             </div>
                         </td>
@@ -80,10 +80,7 @@
                         <p class="m-0" t-field="doc.payment_term_id"/>
                     </div>
 
-                    <!-- 🔥 linhas válidas -->
                     <t t-set="lines" t-value="[l for l in doc.order_line if not l.display_type]"/>
-
-                    <!-- 🔥 PAGINAÇÃO AUTOMÁTICA -->
                     <t t-foreach="range(0, len(lines), 28)" t-as="i">
 
                         <t t-if="i != 0">
@@ -154,7 +151,6 @@
                     </div>
 
                     <p t-field="doc.note"/>
-
                     <div t-if="doc.signature" class="mt32">
                         <strong>Assinatura</strong><br/>
                         <img t-att-src="image_data_uri(doc.signature)"

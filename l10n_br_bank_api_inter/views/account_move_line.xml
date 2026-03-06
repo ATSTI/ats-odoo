@@ -17,34 +17,43 @@
                     type="object"
                     string="PDF Boleto"
                     class="oe_highlight"
+                    attrs="{'invisible': [('payment_method_code', 'not in', ('400', '240', '500'))]}"
                 />
                 <button
                     name="drop_bank_slip_wizard"
                     type="object"
                     string="Dar Baixa"
                     class="btn btn-danger"
+                    attrs="{'invisible': [('payment_method_code', 'not in', ('400', '240', '500'))]}"
                 />
                 <button
                     name="search_bank_slip"
                     type="object"
                     string="Consulta"
                     class="btn btn-warning"
+                    attrs="{'invisible': [('payment_method_code', 'not in', ('400', '240', '500'))]}"
                 />
                 <button
                     name="send_new_boleto"
                     type="object"
                     string="Refazer Boleto"
                     class="btn btn-info"
-                />                
+                    attrs="{'invisible': [('payment_method_code', 'not in', ('400', '240', '500'))]}"
+                />
             </field>
 
             <field name="partner_bank_id" position="after">
-                <field name="bank_inter_state" string="State" />
-                <field name="write_off_choice" string="Write Off" />
-                <field name="write_off_by_api" string="Write Off by API" />
-                <field name="codigo_solicitacao" />
-                <field name="pix_copiaecola" />
-                <field name="pix_txid" />
+                <group
+                    string="Informações do CNAB"
+                    attrs="{'invisible': [('payment_method_code', 'not in', ('400', '240', '500'))]}"
+                >
+                    <field name="bank_inter_state" string="State" />
+                    <field name="write_off_choice" string="Write Off" />
+                    <field name="write_off_by_api" string="Write Off by API" />
+                    <field name="codigo_solicitacao" />
+                    <field name="pix_copiaecola" />
+                    <field name="pix_txid" />
+                </group>
             </field>
         </field>
     </record>

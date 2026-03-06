@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-	<record id="receivable_payable_view_form" model="ir.ui.view">
+   
+	<!-- <record id="receivable_payable_view_form" model="ir.ui.view">
 		<field name="name">receivable_payabale.form</field>
 		<field name="model">account.move.line</field>
 		<field name="inherit_id" ref="account.view_move_line_form" />
-		<field name="priority">999</field>
+		<field name="priority">99</field>
 		<field name="arch" type="xml">
 			<xpath expr="//form" position="replace">
 				<form string="Itens do Diário" create="false">
@@ -112,7 +112,7 @@
 				</form>
 			</xpath>
 		</field>
-	</record>
+	</record> -->
 
 	<record id="receivable_payable_view_tree" model="ir.ui.view">
 		<field name="name">receivable_payabale.view.tree</field>

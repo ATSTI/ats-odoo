@@ -17,9 +17,10 @@
     'author': 'ATSTi Soluções',
     'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
     'website': 'https://github.com/ATSTI/ats-odoo',
-    'depends': ['base', 'sale_management'],
+    'depends': ['base', 'sale_management', 'l10n_br_sale'],
     'data': [
         'views/sale_order_view.xml',
+        'report/sale_report_soloz.xml',
     ],
     'installable': True,
     'application': False,

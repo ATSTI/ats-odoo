@@ -5,13 +5,27 @@
     <template
         id="report_saleorder_document_custom_soloz"
         inherit_id="sale.report_saleorder_document"
-        priority="100"
+        priority="99"
     >
         <xpath expr="//td[@name='td_subtotal']" position="replace">
-            <td t-if="not line.is_downpayment" name="td_subtotal" class="text-end o_price_total">
+            <td t-if="not line.display_type and not line.is_downpayment" name="td_subtotal" class="text-end o_price_total">
                 <span t-field="line.amount_fiscal" groups="account.group_show_line_subtotals_tax_excluded"/>
                 <span t-field="line.amount_fiscal" groups="account.group_show_line_subtotals_tax_included"/>
             </td>
+        </xpath>
+
+        <xpath expr="//td[@name='td_section_subtotal']" position="replace">
+          <td name="td_section_subtotal" colspan="99">
+              <strong class="mr16">Subtotal</strong>
+      
+              <t t-if="line_last">
+                  <span t-out="doc.amount_price_gross" t-options="{'widget':'monetary','display_currency': doc.pricelist_id.currency_id}"/>
+              </t>
+      
+              <t t-else="">
+                  <span t-out="0.0" t-options="{'widget':'monetary','display_currency': doc.pricelist_id.currency_id}"/>
+              </t>
+          </td>
         </xpath>
 
         <xpath expr="//td[@name='td_section_subtotal']" position="replace">

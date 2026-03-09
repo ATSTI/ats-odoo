@@ -9,7 +9,7 @@ from nfelib.nfe.ws.edoc_legacy import NFCeAdapter as edoc_nfce
 from nfelib.nfe.ws.edoc_legacy import NFeAdapter as edoc_nfe
 
 from odoo import models
-from odoo.exceptions import RedirectWarning
+from odoo.exceptions import UserError  
 
 from requests import Session
 
@@ -38,14 +38,7 @@ class NFe(models.Model):
         try:
             certificado = self.company_id._get_br_ecertificate()
         except CertificadoExpirado:
-            certificado = self.company_id.certificate_nfe_id
-            action = self.env.ref('l10n_br_fiscal_certificate.certificate_action')
-            raise RedirectWarning(
-                "Certificado digital expirado. Atualize o certificado.",
-                action['id'],
-                "Abrir certificado",
-            )
-        certificado = self.company_id._get_br_ecertificate()
+            raise UserError("Certificado digital expirado. Atualize o certificado.")
         session = Session()
         session.verify = False
 

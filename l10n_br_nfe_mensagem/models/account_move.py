@@ -3,6 +3,7 @@
 import re
 from odoo import models, _, api, fields
 from odoo.exceptions import UserError
+from erpbrasil.assinatura.excecoes import CertificadoExpirado
 
 from odoo.addons.l10n_br_fiscal.constants.fiscal import (
     MODELO_FISCAL_NFE,
@@ -24,11 +25,16 @@ class AccountMove(models.Model):
         result = super()._onchange_partner_id()
         self.xml_error_message = False
         if self.partner_id and self.document_type_id and self.document_type_id.code == MODELO_FISCAL_NFE:
+            erros = ""
+            try:
+                certificado = self.company_id._get_br_ecertificate()
+            except CertificadoExpirado:
+                erros += " **** ATENÇÃO: Certificado digital expirado. Atualize o certificado. **** "
             max = ""
             if self.partner_id.street_name and self.partner_id.district:
                 max = self.partner_id.street_name or "" + self.partner_id.street2 or "" + self.partner_id.district or ""
             # tratar erros
-            erros = ""
+            
             if not self.partner_id.legal_name:
                 erros += "\n Cadastro do parceiro sem Razão social."
             if not self.partner_id.cnpj_cpf:

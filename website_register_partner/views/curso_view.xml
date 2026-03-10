@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="view_res_cursos_tree" model="ir.ui.view">
+        <field name="name">cadastro.cursos.tree</field>
+        <field name="model">sindicato.cursos</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <record id ='action_cursos' model='ir.actions.act_window'>
+        <field name='name'>Cadastro de Cursos</field>
+        <field name='res_model'>sindicato.cursos</field>
+        <field name='view_mode'>tree,form</field>
+    </record>
+
+    <menuitem id="menu_cursos_root" name="Cadastro de Cursos" parent="contacts.res_partner_menu_config" action="action_cursos"/>
+
+    <record id="view_res_redes_tree" model="ir.ui.view">
+        <field name="name">cadastro.redes.tree</field>
+        <field name="model">res.partner.redes_sociais</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id ='action_redes' model='ir.actions.act_window'>
+        <field name='name'>Cadastro de Redes Sociais</field>
+        <field name='res_model'>res.partner.redes_sociais</field>
+        <field name='view_mode'>tree,form</field>
+    </record>
+
+    <menuitem id="menu_redes_root" name="Cadastro de Redes Sociais" parent="contacts.res_partner_menu_config" action="action_redes"/>    
+
+</odoo>

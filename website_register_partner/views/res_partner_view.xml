@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="view_res_campos_cursos_form" model="ir.ui.view">
+        <field name="name">res.campos.cursos.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='internal_notes']" position="inside">
+                <group string="Pré-Inscrição">
+                    <field name="cursos" widget="many2many_tags"/>
+                    <field name="nascimento" />
+                    <field name="identificacao" />
+                    <field name="grau_escolar" />
+                    <field name="curso_senar" />
+                    <field name="redes_sociais" widget="many2many_tags"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

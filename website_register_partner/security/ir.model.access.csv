@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sindicato_cursos_user,sindicato.cursos.user,model_sindicato_cursos,base.group_user,1,1,1,1
+access_redes_sociais_user,redes.sociais.user,model_res_partner_redes_sociais,base.group_user,1,1,1,1

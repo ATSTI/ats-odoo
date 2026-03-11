@@ -213,7 +213,7 @@ class AccountPaymentOrder(models.Model):
                 })
                 # necessario para nao tentar criar payment_order como se fosse arquivo retorno
                 for line in self.payment_line_ids:
-                    if line.matched_credit_ids:
+                    if line.move_line_id.matched_credit_ids:
                         for rec_line in line.move_line_id.matched_credit_ids:
                             rec_line.already_send_cnab = True
             else:

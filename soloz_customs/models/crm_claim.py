@@ -9,5 +9,13 @@ class CrmClaim(models.Model):
         string="Custos"
     )
 
+    total_cost = fields.Float(
+        string="Total Geral",
+        compute="_compute_total_cost",
+        store=True
+    )
 
-
+    @api.depends("cost_ids.total")
+    def _compute_total_cost(self):
+        for rec in self:
+            rec.total_cost = sum(rec.cost_ids.mapped("total"))

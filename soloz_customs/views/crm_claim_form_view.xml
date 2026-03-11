@@ -17,11 +17,9 @@
               <field name="total"/>
             </tree>
           </field>
-
+          <field name="total_cost" readonly="1"/>
         </group>
       </xpath>
-
     </field>
   </record>
-
 </odoo>

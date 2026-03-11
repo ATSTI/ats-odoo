@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- oca-hooks:disable=file-not-used -->
+<odoo>
+
+    <template
+        id="report_purchaseorder_document_custom_soloz"
+        inherit_id="purchase.report_purchaseorder_document"
+        priority="99"
+    >
+        <xpath expr="//th[@name='th_date_req']" position="replace">
+            <th name="th_date_req" class="text-center"><strong>Data de Entrega.</strong></th>
+        </xpath>
+
+        <xpath expr="//t[@t-set='taxes']" position="replace">
+            <t t-set="taxes" t-value="', '.join([tax.name for tax in line.fiscal_tax_ids])"/>
+        </xpath>
+
+        <xpath expr="//div[@id='informations']" position="inside">
+            <div t-if="o.payment_term_id" class="col-3 bm-2">
+                <strong>Condição de Pagamento:</strong>
+                <p t-field="o.payment_term_id.name" class="m-0"/>
+            </div>
+        </xpath>
+
+        <xpath expr="//div[@id='total']//table" position="replace">
+            <table class="table table-sm table-borderless">
+                <!-- carregar estrutura de impostos -->
+                <t t-set="tax_totals" t-value="o.tax_totals"/>
+                <!-- FRETE -->
+                <tr>
+                    <td>Frete</td>
+                    <td style="border-top:1px solid #999; text-align: right">
+                        <span t-esc="o.amount_freight_value" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                    </td>
+                </tr>
+                <!-- Subtotal -->
+                <tr>
+                    <td style="border-top:1px solid #999;">
+                        <strong>
+                            <span t-esc="tax_totals['subtotals'][0]['name']"/>
+                        </strong>
+                    </td>
+                    <td style="text-align: right; border-top:1px solid #999;">
+                    <span t-esc="tax_totals['subtotals'][0]['formatted_amount']"/>
+                    </td>
+                </tr>
+                <!-- Impostos -->
+                <t t-set="stop" t-value="False"/>
+                <t t-foreach="tax_totals['groups_by_subtotal']['Valor Sem Impostos']" t-as="tax">
+                <t t-if="stop == False">
+                    <tr>
+                        <t t-if="tax['tax_group_name'] == 'IPI'">
+                        <td style="border-top:1px solid #999;">
+                            <span t-esc="tax['tax_group_name']"/>
+                        </td>
+                        <td style="background-color: #f2f2f2; border-top:1px solid #999; text-align: right">
+                            <span t-esc="tax['formatted_tax_group_amount']"/>
+                        </td>
+                        </t>
+                        <t t-else="">
+                        <t t-set="ipi_value" t-value="sum(line.ipi_value for line in o.order_line)"/>
+                        <td>
+                            <span>IPI %<span t-field="o.order_line[0].ipi_percent"/></span>
+                        </td>
+                        <td style="background-color: #f2f2f2; border-top:1px solid #999; text-align: right">
+                            <span t-esc="ipi_value" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                        </td>
+                        <t t-set="stop" t-value="True"/>
+                        </t>
+                    </tr>
+                </t>
+                </t>
+                <!-- Total -->
+                <tr>
+                    <td style="font-weight:bold;">Total</td>
+                    <td class="text-end" style="text-align: right; font-weight:bold;">
+                        <span t-esc="tax_totals['formatted_amount_total']"/>
+                    </td>
+                </tr>
+            </table>
+        </xpath>
+    </template>
+
+</odoo>

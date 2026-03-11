@@ -47,7 +47,6 @@ class SaleOrder(models.Model):
             max = ""
             if self.partner_id.street_name and self.partner_id.district:
                 max = self.partner_id.street_name or "" + self.partner_id.street2 or "" + self.partner_id.district or ""
-            # tratar erros
             erros = ""
             if not self.partner_id.legal_name:
                 erros += "\n Cadastro do parceiro sem Razão social."
@@ -77,13 +76,16 @@ class SaleOrder(models.Model):
                 erros += "\n Nome deve ser menor que 60 caracteres."
             if self.partner_id.legal_name and len(self.partner_id.legal_name) > 60:
                 erros += "\n Razão social deve ser menor que 60 caracteres."
-            # if self.fiscal_operation_id.name and len(self.fiscal_operation_id.name) > 60:
-            #     erros += "\n Natureza da operação deve ser menor que 60 caracteres."
 
-            # erros = "\n".join(erros)
             self.message_error_partner = erros or False
             if self.message_error_partner:
                 raise models.ValidationError(
                     _("Erro no cadastro do parceiro: %s") % self.message_error_partner
                 )
+
+        for order in self:
+            order.picking_ids.filtered(
+                lambda p: p.state not in ('done', 'cancel')
+            ).write({'state': 'draft'})
+
         return result

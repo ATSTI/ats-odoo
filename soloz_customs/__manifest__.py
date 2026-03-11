@@ -3,7 +3,7 @@
 
 {
     'name': 'Customizações Soloz',
-    'version': '1.0',
+    'version': '16.0',
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
@@ -13,14 +13,21 @@
         - Limitação do responsavel pelo cliente
         - Validação das informações do cliente
         - LogCheatter de alterações no Produto
+        - Estados separação/conferencia
+        - Conferencia as cegas, ocultando tabelas de DEMANDA e RESERVADO
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi, Otávio Andretta',
     'website': 'https://github.com/ATSTI/ats-odoo',
-    'depends': ['base', 'sale_management'],
+    'depends': ['base', 'sale_management','stock','mrp'],
     'data': [
+        'security/ir.model.access.csv',
         'views/sale_order_view.xml',
+        'views/crm_claim_form_view.xml',
+        'views/stock_picking_view.xml',
     ],
+
+
     'installable': True,
     'application': False,
 }

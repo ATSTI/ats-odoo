@@ -19,3 +19,6 @@
 from . import res_partner
 from . import sale_order
 from . import product
+from . import crm_claim
+from . import crm_claim_cost
+from . import stock_picking

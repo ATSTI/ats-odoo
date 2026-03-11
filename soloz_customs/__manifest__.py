@@ -25,6 +25,7 @@
         'views/sale_order_view.xml',
         'views/crm_claim_form_view.xml',
         'views/stock_picking_view.xml',
+        'report/report_picking_inherit.xml',
     ],
 
 

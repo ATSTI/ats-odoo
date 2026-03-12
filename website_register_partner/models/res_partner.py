@@ -19,7 +19,7 @@ class Partner(models.Model):
         string='Identificação',
     )
     grau_escolar = fields.Selection(
-        [('dr', 'Doutor'),
+        [('dr', 'Doutorado'),
           ('sup', 'Ensino Superior'),
           ('medio_compl', 'Ensino Médio Completo'),
           ('medio_incom', 'Ensino Médio Incompleto'),

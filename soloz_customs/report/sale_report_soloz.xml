@@ -40,16 +40,18 @@
                 <!-- carregar estrutura de impostos -->
                 <t t-set="tax_totals" t-value="doc.tax_totals"/>
                 <!-- Subtotal -->
-                <tr>
-                    <td style="border-top:1px solid #999;">
-                        <strong>
-                            <span t-esc="tax_totals['subtotals'][0]['name']"/>
-                        </strong>
-                    </td>
-                    <td style="text-align: right; border-top:1px solid #999;">
-                    <span t-esc="tax_totals['subtotals'][0]['formatted_amount']"/>
-                    </td>
-                </tr>
+                <t t-if="tax_totals.get('subtotals')">&gt;
+                  <tr>
+                      <td style="border-top:1px solid #999;">
+                          <strong>
+                              <span t-esc="tax_totals['subtotals'][0]['name']"/>
+                          </strong>
+                      </td>
+                      <td style="text-align: right; border-top:1px solid #999;">
+                      <span t-esc="tax_totals['subtotals'][0]['formatted_amount']"/>
+                      </td>
+                  </tr>
+                </t>
                 <!-- Impostos -->
                 <t t-foreach="tax_totals['groups_by_subtotal']['Valor Sem Impostos']" t-as="tax">
                     <tr>
@@ -75,7 +77,7 @@
                 <tr>
                     <td style="font-weight:bold;">Total</td>
                     <td class="text-end" style="text-align: right; font-weight:bold;">
-                        <span t-esc="tax_totals['formatted_amount_total']"/>
+                        <span t-esc="doc.amount_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>
                     </td>
                 </tr>
             </table>

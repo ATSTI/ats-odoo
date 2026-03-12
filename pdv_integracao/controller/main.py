@@ -849,4 +849,48 @@ class IntegracaoPdv(http.Controller):
                 pick.button_validate()
             return 'Sucesso'
 
-
+    @http.route('/enviandoestoque', type='json', auth="user", csrf=False)
+    def website_enviandoestoque(self, **kwargs):
+        dados = request.get_json_data()
+        code = dados['default_code']
+        qty = dados['quantity']
+        preco = dados['price']
+        
+        in_date = datetime.now()
+        prod = http.request.env['product.product'].search([('default_code', '=', code)], limit=1)
+        if not prod:
+            p = dados['product'][0]
+            prod = http.request.env['product.product'].create({
+                'name': p['name'],
+                'default_code': code,
+                'list_price': preco,
+                'detailed_type': 'product',
+                'categ_id': p['categ_id'],
+                'barcode': p['barcode'],
+                'tipo_venda': p['tipo_venda'],
+                'fiscal_type': p['fiscal_type'],
+                'icms_origin': p['icms_origin'],
+                'ncm_id': p['ncm_id'],
+                'tax_icms_or_issqn': p['tax_icms_or_issqn'],
+                'fiscal_genre_id': p['fiscal_genre_id'],
+            })
+        if prod.list_price != preco:
+            prod.write({
+                'list_price': preco,
+            })
+        stock = http.request.env['stock.quant'].sudo().search([
+                ('product_id', '=', prod.id),
+                ('location_id', '=', 8),
+            ], order='id desc', limit=1)
+        if stock:
+            dt_stock = stock.in_date.strftime("%Y/%m/%d")
+            data_insere = in_date.strftime("%Y/%m/%d")
+            if dt_stock == data_insere:
+                return True
+        http.request.env['stock.quant'].create({
+            'product_id': prod.id,
+            'location_id': 8,
+            'quantity': qty,
+            'in_date': in_date,
+        })
+        return 'Sucesso'

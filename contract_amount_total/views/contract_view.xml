@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="contract_amount_total_form_view" model="ir.ui.view">
+        <field name="name">contract.amount.total.view</field>
+        <field name="model">contract.contract</field>
+        <field name="inherit_id" ref="contract.contract_contract_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='note']" position="replace">
+                <field name="note" />
+                <div class="oe_subtotal_footer oe_right">
+                    <label for="amount_total" class="oe_subtotal_label">Valor Total do Contrato:</label>
+                    <field name="amount_total" readonly="1"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="contract_amount_total_tree_view" model="ir.ui.view">
+        <field name="name">contract.amount.total.view</field>
+        <field name="model">contract.contract</field>
+        <field name="inherit_id" ref="contract.contract_contract_tree_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tag_ids']" position="before">
+                <field name="amount_total" />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

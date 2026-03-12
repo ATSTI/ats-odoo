@@ -26,6 +26,19 @@ class Partner(models.Model):
 
     _inherit = 'res.partner'
 
+    sanitized_vat = fields.Char(string='CNPJ/CPF Sanitizado', compute='_compute_sanitized_vat', store=True)
+
+    @api.depends('vat')
+    def _compute_sanitized_vat(self):
+        for partner in self:
+            if partner.vat:
+                partner.sanitized_vat = partner.vat.replace('.', '').replace('-', '').replace('/', '')
+                partner_vat = self.env['res.partner'].search([('sanitized_vat', '=', partner.sanitized_vat), ('id', '!=', partner._origin.id)])
+                if partner_vat:
+                    raise UserError(_("Já existe um contato com o mesmo CNPJ/CPF: %s") % partner_vat[0].name)
+            else:
+                partner.sanitized_vat = False
+
     def write(self, vals_list):
         if not self.user_id and 'user_id' in vals_list:
             return super().write(vals_list)

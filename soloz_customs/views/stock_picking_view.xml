@@ -22,12 +22,14 @@
                     type="object"
                     string="Enviar para Transporte"
                     class="btn-secondary"
+                    states ='done'
                 />
                 <button
                     name="action_entregue"
                     type="object"
                     string="Marcar como Entregue"
                     class="btn-success"
+                    states ='transito'
                 />
                           
                 <button
@@ -56,7 +58,12 @@
             <xpath expr="//field[@name='move_ids_without_package']/tree/field[@name='product_id']" position="after">
                 <field name="separacao"
                     widget="boolean_toggle"
-                    attrs="{'column_invisible':[('parent.state','=','conferencia')]}"/>
+                    attrs="{'column_invisible': [
+                        ('parent.state','=','conferencia'),
+                        ('parent.state' ,'=','done'),
+                        ('parent.state','=','transito'),
+                        ('parent.state', '=','entregue')
+                    ]}"/>
                 <field name="conferencia"
                     attrs="{'column_invisible':[('parent.state','!=','conferencia')]}"/>
                 <field name="diferenca" invisible="1"/>

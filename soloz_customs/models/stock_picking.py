@@ -73,14 +73,19 @@ class Picking(models.Model):
         if not sale_order:
             return
 
+        Move = self.env['stock.move']
+
         for line in sale_order.order_line:
             product = line.product_id
+
             bom_dict = self.env['mrp.bom']._bom_find(products=product)
             bom = bom_dict.get(product)
+
             if not bom:
                 continue
 
             bom_lines, _ = bom.explode(product, line.product_uom_qty)
+
             for bom_line, line_data in bom_lines:
                 if bom_line._name != 'mrp.bom.line':
                     continue
@@ -89,24 +94,27 @@ class Picking(models.Model):
                     lambda m: m.product_id == bom_line.product_id and m.state not in ('done', 'cancel')
                 )
 
+                vals = {
+                    'name': bom_line.product_id.display_name,
+                    'product_id': bom_line.product_id.id,
+                    'product_uom_qty': line_data['qty'],
+                    'product_uom': bom_line.product_uom.id,
+                    'picking_id': self.id,
+                    'location_id': self.location_id.id,
+                    'location_dest_id': self.location_dest_id.id,
+                }
+
                 if existing_move:
-                    existing_move[0].write({
-                        'product_uom_qty': line_data['qty'],
-                        'product_uom': bom_line.product_uom.id,
-                    })
+                    existing_move.write(vals)
                 else:
-                    self.env['stock.move'].create({
-                        'name': bom_line.product_id.name,
-                        'product_id': bom_line.product_id.id,
-                        'product_uom_qty': line_data['qty'],
-                        'product_uom': bom_line.product_uom.id,
-                        'picking_id': self.id,
-                        'location_id': self.location_id.id,
-                        'location_dest_id': self.location_dest_id.id,
-                    })
+                    Move.create(vals)
+
+        moves = self.move_ids.filtered(lambda m: m.state == 'draft')
+        moves._action_confirm()
+
+        self.move_line_ids.unlink()
 
         self.move_ids._action_assign()
-
 
 class StockMove(models.Model):
     _inherit = "stock.move"

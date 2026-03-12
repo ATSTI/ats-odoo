@@ -11,6 +11,7 @@
             </field>
         </field>
     </record>
+
     <record id="view_sale_order_soloz_tree" model="ir.ui.view">
         <field name="name">sale.order.tree.soloz</field>
         <field name="model">sale.order</field>
@@ -18,18 +19,24 @@
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
                 <field name="contact_partner_names" optional="show"/>
+                <field name="partner_city" string="Cidade"/>
+                <field name="partner_state_id" string="Estado"/>
             </field>
         </field>
     </record>
+
     <record id="view_sale_order_quotation_soloz_tree" model="ir.ui.view">
         <field name="name">sale.order.quotation.tree.soloz</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
         <field name="arch" type="xml">
-            <field name="partner_id" position="after">
+            <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="contact_partner_names" />
-            </field>
+                <field name="partner_city" string="Cidade"/>
+                <field name="partner_state_id" string="Estado"/>
+            </xpath>
         </field>
     </record>
+
 
 </odoo>

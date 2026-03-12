@@ -71,12 +71,22 @@
                 </t>
                 </t>
                 <!-- Total -->
-                <tr>
-                    <td style="font-weight:bold;">Total</td>
-                    <td class="text-end" style="text-align: right; font-weight:bold;">
-                        <span t-esc="tax_totals['formatted_amount_total']"/>
-                    </td>
-                </tr>
+                <t t-if="doc.amount_financial_total">
+                  <tr>
+                      <td style="font-weight:bold;">Total</td>
+                      <td class="text-end" style="text-align: right; font-weight:bold;">
+                          <span t-esc="doc.amount_financial_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>
+                      </td>
+                  </tr>
+                </t>
+                <t t-else="">
+                  <tr>
+                      <td style="font-weight:bold;">Total</td>
+                      <td class="text-end" style="text-align: right; font-weight:bold;">
+                          <span t-esc="doc.amount_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>
+                      </td>
+                  </tr>
+                </t>
             </table>
         </xpath>
     </template>

@@ -26,14 +26,12 @@
             <table class="table table-sm table-borderless">
                 <!-- carregar estrutura de impostos -->
                 <t t-set="tax_totals" t-value="o.tax_totals"/>
-                <!-- FRETE -->
                 <tr>
                     <td>Frete</td>
                     <td style="border-top:1px solid #999; text-align: right">
                         <span t-esc="o.amount_freight_value" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
                     </td>
                 </tr>
-                <!-- Subtotal -->
                 <tr>
                     <td style="border-top:1px solid #999;">
                         <strong>
@@ -44,7 +42,6 @@
                     <span t-esc="tax_totals['subtotals'][0]['formatted_amount']"/>
                     </td>
                 </tr>
-                <!-- Impostos -->
                 <t t-set="stop" t-value="False"/>
                 <t t-foreach="tax_totals['groups_by_subtotal']['Valor Sem Impostos']" t-as="tax">
                 <t t-if="stop == False">
@@ -70,22 +67,23 @@
                     </tr>
                 </t>
                 </t>
-                <!-- Total -->
-                <t t-if="doc.amount_financial_total">
-                  <tr>
-                      <td style="font-weight:bold;">Total</td>
-                      <td class="text-end" style="text-align: right; font-weight:bold;">
-                          <span t-esc="doc.amount_financial_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>
-                      </td>
-                  </tr>
+                
+                <t t-if="o.amount_financial_total">
+                    <tr>
+                        <td style="font-weight:bold;">Total</td>
+                        <td class="text-end" style="text-align: right; font-weight:bold;">
+                            <span t-esc="o.amount_financial_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                        </td>
+                    </tr>
                 </t>
+
                 <t t-else="">
-                  <tr>
-                      <td style="font-weight:bold;">Total</td>
-                      <td class="text-end" style="text-align: right; font-weight:bold;">
-                          <span t-esc="doc.amount_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>
-                      </td>
-                  </tr>
+                    <tr>
+                        <td style="font-weight:bold;">Total</td>
+                        <td class="text-end" style="text-align: right; font-weight:bold;">
+                            <span t-esc="o.amount_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                        </td>
+                    </tr>
                 </t>
             </table>
         </xpath>

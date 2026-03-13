@@ -1,0 +1,94 @@
+<odoo>
+    <record id="view_picking_soloz_form" model="ir.ui.view">
+        <field name="name">stock.picking.soloz</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button
+                    name="action_update_stock"
+                    type="object"
+                    string="Atualizar Materiais"
+                    class="oe_stat_button"
+                    icon="fa-refresh"
+                    states="draft,waiting,confirmed,assigned"
+                />
+
+                
+            </xpath>
+
+            <xpath expr="//form/header" position="inside">
+                <button
+                    name="action_transito"
+                    type="object"
+                    string="Enviar para Transporte"
+                    class="btn-secondary"
+                    states ='done'
+                />
+
+                <button
+                    name="action_aguardando"
+                    type="object"
+                    string="Mudar Status para aguardando"
+                    class="btn-secondary"
+                    states ='draft'
+                />
+                <button
+                    name="action_entregue"
+                    type="object"
+                    string="Marcar como Entregue"
+                    class="btn-success"
+                    states ='transito'
+                />
+                          
+                <button
+                    name="action_reload"
+                    type="object"
+                    string="Atualizar"
+                    class="btn-primary"
+                    icon="fa-refresh"
+                />
+            </xpath>
+
+            <xpath expr="//field[@name='state']" position="attributes">
+                <attribute name="statusbar_visible">
+                    draft,confirmed,separacao,conferencia,assigned,transito,entregue,done
+                </attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='move_ids_without_package']/tree" position="attributes">
+                <attribute name="decoration-danger">
+                    parent.state == 'conferencia' and diferenca != 0
+                </attribute>
+                <attribute name="decoration-success">
+                    parent.state == 'conferencia' and conferencia == product_uom_qty
+                </attribute>
+            </xpath>
+            <xpath expr="//field[@name='move_ids_without_package']/tree/field[@name='product_id']" position="after">
+                <field name="separacao"
+                    widget="boolean_toggle"
+                    attrs="{'column_invisible': [
+                        ('parent.state','=','conferencia'),
+                        ('parent.state' ,'=','done'),
+                        ('parent.state','=','transito'),
+                        ('parent.state', '=','entregue')
+                    ]}"/>
+                <field name="conferencia"
+                    attrs="{'column_invisible':[('parent.state','!=','conferencia')]}"/>
+                <field name="diferenca" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='move_ids_without_package']/tree/field[@name='product_uom_qty']" position="attributes">
+                <attribute name="attrs">
+                    {'column_invisible':[('parent.state','=','conferencia')]}
+                </attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='move_ids_without_package']/tree/field[@name='forecast_availability']" position="attributes">
+                <attribute name="attrs">
+                    {'column_invisible':[('parent.state','=','conferencia')]}
+                </attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

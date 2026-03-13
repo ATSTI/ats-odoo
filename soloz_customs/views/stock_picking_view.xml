@@ -14,6 +14,8 @@
                     icon="fa-refresh"
                     states="draft,waiting,confirmed,assigned"
                 />
+
+                
             </xpath>
 
             <xpath expr="//form/header" position="inside">
@@ -23,6 +25,14 @@
                     string="Enviar para Transporte"
                     class="btn-secondary"
                     states ='done'
+                />
+
+                <button
+                    name="action_aguardando"
+                    type="object"
+                    string="Mudar Status para aguardando"
+                    class="btn-secondary"
+                    states ='draft'
                 />
                 <button
                     name="action_entregue"
@@ -36,7 +46,7 @@
                     name="action_reload"
                     type="object"
                     string="Atualizar"
-                    class="btn-secondary"
+                    class="btn-primary"
                     icon="fa-refresh"
                 />
             </xpath>

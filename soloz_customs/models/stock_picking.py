@@ -36,6 +36,10 @@ class Picking(models.Model):
         for picking in self:
             picking.write({'state': 'entregue'})
     
+    def action_aguardando(self):
+        for picking in self:
+            picking.write({'state': 'confirmed'})
+    
     def action_reload(self):
         return 
 
@@ -69,52 +73,60 @@ class Picking(models.Model):
 
     def action_update_stock(self):
         self.ensure_one()
-        sale_order = self.sale_id
+        # import pudb;pudb.set_trace()
+        sale_order = self.move_ids.mapped("sale_line_id.order_id")[:1]
+        if not sale_order and self.origin:
+            sale_order = self.env["sale.order"].search([("name", "=", self.origin)], limit=1)
         if not sale_order:
             return
 
-        Move = self.env['stock.move']
-
+        Move = self.env["stock.move"]
+        bom_products = {}
         for line in sale_order.order_line:
             product = line.product_id
-
-            bom_dict = self.env['mrp.bom']._bom_find(products=product)
+            bom_dict = self.env["mrp.bom"]._bom_find(products=product)
             bom = bom_dict.get(product)
-
             if not bom:
                 continue
+            for bom_line in bom.bom_line_ids:
+                pid = bom_line.product_id.id
+                qty = bom_line.product_qty * line.product_uom_qty
+                if pid not in bom_products:
+                    bom_products[pid] = {
+                        "qty": 0,
+                        "uom": bom_line.product_uom_id.id,
+                    }
+                bom_products[pid]["qty"] += qty
+        if not bom_products:
+            return
+        picking_moves = {}
+        for m in self.move_ids.filtered(lambda m: m.state not in ("done", "cancel")):
+            picking_moves.setdefault(m.product_id.id, []).append(m)
+        for product_id, data in bom_products.items():
+            moves = picking_moves.get(product_id)
+            if moves:
+                for move in moves:
+                    if move.product_uom_qty != data["qty"]:
+                        move.write({
+                            "product_uom_qty": data["qty"]
+                        })
+            else:
+                Move.create({
+                    "name": self.env["product.product"].browse(product_id).display_name,
+                    "product_id": product_id,
+                    "product_uom_qty": data["qty"],
+                    "product_uom": data["uom"],
+                    "picking_id": self.id,
+                    "location_id": self.location_id.id,
+                    "location_dest_id": self.location_dest_id.id,
+                })
 
-            bom_lines, _ = bom.explode(product, line.product_uom_qty)
-
-            for bom_line, line_data in bom_lines:
-                if bom_line._name != 'mrp.bom.line':
-                    continue
-
-                existing_move = self.move_ids.filtered(
-                    lambda m: m.product_id == bom_line.product_id and m.state not in ('done', 'cancel')
-                )
-
-                vals = {
-                    'name': bom_line.product_id.display_name,
-                    'product_id': bom_line.product_id.id,
-                    'product_uom_qty': line_data['qty'],
-                    'product_uom': bom_line.product_uom.id,
-                    'picking_id': self.id,
-                    'location_id': self.location_id.id,
-                    'location_dest_id': self.location_dest_id.id,
-                }
-
-                if existing_move:
-                    existing_move.write(vals)
-                else:
-                    Move.create(vals)
-
-        moves = self.move_ids.filtered(lambda m: m.state == 'draft')
-        moves._action_confirm()
-
-        self.move_line_ids.unlink()
-
-        self.move_ids._action_assign()
+        for product_id, moves in picking_moves.items():
+            if product_id not in bom_products:
+                for move in moves:
+                    move._do_unreserve()
+                    move._action_cancel()
+                    move.unlink()
 
 class StockMove(models.Model):
     _inherit = "stock.move"

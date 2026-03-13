@@ -18,6 +18,12 @@ class DocumentLineMixin(models.AbstractModel):
 class DocumentLineMixinMethods(models.AbstractModel):
     _inherit = "l10n_br_fiscal.document.line.mixin.methods"
 
+    @api.onchange("ncm_id")
+    def _onchange_ncm_id(self):
+        for rec in self:
+            if rec.ncm_id:
+                rec.cbenef_id = rec.ncm_id.cbenef_id
+
     @api.onchange("cbenef_id")
     def _onchange_cbenef_id(self):
         for rec in self:

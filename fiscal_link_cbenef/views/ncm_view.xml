@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+  <record id="link_cbenef_ncm_form" model="ir.ui.view">
+      <field name="name">link.cbenef.ncm.form</field>
+      <field name="model">l10n_br_fiscal.ncm</field>
+      <field name="priority">99</field>
+      <field name="inherit_id" ref="l10n_br_fiscal.ncm_form" />
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='uot_id']" position="after">
+          <field name="cbenef_id" />
+        </xpath>
+      </field>
+  </record>
+
+</odoo>
+

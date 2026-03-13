@@ -22,6 +22,7 @@ Este módulo adiciona ao ICMS o benefício fiscal e faz a busca a partir deles, 
     'data': [
         'security/ir.model.access.csv',
         'views/cbenef_view.xml',
+        'views/ncm_view.xml',
         'views/document_line_view.xml',
     ],
     'post_init_hook': 'post_init_hook',

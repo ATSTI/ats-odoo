@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import fields, models, _, api
-from collections import defaultdict
-from odoo.addons.sale_project.models.sale_order_line import SaleOrderLine as ParentSaleOrderLine
+
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
@@ -17,6 +16,7 @@ class SaleOrder(models.Model):
     
     task_stage = fields.Char(string='Estagio da Tarefa Engenharia', compute='_get_stage_id', readonly=True)
     libera = fields.Boolean(string="Entrega Liberada pelo Financeiro")
+
 
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
@@ -136,4 +136,3 @@ class SaleOrderLine(models.Model):
                         project = map_so_project[so_line.order_id.id]
                 if not so_line.task_id:
                     so_line._timesheet_create_task(project=project)
-                

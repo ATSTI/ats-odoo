@@ -1,6 +1,6 @@
 code,simples_nacional,cst00,cst02,cst10,cst15,cst20,cst30,cst40,cst41,cst50,cst51,cst53,cst60,cst61,cst70,cst90,dispositivo,descricao,obs
 ,SIM,SIM,SIM,SIM,SIM,,,,,,,,SIM,SIM,,,,Sem preenchimento do cBenef,"Contribuintes que utilizem CST 00, 02, 10, 15, 60 e 61 não estão obrigados ao preenchimento do campo Cbenef"
-SEM CBENEF,SIM,,,,,SIM,SIM,SIM,SIM,SIM,SIM,SIM,,,SIM,SIM,,Item sem cBenef e UF exige cBenef para o CST,"Informar a tag, preenchendo com ""SEM CBENEF"" em maiúsculas; indicar fundamentação legal nas informações complementares do documento fiscal"
+SP00SEMCBENEF,SIM,,,,,SIM,SIM,SIM,SIM,SIM,SIM,SIM,,,SIM,SIM,,Item sem cBenef e UF exige cBenef para o CST,"Informar a tag, preenchendo com ""SEM CBENEF"" em maiúsculas; indicar fundamentação legal nas informações complementares do documento fiscal"
 SP099000,SIM,,,,,,,,,,,,,,,SIM,,Remessas de mercadorias entre estabelecimentos do mesmo titular,Observar as disposições do Anexo XI da Portaria SRE 41/2023
 SP099999,SIM,,,,,,,,SIM,,,,,,,SIM,,"Operações, sem benefício fiscal, para as quais a legislação determine a emissão da NF sem destaque de ICMS",Indicar fundamentação legal nas informações complementares  do documento fiscal
 SP010010,SIM,,,,,,SIM,SIM,,,,,,,,,Artigo 001 do Anexo I do RICMS,Isenção - ADJUDICAÇÃO EFETUADA PELO ESTADO,

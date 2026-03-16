@@ -24,11 +24,22 @@ class DocumentLineMixinMethods(models.AbstractModel):
             if rec.ncm_id:
                 rec.cbenef_id = rec.ncm_id.cbenef_id
 
+    @api.onchange("icms_cst_id")
+    def _onchange_icms_cst_id(self):
+        for rec in self:
+            if rec.icms_cst_id:
+                cbenefs = rec.env['l10n_br_fiscal.icms.cbenef'].search([('icms_cst_ids', 'in', rec.icms_cst_id.id)])
+                if rec.cbenef_id and rec.cbenef_id not in cbenefs:
+                    rec.cbenef_id = False
+                    rec.icms_tax_benefit_id = False
+
     @api.onchange("cbenef_id")
     def _onchange_cbenef_id(self):
         for rec in self:
             if not rec.cbenef_id:
                 continue
+            if rec.ncm_id and not rec.ncm_id.cbenef_id:
+                rec.ncm_id.cbenef_id = rec.cbenef_id.id
             Tax_Definition = rec.env['l10n_br_fiscal.tax.definition']
             Tax_Group = rec.env['l10n_br_fiscal.tax.group']
 

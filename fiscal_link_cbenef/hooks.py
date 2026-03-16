@@ -27,6 +27,8 @@ def post_init_hook(cr, registry):
             csts = []
 
             for key, value in row.items():
+                if not key:
+                    continue
                 if key.startswith('cst') and value == 'SIM':
                     csts.append(key[3:])
 

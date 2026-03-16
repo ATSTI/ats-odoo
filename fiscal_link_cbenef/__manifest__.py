@@ -18,6 +18,8 @@ Este módulo adiciona ao ICMS o benefício fiscal e faz a busca a partir deles, 
     'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': [
         'l10n_br_fiscal',
+        'l10n_br_account',
+        'l10n_br_nfe',
     ],
     'data': [
         'security/ir.model.access.csv',

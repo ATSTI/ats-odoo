@@ -1,55 +1,90 @@
-# -*- coding: utf-8 -*-
-##############################################################################
-#
-#    OpenERP, Open Source Management Solution
-#    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as
-#    published by the Free Software Foundation, either version 3 of the
-#    License, or (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU Affero General Public License for more details.
-#
-#    You should have received a copy of the GNU Affero General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-##############################################################################
+# License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
-from odoo import api, fields, models, _
+from erpbrasil.base.fiscal import cnpj_cpf
+
+from odoo import api, models, _
 from odoo.exceptions import UserError
+from odoo.exceptions import ValidationError
 
 class Partner(models.Model):
 
     _inherit = 'res.partner'
 
-    sanitized_vat = fields.Char(string='CNPJ/CPF Sanitizado', compute='_compute_sanitized_vat', store=True)
+    # se preencher sem pontos esta rotina esta falhando
+    @api.constrains("vat", "l10n_br_ie_code")
+    def _check_cnpj_l10n_br_ie_code(self):
+        for record in self:
+            domain = []
 
-    @api.depends('vat')
-    def _compute_sanitized_vat(self):
-        for partner in self:
-            if partner.vat:
-                partner.sanitized_vat = partner.vat.replace('.', '').replace('-', '').replace('/', '')
-                partner_vat = self.env['res.partner'].search([('sanitized_vat', '=', partner.sanitized_vat), ('id', '!=', partner._origin.id)])
-                if partner_vat:
-                    raise UserError(_("Já existe um contato com o mesmo CNPJ/CPF: %s") % partner_vat[0].name)
-            else:
-                partner.sanitized_vat = False
+            if not record.vat:
+                return
 
+            if self.env.context.get(
+                "disable_allow_cnpj_multi_ie"
+            ) or self.env.context.get("allow_vat_duplicate"):
+                return
 
-    @api.depends('vat')
-    def _compute_sanitized_vat(self):
-        for partner in self:
-            if partner.vat:
-                partner.sanitized_vat = partner.vat.replace('.', '').replace('-', '').replace('/', '')
-                partner_vat = self.env['res.partner'].search([('sanitized_vat', '=', partner.sanitized_vat), ('id', '!=', partner._origin.id)])
-                if partner_vat:
-                    raise UserError(_("Já existe um contato com o mesmo CNPJ/CPF: %s") % partner_vat[0].name)
-            else:
-                partner.sanitized_vat = False
+            allow_cnpj_multi_ie = (
+                record.env["ir.config_parameter"]
+                .sudo()
+                .get_param("l10n_br_base.allow_cnpj_multi_ie", default=True)
+            )
+
+            if record.parent_id:
+                domain += [
+                    ("id", "not in", record.parent_id.ids),
+                    ("parent_id", "not in", record.parent_id.ids),
+                ]
+
+            if record.vat:
+                domain += [
+                    "|",
+                    ("vat", "=", record.vat),
+                    ("cnpj_cpf_stripped", "=", record.cnpj_cpf_stripped),
+                    ("id", "!=", record.id),
+                    ("parent_id", "!=", record.id),
+                ]
+                # return
+
+            matches = record.env["res.partner"].search(domain)
+            if matches:
+                if cnpj_cpf.validar_cnpj(record.vat):
+                    if allow_cnpj_multi_ie == "True":
+                        for partner in record.env["res.partner"].search(domain):
+                            if (
+                                partner.l10n_br_ie_code == record.l10n_br_ie_code
+                                and record.l10n_br_ie_code
+                            ):
+                                raise ValidationError(
+                                    _(
+                                        "Já existe um parceiro %(name)s "
+                                        "(ID %(partner_id)s) com esta "
+                                        "Inscrição Estadual %(incr_est)s!",
+                                        name=partner.name,
+                                        partner_id=partner.id,
+                                        incr_est=partner.l10n_br_ie_code,
+                                    )
+                                )
+                    else:
+                        raise ValidationError(
+                            _(
+                                "Já existe um parceiro %(name)s "
+                                "(ID %(partner_id)s) com este CNPJ %(vat)s!",
+                                name=matches[0].name,
+                                partner_id=matches[0].id,
+                                vat=self.vat,
+                            )
+                        )
+                elif not record.is_company:
+                    raise ValidationError(
+                        _(
+                            "Já existe um parceiro %(name)s (ID %(partner_id)s) "
+                            "com este CPF/RG! %(vat)s",
+                            name=matches[0].name,
+                            partner_id=matches[0].id,
+                            vat=matches[0].vat,
+                        )
+                    )
 
     def write(self, vals_list):
         if not self.user_id and 'user_id' in vals_list:

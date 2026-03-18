@@ -29,7 +29,8 @@ class IntegracaoPdv(http.Controller):
 
     @http.route('/produtoconsulta', type='json', auth="user", csrf=False)
     def website_produtoconsulta(self, **kwargs):
-        data = request.jsonrequest
+        #data = request.jsonrequest
+        data = json.loads(request.httprequest.data)
         # TODO testar aqui se e a empresa mesmo
         hj = datetime.now()
         hj = hj - timedelta(days=5)
@@ -167,7 +168,8 @@ class IntegracaoPdv(http.Controller):
 
     @http.route('/cliente_cnpj', type='json', auth="public", csrf=False)
     def website_cliente_cnpj(self, **kwargs):
-        data = request.jsonrequest
+        #data = request.jsonrequest
+        data = json.loads(request.httprequest.data)
         cnpj = re.sub('[^0-9]', '', data['params']['cnpj'])
         # TODO testar aqui se e a empresa mesmo
         cnpj = '%s.%s.%s/%s-%s' %(cnpj[:2],cnpj[2:5],cnpj[5:8],cnpj[8:12],cnpj[12:14])
@@ -182,7 +184,8 @@ class IntegracaoPdv(http.Controller):
 
     @http.route('/clienteconsulta', type='json', auth="user", csrf=False)
     def website_clienteconsulta(self, **kwargs):
-        data = request.jsonrequest
+        #data = request.jsonrequest
+        data = json.loads(request.httprequest.data)
         # TODO testar aqui se e a empresa mesmo
         hj = datetime.now()
         hj = hj - timedelta(days=10)
@@ -224,7 +227,8 @@ class IntegracaoPdv(http.Controller):
     @http.route('/contasconsulta', type='json', auth="user", csrf=False)
     def website_contasconsulta(self, **kwargs):
         user_id = http.request.env['res.users'].browse([request.uid])
-        data = request.jsonrequest
+        #data = request.jsonrequest
+        data = json.loads(request.httprequest.data)
         cod_cliente = data['cod_cliente']
         caixa = data['caixa']
         aml_id = data['aml_id']
@@ -324,7 +328,8 @@ class IntegracaoPdv(http.Controller):
 
     @http.route('/usuarioconsulta', type='json', auth="user", csrf=False)
     def website_usuarioconsulta(self, **kwargs):
-        data = request.jsonrequest
+        #data = request.jsonrequest
+        data = json.loads(request.httprequest.data)
         # TODO testar aqui se e a empresa mesmo
         hj = datetime.now()
         hj = hj - timedelta(days=10)
@@ -349,7 +354,8 @@ class IntegracaoPdv(http.Controller):
         user_id = http.request.env['res.users'].browse([request.uid])
         # receber todas as sangrias e reforco do caixa
         # verificar no odoo se existe       
-        data = request.jsonrequest
+        #data = request.jsonrequest
+        data = json.loads(request.httprequest.data)
         lista_pdv = json.loads(data['todos'])
         caixa = lista_pdv[0]['caixa']
         sg_obj = http.request.env['account.bank.statement.line']
@@ -386,10 +392,12 @@ class IntegracaoPdv(http.Controller):
 
     @http.route('/integrapdv', type='json', auth="user", csrf=False)
     def website_integrapdv(self, **kwargs):
-        data = request.jsonrequest
+        #data = request.jsonrequest
+        data = json.loads(request.httprequest.data)
         dados_json = data['params']
         nome_arquivo = f"{data['tipo']}_{dados_json['name'].replace('/', '_')}"
         arquivo = f"{path_file}/{nome_arquivo}.json"
+        arquivo = arquivo.replace('\'', '')
         with open(arquivo, 'w') as f:
            f.write(json.dumps(dados_json))
         file_retorno = f"{path_file_return}/retorno.json"
@@ -401,7 +409,8 @@ class IntegracaoPdv(http.Controller):
 
     @http.route('/caixaconsulta', type='json', auth="user", csrf=False)
     def website_caixaconsulta(self, **kwargs):
-        data = request.jsonrequest
+        #data = request.jsonrequest
+        data = json.loads(request.httprequest.data)
         session_obj = http.request.env['pos.session']
         user_id = http.request.env['res.users'].browse([request.uid])
         lista = []
@@ -471,7 +480,8 @@ class IntegracaoPdv(http.Controller):
 
     @http.route('/pedidoconsulta', type='json', auth="user", csrf=False)
     def website_pedidoconsulta(self, **kwargs):
-        data = request.jsonrequest
+        #data = request.jsonrequest
+        data = json.loads(request.httprequest.data)
         dados_json = data['params']
         nome_arquivo = dados_json['name']
         arquivo = f"{path_file}/{nome_arquivo}.json"
@@ -531,7 +541,8 @@ class IntegracaoPdv(http.Controller):
 
     @http.route('/pedidoconsultageral', type='json', auth="user", csrf=False)
     def website_pedidoconsultageral(self, **kwargs):
-        data = request.jsonrequest
+        #data = request.jsonrequest
+        data = json.loads(request.httprequest.data)
         # TODO testar aqui se e a empresa mesmo
         user_id = http.request.env['res.users'].browse([request.uid])
         pedido = http.request.env['pos.order']
@@ -723,7 +734,8 @@ class IntegracaoPdv(http.Controller):
                 
     @http.route('/pedidoinsere', type='json', auth="user", csrf=False)
     def website_pedidoinsere(self, **kwargs):
-        data = request.jsonrequest
+        #data = request.jsonrequest
+        data = json.loads(request.httprequest.data)
         hj = datetime.now()
         hj = datetime.strftime(hj,'%m-%d-%Y')
         if 'pedido' in data:
@@ -806,7 +818,8 @@ class IntegracaoPdv(http.Controller):
 
     @http.route('/devolucao', type='json', auth="user", csrf=False)
     def website_devolucao(self, **kwargs):
-        data = request.jsonrequest
+        #data = request.jsonrequest
+        data = json.loads(request.httprequest.data)
         user_id = http.request.env['res.users'].browse([request.uid]) 
         nome_busca = 'DEV-' + str(data['origin'])
         dev = http.request.env['stock.picking'].sudo().search([

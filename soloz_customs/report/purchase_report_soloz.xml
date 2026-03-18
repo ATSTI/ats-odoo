@@ -69,7 +69,6 @@
                 </t>
                 
                 <t t-if="o.amount_financial_total">
-<<<<<<< HEAD
                     <tr>
                         <td style="font-weight:bold;">Total</td>
                         <td class="text-end" style="text-align: right; font-weight:bold;">
@@ -85,25 +84,6 @@
                             <span t-esc="o.amount_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
                         </td>
                     </tr>
-=======
-                <tr>
-                    <td style="font-weight:bold;">Total</td>
-                    <td class="text-end" style="text-align: right; font-weight:bold;">
-                        <span t-esc="o.amount_financial_total"
-                                t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                    </td>
-                </tr>
-                </t>
-
-                <t t-else="">
-                <tr>
-                    <td style="font-weight:bold;">Total</td>
-                    <td class="text-end" style="text-align: right; font-weight:bold;">
-                        <span t-esc="o.amount_total"
-                                t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                    </td>
-                </tr>
->>>>>>> c393ca74bafd13b115f4de25211b953777c08357
                 </t>
             </table>
         </xpath>

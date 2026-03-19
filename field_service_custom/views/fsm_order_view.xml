@@ -37,12 +37,24 @@
         <field name="model">fsm.order</field>
         <field name="inherit_id" ref="fieldservice.fsm_order_kanban_view"/>
         <field name="arch" type="xml">
+
             <kanban position="attributes">
                 <attribute name="default_order">create_date desc</attribute>
             </kanban>
-        </field>
-    </record>
 
+           <xpath expr="//kanban" position="inside">
+                <field name="customer_address"/>
+            </xpath>
+
+           <xpath expr="//t[@t-name='kanban-box']//field[@name='location_id']" position="after">
+                <div class="text-muted" style="font-size:12px;">
+                    <i class="fa fa-map-marker"/>
+                    <field name="customer_address"/>
+                </div>
+            </xpath>
+
+        </field>
+    </record>   
     <record id="fsm_order_form_custom_calendar" model="ir.ui.view">
         <field name="name">fsm.order.form.calendar</field>
         <field name="model">fsm.order</field>

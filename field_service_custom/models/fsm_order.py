@@ -8,7 +8,11 @@ class FSMOrder(models.Model):
     _inherit = "fsm.order"
 
     loc_location = fields.Char(related="location_id.partner_id.contact_address", string="Endereço do Local")
-
+    customer_address = fields.Char(
+    string="Endereço",
+    related="customer_id.contact_address",
+    store=False
+)
     @api.onchange('person_id')
     def _onchange_person_id(self):
         if self.person_id:

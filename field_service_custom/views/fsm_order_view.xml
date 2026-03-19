@@ -44,12 +44,16 @@
 
            <xpath expr="//kanban" position="inside">
                 <field name="customer_address"/>
+                <field name="scheduled_date_start"/>
+                <field name="scheduled_date_end"/>
             </xpath>
 
            <xpath expr="//t[@t-name='kanban-box']//field[@name='location_id']" position="after">
                 <div class="text-muted" style="font-size:12px;">
                     <i class="fa fa-map-marker"/>
                     <field name="customer_address"/>
+                    <field name="scheduled_date_start"/> - 
+                    <field name="scheduled_date_end"/>
                 </div>
             </xpath>
 

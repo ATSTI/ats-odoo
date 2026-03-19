@@ -862,7 +862,7 @@ class IntegracaoPdv(http.Controller):
                 pick.button_validate()
             return 'Sucesso'
 
-    @http.route('/enviandoestoque', type='json', auth="user", csrf=False)
+    @http.route('/enviandoestoque', type='json', auth="user", website=True)
     def website_enviandoestoque(self, **kwargs):
         dados = request.get_json_data()
         code = dados['default_code']
@@ -873,19 +873,22 @@ class IntegracaoPdv(http.Controller):
         prod = http.request.env['product.product'].search([('default_code', '=', code)], limit=1)
         if not prod:
             p = dados['product'][0]
+            ncm = http.request.env['l10n_br_fiscal.ncm'].search([
+                ('code', '=', p['ncm_id'][1][:10])
+            ], limit=1)
             prod = http.request.env['product.product'].create({
                 'name': p['name'],
                 'default_code': code,
                 'list_price': preco,
                 'detailed_type': 'product',
-                'categ_id': p['categ_id'],
+                'categ_id': p['categ_id'][0],
                 'barcode': p['barcode'],
                 'tipo_venda': p['tipo_venda'],
                 'fiscal_type': p['fiscal_type'],
                 'icms_origin': p['icms_origin'],
-                'ncm_id': p['ncm_id'],
+                'ncm_id': ncm.id,
                 'tax_icms_or_issqn': p['tax_icms_or_issqn'],
-                'fiscal_genre_id': p['fiscal_genre_id'],
+                'fiscal_genre_id': p['fiscal_genre_id'][0],
             })
         if prod.list_price != preco:
             prod.write({
@@ -905,5 +908,6 @@ class IntegracaoPdv(http.Controller):
             'location_id': 8,
             'quantity': qty,
             'in_date': in_date,
+            'inventory_date': in_date,
         })
         return 'Sucesso'

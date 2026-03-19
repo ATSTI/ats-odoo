@@ -7,19 +7,18 @@
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
-    'summary': 'Módulo de Customizações Específicas para a Soloz',
+    'summary': 'Módulo de Customizações Específicas para a Soloz em stock.picking',
     'description': """
         Este módulo tem como finalidade algumas mecanicas que a Empresa pediu, entre elas estão:
-        - Limitação do responsavel pelo cliente
-        - Validação das informações do cliente
-        - LogCheatter de alterações no Produto
+        - Lógica nova em stock.picking
+        - Relátorios com campos ocultos para determinados usuários/estágios do picking
         - Estados separação/conferencia
         - Conferencia as cegas, ocultando tabelas de DEMANDA e RESERVADO
     """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Otávio Andretta',
+    'maintainer': 'Otávio Andretta <otavio12257@gmail.com>',
     'website': 'https://github.com/ATSTI/ats-odoo',
-    'depends': ['base', 'sale_management','stock','mrp'],
+    'depends': ['base', 'sale_management','stock','mrp','crm','stock'],
     'data': [
         'security/ir.model.access.csv',
         'security/security.xml',

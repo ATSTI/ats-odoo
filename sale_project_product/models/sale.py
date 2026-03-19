@@ -110,7 +110,8 @@ class SaleOrderLine(models.Model):
                             so_lines.append(so_line)
                         else:
                             so_line._timesheet_create_task(project=map_sol_project.get(so_line.id))
-            so_lines[0]._timesheet_create_task(project=prj_id)
+            if so_lines:
+                so_lines[0]._timesheet_create_task(project=prj_id)
 
         # project_only, task_in_project: create a new project, based or not on a template (1 per SO). May be create a task too.
         # if 'task_in_project' and project_id configured on SO, use that one instead

@@ -4,6 +4,7 @@ from odoo import models, _
 
 
 import requests as rq
+import json
 
 
 
@@ -26,7 +27,8 @@ class StockPicking(models.Model):
                     'price': line.product_id.lst_price,
                     'product': line.product_id.read()
                 }
-                self.enviando_arquivo(vals, session_id, config_db, config_user, config_passwd, config_url)
+                itens = json.dumps(vals, default=str)
+                envio = self.enviando_arquivo(itens, session_id, config_db, config_user, config_passwd, config_url)
         return True    
 
     def get_session(self, url, username, password, db):

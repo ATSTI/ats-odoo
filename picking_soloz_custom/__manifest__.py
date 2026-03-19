@@ -22,9 +22,14 @@
     'depends': ['base', 'sale_management','stock','mrp'],
     'data': [
         'security/ir.model.access.csv',
+        'security/security.xml',
         'views/crm_claim_form_view.xml',
         'views/stock_picking_view.xml',
+        'views/wizard_validar_conferencia.xml',
+        'report/report_operacao_separacao_total_custom.xml',
         'report/report_picking_inherit.xml',
+        'report/report_delivery_document_inherit.xml',
+        'report/report_separacao_cega_gerente.xml',
     ],
 
 

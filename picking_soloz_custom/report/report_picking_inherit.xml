@@ -1,6 +1,7 @@
 <odoo>
     <template id="report_picking_separacao_conferencia"
-              inherit_id="stock.report_picking">
+        inherit_id="stock.report_picking">
+
         <xpath expr="//tbody/tr/td[2]" position="replace">
             <th t-if="o.state == 'separacao'">
                 <strong>Quantidade</strong>
@@ -12,30 +13,47 @@
                 <strong>Quantity</strong>
             </th>
         </xpath>
+
         <xpath expr="//td[span[@t-field='ml.reserved_uom_qty']]" position="replace">
             <td>
+                <t t-set="is_conferente" t-value="o.conferente_id.id == env.user.id"/>
+
+                <!-- SEPARACAO -->
                 <t t-if="o.state == 'separacao'">
                     <span t-field="ml.reserved_uom_qty"/>
                     <span t-field="ml.product_uom_id" groups="uom.group_uom"/>
                 </t>
-                <t t-if="o.state == 'conferencia'">
-                    <t t-if="ml.move_id.conferencia">
-                        <span t-esc="ml.move_id.conferencia"/>
+
+                <!-- CONFERENCIA -->
+                <t t-elif="o.state == 'conferencia'">
+                    <t t-if="is_conferente">
+                        <t t-if="ml.move_id.conferencia and ml.move_id.conferencia == ml.move_id.product_uom_qty">
+                            <span t-esc="ml.move_id.conferencia"/>
+                            <span t-field="ml.product_uom_id" groups="uom.group_uom"/>
+                        </t>
+                        <t t-else="">
+                            <div style="border-bottom:1px solid black; height:18px; width:80px;"/>
+                        </t>
+                    </t>
+                    <t t-else="">
+                        <span t-field="ml.reserved_uom_qty"/>
                         <span t-field="ml.product_uom_id" groups="uom.group_uom"/>
                     </t>
-                    <t t-if="not ml.move_id.conferencia">
-                        <div style="border-bottom:1px solid black; height:18px; width:80px;"></div>
-                    </t>
                 </t>
-                <t t-if="o.state == 'done'">
+
+                <!-- DONE -->
+                <t t-elif="o.state == 'done'">
                     <span t-field="ml.qty_done"/>
                     <span t-field="ml.product_uom_id" groups="uom.group_uom"/>
                 </t>
-                <t t-if="o.state not in ['separacao','conferencia','done']">
+
+                <!-- OUTROS ESTADOS -->
+                <t t-else="">
                     <span t-field="ml.reserved_uom_qty"/>
                     <span t-field="ml.product_uom_id" groups="uom.group_uom"/>
                 </t>
             </td>
         </xpath>
+
     </template>
 </odoo>

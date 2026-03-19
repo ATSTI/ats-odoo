@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_wizard_validar_conferencia_form" model="ir.ui.view">
+        <field name="name">wizard.validar.conferencia.form</field>
+        <field name="model">wizard.validar.conferencia</field>
+        <field name="arch" type="xml">
+            <form string="Resultado da Conferência">
+                <field name="tem_divergencia" invisible="1"/>
+                <div attrs="{'invisible': [('tem_divergencia', '=', True)]}">
+                    <div class="alert alert-success" role="alert">
+                        <i class="fa fa-check-circle"/> Conferência OK! Nenhuma divergência encontrada.
+                    </div>
+                </div>
+                <div attrs="{'invisible': [('tem_divergencia', '=', False)]}">
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fa fa-exclamation-triangle"/> Atenção! Foram encontradas divergências na conferência.
+                    </div>
+                    <field name="line_ids">
+                    <tree decoration-danger="True">
+                        <field name="product_id" string="Produto Divergente"/>
+                        <field name="qty_conferida" string="Qtd Conferida"/>
+                    </tree>
+                </field>
+                </div>
+
+                <footer>
+                    <button
+                        string="Confirmar Conferência"
+                        name="action_confirmar"
+                        type="object"
+                        class="btn-primary"
+                        attrs="{'invisible': [('tem_divergencia', '=', True)]}"
+                    />
+                    <button
+                        string="Imprimir Divergentes"
+                        name="action_imprimir_divergentes"
+                        type="object"
+                        class="btn-warning"
+                        attrs="{'invisible': [('tem_divergencia', '=', False)]}"
+                    />
+                    <button string="Fechar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

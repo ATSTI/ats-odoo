@@ -1,0 +1,51 @@
+<odoo>
+    <template id="report_operacao_separacao_total_custom"
+        inherit_id="report_soloz.report_operacao_separacao_total">
+
+        <xpath expr="//th[strong='Demanda']" position="replace">
+            <th t-if="o.state == 'separacao'">
+                <strong>Quantidade</strong>
+            </th>
+            <th t-if="o.state == 'conferencia'">
+                <strong>Conferência</strong>
+            </th>
+            <th t-if="o.state not in ['separacao','conferencia']">
+                <strong>Demanda</strong>
+            </th>
+        </xpath>
+
+        <xpath expr="//td[span[@t-esc='line[1]']]" position="replace">
+            <td>
+                <t t-set="move"
+                    t-value="o.move_ids_without_package.filtered(lambda m: m.product_id.id == line[0][0] and m.location_id.id == line[0][1] and m.location_dest_id.id == line[0][2])[:1]"/>
+
+                <t t-set="is_conferente" t-value="o.conferente_id.id == env.user.id"/>
+
+                <t t-if="o.state == 'separacao'">
+                    <span t-esc="line[1]"/>
+                </t>
+
+                <t t-if="o.state == 'conferencia'">
+                    <t t-if="is_conferente">
+                        <!-- conferente: oculto por padrão, mostra só se bateu -->
+                        <t t-if="move and move.conferencia and move.conferencia == move.product_uom_qty">
+                            <span t-esc="move.conferencia"/>
+                        </t>
+                        <t t-else="">
+                            <div style="border-bottom:1px solid black; height:18px; width:80px;"/>
+                        </t>
+                    </t>
+                    <t t-else="">
+                        <!-- outros usuários: veem a quantidade normalmente -->
+                        <span t-esc="line[1]"/>
+                    </t>
+                </t>
+
+                <t t-if="o.state not in ['separacao', 'conferencia']">
+                    <span t-esc="line[1]"/>
+                </t>
+            </td>
+        </xpath>
+
+    </template>
+</odoo>

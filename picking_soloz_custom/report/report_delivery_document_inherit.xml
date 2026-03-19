@@ -1,0 +1,70 @@
+<odoo>
+    <template id="report_delivery_document_separacao_conferencia"
+        inherit_id="stock.report_delivery_document">
+
+        <xpath expr="//table[@name='stock_move_table']//th[@name='th_sm_ordered']" position="replace">
+            <th name="th_sm_ordered" t-if="o.conferente_id.id != env.user.id">
+                <strong>Pedido</strong>
+            </th>
+        </xpath>
+
+        <xpath expr="//table[@name='stock_move_table']//td[span[@t-field='move.product_uom_qty']]" position="replace">
+            <td t-if="o.conferente_id.id != env.user.id">
+                <span t-field="move.product_uom_qty"/>
+                <span t-field="move.product_uom"/>
+            </td>
+        </xpath>
+
+        <xpath expr="//table[@name='stock_move_table']//th[@name='th_sm_quantity']" position="replace">
+            <th name="th_sm_quantity">
+                <t t-if="o.state == 'conferencia'">
+                    <strong>Conferência</strong>
+                </t>
+                <t t-elif="o.state == 'separacao'">
+                    <strong>Quantidade</strong>
+                </t>
+                <t t-else="">
+                    <strong>Delivered</strong>
+                </t>
+            </th>
+        </xpath>
+
+        <xpath expr="//table[@name='stock_move_table']//td[span[@t-field='move.quantity_done']]" position="replace">
+            <td>
+                <t t-set="is_conferente" t-value="o.conferente_id.id == env.user.id"/>
+
+                <t t-if="o.state == 'separacao'">
+                    <span t-field="move.product_uom_qty"/>
+                    <span t-field="move.product_uom"/>
+                </t>
+
+                <t t-elif="o.state == 'conferencia'">
+                    <t t-if="is_conferente">
+                        <t t-if="move.conferencia and move.conferencia == move.product_uom_qty">
+                            <span t-esc="move.conferencia"/>
+                            <span t-field="move.product_uom"/>
+                        </t>
+                        <t t-else="">
+                            <div style="border-bottom:1px solid black; height:18px; width:80px;"/>
+                        </t>
+                    </t>
+                    <t t-else="">
+                        <t t-if="move.conferencia">
+                            <span t-esc="move.conferencia"/>
+                            <span t-field="move.product_uom"/>
+                        </t>
+                        <t t-else="">
+                            <div style="border-bottom:1px solid black; height:18px; width:80px;"/>
+                        </t>
+                    </t>
+                </t>
+
+                <t t-else="">
+                    <span t-field="move.quantity_done"/>
+                    <span t-field="move.product_uom"/>
+                </t>
+            </td>
+        </xpath>
+
+    </template>
+</odoo>

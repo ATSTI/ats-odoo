@@ -12,10 +12,8 @@
                     string="Atualizar Materiais"
                     class="oe_stat_button"
                     icon="fa-refresh"
-                    states="draft,waiting,confirmed,assigned"
+                    states="draft,confirmed"
                 />
-
-                
             </xpath>
 
             <xpath expr="//form/header" position="inside">
@@ -23,25 +21,31 @@
                     name="action_transito"
                     type="object"
                     string="Enviar para Transporte"
-                    class="btn-secondary"
-                    states ='done'
+                    class="btn-primary"
+                    states="done"
                 />
-
                 <button
                     name="action_aguardando"
                     type="object"
                     string="Mudar Status para aguardando"
-                    class="btn-secondary"
-                    states ='draft'
+                    class="btn-primary"
+                    states="draft"
                 />
+
+                 <!-- <button
+                    name="action_concluido"
+                    type="object"
+                    string="Mudar Status Concluido"
+                    class="btn-primary"
+                    states="reservado"
+                /> -->
                 <button
                     name="action_entregue"
                     type="object"
                     string="Marcar como Entregue"
                     class="btn-success"
-                    states ='transito'
+                    states="transito"
                 />
-                          
                 <button
                     name="action_reload"
                     type="object"
@@ -49,46 +53,125 @@
                     class="btn-primary"
                     icon="fa-refresh"
                 />
+                <button
+                    name="action_validar_conferencia"
+                    type="object"
+                    string="Validar Conferência"
+                    class="btn-primary"
+                    states="conferencia"
+                />
+                <button
+                    name="action_marcar_separacao"
+                    type="object"
+                    string="Marcar para Separação"
+                    class="btn-primary"
+                    states="assigned"
+                />
+                <button
+                    name="action_separar_todos_e_conferir"
+                    type="object"
+                    string="Separar Todos e Ir para Conferência"
+                    class="btn-primary"
+                    states="separacao"
+                />
+
+                <button
+                    name="action_assign"
+                    type="object"
+                    string="Verificar Disponibilidade"
+                    class="btn-primary"
+                    states="confirmed"
+                />
+
+                <!-- <button
+                    name="action_pronto"
+                    type="object"
+                    string="Marcar como pronto"
+                    class="btn-primary"
+                    states="reservado"
+                /> -->
+            </xpath>
+
+            <xpath expr="//button[@name='action_assign']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='user_id']" position="after">
+                <!-- <field name="separador_domain" invisible="1"/> -->
+                <!-- <field name="conferente_domain" invisible="1"/> -->
+                <field name="is_conferente" invisible="1"/>
+            </xpath>
+
+            <xpath expr="//field[@name='location_id']" position="after">
+                <field
+                    name="separador_id"
+                    widget="many2one_avatar_user"
+                />
+                <field
+                    name="conferente_id"
+                    widget="many2one_avatar_user"
+                />
             </xpath>
 
             <xpath expr="//field[@name='state']" position="attributes">
                 <attribute name="statusbar_visible">
-                    draft,confirmed,separacao,conferencia,assigned,transito,entregue,done
+                    draft,confirmed,separacao,conferencia,assigned,transito,entregue,done,reservado
                 </attribute>
             </xpath>
 
+            <!-- Remover decoration em tempo real, aplicar só após validação -->
             <xpath expr="//field[@name='move_ids_without_package']/tree" position="attributes">
                 <attribute name="decoration-danger">
-                    parent.state == 'conferencia' and diferenca != 0
+                            parent.conferencia_validada == True and conferencia != product_uom_qty and conferencia != 0
                 </attribute>
                 <attribute name="decoration-success">
-                    parent.state == 'conferencia' and conferencia == product_uom_qty
-                </attribute>
-            </xpath>
-            <xpath expr="//field[@name='move_ids_without_package']/tree/field[@name='product_id']" position="after">
-                <field name="separacao"
-                    widget="boolean_toggle"
-                    attrs="{'column_invisible': [
-                        ('parent.state','=','conferencia'),
-                        ('parent.state' ,'=','done'),
-                        ('parent.state','=','transito'),
-                        ('parent.state', '=','entregue')
-                    ]}"/>
-                <field name="conferencia"
-                    attrs="{'column_invisible':[('parent.state','!=','conferencia')]}"/>
-                <field name="diferenca" invisible="1"/>
-            </xpath>
-            <xpath expr="//field[@name='move_ids_without_package']/tree/field[@name='product_uom_qty']" position="attributes">
-                <attribute name="attrs">
-                    {'column_invisible':[('parent.state','=','conferencia')]}
+                    parent.conferencia_validada == True and conferencia == product_uom_qty
                 </attribute>
             </xpath>
 
-            <xpath expr="//field[@name='move_ids_without_package']/tree/field[@name='forecast_availability']" position="attributes">
-                <attribute name="attrs">
-                    {'column_invisible':[('parent.state','=','conferencia')]}
-                </attribute>
+            <!-- Declarar conferencia_validada invisível para usar no decoration -->
+            <xpath expr="//field[@name='user_id']" position="before">
+                <field name="conferencia_validada" invisible="1"/>
             </xpath>
+
+            <xpath expr="//field[@name='move_ids_without_package']/tree/field[@name='product_id']" position="after">
+                <field name="separacao"
+                    widget="boolean_toggle" invisible ='1'/>
+                <field name="conferencia"
+                    attrs="{'column_invisible': [('parent.state', '!=', 'conferencia')]}"/>
+                <field name="diferenca" invisible="1"/>
+            </xpath>
+
+           <xpath expr="//field[@name='move_ids_without_package']/tree/field[@name='product_uom_qty']" position="attributes">
+            <attribute name="attrs">
+                {'column_invisible': [('parent.is_conferente', '=', True)]}
+            </attribute>
+        </xpath>
+        <!-- faz o botao validar do odoo aparecer no state reservado (state novo)
+        <xpath expr="//button[@name='button_validate']" position="attributes">
+            <attribute name="states">reservado</attribute>
+        </xpath> -->
+
+        <!-- trava a tree toda -->
+
+        <xpath expr="//field[@name='move_ids_without_package']" position="attributes">
+            <attribute name="attrs">
+                {'readonly': [('state', 'in', ['assigned', 'done', 'transito', 'entregue', 'cancel','separacao','reservado'])]}
+            </attribute>
+        </xpath>
+
+        <xpath expr="//field[@name='move_ids_without_package']/tree/field[@name='forecast_availability']" position="attributes">
+            <attribute name="attrs">
+                {'column_invisible': [('parent.is_conferente', '=', True)]}
+            </attribute>
+        </xpath>
+
+        <xpath expr="//field[@name='move_ids_without_package']/tree/field[@name='quantity_done']" position="attributes">
+            <attribute name="attrs">
+                {'column_invisible': [('parent.is_conferente', '=', True)]}
+            </attribute>
+        </xpath>
+        
         </field>
     </record>
 </odoo>

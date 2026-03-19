@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_separador" model="res.groups">
+        <field name="name">Separador</field>
+        <field name="category_id" ref="base.module_category_inventory_inventory"/>
+        <field name="implied_ids" eval="[(4, ref('stock.group_stock_user'))]"/>
+    </record>
+
+    <record id="group_conferente" model="res.groups">
+        <field name="name">Conferente</field>
+        <field name="category_id" ref="base.module_category_inventory_inventory"/>
+        <field name="implied_ids" eval="[(4, ref('stock.group_stock_user'))]"/>
+    </record>
+
+    <record id="group_gerente_inventario" model="res.groups">
+        <field name="name">Gerente de Inventário</field>
+        <field name="category_id" ref="base.module_category_inventory_inventory"/>
+        <field name="implied_ids" eval="[
+            (4, ref('picking_soloz_custom.group_separador')),
+            (4, ref('picking_soloz_custom.group_conferente')),
+            (4, ref('stock.group_stock_manager'))
+        ]"/>
+    </record>
+</odoo>

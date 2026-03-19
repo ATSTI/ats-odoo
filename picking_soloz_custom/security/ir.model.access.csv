@@ -1,2 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_crm_claim_cost_user,crm.claim.cost.user,model_crm_claim_cost,base.group_user,1,1,1,1
+access_wizard_validar_conferencia,wizard.validar.conferencia,model_wizard_validar_conferencia,,1,1,1,1
+access_wizard_validar_conferencia_line,wizard.validar.conferencia.line,model_wizard_validar_conferencia_line,,1,1,1,1

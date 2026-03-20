@@ -903,11 +903,12 @@ class IntegracaoPdv(http.Controller):
             data_insere = in_date.strftime("%Y/%m/%d")
             if dt_stock == data_insere:
                 return True
-        http.request.env['stock.quant'].create({
+        stq = http.request.env['stock.quant'].sudo().create({
             'product_id': prod.id,
             'location_id': 8,
-            'quantity': qty,
+            'inventory_quantity': qty,
             'in_date': in_date,
             'inventory_date': in_date,
         })
+        stq.sudo().action_apply_inventory()
         return 'Sucesso'

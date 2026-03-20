@@ -22,6 +22,9 @@
                 <field name="partner_city" string="Cidade"/>
                 <field name="partner_state_id" string="Estado"/>
             </field>
+            <xpath expr="//field[@name='invoice_status']" position="before">
+                <field name="task_stage" optional="show"/>
+            </xpath>
         </field>
     </record>
 
@@ -34,6 +37,9 @@
                 <field name="contact_partner_names" />
                 <field name="partner_city" string="Cidade"/>
                 <field name="partner_state_id" string="Estado"/>
+            </xpath>
+            <xpath expr="//field[@name='state']" position="before">
+                <field name="task_stage" optional="show"/>
             </xpath>
         </field>
     </record>

@@ -38,6 +38,15 @@ class SaleOrder(models.Model):
         string='Mensagem de erro do parceiro',
         readonly=True,
         invisible=True)
+    
+    task_stage = fields.Char(string='Estagio da Tarefa Engenharia', compute='_get_stage_id', readonly=True)
+
+    def _get_stage_id(self):
+        for order in self:
+            if not order.tasks_ids:
+                order.task_stage = ''
+            for tk in order.tasks_ids:
+                order.task_stage = tk.stage_id.name
 
     @api.depends('partner_id')
     def _compute_contact_partner(self):

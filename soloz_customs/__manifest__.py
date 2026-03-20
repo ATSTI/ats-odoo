@@ -20,6 +20,7 @@
     'depends': ['base', 'l10n_br_sale', 'l10n_br_purchase'],
     'data': [
         'views/sale_order_view.xml',
+        'views/stock_view.xml',
         'report/sale_report_soloz.xml',
         'report/purchase_report_soloz.xml',
     ],

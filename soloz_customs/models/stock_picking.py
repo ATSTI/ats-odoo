@@ -5,6 +5,8 @@ class StockPicking(models.Model):
 
     _inherit = 'stock.picking'
 
+    status_tarefa = fields.Char(string='Estagio da Tarefa Engenharia', related='sale_id.task_stage', readonly=True)
+
     def action_confirm(self):
         for res in self:
             if res.move_ids and not res.move_ids.purchase_line_id:

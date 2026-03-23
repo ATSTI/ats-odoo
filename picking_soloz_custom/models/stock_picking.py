@@ -114,7 +114,7 @@ class Picking(models.Model):
             raise UserError(_("É necessário definir um Separador antes de iniciar a separação."))
 
         if not self.conferente_id:
-            raise UserError(_("É necessário definir um Conferente antes de iniciar a separação."))
+            raise UserError(_("É necessário definir um Conferente antes de iniciar a Conferência."))
 
         moves = self.move_ids_without_package.filtered(lambda m: m.state not in ('done', 'cancel'))
         nao_reservados = moves.filtered(lambda m: m.state != 'assigned')
@@ -126,6 +126,20 @@ class Picking(models.Model):
             ) % produtos)
 
         self.write({'state': 'separacao', 'state_locked': True})
+    
+    def action_agrupar_linhas(self):
+        for picking in self:
+            agrupados = {}
+            for move in picking.move_ids_without_package.filtered(lambda m: m.state not in ['done', 'cancel']):
+                key = (move.product_id.id, move.sale_line_id.id)
+
+                if key not in agrupados:
+                    agrupados[key] = move
+                else:
+                    principal = agrupados[key]
+                    principal.product_uom_qty += move.product_uom_qty
+                    move.unlink()
+        return True
 
     def action_separar_todos_e_conferir(self):
         self.ensure_one()

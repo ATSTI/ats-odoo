@@ -1,0 +1,29 @@
+<odoo>
+    <record id="create_task_view_form_custom" model="ir.ui.view">
+        <field name="name">create.task.wizard.form.custom</field>
+        <field name="model">create.task.wizard</field>
+        <field name="priority" eval="16"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Criar Tarefa desse Pedido" class="o_form_label_align">
+                <sheet>
+                    <group>
+                        <field name="project_id"/>
+                        <field name="name" readonly="0"/>
+                        <field name="user_id"/>
+                        <field name="date_deadline"/>
+                        <field name="description"/>
+                        <field name="model" invisible="1"/>
+                        <field name="res_id" invisible="1"/>
+                    </group>
+                </sheet>
+
+                <footer>
+                    <button string="Criar Tarefa" name="action_create_task" type="object"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

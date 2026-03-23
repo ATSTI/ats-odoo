@@ -111,3 +111,19 @@ class SaleOrder(models.Model):
                     _("Erro no cadastro do parceiro: %s") % self.message_error_partner
                 )
         return result
+    
+    def action_create_task(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Create Task in Project'),
+            'res_model': 'create.task.wizard',  
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_partner_id': self.partner_id.id,
+                'default_project_id': self.project_id.id if self.project_id else False,
+                'default_model': 'sale.order',
+                'default_res_id': self.id,
+            },
+        }

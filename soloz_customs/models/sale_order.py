@@ -122,7 +122,7 @@ class SaleOrder(models.Model):
             'target': 'new',
             'context': {
                 'default_partner_id': self.partner_id.id,
-                'default_project_id': self.project_id.id if self.project_id else False,
+                'default_project_id': self.project_id.id if self.project_id else self.env['project.project'].browse(1).id,
                 'default_model': 'sale.order',
                 'default_res_id': self.id,
             },

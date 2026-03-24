@@ -7,10 +7,11 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="action_create_task" type="object" string="Criar Tarefa" class="btn-primary" data-hotkey="q" attrs="{'invisible': [('state', '!=', 'sale')]}"/>
+                <button name="action_create_task" type="object" string="Criar Tarefa" class="btn-primary" data-hotkey="q" attrs="{'invisible': ['|', ('state', '!=', 'sale'), ('tasks_count', '>=', 1)]}"/>
             </xpath>
             <field name="partner_id" position="after">
                 <field name="contact_partner" widget="many2many_tags" options="{'color_field': 'color'}" invisible="1"/>
+                <field name="tasks_count" invisible="1"/>
             </field>
         </field>
     </record>

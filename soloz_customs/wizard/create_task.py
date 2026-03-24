@@ -32,7 +32,7 @@ class CreateTaskWizard(models.TransientModel):
     @api.depends('project_id')
     def compute_name(self):
         for record in self:
-            record.name = f"Tarefa relacionada ao Pedido: {record.env['sale.order'].browse(record.res_id).name}"
+            record.name = f"{record.env['sale.order'].browse(record.res_id).name} | {record.env['sale.order'].browse(record.res_id).user_id.name} |"
 
     def action_create_task(self):
         self.ensure_one()

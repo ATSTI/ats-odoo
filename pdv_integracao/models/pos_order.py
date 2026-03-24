@@ -16,8 +16,8 @@ import json
 
 
 _logger = logging.getLogger(__name__)
-path_file = '/opt/odoo/arquivos'
-path_file_return = '/opt/odoo/retornos/retorno.json'
+path_file = '/opt/odoo16/arquivos_felicita'
+path_file_return = '/opt/odoo16/retornos_felicita/retorno.json'
 
 class PosSession(models.Model):
     _inherit = 'pos.session'
@@ -62,7 +62,7 @@ class PosSession(models.Model):
     #                 fiscal_genre_id = self.env["l10n_br_fiscal.product.genre"].search([("code", "=", ncm[0:2])])
     #                 vp['ncm_id'] = pr_ncm[0]
     #                 if fiscal_genre_id:
-    #                     vp['fiscal_genre_id'] = fiscal_genre_id[0]
+    #                     vp['fiscal_genre_id'] = fiscal_genre_i/opt/odoo16/outros/ats-odoo/pdv_integracao/models/pos_order.pyd[0]
     #                 if not prod.fiscal_type:
     #                     vp['fiscal_type'] = '00'
     #                 if not prod.icms_origin:
@@ -164,7 +164,11 @@ class PosSession(models.Model):
             vals = {}
             # vals["name"] = arq["name"]
             vals["start_at"] = arq["start_at"]
-            usuario = self.env['res.users'].browse(arq["user_id"])
+            usuario = self.env['res.users'].sudo().search([
+                ('id', '=', arq["user_id"])
+            ])
+            if not usuario:
+                continue
             vals["user_id"] = usuario.id
             if usuario.id in user_adic:
                 continue

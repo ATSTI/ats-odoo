@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 from odoo import models, fields, api, tools, _
+from odoo.exceptions import UserError
 # from odoo.addons.point_of_sale.wizard.pos_box import PosBox
 # from odoo.exceptions import UserError
 from datetime import datetime, date, timedelta
@@ -16,8 +17,8 @@ import json
 
 
 _logger = logging.getLogger(__name__)
-path_file = '/opt/odoo/arquivos'
-path_file_return = '/opt/odoo/retornos/retorno.json'
+path_file = '/opt/odoo16/arquivos_felicita'
+path_file_return = '/opt/odoo16/retornos_felicita/retorno.json'
 
 class PosSession(models.Model):
     _inherit = 'pos.session'
@@ -34,49 +35,7 @@ class PosSession(models.Model):
                 #back = pick._create_backorder()
                 #pick.button_validate()
             pos.write({'state': 'cancel'})
-
-    # def produto_corrige_ncm(self):
-    #     origem = odoorpc.ODOO('url', port=8069)
-    #     origem.login('url', 'user', 'password')
-    #     a_prod = origem.env['product.product']
-    #     b_prod = self.env['product.product']
-    #     arq = open('/var/www/webroot/ncm_nao_encontrado.txt', '+r')
-    #     itens = []
-    #     for item in arq.readlines():
-    #         itens.append(int(item.strip()))
-    #     prod_b = b_prod.search([('ncm_id', '=', False), ('type', '=', 'product'), ('id', 'not in', itens)], order="id", limit=100)
-    #     prod_a = a_prod.browse(prod_b._ids)
-    #     arqx = open('/var/www/webroot/ncm_nao_encontrado.txt', '+a')
-    #     for prd in prod_a:
-    #         prod = b_prod.search([('default_code', '=', prd.default_code)])
-    #         if prod:
-    #             ncm = prd.product_tmpl_id.fiscal_classification_id.code
-    #             if not ncm:
-    #                 continue
-    #             pr_ncm = self.env['l10n_br_fiscal.ncm'].search([('code', '=', ncm)])
-    #             if not pr_ncm:
-    #                 pr_ncm = self.env['l10n_br_fiscal.ncm'].search([('code', 'ilike', ncm[:7])], limit=1)
-    #             if pr_ncm:
-    #                 #_logger.info(f"ITEM : {prod.default_code}")
-    #                 vp = {}
-    #                 fiscal_genre_id = self.env["l10n_br_fiscal.product.genre"].search([("code", "=", ncm[0:2])])
-    #                 vp['ncm_id'] = pr_ncm[0]
-    #                 if fiscal_genre_id:
-    #                     vp['fiscal_genre_id'] = fiscal_genre_id[0]
-    #                 if not prod.fiscal_type:
-    #                     vp['fiscal_type'] = '00'
-    #                 if not prod.icms_origin:
-    #                     vp['icms_origin'] = '0'
-    #                 if len(vp):
-    #                     prod.write(vp)
-    #             else:
-    #                 _logger.info(f"NCM nao encontrado : {ncm}, produto {prd.default_code}")
-    #                 if prod.id not in itens:
-    #                     arqx.write(str(prod.id) + '\n')
-    #                 continue
-    #     arq.close()
-    #     arqx.close()
-    
+   
     def baixa_pagamentos(self, move_line_id, journal_id, caixa, valor, cod_forma, juros):
         if journal_id:
             invoices = move_line_id
@@ -164,7 +123,11 @@ class PosSession(models.Model):
             vals = {}
             # vals["name"] = arq["name"]
             vals["start_at"] = arq["start_at"]
-            usuario = self.env['res.users'].browse(arq["user_id"])
+            usuario = self.env['res.users'].sudo().search([
+                ('id', '=', arq["user_id"])
+            ])
+            if not usuario:
+                continue
             vals["user_id"] = usuario.id
             if usuario.id in user_adic:
                 continue
@@ -323,13 +286,6 @@ class PosSession(models.Model):
             for line_ids in ped['lines']:
                 linhas -= 1
                 line = line_ids[2]
-                # prod = dest.env['product.product'].search([('default_code', '=', line.product_id.default_code)])
-                # if not len(prod):
-                #     #logger.info(f"ITEM nao encontrado : {line.product_id.default_code}")
-                #     prod = dest.env['product.product'].search([('barcode', '=', line.product_id.barcode)])
-                # if not len(prod):
-                #if len(prod):
-                #    print (f"ITEM : {line.product_id.default_code}")
                 codpro = line['product_id']
                 if isinstance(codpro, int):
                     prd = prod_obj.search([('id', '=', codpro)], limit=1)
@@ -343,25 +299,7 @@ class PosSession(models.Model):
                     if not prd:
                         prd = prod_obj.search([('default_code', '=', '321')])
                         descricao = f"{descricao} - PRODUTO NAO LOCALIZADO"
-                #TODO buscar pelo codigo nao id
-                # px = line['product_id']
-                # if px == 30979:
-                #     px = 30683
-                # if px == 31344:
-                #     px = 31242
-                # if px == 30430:
-                #     px = 30495
-                # if px == 29899:
-                #     px = 30586
-                # if px == 30406:
-                #     px = 30404
-                # if px == 30406:
-                #     px = 30404
-                # if 'Troca' in line['name']:
-                #     troca += line['price_unit'] * line['qty']
                 sub_total = line['price_unit'] * line['qty']
-                # print('1-VALOR : %s' %str(sub_total))
-                # print('2-Reducao : %s' %str(sub_total * (desconto/100)))
                 if linhas == 0:
                     desconto = 0.0
                     if sub_total:
@@ -383,12 +321,7 @@ class PosSession(models.Model):
                     "price_subtotal_incl": sub_total,
 
                 }
-                # print('5-GERALLLLLLLLLLLLLL : %s' %str(sub_total))
-                # if 'discount' in line:
-                    # vals_item["discount"] = line['discount']
-                # "order_id": ped_id.id,
-                # ped_id.write({'lines'(vals_iten)
-     
+    
                 list_adi.append(vals_item)
                 ped_id.write({'lines': [(0, 0, vals_item)]})
             if troca or dif_pag:
@@ -441,23 +374,6 @@ class PosSession(models.Model):
                 new_move.sudo().with_company(ped_id.company_id)._post()
             
             ped_id._create_order_picking()
-            
-                # ver se esta paga
-
-                # if ped.invoice_id.state == 'paid':
-                # for ct in ped.invoice_id.receivable_move_line_ids:
-                #     if ct.reconciled:
-                #         bancos = origem.env['account.journal'].search([
-                #             ('type', 'in', ('cash', 'bank'))])
-                #         aml = origem.env['account.move.line'].search([
-                #             ('ref','=',ped.name),
-                #             ('journal_id', 'in', bancos)
-                #         ])
-                #         for ml in aml:
-                #             aml_id = origem.env['account.move.line'].browse(ml)
-                #             jrn = dest.env['account.journal'].search([('name', 'ilike', ml.journal_id.name[:2])])
-                #             jrn_id = dest.env['account.journal'].browse(jrn)
-                #             baixa_pagamentos(new_move, jrn_id, 0, aml_id.debit, 0, 0)
         if ses:
             # crio um arquivo com todos os pedidos desta sessao
             pedido_ses = self.env['pos.order'].search([('session_id', '=', ses.id)])
@@ -557,79 +473,47 @@ class PosSession(models.Model):
 
             if session.state not in ('opened'):
                 continue
-            
-            lista_st = []
-            for lt_st in session.statement_ids:
-                lista_st.append(lt_st.id)
 
             motivo = lt['motivo']
             valor = lt['amount']
             cod_forma = lt['name']
+            ref = lt['ref']
             cod_venda = int(lt['cod_venda'])
-            
-            diario = '1-'
-            if cod_venda == 2: 
-                diario = motivo[:2]
-            diario_obj = self.env['account.journal']    
-            diario_id = diario_obj.search([
-                ('company_id', '=', session.user_id.company_id.id),
-                ('name', 'ilike', diario)])
-            # verifica se ja foi feito
-            #line = sg_obj.search([
-            #    ('ref', '=', str(cod_forma)),
-            #    ('statement_id', 'in', (lista_st)),
-            #])
+
+            payment_ref = '-'.join([session.name, ref, motivo])
             ja_importou = self.env['account.bank.statement.line'].search([
-                ('name', '=', str(cod_forma)+caixa)])
+                ('payment_ref', '=', payment_ref)])
             if not ja_importou:
-                arp = self.env['account.payment.register']
-                arp.lanca_sangria_reforco(diario_id, caixa, valor, cod_forma, cod_venda, session.user_id.partner_id, motivo)
+                # arp = self.env['account.payment.register']
+                # arp.lanca_sangria_reforco(diario_id, caixa, valor, cod_forma, cod_venda, session.user_id.partner_id, motivo)
+                if cod_venda == 0:
+                    tipo = 'in'
+                elif cod_venda == 1:
+                    tipo = 'out'
+                else:
+                    tipo = 'out'
+                session.try_cash_in_out(tipo, valor, motivo, payment_ref)
             else:
                 os.remove(path_file + '/' + i)
 
-    # for ses in a_session.browse(a_ses): 
-    #     #cli_id = b_cliente.search([('name', '=', cli.name)])
-    #     #print ('Codigo : %s , Nome : %s.' % (cli.id,cli.name))
-    #     #print ('Codigo odoo 14 : %s ' % (cli_id)) 
-        
-    #     pedidos_10 = a_pedido.search([('session_id', '=', ses.id)])
-    #     pSession = b_session.search([('name', 'ilike', ses.name )])
-    #     pSession_id = 0
-    #     if not len(pSession):
-    #         vals = {}
-    #         user = a_user.search([('name', '=', ses.user_id.name)])
-    #         vals['user_id'] = user[0]
-    #         vals['name'] = ses.name
-    #         vals['config_id'] = ses.config_id.id
-    #         vals['start_at'] = datetime.strftime(ses.start_at,'%Y-%m-%d %H:%M:%S')
-    #         if ses.stop_at:
-    #             vals['stop_at'] = datetime.strftime(ses.stop_at,'%Y-%m-%d %H:%M:%S')
-    #             vals['state'] = 'closed'    
-    #         pSession_id = b_session.create(vals)
-    #         pSes = b_session.browse(pSession_id)
-    #         pSes.write({'name': ses.name})
-    #         #logger.info(f"Inserido a sessão : {ses.name}")
-    #     if pSession_id:
-    #         pedidos_14 = b_pedido.search([('session_id', '=', pSession_id), ('state', '!=', 'draft')])
-    #         pSes = b_session.browse([pSession_id])
-    #     else:
-    #         pedidos_14 = b_pedido.search([('session_id', '=', pSession[0]), ('state', '!=', 'draft')])
-    #         pSes = b_session.browse(pSession)
-    #     vals_update = {}
-    #     if ses.state != pSes.state:
-    #         vals_update['state'] = ses.state
-    #     if ses.stop_at != pSes.stop_at:
-    #         vals_update['stop_at'] = datetime.strftime(ses.stop_at,'%Y-%m-%d %H:%M:%S')
-    #     if len(vals_update):
-    #         pSes.write(vals_update)
-        
+    def try_cash_in_out(self, _type, amount, reason, extras):
+        sign = 1 if _type == 'in' else -1
+        sessions = self.filtered('cash_journal_id')
+        if not sessions:
+            raise UserError(_("There is no cash payment method for this PoS Session"))
 
-    #     if len(pedidos_10) == len(pedidos_14):
-    #         continue
-    #     #logger.info(f"Sessão : {ses.name}")
-    #     if len(pSession):
-    #         insere_pedido(pSes.id,ses.id)
-    #         continue     
+        self.env['account.bank.statement.line'].sudo().create([
+            {
+                'pos_session_id': session.id,
+                'journal_id': session.cash_journal_id.id,
+                'amount': sign * amount,
+                'date': fields.Date.context_today(self),
+                'payment_ref': '-'.join([session.name, extras, reason]),
+            }
+            for session in sessions
+        ])
 
-    #     #insere_pedido(pSession_id,ses.id)   
-    
+        message_content = [f"Cash {extras}", f'- Amount: {amount}']
+        if reason:
+            message_content.append(f'- Reason: {reason}')
+        self.message_post(body='<br/>\n'.join(message_content))

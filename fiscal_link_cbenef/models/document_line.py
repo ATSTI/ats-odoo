@@ -16,14 +16,8 @@ class DocumentLineMixin(models.AbstractModel):
         domain="[('icms_cst_ids','in',icms_cst_id)]"
     )
 
-    @api.onchange("ncm_id")
-    def _onchange_ncm_id(self):
-        for rec in self:
-            if rec.ncm_id and rec.ncm_id.cbenef_id:
-                rec.cbenef_id = rec.ncm_id.cbenef_id
-
-    @api.onchange("icms_cst_id")
-    def _onchange_icms_cst_id(self):
+    def _prepare_fields_icms(self, tax_dict):
+        res = super()._prepare_fields_icms(tax_dict)
         for rec in self:
             if (
                 rec.icms_cst_id
@@ -56,9 +50,17 @@ class DocumentLineMixin(models.AbstractModel):
                         else:
                             if rec.ncm_id and rec.ncm_id.cbenef_id:
                                 rec.cbenef_id = rec.ncm_id.cbenef_id
+        return res
 
-    @api.onchange("cbenef_id")
-    def _onchange_cbenef_id(self):
+    def _compute_fiscal_tax_ids(self):
+        res = super()._compute_fiscal_tax_ids()
+        for rec in self:
+            if rec.ncm_id and rec.ncm_id.cbenef_id:
+                rec.cbenef_id = rec.ncm_id.cbenef_id
+        return res
+
+    @api.depends("cbenef_id")
+    def _compute_taxbenefit_id(self):
         for rec in self:
             if not rec.cbenef_id:
                 continue

@@ -53,7 +53,8 @@ class IntegracaoPdv(http.Controller):
             for line in pr.line_ids:
                 if line.field_name in (
                     'default_code', 'barcode', 'standard_price', 'list_price', 'tipo_venda',
-                    'qtde_atacado', 'preco_atacado', 'name', 'image_promocao_512','description_sale'
+                    'qtde_atacado', 'preco_atacado', 'name', 'image_promocao_512',
+                    'description_sale', 'ncm_id'
                 ):
                     prod_ids = http.request.env['product.template'].sudo().browse([pr.res_id])
                     if prod_ids:

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="view_br_account_in_line_cbenef_form" model="ir.ui.view">
+        <field name="name">br_account.inv.line.cbenef.form</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="br_account.view_br_account_invoice_line_form"/>
+        <field name="arch" type="xml">
+            <field name="tem_difal" position="after">
+                <field name="cbenef_id" />
+            </field>
+        </field>
+     </record>
+
+</odoo>

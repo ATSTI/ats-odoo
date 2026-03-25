@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+  <record id="cbenef_form_view" model="ir.ui.view">
+      <field name="name">cbenef.form.view</field>
+      <field name="model">l10n_br_fiscal.icms.cbenef</field>
+      <field name="priority">99</field>
+      <field name="arch" type="xml">
+        <form string="Cbenef">
+          <sheet>
+            <group>
+              <field name="name" />
+              <field name="code" />
+              <field name="description" />
+              <field name="cst" />
+            </group>
+          </sheet>
+        </form>
+      </field>
+  </record>
+
+<record id="br_account_tax_rule_benef_form" model="ir.ui.view">
+    <field name="name">br_account.tax.rule.benet.form</field>
+    <field name="model">account.fiscal.position.tax.rule</field>
+    <field name="inherit_id" ref="br_account.br_account_tax_rule_form"/>
+    <field name="arch" type="xml">
+        <field name="cst_icms" position="after">
+            <field name="cbenef_id" attrs="{'invisible': [('domain', '!=', 'icms')]}" />
+        </field>
+    </field>
+</record>
+
+</odoo>

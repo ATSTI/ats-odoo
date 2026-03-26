@@ -60,11 +60,11 @@ class DocumentLineMixin(models.AbstractModel):
         return res
 
     @api.depends("cbenef_id")
-    def _compute_taxbenefit_id(self):
+    def _compute_fiscal_tax_ids(self):
         for rec in self:
             if not rec.cbenef_id:
                 continue
-            if rec.cbenef_id.code == 'SEM CBENEF':
+            if rec.cbenef_id.code == 'SP00SEMCBENEF' or not rec.cbenef_id.code:
                 rec.icms_tax_benefit_id = False
                 continue
             if rec.ncm_id and not rec.ncm_id.cbenef_id:
@@ -115,6 +115,7 @@ class DocumentLineMixin(models.AbstractModel):
                 rec.ncm_id.cbenef_id = rec.cbenef_id.id
 
             rec.icms_tax_benefit_id = tax_benefit.id
+        return super()._compute_fiscal_tax_ids()
 
     def get_benefit_type(self, cst):
         if cst in ['30', '40']:

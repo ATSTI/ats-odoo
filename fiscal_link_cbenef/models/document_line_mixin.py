@@ -26,6 +26,8 @@ class DocumentLineMixin(models.AbstractModel):
     )
     def _compute_fiscal_tax_ids(self):
         for line in self:
+            if line.ncm_id and line.ncm_id.cbenef_id:
+                line.cbenef_id = line.ncm_id.cbenef_id
             if line.fiscal_operation_line_id:
                 mapping_result = line.fiscal_operation_line_id.map_fiscal_taxes(
                     company=line.company_id,

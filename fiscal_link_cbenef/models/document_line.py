@@ -21,42 +21,24 @@ class DocumentLineMixin(models.AbstractModel):
         for rec in self:
             if (
                 rec.icms_cst_id
-                and not rec.icms_tax_benefit_id
                 and rec.move_id.issuer == DOCUMENT_ISSUER_COMPANY
+                and rec.cbenef_id
             ):
-                cbenef = self.get_benefit_type(
-                        rec.icms_cst_id.code if rec.icms_cst_id else False
-                )
-                if rec.cbenef_id:
+                # if rec.get_benefit_type(rec.icms_cst_id.code) != '0':
+                cbenefs = rec.env['l10n_br_fiscal.icms.cbenef'].search([('icms_cst_ids', 'in', rec.icms_cst_id.id)])
+                if rec.cbenef_id in cbenefs:
+                    Tax_Definition = rec.env['l10n_br_fiscal.tax.definition']
+                    tax_benefit = Tax_Definition.search([
+                        ('is_benefit', '=', True),
+                        ('cst_id', '=', rec.icms_cst_id.id),
+                        ('tax_group_id', '=', rec.icms_cst_id.tax_group_id.id),
+                        ('fiscal_operation_line_id', '=', rec.fiscal_operation_line_id.id),
+                    ], limit=1)
+                    if tax_benefit:
+                        rec.icms_tax_benefit_id = tax_benefit.id
+                else:
                     rec.cbenef_id = False
                     rec.icms_tax_benefit_id = False
-                if cbenef != '0':
-                    cbenefs = rec.env['l10n_br_fiscal.icms.cbenef'].search([('icms_cst_ids', 'in', rec.icms_cst_id.id)])
-                    if len(cbenefs) > 1:
-                        if rec.ncm_id and not rec.ncm_id.cbenef_id:
-                            rec.ncm_id.cbenef_id = rec.cbenef_id.id
-                            continue
-                        Tax_Definition = rec.env['l10n_br_fiscal.tax.definition']
-
-                        tax_benefit = Tax_Definition.search([
-                            ('is_benefit', '=', True),
-                            ('cst_id', '=', rec.icms_cst_id.id),
-                            ('tax_group_id', '=', rec.icms_cst_id.tax_group_id.id),
-                            ('fiscal_operation_line_id', '=', rec.fiscal_operation_line_id.id),
-                        ], limit=1)
-
-                        if tax_benefit:
-                            rec.icms_tax_benefit_id = tax_benefit.id
-                        else:
-                            if rec.ncm_id and rec.ncm_id.cbenef_id:
-                                rec.cbenef_id = rec.ncm_id.cbenef_id
-        return res
-
-    def _compute_fiscal_tax_ids(self):
-        res = super()._compute_fiscal_tax_ids()
-        for rec in self:
-            if rec.ncm_id and rec.ncm_id.cbenef_id:
-                rec.cbenef_id = rec.ncm_id.cbenef_id
         return res
 
     @api.depends("cbenef_id")

@@ -14,8 +14,24 @@
                     style="padding: 10px 15px; line-height: 1.4; height: auto; margin-bottom:1px; background-color: #FA944B; font-size: 20px;"
                     attrs="{'invisible': [('parameter_field', '=', True)]}"    
                 >
-                <b><span>⚠️ Atenção: A partir de 01/04, a SEFAZ inicia a validação dos campos relacionados à reforma tributária.
-                    Garanta o preenchimento correto dessas informações para evitar erros e possíveis multas.</span></b>
+                    <ul>⚠️ Atenção:
+                        <li> A partir de 01/04, a SEFAZ inicia a validação dos campos relacionados à reforma tributária.</li>
+                        <li> A partir de 06/04, obrigatoriedade do “cBenef” <b>(ICMS/SP)</b> </li>    
+                    </ul>
+
+                    <div style="margin-top: 10px;">
+                        <a href="/l10n_br_nfe_mensagem/static/description/guia_classtrib.png" 
+                        target="_blank" 
+                        style="color: white; text-decoration: underline; font-weight: bold; font-size:12px;">
+                        👉 O que devo preencher? (reforma fiscal)
+                        </a>
+                        <br/>
+                        <a href="/l10n_br_nfe_mensagem/static/description/guia_cbenef.png" 
+                        target="_blank" 
+                        style="color: white; text-decoration: underline; font-weight: bold; font-size:12px;">
+                        👉 O que devo preencher? (cbenef)
+                        </a>
+                    </div>
                 </div>
             </xpath>
             <xpath expr="//sheet" position="before">

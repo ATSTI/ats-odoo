@@ -9,6 +9,15 @@
         <field name="priority">399</field>
         <field name="arch" type="xml">
             <!-- <xpath expr="//div[@class='alert alert-danger']" position="insert"> -->
+            <xpath expr="//header" position="after">
+                <div class="alert" role="alert" 
+                    style="padding: 10px 15px; line-height: 1.4; height: auto; margin-bottom:1px; background-color: #FA944B; font-size: 20px;"
+                    attrs="{'invisible': [('parameter_field', '=', True)]}"    
+                >
+                <b><span>⚠️ Atenção: A partir de 01/04, a SEFAZ inicia a validação dos campos relacionados à reforma tributária.
+                    Garanta o preenchimento correto dessas informações para evitar erros e possíveis multas.</span></b>
+                </div>
+            </xpath>
             <xpath expr="//sheet" position="before">
                 <div
                     class="alert alert-danger"
@@ -17,6 +26,7 @@
                 >
                 <strong>XML validation errors:</strong>
                 <field name="xml_error_message" readonly="1" />
+                <field name="parameter_field" invisible="1" />
                 </div>
                 <div
                             class="alert alert-success"

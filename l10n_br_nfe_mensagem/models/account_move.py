@@ -19,6 +19,8 @@ class AccountMove(models.Model):
     #     string="XML validation errors",
     #     copy=False,
     # )
+
+    parameter_field = fields.Boolean(related="company_id.parameter_field", string="Parameter Field")
   
     @api.onchange("partner_id")
     def _onchange_partner_id(self):

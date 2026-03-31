@@ -10,7 +10,7 @@ class ResCompany(models.Model):
 
     def _compute_parameter_field(self):
         for record in self:
-            views_posted = self.env['account.move'].search_count([('company_id', '=', record.id), ('invoice_date', '>=', '2026-03-29')])
+            views_posted = self.env['account.move'].search_count([('company_id', '=', record.id), ('invoice_date', '>=', '2026-03-31')])
             if views_posted >= 5:
                 record.parameter_field = True
             else:

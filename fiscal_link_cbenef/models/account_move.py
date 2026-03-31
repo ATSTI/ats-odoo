@@ -13,6 +13,7 @@ class AccountMove(models.Model):
     _inherit = "account.move"
 
     def action_post(self):
+        res = super().action_post()
         for record in self:
             if (
                 record.invoice_line_ids
@@ -32,4 +33,4 @@ class AccountMove(models.Model):
                             erros += f"\n Erro: Sem beneficio Fiscal (cBenef) ABA ICMS , no item {line.name}"
                 if erros and record.invoice_date.strftime('%Y-%m-%d') > '2026-04-05':
                     raise UserError(_(f"{erros}"))
-        return super().action_post()
+        return res

@@ -31,7 +31,7 @@ class DocumentLineMixinMethods(models.AbstractModel):
             if (
                 rec.icms_cst_id
                 and not rec.icms_tax_benefit_id
-                and rec.move_id.issuer == DOCUMENT_ISSUER_COMPANY
+                # and rec.move_id.issuer == DOCUMENT_ISSUER_COMPANY
             ):
                 cbenef = self.get_benefit_type(
                         rec.icms_cst_id.code if rec.icms_cst_id else False

@@ -143,9 +143,9 @@ class Repair(models.Model):
     @api.multi
     def action_create_sale_order(self):
         quotations = self.mapped('sale_ids')
-        sale_name = f"{self.name}-1"
+        sale_name = "%s-1" %self.name
         if len(quotations):
-            sale_name = f"{self.name}-{str(len(quotations)+1)}"
+            sale_name = "%s-%s" %(self.name, str(len(quotations)+1))
         vals={
             "name": sale_name,
             "partner_id": self.partner_id.id,

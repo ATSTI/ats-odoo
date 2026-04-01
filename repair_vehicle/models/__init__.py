@@ -20,3 +20,4 @@ from . import repair_stage
 from . import repair_vehicle
 from . import repair
 from . import res_partner
+from . import sale_order

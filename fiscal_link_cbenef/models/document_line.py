@@ -28,11 +28,11 @@ class DocumentLineMixinMethods(models.AbstractModel):
     @api.onchange("icms_cst_id")
     def _onchange_icms_cst_id(self):
         for rec in self:
-            if (
-                rec.icms_cst_id
-                and not rec.icms_tax_benefit_id
-                # and rec.move_id.issuer == DOCUMENT_ISSUER_COMPANY
-            ):
+            if not hasattr(rec, 'move_id'):
+                cond = rec.icms_cst_id and rec.cbenef_id
+            else:
+                cond = rec.icms_cst_id and rec.cbenef_id and rec.move_id.issuer == DOCUMENT_ISSUER_COMPANY
+            if cond:
                 cbenef = self.get_benefit_type(
                         rec.icms_cst_id.code if rec.icms_cst_id else False
                 )

@@ -19,11 +19,11 @@ class DocumentLineMixin(models.AbstractModel):
     def _prepare_fields_icms(self, tax_dict):
         res = super()._prepare_fields_icms(tax_dict)
         for rec in self:
-            if (
-                rec.icms_cst_id
-                and rec.move_id.issuer == DOCUMENT_ISSUER_COMPANY
-                and rec.cbenef_id
-            ):
+            if not hasattr(rec, 'move_id'):
+                return res
+            else:
+                cond = rec.icms_cst_id and rec.cbenef_id and rec.move_id.issuer == DOCUMENT_ISSUER_COMPANY
+            if cond:
                 # if rec.get_benefit_type(rec.icms_cst_id.code) != '0':
                 cbenefs = rec.env['l10n_br_fiscal.icms.cbenef'].search([('icms_cst_ids', 'in', rec.icms_cst_id.id)])
                 if rec.cbenef_id in cbenefs:
@@ -49,8 +49,8 @@ class DocumentLineMixin(models.AbstractModel):
             if rec.cbenef_id.code == 'SP00SEMCBENEF' or not rec.cbenef_id.code:
                 rec.icms_tax_benefit_id = False
                 continue
-            if rec.ncm_id and not rec.ncm_id.cbenef_id:
-                rec.ncm_id.cbenef_id = rec.cbenef_id.id
+            # if rec.ncm_id and not rec.ncm_id.cbenef_id:
+            #     rec.ncm_id.cbenef_id = rec.cbenef_id.id
             Tax_Definition = rec.env['l10n_br_fiscal.tax.definition']
             Tax_Group = rec.env['l10n_br_fiscal.tax.group']
 
@@ -93,8 +93,8 @@ class DocumentLineMixin(models.AbstractModel):
                     # })
                     # tax_benefit.display_name = f"{icms_group.name} - f{rec.icms_cst_id.code} - {rec.cbenef_id.code} - {rec.cbenef_id.description}"
                     # tax_benefit._onchange_tax_id()
-            if rec.ncm_id and not rec.ncm_id.cbenef_id:
-                rec.ncm_id.cbenef_id = rec.cbenef_id.id
+            # if rec.ncm_id and not rec.ncm_id.cbenef_id:
+            #     rec.ncm_id.cbenef_id = rec.cbenef_id.id
 
             rec.icms_tax_benefit_id = tax_benefit.id
         return super()._compute_fiscal_tax_ids()

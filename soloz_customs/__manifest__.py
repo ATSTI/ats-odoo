@@ -17,11 +17,12 @@
     'author': 'ATSTi Soluções',
     'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
     'website': 'https://github.com/ATSTI/ats-odoo',
-    'depends': ['base', 'l10n_br_sale', 'l10n_br_purchase', 'sale_project'],
+    'depends': ['base', 'l10n_br_sale', 'l10n_br_purchase', 'sale_project', 'l10n_br_account_payment_order'],
     'data': [
         'security/ir.model.access.csv',
         'views/sale_order_view.xml',
         'views/stock_view.xml',
+        'views/move_view.xml',
         'report/sale_report_soloz.xml',
         'report/purchase_report_soloz.xml',
         'wizard/create_task_views.xml',

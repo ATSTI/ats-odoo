@@ -45,17 +45,20 @@ class AccountInvoiceLine(models.Model):
             if rec.fiscal_classification_id and rec.fiscal_classification_id.cbenef_id:
                 rec.cbenef_id = rec.fiscal_classification_id.cbenef_id
 
-    @api.onchange("icms_rule_id")
-    def _onchange_icms_rule_id(self):
+    @api.onchange("tax_icms_id")
+    def _onchange_tax_icms_id(self):
         for rec in self:
             if rec.invoice_id.fiscal_position_id:
-                if rec.icms_rule_id and rec.icms_rule_id.cbenef_id:
-                    rec.cbenef_id = rec.icms_rule_id.cbenef_id
-                # elif rec.invoice_id.fiscal_position_id and rec.invoice_id.fiscal_position_id.tax_rule_ids:
-                #     tax_rule = rec.invoice_id.fiscal_position_id.tax_rule_ids.filtered(lambda r: r.cbenef_id)
-                #     if tax_rule:
-                #         rec.cbenef_id = tax_rule[0].cbenef_id
-                # rec.cbenef_id = rec.fiscal_classification_id.cbenef_id
+                for rule in rec.invoice_id.fiscal_position_id.icms_tax_rule_ids:
+                    if rule.cbenef_id and rule.cbenef_id.cst in [rec.icms_cst_normal, rec.icms_csosn_simples]:
+                        rec.cbenef_id = rule.cbenef_id
+        super(AccountInvoiceLine, self)._onchange_tax_icms_id()
+
+    @api.model
+    def create(self, vals):
+        res = super(AccountInvoiceLine, self).create(vals)
+        res._onchange_tax_icms_id()
+        return res
 
 class AccountFiscalPositionTaxRule(models.Model):
     _inherit = 'account.fiscal.position.tax.rule'

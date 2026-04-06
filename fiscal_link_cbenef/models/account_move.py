@@ -28,7 +28,7 @@ class AccountMove(models.Model):
                         if (
                             not line.cbenef_id
                             and not line.icms_tax_benefit_id
-                            and line.icms_cst_id
+                            and line.icms_cst_id and line.icms_cst_id.code in ['20', '30', '40', '41', '50', '51', '53','70', '90']
                         ):
                             erros += f"\n Erro: Sem beneficio Fiscal (cBenef) ABA ICMS , no item {line.name}"
                 if erros and record.invoice_date.strftime('%Y-%m-%d') > '2026-04-05':

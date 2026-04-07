@@ -24,6 +24,7 @@ class OperationLine(models.Model):
         nbs=None,
         cest=None,
         city_taxation_code=None,
+        national_taxation_code=None,
         service_type=None,
         ind_final=None,
     ):
@@ -53,6 +54,7 @@ class OperationLine(models.Model):
             nbs=nbs,
             cest=cest,
             city_taxation_code=city_taxation_code,
+            national_taxation_code=national_taxation_code,
             service_type=service_type,
         ):
             self._build_mapping_result(mapping_result, tax_definition)
@@ -102,6 +104,7 @@ class OperationLine(models.Model):
             nbs=nbs,
             cest=cest,
             city_taxation_code=city_taxation_code,
+            national_taxation_code=national_taxation_code,
             service_type=service_type,
         ):
             self._build_mapping_result(mapping_result, tax_definition)
@@ -118,6 +121,7 @@ class OperationLine(models.Model):
             nbs=nbs,
             cest=cest,
             city_taxation_code=city_taxation_code,
+            national_taxation_code=national_taxation_code,
             service_type=service_type,
         ):
             self._build_mapping_result(mapping_result, tax_definition)
@@ -141,6 +145,7 @@ class OperationLine(models.Model):
             nbs=nbs,
             cest=cest,
             city_taxation_code=city_taxation_code,
+            national_taxation_code=national_taxation_code,
             service_type=service_type,
         ):
             self._build_mapping_result(mapping_result, tax_definition)

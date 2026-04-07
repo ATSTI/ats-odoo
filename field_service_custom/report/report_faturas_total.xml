@@ -32,7 +32,7 @@
                             <tr style="background-color:#f3f6fb;">
                                 <td style="border:1px solid #ccc; text-align:center; width:20%; padding:6px;">
                                     <b>Data/Hora do Serviço:</b><br/>
-                                    <span t-esc="o.fsm_order_ids.scheduled_date_start"/>
+                                    <span t-field="o.fsm_order_ids.scheduled_date_start" t-options="{'widget': 'datetime', 'format': 'HH:mm dd/MM/yyyy'}"/>
                                 </td>
                                 <td style="border:1px solid #ccc; text-align:center; width:40%; padding:6px;">
                                     <b>Cliente</b><br/>

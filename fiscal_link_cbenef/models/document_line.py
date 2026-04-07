@@ -102,13 +102,13 @@ class DocumentLineMixinMethods(models.AbstractModel):
         if cst in ['30', '40']:
             return '1'
         if cst in ['20']:
-            return '2'
-        if cst in ['51']:
-            return '3'
-        if cst in ['41']:
-            return '7'        
+            return '2'  
         if cst in ['50']:
             return '4'
+        if cst in ['51', '53']:
+            return '5'
+        if cst in ['41']:
+            return '7' 
         if cst in ['90']:
             return '9'
         return '0'

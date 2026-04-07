@@ -14,10 +14,13 @@
                     style="padding: 10px 15px; line-height: 1.4; height: auto; margin-bottom:1px; background-color: #FA944B; font-size: 20px;"
                     attrs="{'invisible': [('parameter_field', '=', True)]}"    
                 >
-                    <ul>⚠️ Atenção:
-                        <li> A partir de 01/04, a SEFAZ inicia a validação dos campos relacionados à reforma tributária.</li>
+                    <!-- <ul>⚠️ Atenção:
+                        <li> Em 2026 a SEFAZ iniciou os processos de testes da REFORMA TRIBUTÁRIA, oriente-se sobre com seu contador.</li>
                         <li> A partir de 06/04, obrigatoriedade do “cBenef” <b>(ICMS/SP)</b> </li>    
-                    </ul>
+                    </ul> -->
+
+                    <img src="https://admin.atsti.agr.br/web/image/143361"
+                        style="width:100%;"/>
 
                     <div style="margin-top: 10px;">
                         <a href="/l10n_br_nfe_mensagem/static/description/guia_classtrib.png" 

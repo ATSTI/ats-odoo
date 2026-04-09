@@ -20,4 +20,4 @@ from . import crm_claim
 from . import crm_claim_cost
 from . import sale_order
 from . import stock_picking
-from . import wizard_validar_conferencia
+# from . import wizard_validar_conferencia

@@ -6,10 +6,10 @@
                 <tree editable="bottom"
                     string="Tabela de Tamanhos"
 
-                    decoration-info="tamanho in ('jr','pp')"
-                    decoration-warning="tamanho in ('p','pl')"
-                    decoration-success="tamanho in ('m','ml','g')"
-                    decoration-danger="tamanho == 'xl'">
+                    decoration-info="tamanho in ('jr','jr-p','jr-m')"
+                    decoration-warning="tamanho in ('pp','p')"
+                    decoration-success="tamanho in ('m','g')"
+                    decoration-danger="tamanho in ('xl','2xl','3xl','4xl','5xl')">
 
                     <field name="genero" required="1"/>
                     <field name="selecao" required="1"/>

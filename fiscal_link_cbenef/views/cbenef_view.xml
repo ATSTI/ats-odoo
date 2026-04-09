@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+  <record id="cbenef_form_view" model="ir.ui.view">
+      <field name="name">cbenef.form.view</field>
+      <field name="model">l10n_br_fiscal.icms.cbenef</field>
+      <field name="priority">99</field>
+      <field name="arch" type="xml">
+        <form string="Cbenef">
+          <sheet>
+            <group>
+              <field name="name" />
+              <field name="code" />
+              <field name="description" />
+              <field name="icms_cst_ids" widget="many2many_tags" options="{'no_create': True}" />
+            </group>
+          </sheet> 
+        </form>
+      </field>
+  </record>
+
+</odoo>

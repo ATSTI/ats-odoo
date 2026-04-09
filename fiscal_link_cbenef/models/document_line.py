@@ -23,12 +23,18 @@ class DocumentLineMixinMethods(models.AbstractModel):
     def _onchange_ncm_id(self):
         for rec in self:
             if rec.ncm_id and rec.ncm_id.cbenef_id:
-                rec.cbenef_id = rec.ncm_id.cbenef_id
+                cbenefs = rec.env['l10n_br_fiscal.icms.cbenef'].search([
+                    ('icms_cst_ids', 'in', rec.icms_cst_id.id)
+                ])
+                if rec.ncm_id.cbenef_id in cbenefs:
+                    rec.cbenef_id = rec.ncm_id.cbenef_id
+                else:
+                    rec.cbenef_id = False
 
     @api.onchange("icms_cst_id")
     def _onchange_icms_cst_id(self):
         for rec in self:
-            if not hasattr(rec, 'move_id'):
+            if 'move_id' not in rec._fields:
                 cond = rec.icms_cst_id and rec.cbenef_id
             else:
                 cond = rec.icms_cst_id and rec.cbenef_id and rec.move_id.issuer == DOCUMENT_ISSUER_COMPANY
@@ -36,15 +42,11 @@ class DocumentLineMixinMethods(models.AbstractModel):
                 cbenef = self.get_benefit_type(
                         rec.icms_cst_id.code if rec.icms_cst_id else False
                 )
-                if rec.cbenef_id:
-                    rec.cbenef_id = False
-                    rec.icms_tax_benefit_id = False
                 if cbenef != '0':
                     cbenefs = rec.env['l10n_br_fiscal.icms.cbenef'].search([('icms_cst_ids', 'in', rec.icms_cst_id.id)])
-                    if len(cbenefs) > 1:
+                    if rec.cbenef_id and rec.cbenef_id in cbenefs:
                         if rec.ncm_id and not rec.ncm_id.cbenef_id:
                             rec.ncm_id.cbenef_id = rec.cbenef_id.id
-                            continue
                         Tax_Definition = rec.env['l10n_br_fiscal.tax.definition']
 
                         tax_benefit = Tax_Definition.search([
@@ -57,8 +59,10 @@ class DocumentLineMixinMethods(models.AbstractModel):
                         if tax_benefit:
                             rec.icms_tax_benefit_id = tax_benefit.id
                         else:
-                            if rec.ncm_id and rec.ncm_id.cbenef_id:
-                                rec.cbenef_id = rec.ncm_id.cbenef_id
+                            rec._onchange_cbenef_id()
+                    else:
+                        rec.cbenef_id = False
+                        rec.icms_tax_benefit_id = False
 
     @api.onchange("cbenef_id")
     def _onchange_cbenef_id(self):

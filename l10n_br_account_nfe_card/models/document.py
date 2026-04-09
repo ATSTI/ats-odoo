@@ -3,6 +3,13 @@
 from odoo import models
 from erpbrasil.base.misc import punctuation_rm
 
+from odoo.addons.l10n_br_fiscal.constants.fiscal import (
+    DOCUMENT_ISSUER_COMPANY,
+    PROCESSADOR_OCA,
+    SITUACAO_EDOC_A_ENVIAR,
+    SITUACAO_EDOC_EM_DIGITACAO,
+)
+
 
 class FiscalDocumentCard(models.Model):
     _inherit = "l10n_br_fiscal.document"
@@ -24,3 +31,15 @@ class FiscalDocumentCard(models.Model):
                     continue
 
         return super()._export_fields(xsd_fields, class_obj, export_dict)
+
+    # sobrescrevi o original pq alguns emitem como 01, e se mudar para outro tipo depois da erro no detPag
+    def _need_compute_nfe_tags(self):
+        if (
+            self.state_edoc in [SITUACAO_EDOC_EM_DIGITACAO, SITUACAO_EDOC_A_ENVIAR]
+            and self.processador_edoc == PROCESSADOR_OCA
+            and self.document_type_id.code in ['55', '65', '01']
+            and self.issuer == DOCUMENT_ISSUER_COMPANY
+        ):
+            return True
+        else:
+            return False

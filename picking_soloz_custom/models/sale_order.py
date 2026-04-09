@@ -1,4 +1,6 @@
-from odoo import models
+import re
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError,ValidationError
 
 
 class SaleOrder(models.Model):

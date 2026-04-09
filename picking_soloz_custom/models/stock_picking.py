@@ -26,7 +26,6 @@ class Picking(models.Model):
         tracking=True,
     )
 
-    # Campo para proteger estados customizados do recompute
     state_locked = fields.Boolean(default=False, copy=False)
 
     separador_id = fields.Many2one('res.users', string='Separador', tracking=True)
@@ -43,19 +42,6 @@ class Picking(models.Model):
     def _compute_is_conferente(self):
         for rec in self:
             rec.is_conferente = rec.conferente_id.id == self.env.uid
-
-    # @api.depends()
-    # def _compute_user_domains(self):
-    #     group_sep = self.env.ref('picking_soloz_custom.group_separador', raise_if_not_found=False)
-    #     group_ger = self.env.ref('picking_soloz_custom.group_gerente_inventario', raise_if_not_found=False)
-    #     group_conf = self.env.ref('picking_soloz_custom.group_conferente', raise_if_not_found=False)
-
-    #     sep_ids = list({g.id for g in [group_sep, group_ger] if g})
-    #     conf_ids = list({g.id for g in [group_conf, group_ger] if g})
-
-    #     for rec in self:
-    #         rec.separador_domain = [('groups_id', 'in', sep_ids)] if sep_ids else []
-    #         rec.conferente_domain = [('groups_id', 'in', conf_ids)] if conf_ids else []
 
     @api.depends("move_ids_without_package.diferenca")
     def _compute_divergencias(self):
@@ -114,7 +100,7 @@ class Picking(models.Model):
             raise UserError(_("É necessário definir um Separador antes de iniciar a separação."))
 
         if not self.conferente_id:
-            raise UserError(_("É necessário definir um Conferente antes de iniciar a separação."))
+            raise UserError(_("É necessário definir um Conferente antes de iniciar a Conferência."))
 
         moves = self.move_ids_without_package.filtered(lambda m: m.state not in ('done', 'cancel'))
         nao_reservados = moves.filtered(lambda m: m.state != 'assigned')
@@ -126,6 +112,20 @@ class Picking(models.Model):
             ) % produtos)
 
         self.write({'state': 'separacao', 'state_locked': True})
+    
+    def action_agrupar_linhas(self):
+        for picking in self:
+            agrupados = {}
+            for move in picking.move_ids_without_package.filtered(lambda m: m.state not in ['done', 'cancel']):
+                key = (move.product_id.id, move.sale_line_id.id)
+
+                if key not in agrupados:
+                    agrupados[key] = move
+                else:
+                    principal = agrupados[key]
+                    principal.product_uom_qty += move.product_uom_qty
+                    move.unlink()
+        return True
 
     def action_separar_todos_e_conferir(self):
         self.ensure_one()

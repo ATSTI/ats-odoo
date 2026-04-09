@@ -18,7 +18,7 @@
     'author': 'ATSTi Soluções',
     'maintainer': 'Otávio Andretta <otavio12257@gmail.com>',
     'website': 'https://github.com/ATSTI/ats-odoo',
-    'depends': ['base', 'sale_management','stock','mrp','crm','stock'],
+    'depends': ['base', 'sale_management','mrp','crm','stock','report_soloz'],
     'data': [
         'security/ir.model.access.csv',
         'security/security.xml',

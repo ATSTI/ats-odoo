@@ -83,13 +83,12 @@
                     states="confirmed"
                 />
 
-                <!-- <button
-                    name="action_pronto"
+               <button name="action_agrupar_linhas"
                     type="object"
-                    string="Marcar como pronto"
+                    string="Agrupar Linhas"
                     class="btn-primary"
-                    states="reservado"
-                /> -->
+                    states="draft,confirmed"/>
+                    
             </xpath>
 
             <xpath expr="//button[@name='action_assign']" position="attributes">

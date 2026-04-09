@@ -13,18 +13,15 @@
                 <strong>Demanda</strong>
             </th>
         </xpath>
-
         <xpath expr="//td[span[@t-esc='line[1]']]" position="replace">
             <td>
                 <t t-set="move"
                     t-value="o.move_ids_without_package.filtered(lambda m: m.product_id.id == line[0][0] and m.location_id.id == line[0][1] and m.location_dest_id.id == line[0][2])[:1]"/>
 
                 <t t-set="is_conferente" t-value="o.conferente_id.id == env.user.id"/>
-
                 <t t-if="o.state == 'separacao'">
                     <span t-esc="line[1]"/>
                 </t>
-
                 <t t-if="o.state == 'conferencia'">
                     <t t-if="is_conferente">
                         <!-- conferente: oculto por padrão, mostra só se bateu -->
@@ -40,12 +37,10 @@
                         <span t-esc="line[1]"/>
                     </t>
                 </t>
-
                 <t t-if="o.state not in ['separacao', 'conferencia']">
                     <span t-esc="line[1]"/>
                 </t>
             </td>
         </xpath>
-
     </template>
 </odoo>

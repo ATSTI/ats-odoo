@@ -24,13 +24,17 @@ class CaptainSizeRule(models.Model):
     tamanho = fields.Selection(
         [
             ("jr", "JR"),
+            ("jr-p", "Jr - P"),
+            ("jr-m", "Jr - M"),
             ("pp", "PP"),
             ("p", "P"),
-            ("pl", "PL"),
             ("m", "M"),
-            ("ml", "ML"),
             ("g", "G"),
             ("xl", "XL"),
+            ("2xl", "2XL"),
+            ("3xl", "3XL"),
+            ("4xl", "4XL"),
+            ("5xl", "5XL"),
         ],
         string="Tamanho CD",
         required=True
@@ -107,6 +111,18 @@ class CaptainSizeRule(models.Model):
         return res
 
     def unlink(self):
+        generos = list(set(self.mapped('genero')))
+
         res = super().unlink()
-        self._recalcular_tamanhos_parceiros()
+
+        partners = self.env['res.partner'].with_context(
+            captain_recalc_done=True
+        ).search([
+            ('genero', 'in', generos),
+            ('peso', '!=', False),
+            ('altura', '!=', False),
+        ])
+
+        partners._compute_tamanhos()
+
         return res

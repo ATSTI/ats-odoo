@@ -50,16 +50,21 @@ class ProductTemplate(models.Model):
 
     tamanho_cd = fields.Selection(
         [
-            ("jr", 'JR'),
-            ('pp', 'PP'),
-            ('p', 'P'),
-            ('pl', 'PL'),
-            ('m', 'M'),
-            ('ml', 'ML'),
-            ('g', 'G'),
-            ('xl', 'XL'),
+            ("jr", "JR"),
+            ("jr-p", "Jr - P"),
+            ("jr-m", "Jr - M"),
+            ("pp", "PP"),
+            ("p", "P"),
+            ("m", "M"),
+            ("g", "G"),
+            ("xl", "XL"),
+            ("2xl", "2XL"),
+            ("3xl", "3XL"),
+            ("4xl", "4XL"),
+            ("5xl", "5XL"),
         ],
-        string='Tamanho CD'
+        string="Tamanho CD",
+        required=True
     )
 
     tag_cd = fields.Text("Tag CD")

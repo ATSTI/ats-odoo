@@ -5,26 +5,26 @@ from odoo.exceptions import UserError
 class Picking(models.Model):
     _inherit = "stock.picking"
 
-#     state = fields.Selection([
-#         ('draft', 'Draft'),
-#         ('waiting', 'Waiting Another Operation'),
-#         ('confirmed', 'Waiting'),
-#         ('assigned', 'Ready'),
-#         ('separacao', 'Separação'),
-#         ('conferencia', 'Conferência'),
-#         ('done', 'Done'),                # ← só para concluído de verdade
-#         ('transito', 'Em trânsito'),
-#         ('entregue', 'Entregue'),
-#         ('cancel', 'Cancelled'),
-#         ],
-#         string="Status",
-#         compute="_compute_state",
-#         copy=False,
-#         index=True,
-#         readonly=True,
-#         store=True,
-#         tracking=True,
-#     )
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('waiting', 'Waiting Another Operation'),
+        ('confirmed', 'Waiting'),
+        ('assigned', 'Ready'),
+        # ('separacao', 'Separação'),
+        # ('conferencia', 'Conferência'),
+        ('done', 'Done'),                # ← só para concluído de verdade
+        ('transito', 'Em trânsito'),
+        ('entregue', 'Entregue'),
+        ('cancel', 'Cancelled'),
+        ],
+        string="Status",
+        compute="_compute_state",
+        copy=False,
+        index=True,
+        readonly=True,
+        store=True,
+        tracking=True,
+    )
 
 #     state_locked = fields.Boolean(default=False, copy=False)
 

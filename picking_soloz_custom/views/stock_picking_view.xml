@@ -29,14 +29,15 @@
                     states="draft,confirmed"
 
                 />
+                </xpath>
 
-                <xpath expr="//field[@name='state']" position="attributes">
+                 <xpath expr="//field[@name='state']" position="attributes">
                     <attribute name="statusbar_visible">
                         draft,confirmed,assigned,transito,entregue,done
                     </attribute>
                 </xpath>
 
-            </xpath>
+           
         
         </field>
     </record>

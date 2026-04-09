@@ -11,7 +11,7 @@ class Picking(models.Model):
         ('confirmed', 'Waiting'),
         ('assigned', 'Ready'),
         # ('separacao', 'Separação'),
-        # ('conferencia', 'Conferência'),
+        ('conferencia', 'Conferência'),
         ('done', 'Done'),                # ← só para concluído de verdade
         ('transito', 'Em trânsito'),
         ('entregue', 'Entregue'),
@@ -26,7 +26,7 @@ class Picking(models.Model):
         tracking=True,
     )
 
-#     state_locked = fields.Boolean(default=False, copy=False)
+    state_locked = fields.Boolean(default=False, copy=False)
 
 #     separador_id = fields.Many2one('res.users', string='Separador', tracking=True)
 #     conferente_id = fields.Many2one('res.users', string='Conferente', tracking=True)

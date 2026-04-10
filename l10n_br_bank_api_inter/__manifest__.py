@@ -26,6 +26,7 @@ Como usar:
         "views/account_move_line.xml",
         "views/account_journal.xml",
         "wizard/bank_api_inter_baixa.xml",
+        "wizard/account_statement_import_view.xml",
         "data/automated_query.xml",
     ],
     'demo': [

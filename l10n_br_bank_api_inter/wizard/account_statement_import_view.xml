@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="account_statement_import_ofx_form" model="ir.ui.view">
+        <field name="name">account.statement_import_ofx</field>
+        <field name="model">account.statement.import</field>
+        <field name="inherit_id" ref="account_statement_import_file.account_statement_import_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='statement_file']" position="before">
+                <group>
+                    <field name="import_with_api" />
+                </group>
+                <group invisible="import_with_api == False">
+                    <field name="journal_id" required="import_with_api == True" />
+                    <field name="data_ini" />
+                    <field name="data_fim" />
+                    <button
+                        name="import_extract_ofx"
+                        string="Importar Extrato OFX"
+                        type="object"
+                        class="btn-secondary"
+                    />
+                </group>
+            </xpath>
+            <xpath expr="//field[@name='statement_file']" position="attributes">
+                <attribute name="invisible">import_with_api == True</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

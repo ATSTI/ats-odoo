@@ -11,7 +11,7 @@ class Picking(models.Model):
         ('confirmed', 'Waiting'),
         ('assigned', 'Ready'),
         # ('separacao', 'Separação'),
-        ('conferencia', 'Conferência'),
+        # ('conferencia', 'Conferência'),
         ('done', 'Done'),                # ← só para concluído de verdade
         ('transito', 'Em trânsito'),
         ('entregue', 'Entregue'),
@@ -166,9 +166,9 @@ class Picking(models.Model):
         for picking in self:
             picking.write({'state': 'entregue', 'state_locked': True})
 
-#     def action_aguardando(self):
-#         for picking in self:
-#             picking.write({'state': 'confirmed', 'state_locked': False})
+    def action_aguardando(self):
+        for picking in self:
+            picking.write({'state': 'confirmed', 'state_locked': False})
 
 #     def action_concluido(self):
 #         for picking in self:

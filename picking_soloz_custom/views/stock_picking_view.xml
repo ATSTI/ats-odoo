@@ -22,6 +22,14 @@
                 />
 
                 <button
+                    name="action_aguardando"
+                    type="object"
+                    string="Mudar Status para aguardando"
+                    class="btn-primary"
+                    states="draft"
+                />
+
+                <button
                     name="action_agrupar_linhas"
                     type="object"
                     string="Agrupar Linhas"

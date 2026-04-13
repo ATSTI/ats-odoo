@@ -36,7 +36,7 @@ class AccountPaymentOrder(models.Model):
         dados = []
         myself = User(
             name=self.company_id.legal_name,
-            identifier=misc.punctuation_rm(self.company_id.cnpj_cpf),
+            identifier=misc.punctuation_rm(self.company_id.vat) or misc.punctuation_rm(self.company_id.cnpj_cpf),
             bank=UserBank(
                 bankId=self.company_partner_bank_id.bank_id.code_bc,
                 bankName=self.company_partner_bank_id.bank_id.name,
@@ -80,7 +80,7 @@ class AccountPaymentOrder(models.Model):
                 telefone = telefone[2:]
             payer = User(
                 name=line.partner_id.legal_name or line.partner_id.name,
-                identifier=misc.punctuation_rm(line.partner_id.cnpj_cpf),
+                identifier=misc.punctuation_rm(line.partner_id.vat) or misc.punctuation_rm(line.partner_id.cnpj_cpf),
                 email=email,
                 ddd=ddd,
                 telefone=telefone,
@@ -208,7 +208,7 @@ class AccountPaymentOrder(models.Model):
                 self._gererate_bank_inter_api(move_line=move_line)
                 self.write({
                     "date_generated": fields.Date.context_today(self),
-                    "state": "generated",
+                    "state": "uploaded",
                     "generated_user_id": self._uid,
                 })
             else:

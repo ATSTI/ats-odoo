@@ -31,9 +31,25 @@ class DocumentLineMixinMethods(models.AbstractModel):
                 else:
                     rec.cbenef_id = False
 
-    @api.onchange("icms_cst_id")
-    def _onchange_icms_cst_id(self):
+    def _search_tax_definition(self, cst_id, tax_group_id, fiscal_operation_line_id, code=None):
+        domain = [
+            ('is_benefit', '=', True),
+            ('cst_id', '=', cst_id),
+            ('tax_group_id', '=', tax_group_id),
+            ('fiscal_operation_line_id', '=', fiscal_operation_line_id),
+        ]
+        if code:
+            domain.append(('code', '=', code))
+        Tax_Definition = self.env['l10n_br_fiscal.tax.definition']
+        tax_benefit = Tax_Definition.search(domain, limit=1)
+        return tax_benefit
+
+    def _search_cbnef(self):
         for rec in self:
+            if not rec.product_id:
+                continue
+            # necessario para o pedido de venda, pois o move_id só existe no momento da criação da fatura,
+            # e o pedido de venda é criado antes da fatura
             if 'move_id' not in rec._fields:
                 cond = rec.icms_cst_id and rec.cbenef_id
             else:
@@ -47,14 +63,13 @@ class DocumentLineMixinMethods(models.AbstractModel):
                     if rec.cbenef_id and rec.cbenef_id in cbenefs:
                         if rec.ncm_id and not rec.ncm_id.cbenef_id:
                             rec.ncm_id.cbenef_id = rec.cbenef_id.id
-                        Tax_Definition = rec.env['l10n_br_fiscal.tax.definition']
 
-                        tax_benefit = Tax_Definition.search([
-                            ('is_benefit', '=', True),
-                            ('cst_id', '=', rec.icms_cst_id.id),
-                            ('tax_group_id', '=', rec.icms_cst_id.tax_group_id.id),
-                            ('fiscal_operation_line_id', '=', rec.fiscal_operation_line_id.id),
-                        ], limit=1)
+                        tax_benefit = rec._search_tax_definition(
+                            rec.icms_cst_id.id,
+                            rec.icms_cst_id.tax_group_id.id,
+                            rec.fiscal_operation_line_id.id,
+                            None,
+                        )
 
                         if tax_benefit:
                             rec.icms_tax_benefit_id = tax_benefit.id
@@ -63,24 +78,49 @@ class DocumentLineMixinMethods(models.AbstractModel):
                     else:
                         rec.cbenef_id = False
                         rec.icms_tax_benefit_id = False
+            else:
+                if rec.fiscal_operation_line_id:
+                    for tax in rec.fiscal_operation_line_id.tax_definition_ids:
+                        if tax.is_benefit:
+                            if  tax.tax_domain == 'icms' or tax.tax_domain == 'icmssn':
+                                tax_benefit = rec._search_tax_definition(
+                                    rec.icms_cst_id.id,
+                                    rec.icms_cst_id.tax_group_id.id,
+                                    rec.fiscal_operation_line_id.id,
+                                    None,
+                                )
+                                # rec.cbenef_id = tax_benefit.id
+                                rec.icms_tax_benefit_id = tax_benefit.id
+                            break
+
+    @api.onchange(
+        "fiscal_operation_id", "ncm_id", "nbs_id", "cest_id", "service_type_id"
+    )
+    def _onchange_fiscal_operation_id(self):
+        """Ao alterar o campo fiscal_operation_id, são atualizados os impostos fiscais relacionados"""
+        result = super()._onchange_fiscal_operation_id()
+
+        self._search_cbnef()
+        return result
 
     @api.onchange("cbenef_id")
     def _onchange_cbenef_id(self):
         for rec in self:
-            if not rec.cbenef_id:
+            if not rec.cbenef_id or not rec.icms_cst_id or not rec.fiscal_operation_line_id:
                 continue
             if rec.ncm_id and not rec.ncm_id.cbenef_id:
                 rec.ncm_id.cbenef_id = rec.cbenef_id.id
             Tax_Definition = rec.env['l10n_br_fiscal.tax.definition']
             Tax_Group = rec.env['l10n_br_fiscal.tax.group']
 
-            icms_group = Tax_Group.search([('name', '=', 'ICMS')], limit=1)
+            icms_group = Tax_Group.search([('name', 'in', ['ICMS', 'ICMSSN'])], limit=1)
             
-            tax_benefit = Tax_Definition.search([
-                ('is_benefit', '=', True),                
-                ('tax_domain', '=', 'icms'),
-                ('code', '=', rec.cbenef_id.code),
-            ], limit=1)
+            tax_benefit = rec._search_tax_definition(
+                rec.icms_cst_id.id,
+                rec.icms_cst_id.tax_group_id.id,
+                rec.fiscal_operation_line_id.id,
+                rec.cbenef_id.code,
+            )
 
             if not tax_benefit:
                 tax_benefit = Tax_Definition.create({
@@ -100,7 +140,7 @@ class DocumentLineMixinMethods(models.AbstractModel):
             if rec.ncm_id and not rec.ncm_id.cbenef_id:
                 rec.ncm_id.cbenef_id = rec.cbenef_id.id
 
-            rec.icms_tax_benefit_id = tax_benefit.id
+            rec.icms_tax_benefit_id = tax_benefit[0].id
 
     def get_benefit_type(self, cst):
         if cst in ['30', '40']:

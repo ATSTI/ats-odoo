@@ -20,7 +20,7 @@
     'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['crm_claim','base', 'sale_management','mrp','crm','stock','report_soloz'],
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         # 'security/security.xml',
         'views/crm_claim_form_view.xml',
         'views/stock_picking_view.xml',

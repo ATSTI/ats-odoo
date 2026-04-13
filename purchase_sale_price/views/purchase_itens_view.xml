@@ -47,11 +47,12 @@
             </field>
         </record>
 
-         <record id="pruchase_itens_action" model="ir.actions.act_window">
+        <record id="pruchase_itens_action" model="ir.actions.act_window">
             <field name="name">Itens da compra</field>
             <field name="res_model">purchase.itens</field>
             <field name="type">ir.actions.act_window</field>
             <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="purchase_itens_tree"/>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
               </p>

@@ -34,8 +34,11 @@ class PurchaseOrder(models.Model):
         super(PurchaseOrder, self).button_confirm()
 
     def abrir_item_pedidos(self):
-        action = self.env.ref('purchase_sale_price.pruchase_itens_action')
-        result = action.read()[0]
-        result['context'] = {}
-        result['domain'] = "[('id','in',[" + str(self.purchase_itens_ref.id) + "])]"
-        return result
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Itens da compra',
+            'res_model': 'purchase.itens',
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', [self.purchase_itens_ref.id])],
+            'context': {},
+        }

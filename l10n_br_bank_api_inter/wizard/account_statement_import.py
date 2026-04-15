@@ -26,6 +26,11 @@ class AccountStatementImport(models.TransientModel):
 
     journal_id = fields.Many2one("account.journal", string="Diário", default=lambda self: self.env.context.get("journal_id"))
     
+    # Para fazer um CRON para essa função
+    # modelo = account.statement.import
+    # método = import_extract_ofx
+    # parametros = data inicio e data fim (YYYY-MM-DD)
+
 
     def import_extract_ofx(self, data_ini=None, data_fim=None):
         if data_ini is None:

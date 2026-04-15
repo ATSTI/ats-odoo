@@ -7,24 +7,13 @@ from odoo.exceptions import ValidationError
 
 class FreteReportWizard(models.TransientModel):
     _name = "frete.report.wizard"
-    _description = "Frete Report Wizard"
+    _description = "Relatorio de Frete(Despesa x Receita)"
     _inherit = "account_financial_report_abstract_wizard"
 
-    date_range_id = fields.Many2one(comodel_name="date.range", string="Date range")
+    date_range_id = fields.Many2one(comodel_name="date.range", string="Período")
     date_from = fields.Date("Data inicio", required=True)
     date_to = fields.Date("Data fim", required=True)
-    # based_on = fields.Selection(
-    #     [("taxtags", "Tax Tags"), ("taxgroups", "Tax Groups")],
-    #     required=True,
-    #     default="taxtags",
-    # )
-    # tax_detail = fields.Boolean("Detail Taxes")
-    # target_move = fields.Selection(
-    #     [("posted", "All Posted Entries"), ("all", "All Entries")],
-    #     string="Target Moves",
-    #     required=True,
-    #     default="posted",
-    # )
+
     account_ids = fields.Many2many(
         comodel_name="account.account", string="Contas Despesas de Frete"
     )
@@ -73,7 +62,7 @@ class FreteReportWizard(models.TransientModel):
         self.ensure_one()
         data = self._prepare_report_data()
         if report_type == "xlsx":
-            report_name = "a_f_r.report_frete_report_xlsx"
+            report_name = "relatorio_frete.frete_report_xlsx"
         else:
             report_name = "relatorio_frete.frete_report"
         return (

@@ -2,4 +2,4 @@
 
 
 from . import frete_report
-# from . import frete_report_xlsx
+from . import frete_report_xlsx

@@ -1,5 +1,3 @@
-# Copyright  2018 Forest and Biomass Romania
-# Copyright 2020 ForgeFlow S.L. (https://www.forgeflow.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 import operator
@@ -19,6 +17,7 @@ class FreteReport(models.AbstractModel):
             ("date", ">=", date_from),
             ("date", "<=", date_to),
             ("account_id", "in", accounts_ids),
+            ("journal_id.type", "=", "purchase"),
         ]
         if only_posted_moves:
             domain += [("move_id.state", "=", "posted")]

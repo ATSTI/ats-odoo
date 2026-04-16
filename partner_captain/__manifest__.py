@@ -33,6 +33,7 @@ Lista de Equipamentos, Viagens e Cursos do Cliente:
     'data': [
         'security/ir.model.access.csv',
         'views/partner_view.xml',
+        'views/account_move_view.xml',
         'views/captain_size_rule_view.xml',
         'views/product_view.xml',
         'report/report_action.xml',

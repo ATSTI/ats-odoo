@@ -26,3 +26,4 @@ from . import captain_size_rule
 from . import event_registration
 from . import event
 from . import equipamento_movimento
+from . import account_move

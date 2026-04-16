@@ -101,11 +101,9 @@ class ProductTemplate(models.Model):
 
     @api.depends('categ_id')
     def _compute_is_suit(self):
-        Category = self.env['product.category']
-        suit_category = Category.search([('name', '=', 'SUIT')], limit=1)
-
         for rec in self:
-            rec.is_suit = bool(suit_category and rec.categ_id == suit_category)
+            nome = (rec.categ_id.name or '').strip().lower()
+            rec.is_suit = nome == 'suit - operacao'
 
     
     @api.depends('categ_id')

@@ -15,6 +15,11 @@ class ResPartner(models.Model):
     peso = fields.Integer(string='Peso')
     altura = fields.Float(string='Altura')
     calcado = fields.Integer(string='Calçado')
+    nadadeira = fields.Text(string='Nadadeira')
+    genero = fields.Selection([
+        ("masculino",'Masculino'),
+        ('feminino','Feminino'),
+    ], string ='Gênero')
     contatonome = fields.Char(string='Contato Emergência')
     contatofone = fields.Char(string='Telefone Emergência')
     alergia= fields.Char(string='Alergia')
@@ -23,8 +28,44 @@ class ResPartner(models.Model):
     segurodan = fields.Char(string='Seguro DAN')
     passaporte = fields.Char(string='Passaporte')
     birthdate_date = fields.Date("Data de Nascimento")
-    	            
-       
+    equipamento_ids = fields.One2many(
+        'partner.equipamento',
+        'partner_id',
+        string='Equipamentos'
+    )
+    tem_equipamento = fields.Boolean(
+        string='Possui Equipamento próprio?'
+    )
+    bcd = fields.Text(
+        "BCD",
+        compute="_compute_tamanhos",
+        store=True
+    )
+
+    suit = fields.Text(
+        "SUIT",
+        compute="_compute_tamanhos",
+        store=True
+    )
+    bag = fields.Text(string="BAG", store=True)
+    reg = fields.Text(string="REG", store=True)
+
+    equipamento_movimento_ids = fields.One2many(
+        'partner.equipamento.movimento',
+        'partner_id',
+        string='Movimentações de Equipamentos'
+    )
+
+    def write(self, vals):
+        if 'equipamento_ids' in vals:
+            for command in vals['equipamento_ids']:
+                # (2, id) = remover linha
+                # (3, id) = remover vínculo
+                if command[0] in (2, 3):
+                    self.env['partner.equipamento'].browse(command[1]).unlink()
+
+        return super().write(vals)
+
 
     # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
 
@@ -40,6 +81,73 @@ class ResPartner(models.Model):
     def _onchange_name(self):
         if self.name and self.company_type == "person":
             self.legal_name = self.name
+
+    @api.depends('peso', 'altura', 'genero')
+    def _compute_tamanhos(self):
+        SizeRule = self.env['captain.size.rule']
+
+        ALTURA_TOL = 10  
+        PESO_TOL = 10    
+        for partner in self:
+            partner.bcd = False
+            partner.suit = False
+
+            if not partner.peso or not partner.altura:
+                continue
+
+            if partner.genero not in ('masculino', 'feminino'):
+                continue
+
+        
+            altura = partner.altura * 100 if partner.altura < 3 else partner.altura
+            peso = partner.peso
+
+            peso_ref = peso + 3
+            altura_ref = altura + 2
+
+            def buscar_tamanho(selecao):
+
+                domain = [
+                    ('genero', '=', partner.genero),
+                    ('selecao', '=', selecao),
+                    ('altura', '>=', altura),
+                    ('peso', '>=', peso),
+                    ('altura', '<=', altura + ALTURA_TOL),
+                    ('peso', '<=', peso + PESO_TOL),
+                ]
+
+                rule = SizeRule.search(
+                    domain,
+                    order='altura asc, peso asc',
+                    limit=1
+                )
+
+                if rule:
+                    return rule
+
+                domain_ref = [
+                    ('genero', '=', partner.genero),
+                    ('selecao', '=', selecao),
+                    ('altura', '>=', altura_ref),
+                    ('peso', '>=', peso_ref),
+                    ('altura', '<=', altura_ref + ALTURA_TOL),
+                    ('peso', '<=', peso_ref + PESO_TOL),
+                ]
+
+                return SizeRule.search(
+                    domain_ref,
+                    order='altura asc, peso asc',
+                    limit=1
+                )
+
+            bcd_rule = buscar_tamanho('bcd')
+            suit_rule = buscar_tamanho('suit')
+
+            partner.bcd = bcd_rule.tamanho if bcd_rule else False
+            partner.suit = suit_rule.tamanho if suit_rule else False
+
+
+
 
 class PartnerHistorico(models.Model):
     _name = "partner.historico"

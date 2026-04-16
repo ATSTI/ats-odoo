@@ -9,7 +9,6 @@ from odoo.addons import decimal_precision as dp
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-
     def _write(self, vals):
         if self.partner_id.vat:
             if self.origin and self.partner_id.vat not in (self.origin):

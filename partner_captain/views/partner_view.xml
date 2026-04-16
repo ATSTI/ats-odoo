@@ -13,9 +13,15 @@
                     <page string="Informações Pessoais">
                     <group> 
                         <group>
+                            <field name="genero" />
                             <field name="peso" />
                             <field name="altura" />
                             <field name="calcado" />
+                            <field name="nadadeira"/>
+                            <field name="bcd" readonly="1"/>
+                            <field name="suit" readonly="1"/>
+                            <field name="reg" readonly="1"/>
+                            <field name="bag" readonly="1"/>
                             <field name="contatonome" />
                             <field name="contatofone" />
                             <field name="alergia" />
@@ -41,6 +47,47 @@
                 </notebook>
             </field>
         </record>
+        <record id="res_users_form_inherit_nova_page" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.equipamentos</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//notebook" position="inside">
+                <page string="Equipamentos Próprios">
+
+                    <group>
+                        <field name="tem_equipamento"/>
+                    </group>
+
+                    <group attrs="{'invisible': [('tem_equipamento', '=', False)]}">
+                        <field name="equipamento_ids" mode="tree">
+                            <tree editable="bottom">
+                                <field name="tipo"/>
+                                <field name="obs"/>
+                            </tree>
+                        </field>
+                    </group>
+
+                </page>
+
+                <page string="Movimentações de Equipamentos">
+                    <field name="equipamento_movimento_ids" nolabel="1">
+                        <tree>
+                            <field name="data_movimento"/>
+                            <field name="tipo"/>
+                            <field name="movimento"/>
+                            <field name="motivo"/>
+                            <field name="user_id"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    
+
         
         <!--  Partners Historico form -->
         <record id="historico_partner_form_view" model="ir.ui.view">

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_captain_size_rule_html">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+
+                <div class="page">
+
+                    <h2 style="text-align:center; margin-bottom:10px;">
+                        Tabela de Tamanhos
+                        <t t-if="genero and selecao">
+                            – <t t-esc="genero"/> / <t t-esc="selecao"/>
+                        </t>
+                    </h2>
+
+                    <div style="text-align:center; margin-bottom:20px;">
+                        <a class="btn btn-primary"
+                           href="/captain/size/table?genero=masculino&amp;selecao=bcd">
+                            Masculino - BCD
+                        </a>
+
+                        <a class="btn btn-primary"
+                           href="/captain/size/table?genero=masculino&amp;selecao=suit">
+                            Masculino - Suit
+                        </a>
+
+                        <a class="btn btn-primary"
+                           href="/captain/size/table?genero=feminino&amp;selecao=bcd">
+                            Feminino - BCD
+                        </a>
+
+                        <a class="btn btn-primary"
+                           href="/captain/size/table?genero=feminino&amp;selecao=suit">
+                            Feminino - Suit
+                        </a>
+                    </div>
+
+                    <table style="width:100%; border-collapse:collapse; text-align:center; font-size:13px;">
+                        <thead>
+                            <tr style="background:#2F4F6F; color:white;">
+                                <th style="padding:6px; border:1px solid #000;">
+                                    Altura \ Peso
+                                </th>
+                                <t t-foreach="pesos" t-as="p">
+                                    <th style="padding:6px; border:1px solid #000;">
+                                        <t t-esc="p"/>
+                                    </th>
+                                </t>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <t t-foreach="alturas" t-as="a">
+                                <tr>
+                                    <th style="background:#EEE; border:1px solid #000;">
+                                        <t t-esc="a"/>
+                                    </th>
+
+                                    <t t-foreach="pesos" t-as="p">
+                                        <td style="border:1px solid #000; min-width:50px;"
+                                            t-att-style="
+                                            matrix.get(a) and matrix[a].get(p) and
+                                            (
+                                                'background:#D6EAF8;' if matrix[a][p] == 'jr' else
+                                                'background:#AED6F1;' if matrix[a][p] == 'jr-p' else
+                                                'background:#85C1E9;' if matrix[a][p] == 'jr-m' else
+
+                                                'background:#FCF3CF;' if matrix[a][p] == 'pp' else
+                                                'background:#F9E79F;' if matrix[a][p] == 'p' else
+
+                                                'background:#D5F5E3;' if matrix[a][p] == 'm' else
+                                                'background:#ABEBC6;' if matrix[a][p] == 'g' else
+
+                                                'background:#F5B7B1;' if matrix[a][p] == 'xl' else
+                                                'background:#EC7063;' if matrix[a][p] == '2xl' else
+                                                'background:#E74C3C;' if matrix[a][p] == '3xl' else
+                                                'background:#CB4335;' if matrix[a][p] == '4xl' else
+                                                'background:#922B21;' if matrix[a][p] == '5xl' else
+
+                                                ''
+                                            )
+                                        ">
+                                            <t t-if="matrix.get(a) and matrix[a].get(p)">
+                                                <strong><t t-esc="matrix[a][p].upper()"/></strong>
+                                            </t>
+                                            <t t-else="">
+                                                –
+                                            </t>
+                                        </td>
+                                    </t>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </t>
+        </t>
+    </template>
+</odoo>

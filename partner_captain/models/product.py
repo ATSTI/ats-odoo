@@ -25,6 +25,100 @@ from odoo import api, fields, models
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-
-    historico_id = fields.Many2one('crm.historico', string='Tipo Historico CRM')
+    historico_id = fields.Many2one(
+        'crm.historico',
+        string='Tipo Histórico CRM'
+    )
     
+    tamanho_etiqueta = fields.Text("Tamanho Etiqueta")
+    situacao = fields.Selection(
+    [
+        ('otima', 'Ótima'),
+        ('bom', 'Bom'),
+        ('medio', 'Médio'),
+        ('ruim', 'Ruim'),
+        ('pessimo', 'Péssimo'),
+        ('manutencao', 'Manutenção')
+    ],
+    string="Situação",
+    default='bom',
+    tracking=True
+)
+
+
+    modelo = fields.Text("Modelo")
+
+    tamanho_cd = fields.Selection(
+        [
+            ("jr", "JR"),
+            ("jr-p", "Jr - P"),
+            ("jr-m", "Jr - M"),
+            ("pp", "PP"),
+            ("p", "P"),
+            ("m", "M"),
+            ("g", "G"),
+            ("xl", "XL"),
+            ("2xl", "2XL"),
+            ("3xl", "3XL"),
+            ("4xl", "4XL"),
+            ("5xl", "5XL"),
+        ],
+        string="Tamanho CD",
+        required=True
+    )
+
+    tag_cd = fields.Text("Tag CD")
+
+    usado = fields.Boolean(
+        "Produto está sendo usado?",
+        default=False
+    )
+
+    tipo_suit = fields.Selection(
+        [
+            ('fina_piscina', 'FINA PISCINA'),
+            ('grossa', 'GROSSA'),
+            ('fina_mar', 'FINA MAR')
+        ],
+        string='Tipo de SUIT'
+    )
+
+    is_suit = fields.Boolean(compute="_compute_is_suit", store=False)
+
+
+    tipo_reg = fields.Selection(
+        [
+            ('balanceado', 'BALANCEADO'),
+            ('console_duplo', 'NÃO BALANCEADO/CONSOLE DUPLO'),
+            ('nao_balanceado', 'NÃO BALANCEADO'),
+
+        ],
+        string='Tipo de REG'
+    )
+
+    is_reg = fields.Boolean(compute="_compute_is_reg", store=False)
+    show_tamanho_cd = fields.Boolean(compute="_compute_show_tamanho")
+
+    @api.depends('categ_id')
+    def _compute_is_suit(self):
+        for rec in self:
+            nome = (rec.categ_id.name or '').strip().lower()
+            rec.is_suit = nome == 'suit - operacao'
+
+    
+    @api.depends('categ_id')
+    def _compute_is_reg(self):
+        for rec in self:
+            nome = (rec.categ_id.name or '').strip().lower()
+            rec.is_reg = nome == 'reg - operacao'
+
+
+    
+
+    @api.depends('categ_id')
+    def _compute_show_tamanho(self):
+        for rec in self:
+            nome = (rec.categ_id.name or '').lower()
+            rec.show_tamanho_cd = nome not in ['reg - operacao', 'bag - operacao']
+
+

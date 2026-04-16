@@ -1,15 +1,44 @@
 <?xml version="1.0"?>
 <odoo>
     <data>
-        <record id="captain_product_template_form_view" model="ir.ui.view">
-            <field name="name">captain_product_template_form_view</field>
+
+        <record id="captain_product_template_form_view_account" model="ir.ui.view">
+            <field name="name">captain.product.template.form.account.inherit</field>
             <field name="model">product.template</field>
             <field name="inherit_id" ref="account.product_template_form_view"/>
             <field name="arch" type="xml">
                 <field name="type" position="after">
-                    <field name="historico_id" />
+                    <field name="historico_id"/>
                 </field>
             </field>
         </record>
+
+
+        <record id="captain_product_template_form_view_extra" model="ir.ui.view">
+            <field name="name">captain.product.template.form.extra.inherit</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='barcode']" position="after">
+                    <field name="situacao"/>
+                    <field name="modelo"/>
+                    <field name="show_tamanho_cd" invisible ='1'/>
+                    <field name="tamanho_cd"
+                        attrs="{'invisible': [('show_tamanho_cd', '=', False)]}"/>
+                    <field name="tag_cd"/>
+                    <field name="is_suit" invisible="1"/>
+                    <field name="is_reg" invisible="1"/>
+                    <field name="tipo_suit"
+                           attrs="{'invisible': [('is_suit', '=', False)]}"/>
+                    <field name="tipo_reg"
+                           attrs="{'invisible': [('is_reg', '=', False)]}"/>
+                    <field name="tamanho_etiqueta"/>
+                    <field name="usado"/>
+                </xpath>
+
+            </field>
+        </record>
+
     </data>
 </odoo>

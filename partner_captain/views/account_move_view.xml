@@ -6,7 +6,7 @@
     <field name="arch" type="xml">
 
         <xpath expr="//button[@name='action_invoice_sent']" position="after">
-            <button name="action_invoice_sent_with_attachments"
+            <button name="action_send_email_with_attachments"
                     type="object"
                     string="Enviar Email com Anexos"
                     class="btn-primary"/>

@@ -6,7 +6,7 @@ class AccountMove(models.Model):
     def action_send_email_with_attachments(self):
         self.ensure_one()
 
-        # template = self.env.ref('account.email_template_edi_invoice', raise_if_not_found=False)
+        template = self.env.ref('account.email_template_edi_invoice', raise_if_not_found=False)
 
         attachments = self.env['ir.attachment'].search([
             ('res_model', '=', 'account.move'),
@@ -17,8 +17,8 @@ class AccountMove(models.Model):
         ctx = {
             'default_move_id': self.id,
             'default_attachment_ids': [(6, 0, attachments.ids)],
-            # 'default_use_template': bool(template),
-            # 'default_template_id': template.id if template else False,
+            'default_use_template': bool(template),
+            'default_template_id': template.id if template else False,
             'default_composition_mode': 'comment',
             'force_email': True,
             'default_reply_to': 'financeiro@captaindive.com.br',

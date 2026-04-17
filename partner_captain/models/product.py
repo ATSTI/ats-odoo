@@ -63,8 +63,7 @@ class ProductTemplate(models.Model):
             ("4xl", "4XL"),
             ("5xl", "5XL"),
         ],
-        string="Tamanho CD",
-        required=True
+        string="Tamanho CD",    
     )
 
     tag_cd = fields.Text("Tag CD")

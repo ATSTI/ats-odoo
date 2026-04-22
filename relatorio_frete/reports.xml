@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>    
+    <record id="action_print_report_frete_report_qweb" model="ir.actions.report">
+        <field name="name">Frete Report</field>
+        <field name="model">frete.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">relatorio_frete.frete_report</field>
+        <field name="report_file">relatorio_frete.frete_report</field>
+        <field name="paperformat_id" ref="account_financial_report.report_qweb_paperformat" />
+    </record>
+    <record id="action_print_report_frete_report_html" model="ir.actions.report">
+        <field name="name">Frete Report</field>
+        <field name="model">frete.report.wizard</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">relatorio_frete.frete_report</field>
+        <field name="report_file">relatorio_frete.frete_report</field>
+    </record>
+    <record id="action_report_frete_report_xlsx" model="ir.actions.report">
+        <field name="name">Frete Report XLSX</field>
+        <field name="model">frete.report.wizard</field>
+        <field name="type">ir.actions.report</field>
+        <field name="report_name">relatorio_frete.frete_report_xlsx</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_file">relatorio_frete.frete_report_xlsx</field>
+    </record>
+    <menuitem
+        parent="account_financial_report.menu_oca_reports"
+        action="action_frete_report_wizard"
+        id="menu_frete_report_wizard"
+        sequence="60"
+    />
+</odoo> 

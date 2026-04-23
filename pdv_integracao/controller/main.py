@@ -14,7 +14,9 @@ import os
 from odoo import http
 from odoo.http import request
 from math import floor
-logger = logging.getLogger(__name__)
+
+_logger = logging.getLogger(__name__)
+
 import werkzeug
 import werkzeug.exceptions
 import werkzeug.utils
@@ -913,3 +915,32 @@ class IntegracaoPdv(http.Controller):
         })
         stq.sudo().action_apply_inventory()
         return 'Sucesso'
+    
+
+    @http.route('/atualiza_preco', type='json', auth="user", csrf=False)
+    def atualiza_preco(self, list_price=None, default_code=None):
+        if not default_code:
+            return {'error': 'default_code não informado'}
+
+        try:
+            list_price = float(list_price[0])
+        except (TypeError, ValueError):
+            return {'error': 'list_price inválido'}
+
+        product = request.env['product.template'].sudo().search([
+            ('default_code', '=', default_code)
+        ], limit=1)
+
+        if not product:
+            return {'error': 'Produto não encontrado'}
+
+        product.sudo().write({
+            'list_price': list_price
+        })
+
+        _logger.info(f"Preço atualizado para o produto {product.name} (ref interna: {default_code}) para {list_price}")
+        return {
+            'success': True,
+            'product_id': product.id,
+            'new_price': list_price
+        }

@@ -1,0 +1,95 @@
+<odoo>
+    <!-- Herdando o formulário de event.registration -->
+    <record id="view_event_registration_form_inherit" model="ir.ui.view">
+        <field name="name">event.registration.form.equipamento</field>
+        <field name="model">event.registration</field>
+        <field name="inherit_id" ref="event.view_event_registration_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button
+                    name="action_limpar_equipamento"
+                    type="object"
+                    string="Limpar Equipamento"
+                    class="oe_highlight"/>
+            </xpath>
+            <xpath expr="//group[@name='attendee']" position="inside">
+                <field name='genero'/>
+                <field name='peso'/>
+                <field name='altura'/>
+                <field name='calcado'/>
+            </xpath>
+            <xpath expr="//group[@name='attendee']" position="after">
+                <group string="Equipamento" name="Equipamento">
+                    <field name="bcd_id"
+                        domain="[('categ_id.name','=','BCD')]"
+                        context="{'form_view_ref': 'product.product_template_event_form_view'}"
+                        attrs="{'invisible': [('bcd_info','!=',False)]}"/>
+
+                    <field name="bcd_info"
+                        attrs="{'invisible': [('bcd_info','=',False)]}"
+                        readonly="1"/>
+
+                    <field name="suit_id"
+                        domain="[('categ_id.name','=','Suit')]"
+                        context="{'form_view_ref': 'product.product_template_event_form_view'}"
+                        attrs="{'invisible': [('suit_info','!=',False)]}"/>
+
+                    <field name="suit_info"
+                        attrs="{'invisible': [('suit_info','=',False)]}"
+                        readonly="1"/>
+
+                    <field name="nadadeira"/>
+                    <field name="reg_id"
+                        domain="[('categ_id.name','=','REG')]"
+                        context="{'form_view_ref': 'product.product_template_event_form_view'}"
+                        attrs="{'invisible': [('reg_info','!=',False)]}"/>
+
+                    <field name="reg_info"
+                        attrs="{'invisible': [('reg_info','=',False)]}"
+                        readonly="1"/>
+
+                    <field name="bag_id"
+                        domain="[('categ_id.name','=','BAG')]"
+                        context="{'form_view_ref': 'product.product_template_event_form_view'}"
+                        attrs="{'invisible': [('bag_info','!=',False)]}"/>
+
+                    <field name="bag_info"
+                        attrs="{'invisible': [('bag_info','=',False)]}"
+                        readonly="1"/>
+                </group>
+            </xpath>
+
+
+            <xpath expr="//group[@name='Equipamento']" position="after">
+                <group string="Evento" name="tipoevento">
+                      <field name='tipo_evento'/>  
+                </group>
+            </xpath>
+
+            <xpath expr="//group[@name='tipoevento']" position="after">
+                <group string="Observações" name="observacao">
+                      <field name='obs'/>  
+                </group>
+            </xpath>
+        </field>
+    </record>
+    <record id="product_template_event_form_view" model="ir.ui.view">
+        <field name="name">product.template.event.form</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/notebook/page[@name='general_information']" position="inside">
+                <group string="Dados produto">
+                    <field name="situacao"/>
+                    <field name="tamanho_cd"/>
+                    <field name="tamanho_etiqueta"/>
+                    <field name="tag_cd"/>
+                    <field name="tipo_suit"/>
+                    <field name="tipo_reg"/>
+                    <field name="modelo"/>
+                    <field name="usado"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

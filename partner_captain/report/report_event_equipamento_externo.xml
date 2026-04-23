@@ -1,0 +1,177 @@
+<odoo>
+    <template id="report_event_equipamentos_externo">
+        <t t-call="web.external_layout">
+            <main class="page">
+
+                <h2 style="text-align:center; margin-bottom:12px;">
+                    EQUIPAMENTOS UTILIZADOS –
+                    <span t-esc="(docs[0].name or '').upper()"/>
+                </h2>
+
+                <div style="margin-bottom: 12px; font-size: 10px;">
+                    <table width="100%">
+                        <tr>
+                            <td width="50%" style="vertical-align: top;">
+                                <strong>LOCAL DO EVENTO</strong><br/>
+                                <t t-if="docs[0].company_id">
+                                    <span t-esc="docs[0].company_id.name"/><br/>
+                                    <t t-if="docs[0].company_id.street">
+                                        <span t-esc="docs[0].company_id.street"/><br/>
+                                    </t>
+                                    <t t-if="docs[0].company_id.street2">
+                                        <span t-esc="docs[0].company_id.street2"/><br/>
+                                    </t>
+                                    <t>
+                                        <t t-esc="docs[0].company_id.city"/>
+                                        <t t-if="docs[0].company_id.state_id"> - </t>
+                                        <t t-esc="docs[0].company_id.state_id.name"/>
+                                    </t><br/>
+                                    <t t-if="docs[0].company_id.zip">
+                                        <span t-esc="docs[0].company_id.zip"/> –
+                                    </t>
+                                    <t t-esc="docs[0].company_id.country_id.name"/>
+                                </t>
+                                <t t-else="">-</t>
+                            </td>
+
+                            <td width="50%" style="vertical-align: top;">
+                                <strong>STAFF RESPONSÁVEL</strong><br/>
+                                <t t-if="docs[0].staff_ids">
+                                    <t t-foreach="docs[0].staff_ids" t-as="staff">
+                                        <span t-esc="staff.name"/><br/>
+                                    </t>
+                                </t>
+                                <t t-else="">-</t>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <style>
+                    table.equip-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 10px;
+                        border: 1.5px solid #000;
+                    }
+                    table.equip-table th {
+                        background-color: #2F4F6F;
+                        color: #FFF;
+                        text-align: center;
+                        padding: 4px;
+                        border: 1px solid #000;
+                        text-transform: uppercase;
+                    }
+                    table.equip-table td {
+                        padding: 4px;
+                        border: 1px solid #000;
+                        vertical-align: middle;
+                        text-transform: uppercase;
+                    }
+                    table.equip-table tr:nth-child(even) {
+                        background-color: #F4F4F4;
+                    }
+                    .center {
+                        text-align: center;
+                    }
+                    .tag {
+                        font-size: 8px;
+                        display: block;
+                        margin-top: 1px;
+                    }
+                    .proprio {
+                        font-weight: bold;
+                        font-size: 9px;
+                    }
+                </style>
+
+                <table class="equip-table">
+                    <thead>
+                        <tr>
+                            <th>Participante</th>
+                            <th>Gênero</th>
+                            <th>Peso</th>
+                            <th>Altura</th>
+                            <th>Evento</th>
+                            <th>Nadadeira</th>
+                            <th>BCD</th>
+                            <th>Suit</th>
+                            <th>Regulador</th>
+                            <th>Bag</th>
+                            <th>Observação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="docs[0].registration_ids" t-as="reg">
+                            <tr>
+                                <td><strong t-esc="(reg.partner_id.name or '').upper()"/></td>
+                                <td class="center"><t t-esc="(reg.genero or '-').upper()"/></td>
+                                <td class="center"><t t-esc="reg.peso or '-'"/></td>
+                                <td class="center"><t t-esc="reg.altura or '-'"/></td>
+                                <td class="center"><t t-esc="(reg.tipo_evento or '-').upper()"/></td>
+                                <td class="center"><t t-esc="reg.nadadeira or '-'"/></td>
+
+                                <td class="center">
+                                    <t t-if="reg.bcd_info">
+                                        <span class="proprio">PRÓPRIO</span>
+                                    </t>
+                                    <t t-elif="reg.bcd_id">
+                                        <t t-esc="reg.bcd_id.display_name.upper()"/>
+                                        <span class="tag">
+                                            TAG: <t t-esc="(reg.bcd_id.product_tmpl_id.tag_cd or '-').upper()"/>
+                                        </span>
+                                    </t>
+                                    <t t-else="">-</t>
+                                </td>
+
+                                <td class="center">
+                                    <t t-if="reg.suit_info">
+                                        <span class="proprio">PRÓPRIO</span>
+                                    </t>
+                                    <t t-elif="reg.suit_id">
+                                        <t t-esc="reg.suit_id.display_name.upper()"/>
+                                        <span class="tag">
+                                            TAG: <t t-esc="(reg.suit_id.product_tmpl_id.tag_cd or '-').upper()"/>
+                                        </span>
+                                    </t>
+                                    <t t-else="">-</t>
+                                </td>
+
+                                <td class="center">
+                                    <t t-if="reg.reg_info">
+                                        <span class="proprio">PRÓPRIO</span>
+                                    </t>
+                                    <t t-elif="reg.reg_id">
+                                        <t t-esc="reg.reg_id.display_name.upper()"/>
+                                        <span class="tag">
+                                            TAG: <t t-esc="(reg.reg_id.product_tmpl_id.tag_cd or '-').upper()"/>
+                                        </span>
+                                    </t>
+                                    <t t-else="">-</t>
+                                </td>
+
+                                <td class="center">
+                                    <t t-if="reg.bag_info">
+                                        <span class="proprio">PRÓPRIO</span>
+                                    </t>
+                                    <t t-elif="reg.bag_id">
+                                        <t t-esc="reg.bag_id.display_name.upper()"/>
+                                        <span class="tag">
+                                            TAG: <t t-esc="(reg.bag_id.product_tmpl_id.tag_cd or '-').upper()"/>
+                                        </span>
+                                    </t>
+                                    <t t-else="">-</t>
+                                </td>
+
+                                <td>
+                                    <t t-esc="reg.obs or '-'"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+            </main>
+        </t>
+    </template>
+</odoo>

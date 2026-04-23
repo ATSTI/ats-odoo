@@ -1,0 +1,125 @@
+<odoo>
+        <record id="view_captain_size_rule_tree" model="ir.ui.view">
+            <field name="name">captain.size.rule.tree</field>
+            <field name="model">captain.size.rule</field>
+            <field name="arch" type="xml">
+                <tree editable="bottom"
+                    string="Tabela de Tamanhos"
+
+                    decoration-info="tamanho in ('jr','jr-p','jr-m')"
+                    decoration-warning="tamanho in ('pp','p')"
+                    decoration-success="tamanho in ('m','g')"
+                    decoration-danger="tamanho in ('xl','2xl','3xl','4xl','5xl')">
+
+                    <field name="genero" required="1"/>
+                    <field name="selecao" required="1"/>
+                    <field name="altura" required="1"/>
+                    <field name="peso" required="1"/>
+                    <field name="tamanho" required="1"/>
+                </tree>
+            </field>
+        </record>
+    <record id="view_captain_size_rule_search" model="ir.ui.view">
+        <field name="name">captain.size.rule.search</field>
+        <field name="model">captain.size.rule</field>
+        <field name="arch" type="xml">
+            <search string="Filtros de Tamanho">
+                <field name="genero"/>
+                <field name="selecao"/>
+                <filter name="masculino" string="Masculino"
+                        domain="[('genero','=','masculino')]"/>
+                <filter name="feminino" string="Feminino"
+                        domain="[('genero','=','feminino')]"/>
+                <filter name="suit" string="Suit"
+                        domain="[('selecao','=','suit')]"/>
+                <filter name="bcd" string="BCD"
+                        domain="[('selecao','=','bcd')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_captain_size_rule_mulher_bcd" model="ir.actions.act_window">
+        <field name="name">Feminino - BCD</field>
+        <field name="res_model">captain.size.rule</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[
+            ('genero','=','feminino'),
+            ('selecao','=','bcd')
+        ]</field>
+    </record>
+
+    <record id="action_captain_size_rule_mulher_suit" model="ir.actions.act_window">
+        <field name="name">Feminino - Suit</field>
+        <field name="res_model">captain.size.rule</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[
+            ('genero','=','feminino'),
+            ('selecao','=','suit')
+        ]</field>
+    </record>
+
+    <record id="action_captain_size_rule_homem_bcd" model="ir.actions.act_window">
+        <field name="name">Masculino - BCD</field>
+        <field name="res_model">captain.size.rule</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[
+            ('genero','=','masculino'),
+            ('selecao','=','bcd')
+        ]</field>
+    </record>
+
+    <record id="action_captain_size_rule_homem_suit" model="ir.actions.act_window">
+        <field name="name">Masculino - Suit</field>
+        <field name="res_model">captain.size.rule</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[
+            ('genero','=','masculino'),
+            ('selecao','=','suit')
+        ]</field>
+    </record>
+
+    <record id="action_captain_size_rule_htmls" model="ir.actions.act_url">
+    <field name="name">Tabela Visual de Tamanhos</field>
+    <field name="url">/captain/size/table</field>
+    <field name="target">new</field>
+</record>
+
+
+    <menuitem id="menu_captain_size_root"
+              name="Configurações de tamanho"
+              parent="contacts.menu_contacts"
+              sequence="90"/>
+
+        <menuitem
+        id="menu_captain_size_html"
+        name="Tabela Visual"
+        parent="menu_captain_size_root"
+        action="action_captain_size_rule_htmls"
+        sequence="5"/>
+
+
+    <menuitem id="menu_captain_size_mulher_bcd"
+              name="Mulher - BCD"
+              parent="menu_captain_size_root"
+              action="action_captain_size_rule_mulher_bcd"
+              sequence="10"/>
+
+    <menuitem id="menu_captain_size_mulher_suit"
+              name="Mulher - Suit"
+              parent="menu_captain_size_root"
+              action="action_captain_size_rule_mulher_suit"
+              sequence="20"/>
+
+    <menuitem id="menu_captain_size_homem_bcd"
+              name="Homem - BCD"
+              parent="menu_captain_size_root"
+              action="action_captain_size_rule_homem_bcd"
+              sequence="30"/>
+
+    <menuitem id="menu_captain_size_homem_suit"
+              name="Homem - Suit"
+              parent="menu_captain_size_root"
+              action="action_captain_size_rule_homem_suit"
+              sequence="40"/>
+
+</odoo>

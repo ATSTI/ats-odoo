@@ -1,0 +1,187 @@
+<odoo>
+    <template id="report_event_equipamentos_interno">
+        <t t-call="web.external_layout">
+            <main class="page">
+                <h2 style="text-align:center; margin-bottom:10px; font-size:14px;">
+                    Relatório de Equipamentos –
+                    <span t-esc="docs[0].name"/>
+                </h2>
+
+                <div style="margin-bottom: 10px; font-size: 10px;">
+                    <table width="100%">
+                        <tr>
+                            <td width="50%" style="vertical-align: top;">
+                                <strong>LOCAL DO EVENTO</strong><br/>
+                                <t t-if="docs[0].company_id">
+                                    <span t-esc="docs[0].company_id.name"/><br/>
+                                    <t t-if="docs[0].company_id.street">
+                                        <span t-esc="docs[0].company_id.street"/><br/>
+                                    </t>
+                                    <t t-if="docs[0].company_id.street2">
+                                        <span t-esc="docs[0].company_id.street2"/><br/>
+                                    </t>
+                                    <t>
+                                        <t t-esc="docs[0].company_id.city"/>
+                                        <t t-if="docs[0].company_id.city and docs[0].company_id.state_id"> - </t>
+                                        <t t-esc="docs[0].company_id.state_id.name"/>
+                                    </t><br/>
+                                    <t t-if="docs[0].company_id.zip">
+                                        <span t-esc="docs[0].company_id.zip"/> –
+                                    </t>
+                                    <t t-esc="docs[0].company_id.country_id.name"/>
+                                </t>
+                                <t t-else="">-</t>
+                            </td>
+
+                            <td width="50%" style="vertical-align: top;">
+                                <strong>STAFFs RESPONSÁVEL</strong><br/>
+                                <t t-if="docs[0].staff_ids">
+                                    <t t-foreach="docs[0].staff_ids" t-as="staff">
+                                        <span t-esc="staff.name"/><br/>
+                                    </t>
+                                </t>
+                                <t t-else="">-</t>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <style>
+                    table.equip-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 9px;
+                    }
+                    table.equip-table th {
+                        background-color: #2F4F6F;
+                        color: #FFF;
+                        text-align: center;
+                        padding: 4px;
+                        border: 1px solid #000;
+                        text-transform: uppercase;
+                    }
+                    table.equip-table td {
+                        padding: 3px;
+                        border: 1px solid #000;
+                        vertical-align: top;
+                    }
+                    table.equip-table tr:nth-child(even) {
+                        background-color: #F2F2F2;
+                    }
+                    .center {
+                        text-align: center;
+                    }
+                    .equip-box strong {
+                        font-size: 9px;
+                    }
+                    .equip-box small {
+                        font-size: 8px;
+                        display: block;
+                        color: #333;
+                        line-height: 1.2;
+                    }
+                    .proprio {
+                        font-weight: bold;
+                        text-transform: uppercase;
+                        font-size: 8px;
+                    }
+                    .obs {
+                        font-size: 8px;
+                        white-space: pre-wrap;
+                    }
+                </style>
+
+                <table class="equip-table">
+                    <thead>
+                        <tr>
+                            <th>Participante</th>
+                            <th>Gênero</th>
+                            <th>Peso</th>
+                            <th>Altura</th>
+                            <th>Evento</th>
+                            <th>Nadadeira</th>
+                            <th>BCD</th>
+                            <th>Suit</th>
+                            <th>REG</th>
+                            <th>BAG</th>
+                            <th>Observação</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <t t-foreach="docs[0].registration_ids" t-as="reg">
+                            <tr>
+                                <td><strong t-esc="reg.partner_id.name"/></td>
+                                <td class="center"><t t-esc="reg.genero or '-'"/></td>
+                                <td class="center"><t t-esc="reg.peso or '-'"/></td>
+                                <td class="center"><t t-esc="reg.altura or '-'"/></td>
+                                <td class="center"><t t-esc="reg.tipo_evento or '-'"/></td>
+                                <td class="center"><t t-esc="reg.nadadeira or '-'"/></td>
+
+                                <!-- BCD -->
+                                <td t-attf-style="background-color:#{reg.bcd_id and docs.color_by_situacao(reg.bcd_id) or ''}">
+                                    <t t-if="reg.bcd_info">
+                                        <span class="proprio">Próprio</span>
+                                    </t>
+                                    <t t-elif="reg.bcd_id">
+                                        <div class="equip-box">
+                                            <strong t-esc="reg.bcd_id.display_name"/>
+                                            <small>Situação: <t t-esc="reg.bcd_id.situacao"/></small>
+                                            <small>Tag: <t t-esc="reg.bcd_id.product_tmpl_id.tag_cd or '-'"/></small>
+                                        </div>
+                                    </t>
+                                    <t t-else="">-</t>
+                                </td>
+
+                                <td t-attf-style="background-color:#{reg.suit_id and docs.color_by_situacao(reg.suit_id) or ''}">
+                                    <t t-if="reg.suit_info">
+                                        <span class="proprio">Próprio</span>
+                                    </t>
+                                    <t t-elif="reg.suit_id">
+                                        <div class="equip-box">
+                                            <strong t-esc="reg.suit_id.display_name"/>
+                                            <small>Tipo: <t t-esc="reg.suit_id.product_tmpl_id.tipo_suit or '-'"/></small>
+                                            <small>Tag: <t t-esc="reg.suit_id.product_tmpl_id.tag_cd or '-'"/></small>
+                                        </div>
+                                    </t>
+                                    <t t-else="">-</t>
+                                </td>
+
+                                <td t-attf-style="background-color:#{reg.reg_id and docs.color_by_situacao(reg.reg_id) or ''}">
+                                    <t t-if="reg.reg_info">
+                                        <span class="proprio">Próprio</span>
+                                    </t>
+                                    <t t-elif="reg.reg_id">
+                                        <div class="equip-box">
+                                            <strong t-esc="reg.reg_id.display_name"/>
+                                            <small>Tipo: <t t-esc="reg.reg_id.product_tmpl_id.tipo_reg or '-'"/></small>
+                                            <small>Tag: <t t-esc="reg.reg_id.product_tmpl_id.tag_cd or '-'"/></small>
+                                        </div>
+                                    </t>
+                                    <t t-else="">-</t>
+                                </td>
+
+                                <td t-attf-style="background-color:#{reg.bag_id and docs.color_by_situacao(reg.bag_id) or ''}">
+                                    <t t-if="reg.bag_info">
+                                        <span class="proprio">Próprio</span>
+                                    </t>
+                                    <t t-elif="reg.bag_id">
+                                        <div class="equip-box">
+                                            <strong t-esc="reg.bag_id.display_name"/>
+                                            <small>Tag: <t t-esc="reg.bag_id.product_tmpl_id.tag_cd or '-'"/></small>
+                                        </div>
+                                    </t>
+                                    <t t-else="">-</t>
+                                </td>
+
+                                <td class="obs">
+                                    <t t-esc="reg.obs or '-'"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </main>
+        </t>
+    </template>
+</odoo>

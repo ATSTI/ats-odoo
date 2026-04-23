@@ -4,6 +4,7 @@
 
 NFSE_URL = {
     "1": "https://arturnogueira.presconinformatica.com.br/ords/arthur",
+    "2": "https://arturnogueira.presconinformatica.com.br/ords/arthur",
 }
 
 API_ENDPOINT_NACIONAL = {

@@ -183,6 +183,16 @@ class ContractContract(models.Model):
                         # se banco inter, a action abaixo faz o necessario
                         if invoice.payment_mode_id.fixed_journal_id.bank_id.code_bc == "077":
                             invoice.action_pdf_boleto()
+                        else:
+                            file_name = "boleto_nf-"
+                            tem_boleto = self.env["ir.attachment"].search([
+                               ("name", "like", file_name),
+                               ("res_model", "=", "account.move"),
+                               ("res_id", "=", invoice.id),
+                            ])
+                            if not tem_boleto:
+                                invoice.generate_boleto_pdf()
+   
 
     def _recurring_create_invoice(self, date_ref=False):
         # substitui tudo pra nao passar pelo l10n_br_contract

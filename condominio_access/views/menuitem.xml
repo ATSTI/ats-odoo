@@ -1,0 +1,7 @@
+<odoo>
+    <record id="condominio_access.menu_condominio_root" model="ir.ui.menu">
+        <field name="web_icon">condominio_access,static/description/condominio.png</field>
+    </record>
+</odoo>
+
+<!-- nao ta funcionando nao sei por que, verificar depois-->

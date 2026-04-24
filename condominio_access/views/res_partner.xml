@@ -1,0 +1,82 @@
+<odoo>
+    <record id="view_res_partner_residence_tab" model="ir.ui.view">
+        <field name="name">res.partner.residence.tab</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//notebook" position="inside">
+                <page string="Residências">
+
+                    <field name="condo_residence_ids" widget="kanban" context="{'default_proprietario_id': active_id}">
+>
+
+                        <kanban class="o_kanban_mobile"
+                                create="true"
+                                quick_create="false">
+
+                            <field name="name"/>
+                            <field name="rua"/>
+                            <field name="lote"/>
+                            <field name="numero"/>
+                            <field name="moradores"/>
+                            <field name="tipo"/>
+                            <field name="image_1920"/>
+
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <div class="oe_kanban_global_click o_kanban_card d-flex align-items-center">  
+
+                                        <t t-if="record.image_1920.value">
+                                            <field name="image_1920"
+                                                   class="oe_avatar me-2"
+                                                   widget="image"
+                                                   options="{'img_class': 'object-fit-cover'}"
+                                                   style="height:220px; object-fit:cover;"/>
+                                        </t>
+                                        <t t-else="">
+                                            <img src="/web/static/img/placeholder.png"
+                                                 class="oe_avatar me-2"
+                                                 style="width:64px;height:64px;object-fit:cover;"/>
+                                        </t>
+
+                                        <div class="ms-3">
+                                            <strong>
+                                                <field name="name"/>
+                                            </strong>
+
+                                            <div>
+                                                <field name="rua"/> -
+                                                <field name="numero"/>
+                                            </div>
+
+                                            <div>
+                                                👥 <field name="moradores"/> moradores
+                                            </div>
+
+                                            <div>
+                                                <span class="badge bg-primary">
+                                                    <field name="tipo"/>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </t>
+                            </templates>
+
+                        </kanban>
+
+                    </field>
+
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+    <odoo>
+
+
+</odoo>
+</odoo>

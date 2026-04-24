@@ -1,0 +1,165 @@
+<odoo>
+    <record id="view_condo_residence_kanban" model="ir.ui.view">
+        <field name="name">condo.residence.kanban</field>
+        <field name="model">condo.residence</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" create="true" quick_create="false">
+                <field name="name"/>
+                <field name="rua"/>
+                <field name="lote"/>
+                <field name="numero"/>
+                <field name="moradores"/>
+                <field name="tipo"/>
+                <field name="image_1920"/>
+                <field name="active"/>
+                <field name="leitura_agua_ids" invisible="1"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_kanban_card shadow-sm rounded overflow-hidden"
+                             style="width:260px;">
+
+                           <div class="text-center mb-3">
+                                <field name="image_1920"
+                                    widget="image"
+                                    class="oe_avatar"
+                                    options="{'preview_image': 'image_1920'}"
+                                    style="max-width:100%; max-height:220px; object-fit:cover;"/>                            </div>
+
+                            <div class="p-2">
+                                <strong class="d-block text-truncate">
+                                    <field name="name"/>
+                                </strong>
+
+                                <div class="text-muted small">
+                                    <field name="rua"/> - <field name="numero"/>
+                                </div>
+
+                                <div class="mt-1 small">
+                                    👥 <field name="moradores"/> moradores
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <span class="badge bg-primary">
+                                        <field name="tipo"/>
+                                    </span>
+
+                                    <field name="active" widget="boolean_toggle"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_condo_residence_form" model="ir.ui.view">
+        <field name="name">condo.residence.form</field>
+        <field name="model">condo.residence</field>
+        <field name="arch" type="xml">
+            <form string="Residência">
+                <sheet>
+
+                    <div style="width:100%; height:220px; overflow:hidden; border-radius:8px;">
+                        <field name="image_1920"
+                                    widget="image"
+                                    class="oe_avatar"
+                                    options="{'preview_image': 'image_1920'}"
+                                    style="width:100%; height:100%; object-fit:cover;"/>
+                    </div>
+
+                    <div class="oe_title mt-3">
+                        <h1>
+                            <field name="name" placeholder="Nome da residência"/>
+                        </h1>
+                    </div>
+
+                    <group col="2">
+                        <group string="Endereço">
+                            <field name="rua"/>
+                            <field name="numero"/>
+                            <field name="lote"/>
+                        </group>
+
+                        <group string="Detalhes">
+                            <field name="tipo"/>
+                            <field name="moradores" readonly="1"/>
+                            <field name="active"/>
+                        </group>
+
+                        <group string="Inquilino e Proprietário">
+                            <field name="inquilino_id"/>
+                            <field name="proprietario_id"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+
+                        <page string="Moradores">
+                            <field name="partner_ids"/>
+                        </page>
+
+                        <page string="Leitura de Água">
+                            <field name="leitura_agua_ids">
+                                <tree editable="bottom">
+                                    <field name="data_leitura"/>
+                                    <field name="data_conta"/>
+                                    <field name="valor_conta"/>
+                                </tree>
+                            </field>
+
+                            <field name="total_agua"
+                                   readonly="1"
+                                   string="Total"/>
+                        </page>
+
+                        <page string="Visitantes">
+                            <field name="visitor_ids"
+                                   nolabel="1"
+                                   readonly="1"
+                                   create="false"
+                                   delete="false">
+
+                                <tree string="Histórico de Visitantes"
+                                      decoration-success="status == 'presente'"
+                                      decoration-muted="status == 'saiu'">
+
+                                    <field name="visitante_id"/>
+                                    <field name="data_entrada"/>
+                                    <field name="data_saida"/>
+                                    <field name="tempo_permanencia"
+                                           widget="float_time"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                        <page string="Tags">
+                            <field name="tag_ids">
+                                <tree string="Tags da Moradia"
+                                      editable="bottom">
+                                    <field name="name"/>
+                                    <field name="numero_tag"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                    </notebook>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_condo_residence" model="ir.actions.act_window">
+        <field name="name">Residências</field>
+        <field name="res_model">condo.residence</field>
+        <field name="view_mode">kanban,form,tree</field>
+    </record>
+
+    <menuitem id="menu_condo_residence"
+              name="Residências"
+              parent="contacts.menu_contacts"
+              action="action_condo_residence"/>
+</odoo>

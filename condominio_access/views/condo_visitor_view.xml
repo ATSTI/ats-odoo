@@ -1,0 +1,217 @@
+<odoo>
+    <record id="view_condo_visitor_tree" model="ir.ui.view">
+        <field name="name">condo.visitor.tree</field>
+        <field name="model">condo.visitor</field>
+        <field name="arch" type="xml">
+
+            <tree decoration-success="status == 'presente'"
+                  decoration-warning="status == 'esperado'"
+                  decoration-muted="status == 'saiu'">
+
+                <field name="visitante_id" string="Visitante"/>
+                <field name="morador_id"/>
+                <field name="residence_id" string="Residência"/>
+                <field name="data_entrada"/>
+                <field name="tempo_permanencia" widget="float_time"/>
+                <field name="data_saida"/>
+                <field name="status"/>
+
+            </tree>
+
+        </field>
+    </record>
+
+    <record id="view_condo_visitor_search" model="ir.ui.view">
+        <field name="name">condo.visitor.search</field>
+        <field name="model">condo.visitor</field>
+        <field name="arch" type="xml">
+
+            <search>
+                <field name="visitante_id"/>
+                <field name="residence_id"/>
+
+                <filter name="filter_presentes"
+                        string="Presentes"
+                        domain="[('status','=','presente')]"/>
+
+                <filter name="filter_esperados"
+                        string="Esperados"
+                        domain="[('status','=','esperado')]"/>
+
+                <filter name="filter_saida"
+                        string="Saíram"
+                        domain="[('status','=','saiu')]"/>
+            </search>
+
+        </field>
+    </record>
+
+    <record id="view_condo_visitor_kanban" model="ir.ui.view">
+        <field name="name">condo.visitor.kanban</field>
+        <field name="model">condo.visitor</field>
+        <field name="arch" type="xml">
+
+            <kanban class="o_kanban_small_column">
+                <field name="visitante_id"/>
+                <field name="morador_id"/>
+                <field name="status"/>
+                <field name="residence_id"/>
+                <field name="cpf"/>
+                <field name="foto"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click oe_kanban_card p-3 rounded shadow-sm">
+
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div style="width:60px; height:60px; border-radius:50%; overflow:hidden;">
+                                    <field name="foto"
+                                           widget="image"
+                                            class="oe_avatar me-2"
+                                           style="width:100%; height:100%; object-fit:cover;"/>
+                                </div>
+
+                                <div>
+                                    <div style="font-size:16px; font-weight:600;">
+                                        <field name="visitante_id"/>
+                                    </div>
+
+                                    <div class="text-muted small">
+                                        CPF: <field name="cpf"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-muted small mb-1">
+                                👤 <strong>Morador:</strong>
+                                <field name="morador_id"/>
+                            </div>
+
+                            <div class="text-muted small mb-2">
+                                🏠 <field name="residence_id"/>
+                            </div>
+
+                            <div class="small mb-1">
+                                <strong>Entrada:</strong>
+                                <field name="data_entrada"/>
+                            </div>
+
+                            <div class="small mb-1">
+                                <strong>Saída:</strong>
+                                <field name="data_saida"/>
+                            </div>
+
+                            <div class="small mb-3">
+                                <strong>Tempo:</strong>
+                                <field name="tempo_permanencia"
+                                       widget="float_time"/>
+                            </div>
+
+                            <div class="mt-2">
+                                <span t-if="record.status.raw_value == 'presente'"
+                                      class="badge bg-success w-100 text-center">
+                                    🟢 Presente
+                                </span>
+
+                                <span t-if="record.status.raw_value == 'esperado'"
+                                      class="badge bg-warning text-dark w-100 text-center">
+                                    🟡 Esperado
+                                </span>
+
+                                <span t-if="record.status.raw_value == 'saiu'"
+                                      class="badge bg-secondary w-100 text-center">
+                                    ⚫ Saiu
+                                </span>
+                            </div>
+
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+
+        </field>
+    </record>
+
+    <record id="view_condo_visitor_form" model="ir.ui.view">
+        <field name="name">condo.visitor.form</field>
+        <field name="model">condo.visitor</field>
+        <field name="arch" type="xml">
+
+            <form string="Visitante">
+                <header>
+                <button name="action_entrada"
+                        type="object"
+                        string="Dar Entrada"
+                        class="btn-success"
+                        attrs="{'invisible': [('status', '=', 'presente')]}"/>
+
+                <button name="action_saida"
+                        type="object"
+                        string="Registrar Saída"
+                        class="btn-danger"
+                        attrs="{'invisible': [('status', '=', 'saiu')]}"/>
+
+                <field name="status" widget="statusbar"/>
+            </header>
+
+                <sheet>
+                    <div class="oe_title d-flex align-items-center gap-3">
+
+                        <field name="foto"
+                               widget="image"
+                                class="oe_avatar me-2"
+                               style="width:100px; height:100px; border-radius:50%; object-fit:cover;"/>
+
+                        <h1>
+                            <field name="visitante_id"/>
+                        </h1>
+
+                    </div>
+
+                    <group col="2">
+                        <group string="Dados do Visitante">
+                            <field name="visitante_id"/>
+                            <field name="cpf" readonly="1"/>
+                        </group>
+
+                        <group string="Dados do Morador">
+                            <field name="morador_id"/>
+                            <field name="residence_id"/>
+                            <field name="autorizado_por"/>
+                        </group>
+                    </group>
+
+                    <group col="2">
+                        <group string="Entrada">
+                            <field name="data_entrada"/>
+                        </group>
+
+                        <group string="Saída">
+                            <field name="data_saida"/>
+                            <field name="tempo_permanencia"
+                                   widget="float_time"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+
+        </field>
+    </record>
+
+    <record id="action_condo_visitor" model="ir.actions.act_window">
+        <field name="name">Controle de Visitantes</field>
+        <field name="res_model">condo.visitor</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="search_view_id" ref="view_condo_visitor_search"/>
+    </record>
+
+    <menuitem id="menu_condominio_root"
+              name="Condomínio"
+              sequence="10"/>
+
+    <menuitem id="menu_condo_visitor"
+              name="Visitantes"
+              parent="menu_condominio_root"
+              action="action_condo_visitor"
+              sequence="1"/>
+</odoo>

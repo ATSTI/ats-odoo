@@ -116,15 +116,30 @@ class Picking(models.Model):
     def action_agrupar_linhas(self):
         for picking in self:
             agrupados = {}
-            for move in picking.move_ids_without_package.filtered(lambda m: m.state not in ['done', 'cancel']):
-                key = (move.product_id.id, move.sale_line_id.id)
 
-                if key not in agrupados:
-                    agrupados[key] = move
-                else:
+            moves = picking.move_ids_without_package.filtered(
+                lambda m: m.state not in ('done', 'cancel')
+            ).sorted('id')
+
+            for move in moves:
+                key = (
+                    move.product_id.id,
+                    move.product_uom.id,
+                    move.location_id.id,
+                    move.location_dest_id.id,
+                    move.description_picking or '',
+                )
+
+                if key in agrupados:
                     principal = agrupados[key]
+
                     principal.product_uom_qty += move.product_uom_qty
+
+                    move._action_cancel()
                     move.unlink()
+                else:
+                    agrupados[key] = move
+
         return True
 
 #     def action_separar_todos_e_conferir(self):

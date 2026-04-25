@@ -290,8 +290,7 @@ class Document(models.Model):
                 code = child.text
             if child.tag == "messages":
                 msg = child.text
-
-        if response.status_code == 200 and code == "200":
+        if response.status_code == 200 and code == '200':
             self.cancel_event_id = self.event_ids.create_event_save_xml(
                company_id=self.company_id,
                 environment=(
@@ -301,8 +300,12 @@ class Document(models.Model):
                 xml_file=retorno,
                 document_id=self,
             )
-            self.state_fiscal = SITUACAO_FISCAL_CANCELADO
-            self.state_edoc = SITUACAO_EDOC_CANCELADA
+            # record.write({
+            #     'state_fiscal': SITUACAO_FISCAL_CANCELADO,
+            #     'state_edoc': SITUACAO_EDOC_CANCELADA
+            # })
+            # record._document_cancel(record.cancel_reason)
+            return response
         else:
             raise UserError(
                 _(
@@ -320,14 +323,14 @@ class Document(models.Model):
             return nfse.cancel_prescon_nfse_document(
                 ref, cancel_reason, company, environment
             )
-
-        return self._process_cancel_base(
+        result = self._process_cancel_base(
             record,
             ref,
             None,
             cancel_method,
             use_url_first=True,
         )
+        return result 
 
     def cancel_document_prescon(self):
         # Handle NFSe Municipal (original)
@@ -447,6 +450,10 @@ class Document(models.Model):
         """
         super()._exec_before_SITUACAO_EDOC_CANCELADA(old_state, new_state)
         return self.cancel_document_prescon()
+
+    def _exec_after_SITUACAO_EDOC_CANCELADA(self, old_state, new_state):
+        super()._exec_before_SITUACAO_EDOC_CANCELADA(old_state, new_state)
+        self.state_edoc = SITUACAO_EDOC_CANCELADA
 
     @api.model
     def _cron_document_status_prescon(self):

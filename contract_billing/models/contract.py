@@ -213,55 +213,54 @@ class ContractContract(models.Model):
 
         return moves
     
-    def _prepare_recurring_invoices_values(self, date_ref=False):
-        """Gera os valores das faturas com base nas regras de preço sem passar pelo l10n_latam"""
-        invoices_values = []
-        for contract in self:
-            if not contract.partner_id:
-                continue
-            journal = self.env['account.journal'].search([
-                ('company_id', '=', contract.company_id.id),
-                ('type', '=', 'sale'),
-                ('l10n_latam_use_documents', '=', False)
-            ], limit=1)
-            if not journal:
-                journal = self.env['account.journal'].create({
-                    'name': 'Vendas Internas (Sem Fiscal)',
-                    'code': 'INTV',
-                    'type': 'sale',
-                    'company_id': contract.company_id.id,
-                    'l10n_latam_use_documents': False,
-                })
-            invoice_date = date_ref or fields.Date.today()
-            mes_ano = invoice_date.strftime("%m/%Y")
-            # cliente = contract.partner_id.name or "Sem Cliente"
-            contrato = contract.code or str(contract.id)
-            # invoice_name = f"FATURA - {cliente} - {mes_ano} - {contradias_vencimento = int(contract.payment_term_id.line_ids.payment_days)
-            dias_vencimento = int(contract.payment_term_id.line_ids.payment_days)
-            vencimento = contract.recurring_next_date + relativedelta(day=dias_vencimento)
-            if vencimento <= contract.recurring_next_date:
-                vencimento = vencimento + relativedelta(months=+1)
-            mes_ano = vencimento.strftime("%m/%Y")
-            invoice_vals = {
-                "move_type": "out_invoice",
-                "partner_id": contract.partner_id.id,
-                "invoice_date": invoice_date,
-                "ref": contrato + "-" + mes_ano,
-                "company_id": contract.company_id.id,
-                "journal_id": journal.id,
-                "invoice_line_ids": [],
-                "l10n_latam_document_type_id": False,
-                "l10n_latam_document_number": False,
-                "invoice_payment_term_id": contract.payment_term_id.id,
-                "payment_mode_id": contract.payment_mode_id.id,
-                "invoice_line_ids": [(0, 0, line._prepare_invoice_line()) for line in contract.contract_line_ids.filtered(lambda l: not l.is_canceled)],
-                "move_tag_ids": [(6, 0, contract.tag_ids.ids)],
-                # "name": invoice_name,
-                "old_contract_id": contract.id,
-                "invoice_date_due": vencimento,
-            }
-            invoices_values.append(invoice_vals)
-        return invoices_values
+    # def _prepare_recurring_invoices_values(self, date_ref=False):
+    #     """Gera os valores das faturas com base nas regras de preço sem passar pelo l10n_latam"""
+    #     invoices_values = []
+    #     for contract in self:
+    #         if not contract.partner_id:
+    #             continue
+    #         journal = self.env['account.journal'].search([
+    #             ('company_id', '=', contract.company_id.id),
+    #             ('type', '=', 'sale'),
+    #             ('l10n_latam_use_documents', '=', False)
+    #         ], limit=1)
+    #         if not journal:
+    #             journal = self.env['account.journal'].create({
+    #                 'name': 'Vendas Internas (Sem Fiscal)',
+    #                 'code': 'INTV',
+    #                 'type': 'sale',
+    #                 'company_id': contract.company_id.id,
+    #                 'l10n_latam_use_documents': False,
+    #             })
+    #         invoice_date = date_ref or fields.Date.today()
+    #         mes_ano = invoice_date.strftime("%m/%Y")
+    #         # cliente = contract.partner_id.name or "Sem Cliente"
+    #         contrato = contract.code or str(contract.id)
+    #         # invoice_name = f"FATURA - {cliente} - {mes_ano} - {contradias_vencimento = int(contract.payment_term_id.line_ids.payment_days)
+    #         dias_vencimento = int(contract.payment_term_id.line_ids.payment_days)
+    #         vencimento = contract.recurring_next_date + relativedelta(day=dias_vencimento)
+    #         if vencimento <= contract.recurring_next_date:
+    #             vencimento = vencimento + relativedelta(months=+1)
+    #         mes_ano = vencimento.strftime("%m/%Y")
+    #         invoice_vals = {
+    #             "move_type": "out_invoice",
+    #             "partner_id": contract.partner_id.id,
+    #             "invoice_date": invoice_date,
+    #             "ref": contrato + "-" + mes_ano,
+    #             "company_id": contract.company_id.id,
+    #             "journal_id": journal.id,
+    #             "invoice_line_ids": [],
+    #             "l10n_latam_document_type_id": False,
+    #             "l10n_latam_document_number": False,
+    #             "invoice_payment_term_id": contract.payment_term_id.id,
+    #             "payment_mode_id": contract.payment_mode_id.id,
+    #             "invoice_line_ids": [(0, 0, line._prepare_invoice_line()) for line in contract.contract_line_ids.filtered(lambda l: not l.is_canceled)],
+    #             "move_tag_ids": [(6, 0, contract.tag_ids.ids)],
+    #             # "name": invoice_name,
+    #             "invoice_date_due": vencimento,
+    #         }
+    #         invoices_values.append(invoice_vals)
+    #     return invoices_values
     
     @api.model
     def _cron_recurring_create(self, date_ref=False, create_type="invoice"):

@@ -42,15 +42,17 @@
                 position="before"
             >
                 <button
-                    name="dummy_button_for_js"
+                    name="action_open_form"
                     icon="fa-external-link"
                     title="Edit in Form"
+                    type="object"
                     class="btn-sm btn-link p-0 edit-line-popup"
                 />
-                <control name="fiscal_fields" invisible="1" />
-                <control name="fiscal_taxes_fields" string="Taxes" invisible="1" />
-                <field name="tax_framework" invisible="1" />
-                <field name="fiscal_operation_id" invisible="1" />
+                <control name="fiscal_fields" column_invisible="1" />
+                <control name="fiscal_taxes_fields" string="Taxes" column_invisible="1" />
+                <field name="tax_framework" column_invisible="1" />
+                <field name="fiscal_operation_id" />
+                <field name="fiscal_operation_line_id" />
             </xpath>
             <xpath
                 expr="//field[@name='contract_line_fixed_ids']/list/field[@name='last_date_invoiced']"

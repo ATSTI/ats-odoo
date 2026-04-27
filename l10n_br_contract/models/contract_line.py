@@ -67,6 +67,7 @@ class ContractLine(models.Model):
         tax_ids = self.fiscal_tax_ids.account_taxes(
             user_type=contract.contract_type,
             fiscal_operation=contract.fiscal_operation_id,
+            company=contract.company_id,
         )
 
         if invoice_line_vals:
@@ -74,3 +75,13 @@ class ContractLine(models.Model):
             invoice_line_vals["quantity"] = quantity
             invoice_line_vals["tax_ids"] = tax_ids.ids
         return invoice_line_vals
+
+    def action_open_form(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Detail View',
+            'res_model': self._name, # The model of the form you want to open
+            'res_id': self.id,       # The ID of the specific record
+            'view_mode': 'form',
+            'target': 'new',     # Use 'new' to open in a popup/wizard instead
+        }

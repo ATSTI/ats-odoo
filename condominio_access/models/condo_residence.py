@@ -5,32 +5,32 @@ class CondoResidence(models.Model):
     _description = "Residências do Condomínio"
 
     leitura_agua_ids = fields.One2many(
-    "condo.water.reading",
-    "residence_id",
-    string="Leituras de Água"
-)
-    
+        "condo.water.reading",
+        "residence_id",
+        string="Leituras de Água"
+    )
+        
     tag_ids = fields.One2many(
-    "condo.residence.tags",
-    "residence_id",
-    string="Tags"
-)
+        "condo.residence.tags",
+        "residence_id",
+        string="Tags"
+    )
     
     visitor_ids = fields.One2many(
-    "condo.visitor",
-    "residence_id",
-    string="Visitantes"
-)
+        "condo.visitor",
+        "residence_id",
+        string="Visitantes"
+    )
 
-    name = fields.Char(string="Identificação", required=True,compute ='_compute_name', store=True)
+    name = fields.Char(string="Identificação", compute ='_compute_name', store=True)
 
     partner_ids = fields.Many2many(
-    comodel_name="res.partner",
-    relation="residence_partner_rel",  
-    column1="residence_id",
-    column2="partner_id",
-    string="Moradores"
-)
+        comodel_name="res.partner",
+        relation="residence_partner_rel",  
+        column1="residence_id",
+        column2="partner_id",
+        string="Moradores"
+    )
 
     rua = fields.Char(string="Rua")
     numero = fields.Char(string="Número")
@@ -81,6 +81,17 @@ class CondoResidence(models.Model):
         for rec in self:
             rec.total_agua = sum(rec.leitura_agua_ids.mapped('valor_conta'))
 
+    @api.onchange('inquilino_id')
+    def _onchange_inquilino_id(self):
+        for rec in self:
+            if rec.inquilino_id:
+                if self.inquilino_id.parent_id:
+                    rec.partner_ids = [(6, 0, [rec.inquilino_id.id, rec.inquilino_id.parent_id.id])]
+                else:   
+                    rec.partner_ids = [(6, 0, [rec.inquilino_id.id])]
+            else:
+                rec.partner_ids = [(5, 0, 0)]
+    
     @api.depends('partner_ids')
     def _compute_moradores(self):
         for rec in self:

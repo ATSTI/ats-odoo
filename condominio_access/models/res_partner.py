@@ -14,6 +14,12 @@ class ResPartner(models.Model):
         string="Residências"
     )
 
+    residence_owner_ids = fields.One2many(
+        'condo.residence',
+        'proprietario_id',
+        string="Residências como Proprietário"
+    )
+
     visitor_ids = fields.One2many(
         'condo.visitor',
         'residence_id',
@@ -26,8 +32,27 @@ class ResPartner(models.Model):
         store=True
     )
 
-    @api.depends('condo_residence_ids.partner_ids')
+    # @api.depends('condo_residence_ids.partner_ids')
+    # def _compute_is_morador(self):
+    #     all_morador_ids = self.env['condo.residence'].search([]).mapped('partner_ids.id')
+    #     for partner in self:
+    #         partner.is_morador = partner.id in all_morador_ids
+
+    @api.depends('condo_residence_ids')
     def _compute_is_morador(self):
-        all_morador_ids = self.env['condo.residence'].search([]).mapped('partner_ids.id')
         for partner in self:
-            partner.is_morador = partner.id in all_morador_ids
+            partner.is_morador = bool(partner.condo_residence_ids)
+
+    def link_residence(self):
+        partners = self.env['res.partner'].search([('residence_id', '!=', False), ('is_company', '=', False)])
+        for prt in partners:
+            for resd in prt.condo_residence_ids:
+                if prt.id in resd.partner_ids.ids:
+                    resd.partner_ids = [(3, prt.id)]
+            prt.is_company = False
+            residence = self.env['condo.residence'].search([('proprietario_id.name', '=', prt.name)])
+            if len(residence) >= 1:
+                for resd in residence:
+                    
+                    prt.residence_id = resd.id
+                    prt.condo_residence_ids = [(4, resd.id)]

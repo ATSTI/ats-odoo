@@ -61,7 +61,7 @@
             <form string="Residência">
                 <sheet>
 
-                    <div style="width:100%; height:220px; overflow:hidden; border-radius:8px;">
+                    <div style="width:100%; height:100px; overflow:hidden; border-radius:8px;">
                         <field name="image_1920"
                                     widget="image"
                                     class="oe_avatar"

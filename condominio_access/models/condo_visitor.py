@@ -18,7 +18,7 @@ class CondoVisitor(models.Model):
     "res.partner",
     string="Visitante",
     required=True,
-     domain="[('is_morador','=',False)]"
+    domain="[('is_morador','=',False)]"
 )
 
     morador_id = fields.Many2one(
@@ -164,3 +164,24 @@ class CondoVisitor(models.Model):
 
         if self.status == 'saiu' and not self.data_saida:
             self.data_saida = fields.Datetime.now()
+    
+
+    @api.onchange('visitante_id')
+    def _onchange_visitante_recorrente(self):
+        if not self.visitante_id:
+            return
+        
+        residencia = self.env['condo.residence'].search([
+            ('visitantes_recorrentes', 'in', self.visitante_id.id)
+        ], limit=1)
+        
+        if residencia:
+            return {
+                'warning': {
+                    'title': 'Visitante Recorrente',
+                    'message': (
+                        f"{self.visitante_id.name} é visitante recorrente "
+                        f"da residência {residencia.name}."
+                    )
+                }
+            }

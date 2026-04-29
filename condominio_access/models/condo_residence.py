@@ -1,8 +1,11 @@
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError, UserError
+from odoo import _
 
 class CondoResidence(models.Model):
     _name = "condo.residence"
     _description = "Residências do Condomínio"
+    _inherit = ['mail.thread', 'mail.activity.mixin']  # ← adicionar isso
 
     leitura_agua_ids = fields.One2many(
         "condo.water.reading",
@@ -15,11 +18,23 @@ class CondoResidence(models.Model):
         "residence_id",
         string="Tags"
     )
+
+    pet_ids = fields.One2many(
+        "condo.residence.pets",
+        "residence_id",
+        string="Pets"
+    )
     
     visitor_ids = fields.One2many(
         "condo.visitor",
         "residence_id",
         string="Visitantes"
+    )
+
+    vehicle_ids = fields.One2many(
+        "condo.residence.vehicles",
+        "residence_id",
+        string="Veículos"
     )
 
     name = fields.Char(string="Identificação", compute ='_compute_name', store=True)
@@ -32,9 +47,9 @@ class CondoResidence(models.Model):
         string="Moradores"
     )
 
-    rua = fields.Char(string="Rua")
-    numero = fields.Char(string="Número")
-    lote = fields.Char(string="Lote")
+    rua = fields.Char(string="Rua", tracking = True)
+    numero = fields.Char(string="Número" ,tracking = True)
+    lote = fields.Char(string="Lote" ,tracking = True)
 
     moradores = fields.Integer(
         string="Moradores", compute='_compute_moradores', store=True
@@ -69,11 +84,20 @@ class CondoResidence(models.Model):
     compute="_compute_total_agua",)
 
 
+    visitantes_recorrentes = fields.Many2many(
+        comodel_name="res.partner",
+        relation="residence_partner_rel2",  
+        column1="residence_id",
+        column2="partner_id",
+        string="Visitantes Recorrentes",
+        domain="[('is_morador','=',False)]"
+    )
+
 
     @api.depends('lote','proprietario_id')
     def _compute_name(self):
         for rec in self:           
-            rec.name = f"{rec.proprietario_id.name if rec.proprietario_id else 'Sem Proprietário'} - {rec.lote}"
+            rec.name = f"{rec.lote} - {rec.proprietario_id.name if rec.proprietario_id else 'Sem Proprietário'}"
 
 
     @api.depends('leitura_agua_ids.valor_conta')
@@ -96,4 +120,21 @@ class CondoResidence(models.Model):
     def _compute_moradores(self):
         for rec in self:
             rec.moradores = len(rec.partner_ids)
+    
+
+    @api.constrains("lote")
+    def _check_unique_lote(self):
+        for record in self:
+            if not record.lote:
+                continue
+
+            existing = self.search([
+                ("id", "!=", record.id),
+                ("lote", "=", record.lote),
+            ], limit=1)
+
+            if existing:
+                raise ValidationError(
+                    _("Já existe uma residência cadastrada no lote %s.") % record.lote
+                )
 

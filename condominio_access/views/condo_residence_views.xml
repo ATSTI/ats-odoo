@@ -94,6 +94,10 @@
                         </group>
                     </group>
 
+                    <group string ='Visitantes recorrentes'>
+                        <field name="visitantes_recorrentes" widget="many2many_tags" options="{'no_create': True}"/>
+                    </group>
+
                     <notebook>
 
                         <page string="Moradores">
@@ -114,7 +118,7 @@
                                    string="Total"/>
                         </page>
 
-                        <page string="Visitantes">
+                        <page string="Log de visitantes">
                             <field name="visitor_ids"
                                    nolabel="1"
                                    readonly="1"
@@ -145,18 +149,149 @@
                             </field>
                         </page>
 
+                        <page string="Pets">
+                            <field name="pet_ids">
+                                <tree string="Pets da Moradia"
+                                      editable="bottom">
+                                    <field name="name"/>
+                                    <field name="raça"/>
+                                    <field name="nome"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                        <page string="Veículos">
+                            <field name="vehicle_ids">
+                                <tree string="Veículos da Moradia"
+                                    editable="bottom">
+
+                                    <field name="name" string="Modelo" width="120"/>
+                                    <field name="marca" width="110"/>
+                                    <field name="cor" width="110"/>
+                                    <field name="placa" width="110"/>
+                                    <field name="possui_tag" width="100"/>
+                                    <field name="numero_tag"
+                                         width="100"
+                                        attrs="{'invisible': [('possui_tag', '=', False)]}"/>
+                                    <field name="quantidade" width="100"/>
+
+                                </tree>
+                            </field>
+                        </page>
                     </notebook>
 
                 </sheet>
+                <div class="oe_chatter">
+                <field name="message_follower_ids"/>
+                <field name="activity_ids"/>
+                <field name="message_ids"/>
+            </div>
             </form>
         </field>
     </record>
 
-    <record id="action_condo_residence" model="ir.actions.act_window">
-        <field name="name">Residências</field>
-        <field name="res_model">condo.residence</field>
-        <field name="view_mode">kanban,form,tree</field>
-    </record>
+    <record id="view_condo_residence_search" model="ir.ui.view">
+    <field name="name">condo.residence.search</field>
+    <field name="model">condo.residence</field>
+    <field name="arch" type="xml">
+        <search string="Pesquisar Residências">
+
+            <field name="name"/>
+            <field name="lote"/>
+            <field name="rua"/>
+            <field name="tipo"/>
+            <field name="inquilino_id"/>
+            <field name="proprietario_id"/>
+
+            <filter string="Ativas"
+                    name="active"
+                    domain="[('active', '=', True)]"/>
+
+            <filter string="Inativas"
+                    name="inactive"
+                    domain="[('active', '=', False)]"/>
+
+            <separator/>
+
+            <filter string="Com Moradores"
+                    name="with_residents"
+                    domain="[('partner_ids', '!=', False)]"/>
+
+            <filter string="Sem Moradores"
+                    name="without_residents"
+                    domain="[('partner_ids', '=', False)]"/>
+
+            <separator/>
+
+            <filter string="Com Pets"
+                    name="with_pets"
+                    domain="[('pet_ids', '!=', False)]"/>
+
+            <filter string="Sem Pets"
+                    name="without_pets"
+                    domain="[('pet_ids', '=', False)]"/>
+
+            <filter string="Com Veículos"
+                    name="with_vehicles"
+                    domain="[('vehicle_ids', '!=', False)]"/>
+
+            <filter string="Sem Veículos"
+                    name="without_vehicles"
+                    domain="[('vehicle_ids', '=', False)]"/>
+
+            <filter string="Com Tags"
+                    name="with_tags"
+                    domain="[('tag_ids', '!=', False)]"/>
+
+            <filter string="Sem Tags"
+                    name="without_tags"
+                    domain="[('tag_ids', '=', False)]"/>
+
+            <separator/>
+
+            <filter string="Com Inquilino"
+                    name="with_tenant"
+                    domain="[('inquilino_id', '!=', False)]"/>
+
+            <filter string="Com Proprietário"
+                    name="with_owner"
+                    domain="[('proprietario_id', '!=', False)]"/>
+
+            <group expand="0" string="Agrupar por">
+                <filter string="Lote"
+                        name="group_by_lote"
+                        context="{'group_by': 'lote'}"/>
+
+                <filter string="Rua"
+                        name="group_by_rua"
+                        context="{'group_by': 'rua'}"/>
+
+                <filter string="Tipo"
+                        name="group_by_tipo"
+                        context="{'group_by': 'tipo'}"/>
+
+                <filter string="Inquilino"
+                        name="group_by_tenant"
+                        context="{'group_by': 'inquilino_id'}"/>
+
+                <filter string="Proprietário"
+                        name="group_by_owner"
+                        context="{'group_by': 'proprietario_id'}"/>
+
+                <filter string="Status"
+                        name="group_by_active"
+                        context="{'group_by': 'active'}"/>
+            </group>
+        </search>
+    </field>
+</record>
+
+<record id="action_condo_residence" model="ir.actions.act_window">
+    <field name="name">Residências</field>
+    <field name="res_model">condo.residence</field>
+    <field name="view_mode">kanban,form,tree</field>
+    <field name="search_view_id" ref="view_condo_residence_search"/>
+</record>
 
     <menuitem id="menu_condo_residence"
               name="Residências"

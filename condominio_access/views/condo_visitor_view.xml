@@ -206,8 +206,9 @@
     </record>
 
     <menuitem id="menu_condominio_root"
-              name="Condomínio"
-              sequence="10"/>
+    name="Condomínio"
+    web_icon="condominio_access,static/description/condominio.png"
+    sequence="10"/>
 
     <menuitem id="menu_condo_visitor"
               name="Visitantes"

@@ -12,12 +12,15 @@ class AccountPaymentRegister(models.TransientModel):
         payment_vals = super()._create_payment_vals_from_wizard(batch_result)
         # for line in self.line_ids:
         #     line.write({'payment_date': fields.Date.context_today(self)})
-        if not self.currency_id.is_zero(self.payment_difference) and self.payment_difference_handling == 'reconcile':
-            name = payment_vals['ref']
-            payment_vals['write_off_line_vals'] = {
-                'name': name,
-                'amount': self.payment_difference,
-                'account_id': self.writeoff_account_id.id,
-                'payment_date': fields.Date.context_today(self),
-            }
+        # if not self.currency_id.is_zero(self.payment_difference) and self.payment_difference_handling == 'reconcile':
+        #     name = payment_vals['ref']
+        #     payment_vals['write_off_line_vals'] = {
+        #         'name': name,
+        #         'amount': self.payment_difference,
+        #         'account_id': self.writeoff_account_id.id,
+        #         'payment_date': fields.Date.context_today(self),
+        #         'currency_id': self.currency_id.id,
+        #         'amount_currency': self.payment_difference,
+        #     }
+        #     # 'balance': write_off_balance,
         return payment_vals

@@ -1,0 +1,218 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* l10n_br_nfse_prescon
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2024-06-11 19:36+0000\n"
+"Last-Translator: Rodrigo Macedo "
+"<sottomaiormacedotec@users.noreply.translation.odoo-community.org>\n"
+"Language-Team: none\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 4.17\n"
+
+#. module: l10n_br_nfse_prescon
+#. odoo-python
+#: code:addons/l10n_br_nfse_prescon/models/document.py:0
+msgid "%(code)s - %(msg)s"
+msgstr "%(code)s - %(msg)s"
+
+#. module: l10n_br_nfse_prescon
+#. odoo-python
+#: code:addons/l10n_br_nfse_prescon/models/document.py:0
+msgid "%(code)s - %(status)s"
+msgstr "%(code)s - %(status)s"
+
+#. module: l10n_br_nfse_prescon
+#. odoo-python
+#: code:addons/l10n_br_nfse_prescon/models/document.py:0
+msgid "Authorization error"
+msgstr ""
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields.selection,name:l10n_br_nfse_prescon.selection__res_company__presconnfe_nfse_cnae_code_value__codigo_cnae
+msgid "CNAE Code"
+msgstr "Código CNAE"
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields.selection,name:l10n_br_nfse_prescon.selection__res_company__presconnfe_nfse_cnae_code_value__codigo_tributacao_municipio
+#: model:ir.model.fields.selection,name:l10n_br_nfse_prescon.selection__res_company__presconnfe_nfse_service_type_value__codigo_tributacao_municipio
+msgid "City Taxation Code"
+msgstr "Código de Tributação da Cidade"
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model,name:l10n_br_nfse_prescon.model_res_company
+msgid "Companies"
+msgstr "Empresas"
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields.selection,name:l10n_br_nfse_prescon.selection__res_company__presconnfe_tax_rate_format__decimal
+msgid "Decimal"
+msgstr ""
+
+#. module: l10n_br_nfse_prescon
+#. odoo-python
+#: code:addons/l10n_br_nfse_prescon/models/base.py:0
+msgid "Error communicating with %(service)s service: %(error)s"
+msgstr ""
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model,name:l10n_br_nfse_prescon.model_l10n_br_fiscal_document
+msgid "Fiscal Document"
+msgstr "Documento Fiscal"
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model,name:l10n_br_nfse_prescon.model_presconnfe_nfse
+msgid "PresconNFE NFSE"
+msgstr "PresconNFE NFSE"
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model,name:l10n_br_nfse_prescon.model_presconnfe_nfse_base
+msgid "PresconNFE NFSE Base"
+msgstr ""
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model,name:l10n_br_nfse_prescon.model_presconnfe_nfse_nacional
+msgid "PresconNFE NFSe Nacional"
+msgstr ""
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields.selection,name:l10n_br_nfse_prescon.selection__res_company__provedor_nfse__presconnfe
+msgid "PresconNFe"
+msgstr "PresconNFe"
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields,field_description:l10n_br_nfse_prescon.field_res_company__presconnfe_homologation_token
+msgid "PresconNFe Homologation Token"
+msgstr "Token de homologação PresconNFe"
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields,field_description:l10n_br_nfse_prescon.field_res_company__presconnfe_nfse_type
+msgid "PresconNFe NFSe Type"
+msgstr ""
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields,field_description:l10n_br_nfse_prescon.field_res_company__presconnfe_production_token
+msgid "PresconNFe Production Token"
+msgstr "Token de produção PresconNFe"
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields,field_description:l10n_br_nfse_prescon.field_res_company__presconnfe_tax_rate_format
+msgid "Presconnfe Tax Rate Format"
+msgstr ""
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields,field_description:l10n_br_nfse_prescon.field_res_company__presconnfe_nfse_force_odoo_danfse
+msgid "Force Odoo DANFSE"
+msgstr ""
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields,help:l10n_br_nfse_prescon.field_res_company__presconnfe_nfse_update_authorized_document_status
+msgid ""
+"If checked, authorized documents will be included in the status check "
+"wizard. The system will verify the status of the documents with Prescon NFE, "
+"and if there are discrepancies with the status in Odoo, it will "
+"automatically update the status in the system."
+msgstr ""
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields,help:l10n_br_nfse_prescon.field_res_company__presconnfe_nfse_force_odoo_danfse
+msgid ""
+"If checked, the system will always use the Odoo DANFSE instead of the Prescon "
+"DANFSE."
+msgstr ""
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields,field_description:l10n_br_nfse_prescon.field_res_company__presconnfe_nfse_update_authorized_document_status
+msgid "Include Authorized Documents in Status Check"
+msgstr ""
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields,field_description:l10n_br_nfse_prescon.field_res_company__presconnfe_nfse_cnae_code_value
+msgid "NFSE CNAE Code Value"
+msgstr "Valor do código NFSE CNAE"
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields,field_description:l10n_br_nfse_prescon.field_res_company__presconnfe_nfse_service_type_value
+msgid "NFSE Service Type Value"
+msgstr "Valor do tipo de serviço NFSE"
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields.selection,name:l10n_br_nfse_prescon.selection__res_company__presconnfe_nfse_type__nfse
+msgid "NFSe"
+msgstr ""
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.actions.server,name:l10n_br_nfse_prescon.l10n_br_nfse_prescon_cron_ir_actions_server
+msgid "NFSe PresconNFe: Check status and update status of submitted documents."
+msgstr ""
+"NFSe PresconNFe: Verifique o status e atualize o status dos documentos "
+"enviados."
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields.selection,name:l10n_br_nfse_prescon.selection__res_company__presconnfe_nfse_type__nfse_nacional
+msgid "NFSe Nacional"
+msgstr ""
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields,field_description:l10n_br_nfse_prescon.field_res_company__provedor_nfse
+msgid "NFSe Provider"
+msgstr "Provedor NFSe"
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields.selection,name:l10n_br_nfse_prescon.selection__res_company__presconnfe_nfse_service_type_value__codigo_tributacao_nacional
+msgid "National Taxation Code"
+msgstr ""
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields.selection,name:l10n_br_nfse_prescon.selection__res_company__presconnfe_tax_rate_format__percentage
+msgid "Percentage"
+msgstr ""
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields,help:l10n_br_nfse_prescon.field_res_company__presconnfe_nfse_type
+msgid "Select whether to use NFSe (municipal) or NFSe Nacional (national) API"
+msgstr ""
+
+#. module: l10n_br_nfse_prescon
+#: model:ir.model.fields.selection,name:l10n_br_nfse_prescon.selection__res_company__presconnfe_nfse_service_type_value__item_lista_servico
+msgid "Service Type"
+msgstr "Tipo de Serviço"
+
+#. module: l10n_br_nfse_prescon
+#. odoo-python
+#: code:addons/l10n_br_nfse_prescon/models/document.py:0
+msgid "Successfully Processed"
+msgstr ""
+
+#. module: l10n_br_nfse_prescon
+#. odoo-python
+#: code:addons/l10n_br_nfse_prescon/models/document.py:0
+msgid "status"
+msgstr "situação"
+
+#, python-format
+#~ msgid "Error communicating with NFSe service: %s"
+#~ msgstr "Erro na comunicação com o serviço NFSe: %s"
+
+#, python-format
+#~ msgid "HTTP status is 200 or 400 but unable to read error code"
+#~ msgstr "O status HTTP é 200 ou 400, mas não é possível ler o código de erro"
+
+#, python-format
+#~ msgid "HTTP status is 200 or 400 but unable to read json['codigo']"
+#~ msgstr "O status HTTP é 200 ou 400, mas não é possível ler json['codigo']"
+
+#, python-format
+#~ msgid "HTTP status is 200 or 400 but unable to read json['status']"
+#~ msgstr "O status HTTP é 200 ou 400, mas não é possível ler json['status']"
+
+#, python-format
+#~ msgid "Processado com Sucesso"
+#~ msgstr "Processado com Sucesso"

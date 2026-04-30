@@ -286,6 +286,41 @@
     </field>
 </record>
 
+<record id="view_condo_residence_tree" model="ir.ui.view">
+    <field name="name">condo.residence.tree</field>
+    <field name="model">condo.residence</field>
+    <field name="arch" type="xml">
+        <tree string="Residências">
+
+            <!-- <field name="image_128" widget="image" class="oe_avatar"/> -->
+
+            <field name="name"/>
+
+            <field name="rua"/>
+            <field name="numero"/>
+            <field name="lote"/>
+
+            <field name="tipo"
+                   widget="badge"
+                   decoration-primary="tipo == 'casa'"
+                   decoration-info="tipo == 'apartamento'"/>
+
+            <field name="moradores" sum="Total de Moradores"/>
+
+            <field name="inquilino_id"
+                   optional="show"/>
+
+            <field name="proprietario_id"
+                   optional="show"/>
+
+            <field name="active"
+                   widget="boolean_toggle"
+                    optional="hide"/>
+
+        </tree>
+    </field>
+</record>
+
 <record id="action_condo_residence" model="ir.actions.act_window">
     <field name="name">Residências</field>
     <field name="res_model">condo.residence</field>

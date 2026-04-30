@@ -43,10 +43,10 @@ class PosOrder(models.Model):
         ])  # Default payment mode
 
         return {
-            "document_type_id": 31,  # NFC-e
-            "fiscal_operation_id": 1,  # Venda de Mercadoria
+            "document_type_id": self.company_id.document_type_id.id,  # NFC-e
+            "fiscal_operation_id": self.company_id.sale_fiscal_operation_id.id,  # Venda de Mercadoria
             "ind_pres": "1",
-            "document_serie_id": 1,  # Série padrão NFC-e
+            "document_serie_id": self.company_id.document_type_id.document_serie_ids[0].id,  # Série padrão NFC-e
             "partner_id": self.partner_id.id,
             "payment_mode_id": payment_mode_id[0].id,
             "nfe40_vTroco": 0.0,

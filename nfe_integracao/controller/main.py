@@ -77,7 +77,8 @@ class IntegracaoPdv(http.Controller):
             data_pedido = data_pedido.replace(day=1, hour=3, minute=59, second=0, microsecond=0)
             
             #('state', '=', 'draft'),
-            mes_ano = f"{str(data_pedido.month).zfill(2)}-{data_pedido.year}"
+            # mes_ano = f"{str(data_pedido.month).zfill(2)}-{data_pedido.year}"
+            mes_ano = f"{data_pedido.year}-{str(data_pedido.month).zfill(2)}"
             order_id = order.sudo().search([
                 ('partner_id', '=', cli_ids.financeiro.id),
                 ('client_order_ref', '=', mes_ano),

@@ -17,7 +17,7 @@ def post_init_hook(cr, registry):
     
     for prt in partner:
         # não vou fazer isso agora
-        continue
+        # continue
         values = {}
         if prt.city_id or not prt.ibge_code:
             continue
@@ -35,28 +35,35 @@ def post_init_hook(cr, registry):
         values['inscr_est'] = prt.inscr_est_bkp
         # prt.rg_fisica = prt.rg_fisica_bkp
         values['inscr_mun'] = prt.inscr_mun_bkp
-        values['suframa'] = prt.suframa_bkp
+        values['l10n_br_isuf_code'] = prt.suframa_bkp
         values['legal_name'] = prt.legal_name_bkp
         values['district'] = prt.district_bkp
         values['street_number'] = prt.number_bkp
         if prt.indicador_ie_dest_bkp:
             values['ind_ie_dest'] = prt.indicador_ie_dest_bkp
             if prt.indicador_ie_dest_bkp == "9":
-                values['ind_final'] = "1"
+                # values['ind_final'] = "1"
+                values["fiscal_profile_id"] = 8
         else:
-            values['ind_ie_dest'] = '9'
-            values['ind_final'] = '1'
-        
+            values["fiscal_profile_id"] = 4
+            # values['ind_ie_dest'] = '9'
+            # values['ind_final'] = '1'
+        prt._onchange_fiscal_profile_id()
         prt.with_context(disable_ie_validation=True).write(values)
         print(f"Corrigindo partner {prt.name}")
 
     product = env["product.template"].search([], order = "ncm")
     ncm = '0'
     ncm_id = 0
-    
+
     for prd in product:
         values = {}
         if prd.ncm_id or not prd.ncm:
+            if prd.fiscal_type_bkp == 'product':
+                prd.fiscal_type = '04'
+            if prd.fiscal_type_bkp == 'service':
+                prd.fiscal_type = '09'
+
             prd._compute_ncm_id()
             continue
         code_ncm = ''
@@ -71,9 +78,9 @@ def post_init_hook(cr, registry):
         if ncm_id:
             values['ncm_id'] = ncm_id.id
         #prd.type = prd.type_bkp
-        if prd.type_bkp == 'product':
-            values['fiscal_type'] = '00'
-        if prd.type_bkp == 'service':
+        if prd.fiscal_type_bkp == 'product':
+            values['fiscal_type'] = '04'
+        if prd.fiscal_type_bkp == 'service':
             values['fiscal_type'] = '09'
         values['icms_origin'] = prd.origin_bkp
         if prd.code_servico:
@@ -83,7 +90,7 @@ def post_init_hook(cr, registry):
                 values['service_type_id'] = service_id.id
         print(f"Corrigindo item {prd.name}")
         prd.with_context(inventory_mode=False).write(values)
-        prd._onchange_ncm_id()
+        prd._compute_ncm_id()
 
     # cr.execute(
     #     """

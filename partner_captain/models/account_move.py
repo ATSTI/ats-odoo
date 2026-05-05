@@ -3,6 +3,15 @@ from odoo import models
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
+    # def _write(self, vals):
+    #     if self.partner_id.vat:
+    #         if self.origin and self.partner_id.vat not in (self.origin):
+    #             vals['origin'] = self.origin + ' - ' + self.partner_id.vat
+    #         elif self.partner_id.vat not in (self.origin):
+    #             vals['origin'] = self.partner_id.vat
+    #     res = super(AccountMove, self)._write(vals)    
+    #     return res
+
     def action_send_email_with_attachments(self):
         self.ensure_one()
 

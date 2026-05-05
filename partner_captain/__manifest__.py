@@ -28,7 +28,8 @@ Lista de Equipamentos, Viagens e Cursos do Cliente:
         'product',
         'sale',
         'account',
-        'event'
+        'event',
+        'crm'
     ],
     'data': [
         'security/ir.model.access.csv',

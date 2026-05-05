@@ -76,7 +76,7 @@ class EmailEinvoice(models.Model):
                 mail.send_mail(inv.id)
                 inv.message_post(body=_(mail.name))
                 #inseri aqui a modificação
-                invoice_ids.email_send = True
+                inv.email_send = True
             else:
                 fatura_status = {'enviada':'NAO',
                                  'fatura': inv.move_id.name,

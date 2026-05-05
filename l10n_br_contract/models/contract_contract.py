@@ -110,9 +110,9 @@ class ContractContract(models.Model):
         if not self.fiscal_operation_id:
             if isinstance(super_inv_vals, list):
                 for inv_val in super_inv_vals:
-                    inv_val["document_type_id"] = False
+                    inv_val["l10n_latam_document_type_id"] = False
             else:
-                super_inv_vals["document_type_id"] = False
+                super_inv_vals["l10n_latam_document_type_id"] = False
             return super_inv_vals
 
         if not isinstance(super_inv_vals, list):
@@ -154,13 +154,13 @@ class ContractContract(models.Model):
                     inv_to_append.update(
                         {
                             "invoice_line_ids": [],
-                            "document_type_id": doc_type_id,
+                            "l10n_latam_document_type_id": doc_type_id,
                             "document_serie_id": self.env[
                                 "l10n_br_fiscal.document.serie"
                             ]
                             .search(
                                 [
-                                    ("document_type_id", "=", doc_type_id),
+                                    ("l10n_latam_document_type_id", "=", doc_type_id),
                                     ("company_id", "=", self.company_id.id),
                                 ],
                                 limit=1,

@@ -9,17 +9,24 @@ import logging
 from unicodedata import normalize
 from odoo import http
 from odoo.http import request
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 logger = logging.getLogger(__name__)
 
 
 
 class ConsultaPendencia(http.Controller):
 
-    @http.route('/consultar-pendencia', type='json', auth="user", csrf=False)
-    def website_consultar_pendencia(self, company_name, **kwargs):
+    @http.route('/check-pending-payments', type='http', auth="public", csrf=False)
+    def website_check_pending_payments(self, company_name=None, comapny_vat=None, **kwargs):
+        if not company_name:
+            return request.make_json_response({"error": "company_name é obrigatório"}, status=400)
+
         env = request.env
         cmp_name = normalize('NFKD', company_name).encode('ASCII', 'ignore').decode('ASCII')
-        partner = env['res.partner'].search([('name', 'ilike', cmp_name)])
+        partner = env['res.partner'].sudo().search(['|', ('name', 'ilike', cmp_name),('cnpj_cpf_stripped', '=', comapny_vat)], limit=1)
         if not partner:
             return {"error": "Parceiro não encontrado."}
 
@@ -28,7 +35,7 @@ class ConsultaPendencia(http.Controller):
         proximo_mes = (inicio + timedelta(days=32)).replace(day=1)
         fim = proximo_mes - timedelta(days=1)
 
-        pendencias = env['account.move'].search([
+        pendencias = env['account.move'].sudo().search([
             ('partner_id', '=', partner.id), 
             ('state', '=', 'posted'), 
             ('payment_state', '!=', 'paid'),
@@ -38,10 +45,8 @@ class ConsultaPendencia(http.Controller):
         pendencias_data = []
         for move in pendencias:
             pendencias_data.append({
-                'move_id': move.id,
-                'move_name': move.name,
-                'amount_total': move.amount_total,
-                'currency_id': move.currency_id.name,
-                'date': move.line_ids[0].date_maturity.strftime('%Y-%m-%d') if move.line_ids[0].date_maturity else None,
+                'partner_id': move.partner_id.name,
             })
-        return {"pendencias": pendencias_data}
+        return request.make_json_response({
+                "pendencias": pendencias_data
+            })

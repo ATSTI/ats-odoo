@@ -1,0 +1,703 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_pedido_venda_global_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="report_globo.report_pedido_venda_global_document"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_pedido_venda_global_document">
+        <div class="page">
+            <style>
+                * {
+                    box-sizing: border-box;
+                    margin: 0;
+                    padding: 0;
+                }
+
+                body, .page {
+                    font-family: Arial, sans-serif;
+                    font-size: 10px;
+                    color: #000;
+                }
+
+                /* Cada "via" ocupa metade da página A4 */
+                .via-container {
+                    width: 100%;
+                    padding: 8px 10px;
+                    border-bottom: 2px dashed #555;
+                    page-break-inside: avoid;
+                }
+
+                .via-container:last-child {
+                    border-bottom: none;
+                }
+
+               
+                .header-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 4px;
+                }
+
+                .header-logo-cell {
+                    width: 22%;
+                    vertical-align: middle;
+                    padding: 4px 6px;
+                    border: 1px solid #ccc;
+                }
+
+                .header-logo-cell img {
+                    max-height: 40px;
+                    max-width: 100%;
+                }
+
+                .header-title-cell {
+                    width: 56%;
+                    text-align: center;
+                    vertical-align: middle;
+                    padding: 4px;
+                    border-top: 1px solid #ccc;
+                    border-bottom: 1px solid #ccc;
+                }
+
+                .header-title-cell h2 {
+                    font-size: 13px;
+                    font-weight: bold;
+                    letter-spacing: 0.5px;
+                    text-transform: uppercase;
+                    margin-bottom: 2px;
+                }
+
+                .header-title-cell .numero-pedido {
+                    font-size: 13px;
+                    font-weight: bold;
+                }
+
+                .header-date-cell {
+                    width: 22%;
+                    text-align: center;
+                    vertical-align: middle;
+                    padding: 4px 6px;
+                    border: 1px solid #ccc;
+                    font-size: 9px;
+                }
+
+                .header-date-cell .label {
+                    font-weight: bold;
+                    display: block;
+                    margin-bottom: 2px;
+                }
+
+                .header-date-cell .date-value {
+                    font-size: 11px;
+                    font-weight: bold;
+                }
+
+               
+                .cliente-section {
+                    border: 1px solid #ccc;
+                    border-top: none;
+                    padding: 4px 6px;
+                    margin-bottom: 0;
+                }
+
+                .cliente-row {
+                    display: flex;
+                    width: 100%;
+                    margin-bottom: 2px;
+                    align-items: baseline;
+                    flex-wrap: nowrap;
+                }
+
+                .cliente-label {
+                    font-weight: bold;
+                    white-space: nowrap;
+                    margin-right: 4px;
+                    font-size: 9px;
+                }
+
+                .cliente-value {
+                    font-size: 9px;
+                    flex: 1;
+                }
+
+                .cliente-row-multi {
+                    display: flex;
+                    width: 100%;
+                    gap: 20px;
+                    margin-bottom: 2px;
+                }
+
+                .cliente-field {
+                    display: flex;
+                    align-items: baseline;
+                }
+
+                
+                .produtos-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 0;
+                }
+
+                .produtos-table thead tr {
+                    background-color: #e8e8e8;
+                }
+
+                .produtos-table th {
+                    border: 1px solid #bbb;
+                    padding: 3px 5px;
+                    text-align: center;
+                    font-size: 9px;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                }
+
+                .produtos-table th.col-desc {
+                    text-align: left;
+                    width: 45%;
+                }
+
+                .produtos-table th.col-cod {
+                    width: 8%;
+                }
+
+                .produtos-table th.col-qty {
+                    width: 10%;
+                }
+
+                .produtos-table th.col-desc-pct {
+                    width: 9%;
+                }
+
+                .produtos-table th.col-unit {
+                    width: 14%;
+                }
+
+                .produtos-table th.col-total {
+                    width: 14%;
+                }
+
+                .produtos-table td {
+                    border: 1px solid #ccc;
+                    padding: 2px 5px;
+                    font-size: 9px;
+                    vertical-align: middle;
+                }
+
+                .produtos-table td.col-desc {
+                    text-align: left;
+                }
+
+                .produtos-table td.col-qty,
+                .produtos-table td.col-desc-pct,
+                .produtos-table td.col-unit,
+                .produtos-table td.col-total {
+                    text-align: right;
+                }
+
+                .produtos-table td.col-cod {
+                    text-align: center;
+                }
+
+                /* Linhas vazias de preenchimento */
+                .produtos-table tr.linha-vazia td {
+                    height: 14px;
+                    border: 1px solid #ccc;
+                }
+
+                
+                .footer-section {
+                    width: 100%;
+                    border: 1px solid #ccc;
+                    border-top: none;
+                }
+
+                .footer-obs-row {
+                    padding: 3px 6px;
+                    border-bottom: 1px solid #ccc;
+                    font-size: 9px;
+                }
+
+                .footer-obs-row strong {
+                    font-size: 9px;
+                }
+
+                .footer-main {
+                    display: flex;
+                    width: 100%;
+                }
+
+                .footer-left {
+                    flex: 1;
+                    padding: 4px 6px;
+                    border-right: 1px solid #ccc;
+                    font-size: 9px;
+                }
+
+                .footer-left .cond-row {
+                    margin-bottom: 3px;
+                }
+
+                .footer-left .cond-row strong {
+                    font-size: 9px;
+                }
+
+                .footer-left .extenso {
+                    font-size: 8px;
+                    font-style: italic;
+                    margin-top: 3px;
+                }
+
+                .footer-left .extenso strong {
+                    font-size: 8px;
+                    font-style: normal;
+                }
+
+                .footer-left .assinatura {
+                    margin-top: 10px;
+                    font-size: 8px;
+                    font-weight: bold;
+                }
+
+                .footer-left .assinatura-linha {
+                    border-top: 1px solid #000;
+                    width: 70%;
+                    margin-top: 18px;
+                    padding-top: 2px;
+                }
+
+                .footer-right {
+                    width: 200px;
+                    min-width: 200px;
+                    padding: 4px 6px;
+                }
+
+                .footer-total-row {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 2px 0;
+                    border-bottom: 1px solid #eee;
+                    font-size: 9px;
+                }
+
+                .footer-total-row:last-child {
+                    border-bottom: none;
+                    font-weight: bold;
+                    font-size: 10px;
+                    padding-top: 3px;
+                    border-top: 1px solid #bbb;
+                    margin-top: 1px;
+                }
+
+                .footer-total-row .label {
+                    font-weight: normal;
+                }
+
+                .footer-total-row.total-final .label {
+                    font-weight: bold;
+                }
+
+                .footer-total-row .valor {
+                    font-weight: bold;
+                    text-align: right;
+                }
+
+                
+                .via-label {
+                    text-align: right;
+                    font-size: 8px;
+                    font-style: italic;
+                    color: #555;
+                    margin-bottom: 2px;
+                }
+
+               
+                .compromisso-text {
+                    font-size: 8px;
+                    font-weight: bold;
+                    margin-top: 5px;
+                    border-top: 1px solid #ddd;
+                    padding-top: 3px;
+                }
+
+                /* Utilitários */
+                .text-right { text-align: right; }
+                .text-center { text-align: center; }
+                .fw-bold { font-weight: bold; }
+                .no-border { border: none !important; }
+            </style>
+
+            <!-- ================================================
+                 VIA 1: CLIENTE
+            ================================================ -->
+            <div class="via-container">
+                <div class="via-label">1ª VIA - CLIENTE</div>
+
+                <table class="header-table">
+                    <tr>
+                        <td class="header-logo-cell">
+                            <t t-if="o.company_id.logo">
+                                <img t-att-src="'data:image/png;base64,' + o.company_id.logo.decode('utf-8')"
+                                     style="max-height:40px; max-width:100%;"/>
+                            </t>
+                            <t t-else="">
+                                <strong style="font-size:12px;">
+                                    <t t-esc="o.company_id.name"/>
+                                </strong>
+                            </t>
+                        </td>
+                        <td class="header-title-cell">
+                            <h2>PEDIDO DE VENDA N°:
+                                <span class="numero-pedido">
+                                    <t t-esc="o.name"/>
+                                </span>
+                            </h2>
+                        </td>
+                        <td class="header-date-cell">
+                            <span class="label">Data Emissão</span>
+                            <span class="date-value">
+                                <t t-esc="o.invoice_date and o.invoice_date.strftime('%d/%m/%Y') or ''"/>
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+                <div class="cliente-section">
+                    <div class="cliente-row">
+                        <span class="cliente-label">Cliente :</span>
+                        <span class="cliente-value fw-bold">
+                            <t t-esc="o.partner_id.name"/>
+                        </span>
+                    </div>
+                    <div class="cliente-row">
+                        <span class="cliente-label">Endereço :</span>
+                        <span class="cliente-value">
+                            <t t-esc="', '.join(filter(None, [
+                                o.partner_id.street or '',
+                                o.partner_id.street2 or '',
+                                o.partner_id.city or '',
+                                o.partner_id.state_id.name if o.partner_id.state_id else '',
+                                ('Cep:' + o.partner_id.zip) if o.partner_id.zip else ''
+                            ]))"/>
+                        </span>
+                    </div>
+                    <div class="cliente-row-multi">
+                        <div class="cliente-field">
+                            <span class="cliente-label">CNPJ/CPF :</span>
+                            <span class="cliente-value">
+                                <t t-esc="o.partner_id.vat or ''"/>
+                            </span>
+                        </div>
+                        <div class="cliente-field">
+                            <span class="cliente-label">I.E. :</span>
+                            <span class="cliente-value">
+                                <t t-esc="o.partner_id.state_id.name or ''"/>
+                            </span>
+                        </div>
+                        <div class="cliente-field">
+                            <span class="cliente-label">Telefone :</span>
+                            <span class="cliente-value">
+                                <t t-esc="o.partner_id.phone or o.partner_id.mobile or ''"/>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <table class="produtos-table">
+                    <thead>
+                        <tr>
+                            <th class="col-cod">Cod.</th>
+                            <th class="col-desc">Descrição dos Produtos</th>
+                            <th class="col-qty">Quantidade</th>
+                            <th class="col-desc-pct">Desc. %</th>
+                            <th class="col-unit">R$ Unitário</th>
+                            <th class="col-total">R$ Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="o.invoice_line_ids.filtered(lambda l: l.display_type not in ['line_section', 'line_note'])" t-as="line">
+                            <tr>
+                                <td class="col-cod">
+                                    <t t-esc="line.product_id.default_code or ''"/>
+                                </td>
+                                <td class="col-desc">
+                                    <t t-esc="line.name or line.product_id.name"/>
+                                </td>
+                                <td class="col-qty">
+                                    <t t-esc="'%.1f' % line.quantity"/>
+                                </td>
+                                <td class="col-desc-pct">
+                                    <t t-if="line.discount">
+                                        <t t-esc="'%.0f' % line.discount"/>%
+                                    </t>
+                                </td>
+                                <td class="col-unit">
+                                    <t t-esc="'%.2f' % line.price_unit"/>
+                                </td>
+                                <td class="col-total">
+                                    <t t-esc="'%.2f' % line.price_subtotal"/>
+                                </td>
+                            </tr>
+                        </t>
+                        <t t-set="n_linhas" t-value="len(o.invoice_line_ids.filtered(lambda l: l.display_type not in ['line_section', 'line_note']))"/>
+                        <t t-if="n_linhas &lt; 12">
+                            <t t-foreach="range(12 - n_linhas)" t-as="vazio">
+                                <tr class="linha-vazia">
+                                    <td class="col-cod">&#160;</td>
+                                    <td class="col-desc">&#160;</td>
+                                    <td class="col-qty">&#160;</td>
+                                    <td class="col-desc-pct">&#160;</td>
+                                    <td class="col-unit">&#160;</td>
+                                    <td class="col-total">&#160;</td>
+                                </tr>
+                            </t>
+                        </t>
+                    </tbody>
+                </table>
+                <div class="footer-section">
+                    <div class="footer-obs-row">
+                        <strong>Obs. :</strong>
+                        <span>&#160;<t t-esc="o.narration or ''"/></span>
+                    </div>
+                    <div class="footer-main">
+                        <div class="footer-left">
+                            <div class="cond-row">
+                                <strong>Cond. Pagto. :</strong>
+                                &#160;<t t-esc="o.invoice_payment_term_id.name or ''"/>
+                                &#160;&#160;
+                                <t t-esc="'%.2f' % o.amount_total"/>
+                            </div>
+                            <div class="extenso">
+                                <strong>Valor por extenso :</strong>
+                                &#160;
+                                <t t-esc="o.amount_total"/>
+                            </div>
+                            <div class="compromisso-text">
+                                Reconheço o valor acima e comprometo-me a quitá-lo até a data do vencimento
+                            </div>
+                            <div class="assinatura">
+                                Assinatura :
+                                <div class="assinatura-linha">&#160;</div>
+                            </div>
+                        </div>
+                        <div class="footer-right">
+                            <div class="footer-total-row">
+                                <span class="label">Valor : R$</span>
+                                <span class="valor">
+                                    <t t-esc="'%.2f' % o.amount_untaxed"/>
+                                </span>
+                            </div>
+                            <div class="footer-total-row">
+                                <span class="label">Frete : R$</span>
+                                <span class="valor">
+                                    0,00
+                                </span>
+                            </div>
+                            <div class="footer-total-row">
+                                <span class="label">Desc : R$</span>
+                                <span class="valor">
+                                    <t t-if="o.amount_untaxed != o.amount_total">
+                                        <t t-esc="'%.2f' % (o.amount_untaxed - o.amount_total)"/>
+                                    </t>
+                                    <t t-else="">0,00</t>
+                                </span>
+                            </div>
+                            <div class="footer-total-row total-final">
+                                <span class="label">Total : R$</span>
+                                <span class="valor">
+                                    <t t-esc="'%.2f' % o.amount_total"/>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- ================================================
+                 VIA 2: ESTABELECIMENTO
+            ================================================ -->
+            <div class="via-container">
+                <div class="via-label">2ª VIA - ESTABELECIMENTO</div>
+
+                <table class="header-table">
+                    <tr>
+                        <td class="header-logo-cell">
+                            <t t-if="o.company_id.logo">
+                                <img t-att-src="'data:image/png;base64,' + o.company_id.logo.decode('utf-8')"
+                                     style="max-height:40px; max-width:100%;"/>
+                            </t>
+                            <t t-else="">
+                                <strong style="font-size:12px;">
+                                    <t t-esc="o.company_id.name"/>
+                                </strong>
+                            </t>
+                        </td>
+                        <td class="header-title-cell">
+                            <h2>PEDIDO DE VENDA N°:
+                                <span class="numero-pedido">
+                                    <t t-esc="o.name"/>
+                                </span>
+                            </h2>
+                        </td>
+                        <td class="header-date-cell">
+                            <span class="label">Data Emissão</span>
+                            <span class="date-value">
+                                <t t-esc="o.invoice_date and o.invoice_date.strftime('%d/%m/%Y') or ''"/>
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+                <div class="cliente-section">
+                    <div class="cliente-row">
+                        <span class="cliente-label">Cliente :</span>
+                        <span class="cliente-value fw-bold">
+                            <t t-esc="o.partner_id.name"/>
+                        </span>
+                    </div>
+                    <div class="cliente-row">
+                        <span class="cliente-label">Endereço :</span>
+                        <span class="cliente-value">
+                            <t t-esc="', '.join(filter(None, [
+                                o.partner_id.street or '',
+                                o.partner_id.street2 or '',
+                                o.partner_id.city or '',
+                                o.partner_id.state_id.name if o.partner_id.state_id else '',
+                                ('Cep:' + o.partner_id.zip) if o.partner_id.zip else ''
+                            ]))"/>
+                        </span>
+                    </div>
+                    <div class="cliente-row-multi">
+                        <div class="cliente-field">
+                            <span class="cliente-label">CNPJ/CPF :</span>
+                            <span class="cliente-value">
+                                <t t-esc="o.partner_id.vat or ''"/>
+                            </span>
+                        </div>
+                        <div class="cliente-field">
+                            <span class="cliente-label">I.E. :</span>
+                            <span class="cliente-value">
+                                <t t-esc="o.partner_id.state_id.name or ''"/>
+                            </span>
+                        </div>
+                        <div class="cliente-field">
+                            <span class="cliente-label">Telefone :</span>
+                            <span class="cliente-value">
+                                <t t-esc="o.partner_id.phone or o.partner_id.mobile or ''"/>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <table class="produtos-table">
+                    <thead>
+                        <tr>
+                            <th class="col-cod">Cod.</th>
+                            <th class="col-desc">Descrição dos Produtos</th>
+                            <th class="col-qty">Quantidade</th>
+                            <th class="col-desc-pct">Desc. %</th>
+                            <th class="col-unit">R$ Unitário</th>
+                            <th class="col-total">R$ Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="o.invoice_line_ids.filtered(lambda l: l.display_type not in ['line_section', 'line_note'])" t-as="line">
+                            <tr>
+                                <td class="col-cod">
+                                    <t t-esc="line.product_id.default_code or ''"/>
+                                </td>
+                                <td class="col-desc">
+                                    <t t-esc="line.name or line.product_id.name"/>
+                                </td>
+                                <td class="col-qty">
+                                    <t t-esc="'%.1f' % line.quantity"/>
+                                </td>
+                                <td class="col-desc-pct">
+                                    <t t-if="line.discount">
+                                        <t t-esc="'%.0f' % line.discount"/>%
+                                    </t>
+                                </td>
+                                <td class="col-unit">
+                                    <t t-esc="'%.2f' % line.price_unit"/>
+                                </td>
+                                <td class="col-total">
+                                    <t t-esc="'%.2f' % line.price_subtotal"/>
+                                </td>
+                            </tr>
+                        </t>
+                        <t t-set="n_linhas" t-value="len(o.invoice_line_ids.filtered(lambda l: l.display_type not in ['line_section', 'line_note']))"/>
+                        <t t-if="n_linhas &lt; 12">
+                            <t t-foreach="range(12 - n_linhas)" t-as="vazio">
+                                <tr class="linha-vazia">
+                                    <td class="col-cod">&#160;</td>
+                                    <td class="col-desc">&#160;</td>
+                                    <td class="col-qty">&#160;</td>
+                                    <td class="col-desc-pct">&#160;</td>
+                                    <td class="col-unit">&#160;</td>
+                                    <td class="col-total">&#160;</td>
+                                </tr>
+                            </t>
+                        </t>
+                    </tbody>
+                </table>
+                <div class="footer-section">
+                    <div class="footer-obs-row">
+                        <strong>Obs. :</strong>
+                        <span>&#160;<t t-esc="o.narration or ''"/></span>
+                    </div>
+                    <div class="footer-main">
+                        <div class="footer-left">
+                            <div class="cond-row">
+                                <strong>Cond. Pagto. :</strong>
+                                &#160;<t t-esc="o.invoice_payment_term_id.name or ''"/>
+                                &#160;&#160;
+                                <t t-esc="'%.2f' % o.amount_total"/>
+                            </div>
+                            <div class="extenso">
+                                <strong>Valor por extenso :</strong>
+                                &#160;
+                                <t t-esc="o.amount_total"/>
+                            </div>
+                            <div class="compromisso-text">
+                                Reconheço o valor acima e comprometo-me a quitá-lo até a data do vencimento
+                            </div>
+                            <div class="assinatura">
+                                Assinatura :
+                                <div class="assinatura-linha">&#160;</div>
+                            </div>
+                        </div>
+                        <div class="footer-right">
+                            <div class="footer-total-row">
+                                <span class="label">Valor : R$</span>
+                                <span class="valor">
+                                    <t t-esc="'%.2f' % o.amount_untaxed"/>
+                                </span>
+                            </div>
+                            <div class="footer-total-row">
+                                <span class="label">Frete : R$</span>
+                                <span class="valor">0,00</span>
+                            </div>
+                            <div class="footer-total-row">
+                                <span class="label">Desc : R$</span>
+                                <span class="valor">
+                                    <t t-if="o.amount_untaxed != o.amount_total">
+                                        <t t-esc="'%.2f' % (o.amount_untaxed - o.amount_total)"/>
+                                    </t>
+                                    <t t-else="">0,00</t>
+                                </span>
+                            </div>
+                            <div class="footer-total-row total-final">
+                                <span class="label">Total : R$</span>
+                                <span class="valor">
+                                    <t t-esc="'%.2f' % o.amount_total"/>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+</odoo>

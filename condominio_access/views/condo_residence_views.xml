@@ -100,7 +100,7 @@
                         </group>
                     </group>
 
-                    <group string="Visitantes recorrentes">
+                    <group string="Visitantes recorrentes" name ="visitantes_recorrentes_page">
                         <field name="visitantes_recorrentes_ids">
                             <tree editable="bottom">
                                 <field name="partner_id"/>
@@ -111,11 +111,11 @@
 
                     <notebook>
 
-                        <page string="Moradores">
+                        <page string="Moradores" name='moradores_page'>
                             <field name="partner_ids"/>
                         </page>
 
-                        <page string="Leitura de Água">
+                        <page string="Leitura de Água" name ="leitura_agua_page">
                             <field name="leitura_agua_ids">
                                 <tree editable="bottom">
                                     <field name="data_leitura"/>
@@ -129,7 +129,7 @@
                                    string="Total"/>
                         </page>
 
-                        <page string="Log de visitantes">
+                        <page string="Log de visitantes" name="visitantes_page">
                             <field name="visitor_ids"
                                    nolabel="1"
                                    readonly="1"
@@ -150,7 +150,7 @@
                             </field>
                         </page>
 
-                        <page string="Tags">
+                        <page string="Tags" name="tags_page">
                             <field name="tag_ids">
                                 <tree string="Tags da Moradia"
                                       editable="bottom">
@@ -160,7 +160,7 @@
                             </field>
                         </page>
 
-                        <page string="Pets">
+                        <page string="Pets" name="pets_page">
                             <field name="pet_ids">
                                 <tree string="Pets da Moradia"
                                       editable="bottom">
@@ -171,7 +171,7 @@
                             </field>
                         </page>
 
-                        <page string="Veículos">
+                        <page string="Veículos" name="veiculos_page">
                             <field name="vehicle_ids">
                                 <tree string="Veículos da Moradia"
                                     editable="bottom">

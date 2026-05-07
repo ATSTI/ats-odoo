@@ -12,8 +12,9 @@
     'data': [
         'views/security.xml',
         'security/ir.model.access.csv',
-        # 'views/menuitem.xml',
         'views/condo_residence_views.xml',
+        'views/condo_residence_leitura.xml',
+        # 'views/menuitem.xml',
         'views/condo_visitor_view.xml',
         'views/res_partner.xml',
     ],

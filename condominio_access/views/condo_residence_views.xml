@@ -59,6 +59,12 @@
         <field name="model">condo.residence</field>
         <field name="arch" type="xml">
             <form string="Residência">
+                <header>
+                <button name="action_compute_name"
+                        string="Recalcular Nomes (Lote - Proprietário)"
+                        type="object"
+                        class="btn btn-secondary"/>
+            </header>
                 <sheet>
 
                     <div style="width:100%; height:100px; overflow:hidden; border-radius:8px;">
@@ -94,8 +100,13 @@
                         </group>
                     </group>
 
-                    <group string ='Visitantes recorrentes'>
-                        <field name="visitantes_recorrentes" widget="many2many_tags" options="{'no_create': True}"/>
+                    <group string="Visitantes recorrentes">
+                        <field name="visitantes_recorrentes_ids">
+                            <tree editable="bottom">
+                                <field name="partner_id"/>
+                                <field name="expediente"/>
+                            </tree>
+                        </field>
                     </group>
 
                     <notebook>

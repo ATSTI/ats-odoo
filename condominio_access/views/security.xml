@@ -1,0 +1,8 @@
+<odoo>
+
+    <record id="group_condo_water_reader" model="res.groups">
+        <field name="name">Leiturista de Água</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+</odoo>

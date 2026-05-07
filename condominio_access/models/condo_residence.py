@@ -84,20 +84,24 @@ class CondoResidence(models.Model):
     compute="_compute_total_agua",)
 
 
-    visitantes_recorrentes = fields.Many2many(
-        comodel_name="res.partner",
-        relation="residence_partner_rel2",  
-        column1="residence_id",
-        column2="partner_id",
-        string="Visitantes Recorrentes",
-        domain="[('is_morador','=',False)]"
-    )
+    visitantes_recorrentes_ids = fields.One2many(
+    "condo.recurring.visitor",
+    "residence_id",
+    string="Visitantes Recorrentes"
+)
 
 
     @api.depends('lote','proprietario_id')
     def _compute_name(self):
         for rec in self:           
             rec.name = f"{rec.lote} - {rec.proprietario_id.name if rec.proprietario_id else 'Sem Proprietário'}"
+
+    
+    def action_compute_name(self):
+        residences = self.env['condo.residence'].search([])
+
+        for rec in residences:
+            rec._compute_name()
 
 
     @api.depends('leitura_agua_ids.valor_conta')

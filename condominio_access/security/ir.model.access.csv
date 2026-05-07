@@ -5,3 +5,7 @@ access_condo_visitor,access_condo_visitor,model_condo_visitor,,1,1,1,1
 access_condo_residence_tags,access_condo_residence_tags,model_condo_residence_tags,,1,1,1,1
 access_condo_residence_pets,access_condo_residence_pets,model_condo_residence_pets,,1,1,1,1
 access_condo_residence_vehicles,access_condo_residence_vehicles,model_condo_residence_vehicles,,1,1,1,1
+access_condo_recurring_visitor,access_condo_recurring_visitor,model_condo_recurring_visitor,,1,1,1,1
+
+access_condo_residence_water_reader,access.condo.residence.water.reader,model_condo_residence,condominio_access.group_condo_water_reader,1,1,0,0
+access_condo_water_reading_water_reader,access.condo.water.reading.water.reader,model_condo_water_reading,condominio_access.group_condo_water_reader,1,1,1,0

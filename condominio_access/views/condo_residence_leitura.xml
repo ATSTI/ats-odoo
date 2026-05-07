@@ -1,0 +1,45 @@
+<odoo>
+
+    <record id="view_condo_residence_form_water_reader" model="ir.ui.view">
+        <field name="name">condo.residence.form.water.reader</field>
+        <field name="model">condo.residence</field>
+        <field name="inherit_id" ref="condo.view_condo_residence_form"/>
+        <field name="groups_id" eval="[(4, ref('condo.group_condo_water_reader'))]"/>
+
+        <field name="arch" type="xml">
+
+            <!-- Tudo readonly -->
+            <xpath expr="//field" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <!-- Libera leitura de água -->
+            <xpath expr="//field[@name='leitura_agua_ids']" position="attributes">
+                <attribute name="readonly">0</attribute>
+            </xpath>
+
+            <!-- Oculta páginas -->
+            <xpath expr="//page[@string='Moradores']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//page[@string='Log de visitantes']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//page[@string='Tags']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//page[@string='Pets']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//page[@string='Veículos']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

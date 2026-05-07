@@ -10,6 +10,7 @@
     'maintainer': 'Otávio Andretta <otavio12257@gmail.com>',
     'depends': ['contacts', 'base','web_widget_image_webcam'],
     'data': [
+        'views/security.xml',
         'security/ir.model.access.csv',
         # 'views/menuitem.xml',
         'views/condo_residence_views.xml',

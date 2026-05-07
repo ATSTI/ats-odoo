@@ -207,7 +207,7 @@
 
     <menuitem id="menu_condominio_root"
     name="Condomínio"
-    web_icon="condominio_access,static/description/condominio.png"
+    web_icon="condominio_access,static/description/condominio.jpeg"
     sequence="10"/>
 
     <menuitem id="menu_condo_visitor"

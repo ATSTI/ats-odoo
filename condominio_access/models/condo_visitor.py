@@ -170,18 +170,26 @@ class CondoVisitor(models.Model):
     def _onchange_visitante_recorrente(self):
         if not self.visitante_id:
             return
-        
-        residencia = self.env['condo.residence'].search([
-            ('visitantes_recorrentes', 'in', self.visitante_id.id)
-        ], limit=1)
-        
-        if residencia:
-            return {
-                'warning': {
-                    'title': 'Visitante Recorrente',
-                    'message': (
-                        f"{self.visitante_id.name} é visitante recorrente "
-                        f"da residência {residencia.name}."
-                    )
-                }
+
+        residencias = self.env['condo.residence'].search([
+            (
+                'visitantes_recorrentes_ids.partner_id',
+                '=',
+                self.visitante_id.id
+            )
+        ])
+
+        if not residencias:
+            return
+
+        nomes = ", ".join(residencias.mapped('name'))
+
+        return {
+            'warning': {
+                'title': 'Visitante Recorrente',
+                'message': (
+                    f'{self.visitante_id.name} já está cadastrado '
+                    f'como visitante recorrente em: {nomes}'
+                )
             }
+        }

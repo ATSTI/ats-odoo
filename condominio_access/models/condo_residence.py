@@ -37,6 +37,10 @@ class CondoResidence(models.Model):
         string="Veículos"
     )
 
+    is_water_reader = fields.Boolean(
+    compute="_compute_is_water_reader"
+)
+
     name = fields.Char(string="Identificação", compute ='_compute_name', store=True)
 
     partner_ids = fields.Many2many(
@@ -91,6 +95,11 @@ class CondoResidence(models.Model):
 )
 
 
+    def _compute_is_water_reader(self): 
+        for rec in self:
+            rec.is_water_reader = self.env.user.has_group(
+                'condominio_access.group_condo_water_reader'
+            )
     @api.depends('lote','proprietario_id')
     def _compute_name(self):
         for rec in self:           
@@ -141,4 +150,21 @@ class CondoResidence(models.Model):
                 raise ValidationError(
                     _("Já existe uma residência cadastrada no lote %s.") % record.lote
                 )
+    def write(self, vals):
 
+        if self.env.user.has_group(
+            'condominio_access.group_condo_water_reader'
+        ):
+
+            campos_permitidos = {
+                'leitura_agua_ids',
+            }
+
+            campos_invalidos = set(vals.keys()) - campos_permitidos
+
+            if campos_invalidos:
+                raise UserError(
+                    _("Você só pode editar leituras de água.")
+                )
+
+        return super().write(vals)

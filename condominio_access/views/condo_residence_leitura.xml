@@ -7,66 +7,95 @@
 
         <field name="arch" type="xml">
 
-            <xpath expr="//form" position="attributes">
-                <attribute name="groups">
-                    condominio_access.group_condo_water_reader
+            <!-- Campo auxiliar -->
+            <xpath expr="//sheet" position="inside">
+                <field name="is_water_reader" invisible="1"/>
+            </xpath>
+
+            <!-- Readonly -->
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="attrs">
+                    {'readonly': [('is_water_reader', '=', True)]}
                 </attribute>
             </xpath>
 
-            <xpath expr="//field[@name='name']" position="attributes">
-                <attribute name="readonly">1</attribute>
-            </xpath>
-
             <xpath expr="//field[@name='rua']" position="attributes">
-                <attribute name="readonly">1</attribute>
+                <attribute name="attrs">
+                    {'readonly': [('is_water_reader', '=', True)]}
+                </attribute>
             </xpath>
 
             <xpath expr="//field[@name='numero']" position="attributes">
-                <attribute name="readonly">1</attribute>
+                <attribute name="attrs">
+                    {'readonly': [('is_water_reader', '=', True)]}
+                </attribute>
             </xpath>
 
             <xpath expr="//field[@name='lote']" position="attributes">
-                <attribute name="readonly">1</attribute>
+                <attribute name="attrs">
+                    {'readonly': [('is_water_reader', '=', True)]}
+                </attribute>
             </xpath>
 
             <xpath expr="//field[@name='tipo']" position="attributes">
-                <attribute name="readonly">1</attribute>
+                <attribute name="attrs">
+                    {'readonly': [('is_water_reader', '=', True)]}
+                </attribute>
             </xpath>
 
             <xpath expr="//field[@name='moradores']" position="attributes">
-                <attribute name="readonly">1</attribute>
+                <attribute name="attrs">
+                    {'readonly': [('is_water_reader', '=', True)]}
+                </attribute>
             </xpath>
 
             <xpath expr="//field[@name='inquilino_id']" position="attributes">
-                <attribute name="readonly">1</attribute>
+                <attribute name="attrs">
+                    {'readonly': [('is_water_reader', '=', True)]}
+                </attribute>
             </xpath>
 
             <xpath expr="//field[@name='proprietario_id']" position="attributes">
-                <attribute name="readonly">1</attribute>
+                <attribute name="attrs">
+                    {'readonly': [('is_water_reader', '=', True)]}
+                </attribute>
             </xpath>
 
+            <!-- Invisíveis -->
             <xpath expr="//group[@name='visitantes_recorrentes_page']" position="attributes">
-                <attribute name="invisible">1</attribute>
+                <attribute name="attrs">
+                    {'invisible': [('is_water_reader', '=', True)]}
+                </attribute>
             </xpath>
 
             <xpath expr="//page[@name='moradores_page']" position="attributes">
-                <attribute name="invisible">1</attribute>
+                <attribute name="attrs">
+                    {'invisible': [('is_water_reader', '=', True)]}
+                </attribute>
             </xpath>
 
             <xpath expr="//page[@name='visitantes_page']" position="attributes">
-                <attribute name="invisible">1</attribute>
+                <attribute name="attrs">
+                    {'invisible': [('is_water_reader', '=', True)]}
+                </attribute>
             </xpath>
 
             <xpath expr="//page[@name='tags_page']" position="attributes">
-                <attribute name="invisible">1</attribute>
+                <attribute name="attrs">
+                    {'invisible': [('is_water_reader', '=', True)]}
+                </attribute>
             </xpath>
 
             <xpath expr="//page[@name='pets_page']" position="attributes">
-                <attribute name="invisible">1</attribute>
+                <attribute name="attrs">
+                    {'invisible': [('is_water_reader', '=', True)]}
+                </attribute>
             </xpath>
 
             <xpath expr="//page[@name='veiculos_page']" position="attributes">
-                <attribute name="invisible">1</attribute>
+                <attribute name="attrs">
+                    {'invisible': [('is_water_reader', '=', True)]}
+                </attribute>
             </xpath>
 
         </field>

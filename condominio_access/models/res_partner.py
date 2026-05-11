@@ -32,6 +32,10 @@ class ResPartner(models.Model):
         store=True
     )
 
+    data_nascimento = fields.Date(
+        string="Data de Nascimento"
+    )
+
     # @api.depends('condo_residence_ids.partner_ids')
     # def _compute_is_morador(self):
     #     all_morador_ids = self.env['condo.residence'].search([]).mapped('partner_ids.id')

@@ -20,6 +20,10 @@
                 <attribute name="invisible">1</attribute>
             </xpath>
 
+            <field name='category_id' position="after">
+                <field name="data_nascimento"/>
+            </field>
+
             <xpath expr="//notebook" position="inside">
                 <page string="Residências">
                     <field name="is_morador" invisible="1"/>

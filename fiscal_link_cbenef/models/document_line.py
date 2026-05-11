@@ -108,6 +108,8 @@ class DocumentLineMixinMethods(models.AbstractModel):
         for rec in self:
             if not rec.cbenef_id or not rec.icms_cst_id or not rec.fiscal_operation_line_id:
                 continue
+            if rec.fiscal_operation_type == "in":
+                continue
             if rec.ncm_id and not rec.ncm_id.cbenef_id:
                 rec.ncm_id.cbenef_id = rec.cbenef_id.id
             Tax_Definition = rec.env['l10n_br_fiscal.tax.definition']

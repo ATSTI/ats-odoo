@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="fsm_equipment_civil_form" model="ir.ui.view">
+        <field name="name">fsm.equipment.form.inherit</field>
+        <field name="model">fsm.equipment</field>
+        <field name="inherit_id" ref="fieldservice.fsm_equipment_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button
+                    name="account_create_invoice"
+                    string="Gerar Fatura de Cliente"
+                    type="object"
+                    attrs="{'invisible': ['|',('stage_id', '!=', 8), ('customer_invoice', '=', True)]}"
+                    groups="account.group_account_invoice"
+                />
+                <button
+                    name="create_bills"
+                    string="Gerar Fatura de Fornecedor"
+                    type="object"
+                    attrs="{'invisible': ['|',('stage_id', '!=', 8), ('bill_invoice', '=', True)]}"
+                    groups="account.group_account_invoice"
+                />
+            </xpath>
+            <xpath expr="//label[@for='name']" position="before">
+                <div class="oe_button_box" name="button_box" />
+            </xpath>
+            <xpath expr="//field[@name='name']" position="replace">
+                <field name="name" invisible="1"/>
+                <field name="display_name_custom"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button
+                    name="action_view_invoices"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-pencil-square-o"
+                    attrs="{'invisible': [('invoice_count', '=', 0)]}"
+                    groups="account.group_account_invoice"
+                >
+                    <field
+                        name="invoice_count"
+                        widget="statinfo"
+                        string="Clientes/Fornecedores"
+                    />
+                </button>
+            </xpath>
+            <xpath expr="//group[@id='main-right']" position="after">
+                <group string="Informações de Locação">
+                    <field name="product_id"/>
+                    <field name="number_equipment"/>
+                    <field name="date_rental_start"/>
+                    <field name="date_rental_end"/>
+                </group>
+            </xpath>
+            <xpath expr="//group[@id='main-left']" position="replace">
+                <group id="main-left">
+                    <field name="parent_id" invisible="1" />
+                    <field name="person_id" />
+                    <field name="location_id" domain="[('owner_id', '=', partner_id)]" />
+                    <field name="current_location_id" invisible="1"/>
+                </group>
+            </xpath>
+            <xpath expr="//group[@id='main-right']" position="replace">
+                <group id="main-right">
+                    <field name="managed_by_id" domain="[('parent_id', '=', False)]"/>
+                    <field name="owned_by_id" domain="[('parent_id', '=', False)]" />
+                    <field
+                        name="company_id"
+                        options="{'no_create': True}"
+                        groups="base.group_multi_company"
+                    />
+                    <field name="partner_id" domain="[('parent_id', '=', False)]"/>
+                    <field name="bill_invoice" invisible="1"/>
+                    <field name="customer_invoice" invisible="1"/>
+                </group>
+            </xpath>
+            <xpath expr="//notebook" position="replace">
+                <notebook>
+                    <page string="Notes">
+                        <field name="notes" nolabel="1" />
+                    </page>
+                    <page string="Location">
+                        <group>
+                            <group>
+                                <field name="territory_id" />
+                                <field name="branch_id" />
+                                <field name="district_id" />
+                                <field name="region_id" />
+                            </group>
+                        </group>
+                    </page>
+                    <page string="Trocas" groups="fieldservice.group_fsm_manager">
+                        <field name="child_ids">
+                            <tree editable="bottom">
+                                <field name="product_id"/>
+                                <field name="number_equipment"/>
+                                <field name="date_rental_start"/>
+                                <field name="date_rental_end"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="fsm_equipment_civil_kanban" model="ir.ui.view">
+        <field name="name">fsm.equipment.kanban.inherit</field>
+        <field name="model">fsm.equipment</field>
+        <field name="inherit_id" ref="fieldservice.fsm_equipment_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="replace">
+                <kanban default_group_by="stage_id" class="o_kanban_small_column">
+                    <field name="display_name_custom"/>
+                    <div class="o_row">
+                        <field name="date_rental_start"/>
+                        <field name="date_rental_end"/>
+                    </div>
+                    <field name="location_id"/>
+                    <field name="person_id"/>
+                    <field name="color"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color.raw_value)} oe_kanban_card oe_kanban_global_click">
+                                <div class="o_dropdown_kanban dropdown">
+                                    <a role="button" class="dropdown-toggle o-no-caret btn" data-toggle="dropdown" href="#" aria-label="Dropdown menu" title="Dropdown menu">
+                                        <span class="fa fa-ellipsis-v"/>
+                                    </a>
+                                    <div class="dropdown-menu" role="menu">
+                                        <a t-if="widget.editable" role="menuitem" type="edit" class="dropdown-item">Edit
+                                        </a>
+                                        <a t-if="widget.deletable" role="menuitem" type="delete" class="dropdown-item">Delete
+                                        </a>
+                                        <div role="separator" class="dropdown-divider"/>
+                                        <ul class="oe_kanban_colorpicker" data-field="color"/>
+                                    </div>
+                                </div>
+                                <div class="oe_kanban_content">
+                                    <div>
+                                        <strong class="o_kanban_record_title">
+                                            <field name="display_name_custom"/>
+                                        </strong>
+                                    </div>
+                                    <div class="o_row">
+                                        <field name="date_rental_start"/>
+                                        <span> - </span>
+                                        <field name="date_rental_end"/>
+                                    </div>
+                                    <div>
+                                        <field name="location_id"/>
+                                    </div>
+                                    <div>
+                                        <field name="person_id"/>
+                                    </div>
+                                </div>
+                                <div class="oe_clear"/>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- SOBRESCREVENDO PRO KANBAN SER A PRIMEIRA TELA -->
+    <record id="fieldservice.action_fsm_dash_equipment" model="ir.actions.act_window">
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_id" ref="fsm_equipment_civil_kanban"/>
+    </record>
+
+    <record id="fsm_equipment_civil_search" model="ir.ui.view">
+        <field name="name">fsm.equipment.search.inherit</field>
+        <field name="model">fsm.equipment</field>
+        <field name="inherit_id" ref="fieldservice.fsm_equipment_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="replace">
+                <search string="Equipments">
+                    <field name="display_name_custom" />
+                    <field name="partner_id" />
+                    <field name="location_id" />
+                    <field name="number_equipment" />
+                    <field name="product_id" />
+                    <field name="person_id" string="Trabalhador"/>
+                    <group expand="0" string="Group By">
+                        <filter
+                            name="partner_id"
+                            string="Cliente"
+                            domain=""
+                            context="{'group_by':'partner_id'}"
+                        />
+                        <filter
+                            name="location_id"
+                            string="Local Atribuido"
+                            domain=""
+                            context="{'group_by':'location_id'}"
+                        />
+                        <filter
+                            name="number_equipment"
+                            string="Numero do Equipamento"
+                            domain=""
+                            context="{'group_by':'number_equipment'}"
+                        />
+                        <filter
+                            name="person_id"
+                            string="Trabalhador"
+                            domain=""
+                            context="{'group_by':'person_id'}"
+                        />
+                    </group>
+                </search>
+            </xpath>
+        </field>
+    </record>
+    <record id="fsm_equipment_civil_tree" model="ir.ui.view">
+        <field name="name">fsm.equipment.tree.inherit</field>
+        <field name="model">fsm.equipment</field>
+        <field name="inherit_id" ref="fieldservice.fsm_equipment_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="replace">
+                <tree>
+                    <field name="name" invisible="1" />
+                    <field name="display_name_custom" />
+                    <field name="partner_id" />
+                    <field name="location_id" />
+                    <field name="current_location_id" invisible="1" />
+                    <field name="number_equipment" />
+                    <field name="person_id" />
+                    <field name="company_id" groups="base.group_multi_company" />
+                    <field name="stage_id" />
+                </tree>
+            </xpath>
+        </field>
+    </record>
+</odoo>

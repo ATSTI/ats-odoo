@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="product_template_rental_form" model="ir.ui.view">
+        <field name="name">product.template.form.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//label[@for='purchase_ok']" position="after">
+                <label for="is_rental" string="É para Locação?"/>
+                <field name="is_rental"/>
+            </xpath>
+            <xpath expr="//group[@name='group_standard_price']" position="after">
+                <group string="Informações de Locação" attrs="{'invisible': [('is_rental', '=', False)]}">
+                    <field name="rental_price"/>
+                    <field name="rental_duration"/>
+                    <field name="owner_value_type"/>
+                    <field name="owner_value_rate" />
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

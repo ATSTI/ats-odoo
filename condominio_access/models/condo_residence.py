@@ -83,10 +83,6 @@ class CondoResidence(models.Model):
     string="Proprietário"
 )
 
-    total_agua = fields.Float(
-    string="Total Água",
-    compute="_compute_total_agua",)
-
 
     visitantes_recorrentes_ids = fields.One2many(
     "condo.recurring.visitor",
@@ -112,11 +108,6 @@ class CondoResidence(models.Model):
         for rec in residences:
             rec._compute_name()
 
-
-    @api.depends('leitura_agua_ids.valor_conta')
-    def _compute_total_agua(self):
-        for rec in self:
-            rec.total_agua = sum(rec.leitura_agua_ids.mapped('valor_conta'))
 
     @api.onchange('inquilino_id')
     def _onchange_inquilino_id(self):
@@ -168,3 +159,15 @@ class CondoResidence(models.Model):
                 )
 
         return super().write(vals)
+    
+    def action_open_water_report_wizard(self):
+        return {
+            "type": "ir.actions.act_window",
+            "name": "Relatórios Água",
+            "res_model": "condo.water.report.wizard",
+            "view_mode": "form",
+            "target": "new",
+            "context": {
+                "default_residence_id": self.id,
+            }
+        }   

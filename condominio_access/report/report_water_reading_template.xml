@@ -1,0 +1,172 @@
+<odoo>
+
+    <template id="report_water_reading_template">
+
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+
+                <div class="page">
+
+                    <h2 style="text-align:center;">
+                        Relatório de Leituras de Água
+                    </h2>
+
+                    <br/>
+
+                    <t t-set="total_consumo" t-value="0"/>
+                    <t t-set="total_valor" t-value="0"/>
+
+                    <table class="table table-sm table-bordered">
+
+                        <thead>
+
+                            <tr>
+                                <th>Residência</th>
+                                <th>Data Referência</th>
+                                <th>Leitura Anterior</th>
+                                <th>Leitura Atual</th>
+                                <th>Consumo</th>
+                                <th>Valor</th>
+                                <th>Observação</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+                            <t t-foreach="docs" t-as="leitura">
+
+                                <t t-if="leitura.exists()">
+
+                                    <t t-set="total_consumo"
+                                       t-value="total_consumo + (leitura.consumo or 0)"/>
+
+                                    <t t-set="valor_calculado"
+                                       t-value="(leitura.consumo or 0) * metro"/>
+
+                                    <t t-set="valor_final"
+                                       t-value="35 if valor_calculado &lt; 35 else valor_calculado"/>
+
+                                    <t t-set="total_valor"
+                                       t-value="total_valor + valor_final"/>
+
+                                    <tr>
+
+                                        <td>
+
+                                            <t t-if="leitura.residence_id and leitura.residence_id.exists()">
+                                                <span t-field="leitura.residence_id"/>
+                                            </t>
+
+                                            <t t-else="">
+                                                <span>Residência removida</span>
+                                            </t>
+
+                                        </td>
+
+                                        <td>
+
+                                            <t t-if="leitura.data_referencia">
+                                                <span t-field="leitura.data_referencia"/>
+                                            </t>
+
+                                        </td>
+
+                                        <td>
+
+                                            <t t-if="leitura.anterior is not None">
+                                                <span t-field="leitura.anterior"/>
+                                            </t>
+
+                                        </td>
+
+                                        <td>
+
+                                            <t t-if="leitura.atual is not None">
+                                                <span t-field="leitura.atual"/>
+                                            </t>
+
+                                        </td>
+
+                                        <td>
+
+                                            <t t-if="leitura.consumo is not None">
+                                                <span t-field="leitura.consumo"/> m³
+                                            </t>
+
+                                        </td>
+
+                                        <td>
+
+                                            <strong>
+                                                R$
+                                                <t t-esc="'%.2f' % valor_final"/>
+                                            </strong>
+
+                                        </td>
+
+                                        <td>
+
+                                            <t t-if="leitura.obs">
+                                                <span t-field="leitura.obs"/>
+                                            </t>
+
+                                            <t t-else="">
+                                                <span>-</span>
+                                            </t>
+
+                                        </td>
+
+                                    </tr>
+
+                                </t>
+
+                            </t>
+
+                        </tbody>
+
+                        <tfoot>
+                            <tr>
+
+                                <td colspan="4">
+                                    <strong>Total Consumido</strong>
+                                </td>
+
+                                <td colspan="3">
+
+                                    <strong>
+                                        <t t-esc="'%.2f' % total_consumo"/>
+                                    </strong>
+
+                                </td>
+
+                            </tr>
+
+                            <tr>
+
+                                <td colspan="4">
+                                    <strong>Total em R$</strong>
+                                </td>
+
+                                <td colspan="3">
+
+                                    <strong>
+                                        R$
+                                        <t t-esc="'%.2f' % total_valor"/>
+                                    </strong>
+
+                                </td>
+
+                            </tr>
+
+                        </tfoot>
+
+                    </table>
+
+                </div>
+
+            </t>
+        </t>
+
+    </template>
+
+</odoo>

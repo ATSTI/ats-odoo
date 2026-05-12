@@ -63,7 +63,7 @@
             <xpath expr="//group[@id='main-right']" position="replace">
                 <group id="main-right">
                     <field name="managed_by_id" domain="[('parent_id', '=', False)]"/>
-                    <field name="owned_by_id" domain="[('parent_id', '=', False)]" />
+                    <field name="owned_by_id" domain="[('parent_id', '=', False)]" required="1"/>
                     <field
                         name="company_id"
                         options="{'no_create': True}"
@@ -230,5 +230,38 @@
                 </tree>
             </xpath>
         </field>
+    </record>
+
+    <record id="report_rental_summary_prt_act" model="ir.actions.report">
+        <field name="name">Relatório de Locações (Cliente)</field>
+        <field name="model">fsm.equipment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">rental_civil_construction.report_rental_summary_prt</field>
+        <field name="report_file">rental_civil_construction.report_rental_summary_prt</field>
+        <field name="binding_model_id" ref="fieldservice.model_fsm_equipment"/>
+    </record>
+    <record id="report_rental_summary_neq_act" model="ir.actions.report">
+        <field name="name">Relatório de Locações (Nº Equip)</field>
+        <field name="model">fsm.equipment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">rental_civil_construction.report_rental_summary_neq</field>
+        <field name="report_file">rental_civil_construction.report_rental_summary_neq</field>
+        <field name="binding_model_id" ref="fieldservice.model_fsm_equipment"/>
+    </record>
+    <record id="report_rental_summary_loc_act" model="ir.actions.report">
+        <field name="name">Relatório de Locações (Local)</field>
+        <field name="model">fsm.equipment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">rental_civil_construction.report_rental_summary_loc</field>
+        <field name="report_file">rental_civil_construction.report_rental_summary_loc</field>
+        <field name="binding_model_id" ref="fieldservice.model_fsm_equipment"/>
+    </record>
+    <record id="report_rental_summary_stg_act" model="ir.actions.report">
+        <field name="name">Relatório de Locações (Estagio)</field>
+        <field name="model">fsm.equipment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">rental_civil_construction.report_rental_summary_stg</field>
+        <field name="report_file">rental_civil_construction.report_rental_summary_stg</field>
+        <field name="binding_model_id" ref="fieldservice.model_fsm_equipment"/>
     </record>
 </odoo>

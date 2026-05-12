@@ -16,10 +16,8 @@ class AccountMove(models.Model):
     fsm_equipment_count = fields.Integer(
         string="FSM Equipment", compute="_compute_fsm_equipment_ids"
     )
-    location_id = fields.Many2one(
-        "fsm.location",
-        string="Location",
-    )
+
+    move_tag_ids = fields.Many2many(comodel_name="res.partner.category", related="partner_id.category_id", string="Marcadores")
 
     @api.depends("line_ids")
     def _compute_fsm_equipment_ids(self):

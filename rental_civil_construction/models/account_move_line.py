@@ -16,3 +16,8 @@ class AccountMoveLine(models.Model):
         readonly=True,
         copy=False,
     )
+
+    location_id = fields.Many2one(
+        "fsm.location",
+        string="Location",
+    )

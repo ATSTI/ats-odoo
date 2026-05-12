@@ -14,14 +14,14 @@ ACCOUNT_STAGES = [
 class FSMEquipment(models.Model):
     _inherit = 'fsm.equipment'
 
-    date_rental_start = fields.Date(string='Data de Início da Locação')
+    date_rental_start = fields.Date(string='Data de Início da Locação', required=True)
     date_rental_end = fields.Date(string='Data de Término da Locação')
 
     product_id = fields.Many2one('product.product', string='Produto', required=True, domain="[('is_rental', '=', True)]")
     partner_id = fields.Many2one('res.partner', string='Parceiro', required=True)
 
     display_name_custom = fields.Char(string="Descrição")
-    number_equipment = fields.Char(string='Número do Equipamento',)
+    number_equipment = fields.Char(string='Número do Equipamento', required=True)
 
     account_stage = fields.Selection(
         ACCOUNT_STAGES,
@@ -202,30 +202,40 @@ class FSMEquipment(models.Model):
             if move_type == "out_invoice"
             else accounts["expense"]
         )
-
-        qty = len(self.child_ids) + 1
-        
         price_unit = (
             self.product_id.rental_price
             if move_type == "out_invoice"
             else self.calculate_owner_value()
         )
 
-        return [
-            (
-                0,
-                0,
-                {
-                    "product_id": self.product_id.id,
+        invoice_line = []
+        #CRIANDO LINHA DE FATURA PARA O EQUIPAMENTO PRINCIPAL
+        invoice_line.append(
+            (0, 0, {
+                "product_id": self.product_id.id,
+                "quantity": 1,
+                "name": f"{self.date_rental_start} - {self.date_rental_end} ({self.number_equipment or ''})",
+                "price_unit": price_unit,
+                "account_id": account.id,
+                "fsm_equipment_ids": [(4, self.id)],
+                "location_id": self.location_id.id,
+            })
+        )
+
+        for child in self.child_ids:
+            invoice_line.append(
+                (0, 0, {
+                    "product_id": child.product_id.id,
                     "quantity": 1,
-                    "name": self.product_id.display_name,
+                    "name": f"{child.date_rental_start} - {child.date_rental_end} ({child.number_equipment or ''})",
                     "price_unit": price_unit,
                     "account_id": account.id,
-                    "fsm_equipment_ids": [(4, self.id)],
-                },
+                    "fsm_equipment_ids": [(4, child.id)],
+                    "location_id": child.location_id.id,
+                })
             )
-            for _ in range(qty)
-        ]
+
+        return invoice_line
 
     def calculate_owner_value(self):
         if self.product_id.owner_value_type == 'percent':
@@ -246,7 +256,6 @@ class FSMEquipment(models.Model):
             "company_id": self.env.company.id,
             "user_id": self.managed_by_id.id or self.env.uid,
             "invoice_line_ids": self._prepare_invoice_lines("in_invoice"),
-            "location_id": self.location_id.id,
         }
 
     def create_bills(self):
@@ -285,7 +294,7 @@ class FSMEquipment(models.Model):
             "company_id": self.env.company.id,
             "user_id": self.managed_by_id.id or self.env.uid,
             "invoice_line_ids": self._prepare_invoice_lines("out_invoice"),
-            "location_id": self.location_id.id,
+            "narration": self.notes,
         }
 
 

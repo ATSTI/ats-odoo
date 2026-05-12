@@ -9,10 +9,7 @@ import logging
 from unicodedata import normalize
 from odoo import http, fields
 from odoo.http import request
-import os
-from dotenv import load_dotenv
 
-load_dotenv()
 logger = logging.getLogger(__name__)
 
 
@@ -25,10 +22,11 @@ class ConsultaPendencia(http.Controller):
             return request.make_json_response({"error": "company_name é obrigatório"}, status=400)
 
         env = request.env
+        company = request.env.company
         cmp_name = normalize('NFKD', company_name).encode('ASCII', 'ignore').decode('ASCII')
         partner = env['res.partner'].sudo().search(['|', ('name', 'ilike', cmp_name),('cnpj_cpf_stripped', '=', company_vat)], limit=1)
         if not partner:
-            return {"error": "Parceiro não encontrado."}
+            return request.make_json_response({"error": "Parceiro não encontrado."}, status=404)
 
         hoje = datetime.now()
         inicio = hoje.replace(day=1)
@@ -39,21 +37,29 @@ class ConsultaPendencia(http.Controller):
             ('partner_id', '=', partner.id), 
             ('state', '=', 'posted'), 
             ('payment_state', '!=', 'paid'),
-            ('invoice_date', '>=', inicio),
-            ('invoice_date', '<=', fim),
-            ('invoice_date_due', '<=', fields.Date.today())
+            ('invoice_date_due', '>=', inicio),
+            ('invoice_date_due', '<=', fim),
+            ('move_type', 'in', ['out_invoice', 'out_refund']),
         ])
         pendencias_data = []
+        msg = company.notify_customers if company.notify else ""
+        if msg:
+            pendencias_data.append({
+                'pending': False,
+                'mensagem': msg,
+            })
+            return request.make_json_response({
+                "pendencias": pendencias_data
+            })
         for move in pendencias:
             date_now = fields.Date.today()
-            date_due_limit = move.invoice_date_due + timedelta(days=3)
-            msg = ""
-            if date_now < date_due_limit:
-                msg = f"""Não verificamos o seu pagamento. Por favor, contate o financeiro, whatsapp: 1997104-0941\n
-                   Seu sistema será bloqueado em {(date_due_limit - date_now).days} dia(s)"""
-            if date_now >= date_due_limit:
-                msg = f"""Não verificamos o seu pagamento. Por favor, contate o financeiro, whatsapp: 1997104-0941\n
-                   SEU SISTEMA ESTÁ BLOQUEADO!!!"""
+            date_due_limit = move.invoice_date_due + timedelta(days=company.days_to_notify)
+            if date_now < date_due_limit and date_now >= move.invoice_date_due:
+                msg = f"""Por favor, contate o financeiro da ATS, whatsapp: {company.mobile}\n
+                Seu sistema será interrompido em {(date_due_limit - date_now).days} dia(s)"""
+            elif date_now >= date_due_limit:
+                msg = f"""Por favor, contate o financeiro da ATS, whatsapp: {company.mobile}\n
+                SEU SISTEMA ESTÁ BLOQUEADO!!!"""
             if msg:
                 pendencias_data.append({
                     'pending': True,

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2018 Aitor Bouzas <aitor.bouzas@adaptivecity.com>
+     License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl). -->
+<odoo>
+    <record id="view_company_form_notify_inherit" model="ir.ui.view">
+        <field name="name">res.company.form.notify.modif.inherit</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='color']" position="after">
+                <field name="days_to_notify" />
+                <field name="notify" />
+                <field name="notify_customers" invisible="notify == False" />
+            </xpath>
+        </field>
+    </record>
+</odoo>

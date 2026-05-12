@@ -19,7 +19,9 @@ no cadastro de clientes/fornecedores.
     'maintainer': 'Mauricio-ATS, ATSTi',
     'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['base', 'account', 'website'],
-    'data': [],
+    'data': [
+        'views/res_company.xml',
+    ],
     'installable': True,
     'application': False,
 }

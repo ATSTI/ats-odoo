@@ -1,6 +1,31 @@
 odoo.define('pending_payments.action_patch', function (require) {
     'use strict';
 
+    // Primeira vez da sessão
+    if (!sessionStorage.getItem('pending_assets_reload')) {
+
+        sessionStorage.setItem('pending_assets_reload', '1');
+
+        // Espera o Odoo terminar de montar a tela
+        const wait = setInterval(() => {
+
+            const navbar = document.querySelector('.o_main_navbar');
+
+            if (navbar) {
+
+                clearInterval(wait);
+
+                console.log('RECARREGANDO O ODOO');
+
+                // Pequeno delay extra
+                setTimeout(() => {
+                    window.location.reload();
+                }, 300);
+            }
+
+        }, 200);
+    }
+
     const WebClient = require('web.WebClient');
     const rpc = require('web.rpc');
     const session = require('web.session');
@@ -9,7 +34,7 @@ odoo.define('pending_payments.action_patch', function (require) {
 
     WebClient.include({
 
-        show_application() {
+        start() {
             return this._super(...arguments).then(() => {
                 return this._checkPendingPayment();
             });
@@ -17,19 +42,12 @@ odoo.define('pending_payments.action_patch', function (require) {
 
         _checkPendingPayment() {
 
-            // Garante que a sessão já tem dados de empresa
-            const companies = session.user_companies;
+            const companyId = session.user_context?.allowed_company_ids?.[0];
 
-
-            if (!companies || !companies.current_company) {
-                console.warn('[PendingPayment] session.user_companies não disponível');
+            if (!companyId) {
+                console.warn('[PendingPayment] companyId ainda não disponível');
                 return Promise.resolve();
             }
-
-            // No Odoo 14, current_company é [id, nome]
-            const companyId = Array.isArray(companies.current_company)
-                ? companies.current_company[0]
-                : companies.current_company;
 
             return rpc.query({
                 model: 'res.company',
@@ -41,7 +59,7 @@ odoo.define('pending_payments.action_patch', function (require) {
                 if (result && result[0] && result[0].mensage_pai) {
                     var title = ''
                     if (result[0].payment_pending) {
-                        title = 'Pagamento pendente'
+                        title = 'Controle Sistema'
                     }
                     else {
                         title = 'Aviso'

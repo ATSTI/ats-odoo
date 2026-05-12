@@ -1,0 +1,22 @@
+<odoo>
+    <record id="action_report_dica_locacao_fatura" model="ir.actions.report">
+        <field name="name">Impressão locacao caçamba - Dica LTDA</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">report_cacamba.report_locacao_dica</field>
+        <field name="report_file">report_cacamba.report_locacao_dica</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record>
+
+
+      <record id="action_report_dica_locacao_fatura2" model="ir.actions.report">
+        <field name="name">Impressão locacao caçamba - Lillo Eireli</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">report_cacamba.report_locacao_lilio</field>
+        <field name="report_file">report_cacamba.report_locacao_lilio</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

@@ -1,0 +1,538 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_locacao_dica" name="Relatório de Locação - Dica LTDA">
+        <t t-call="web.external_layout">
+            <main>
+                <t t-foreach="docs" t-as="o">
+                    <div class="page" style="font-family: Arial, Helvetica, sans-serif; color:#222;">
+                        <style>
+
+                            .nf-wrapper{
+                                width: 100%;
+                                padding: 10px 15px;
+                                font-size: 12px;
+                            }
+
+                            .box{
+                                border: 1px solid #333;
+                                border-radius: 10px;
+                                overflow: hidden;
+                            }
+
+                            .header-table{
+                                width: 100%;
+                                border-collapse: collapse;
+                            }
+
+                            .header-table td{
+                                vertical-align: top;
+                            }
+
+                            .left-company{
+                                width: 52%;
+                                border-right: 1px solid #333;
+                                padding: 18px 12px 10px 12px;
+                                text-align: center;
+                                height: 150px;
+                            }
+
+                            .right-invoice{
+                                width: 48%;
+                                padding: 8px 10px;
+                                height: 150px;
+                            }
+
+                            .company-name{
+                                font-size: 20px;
+                                margin-bottom: 10px;
+                            }
+
+                            .company-phone{
+                                font-size: 34px;
+                                font-weight: bold;
+                                margin-bottom: 5px;
+                            }
+
+                            .company-small{
+                                font-size: 12px;
+                                line-height: 16px;
+                            }
+
+                            .invoice-title{
+                                font-size: 30px;
+                                font-weight: bold;
+                                line-height: 28px;
+                            }
+
+                            .invoice-subtitle{
+                                font-size: 18px;
+                                margin-top: -2px;
+                                margin-bottom: 8px;
+                            }
+
+                            .invoice-number{
+                                float: right;
+                                font-size: 26px;
+                                font-weight: bold;
+                                margin-top: -40px;
+                            }
+
+                            .line-field{
+                                border-bottom: 1px solid #444;
+                                min-height: 18px;
+                                line-height: 18px;
+                                margin-top: 2px;
+                            }
+
+                            .label{
+                                font-size: 11px;
+                                color: #333;
+                            }
+
+                            .value{
+                                font-size: 12px;
+                                font-weight: bold;
+                            }
+
+                            .row{
+                                width: 100%;
+                                display: table;
+                                table-layout: fixed;
+                            }
+
+                            .col{
+                                display: table-cell;
+                                vertical-align: top;
+                            }
+
+                            .mt5{ margin-top:5px; }
+                            .mt8{ margin-top:8px; }
+                            .mt10{ margin-top:10px; }
+
+                            .client-box{
+                                margin-top: 8px;
+                            }
+
+                            .client-header{
+                                text-align: center;
+                                font-size: 11px;
+                                letter-spacing: 2px;
+                                font-weight: bold;
+                                border-bottom: 1px solid #333;
+                                padding: 4px;
+                            }
+
+                            .client-content{
+                                padding: 8px;
+                            }
+
+                            .service-table{
+                                width: 100%;
+                                border-collapse: collapse;
+                                table-layout: fixed;
+                            }
+
+                            .service-table th{
+                                border: 1px solid #333;
+                                background: #d9d9d9;
+                                font-size: 11px;
+                                padding: 3px;
+                                text-align: center;
+                            }
+
+                            .service-table td{
+                                border: 1px solid #333;
+                                height: 26px;
+                                padding: 2px 5px;
+                                font-size: 11px;
+                            }
+
+                            .center{
+                                text-align:center;
+                            }
+
+                            .service-desc{
+                                padding-left: 10px !important;
+                                line-height: 18px;
+                            }
+
+                            .gray{
+                                background: #e5e5e5;
+                            }
+
+                            .footer-observation{
+                                font-size: 9px;
+                                line-height: 12px;
+                                padding: 5px;
+                            }
+
+                            .total-label{
+                                text-align: right;
+                                font-size: 18px;
+                                font-weight: bold;
+                            }
+
+                            .total-value{
+                                width: 180px;
+                                text-align: center;
+                                font-size: 22px;
+                                font-weight: bold;
+                            }
+
+                            .receipt-box{
+                                margin-top: 40px;
+                                padding: 10px;
+                                height: 110px;
+                            }
+
+                            .receipt-number{
+                                float:right;
+                                font-size:22px;
+                                font-weight:bold;
+                            }
+
+                            .signature-line{
+                                border-bottom:1px solid #333;
+                                width:180px;
+                                display:inline-block;
+                                height:16px;
+                            }
+
+                        </style>
+                        <div class="nf-wrapper">
+                            <div class="box">
+                                <table class="header-table">
+                                    <tr>
+                                        <td class="left-company">
+                                            <div class="company-name">
+                                                Dica Locacao LTDA
+                                            </div>
+
+                                            <div class="company-phone">
+                                                ☎ (11) 983010182
+                                            </div>
+
+                                            <div class="company-small">
+                                                e-mail: marcidca@gmail.com
+                                                <br/>
+                                                www.dicalocacao.com.br
+                                                <br/><br/>
+                                                Rua Tnente Americo Moretti, 670 sala 15 - CEP. 04372-064
+                                                <br/>
+                                                Vila Santa Catarina - São Paulo - SP
+                                            </div>
+                                        </td>
+                                        <td class="right-invoice">
+
+                                            <div class="invoice-title">
+                                                FATURA DE SERVIÇOS
+                                            </div>
+
+                                            <div class="invoice-subtitle">
+                                                (Não Tributados)
+                                            </div>
+
+                                            <div class="invoice-number">
+                                                Nº
+                                                <span t-esc="o.name.replace('/','') if o.name else '0000'"/>
+                                            </div>
+
+                                            <div class="mt10">
+                                                Rua Tnente Americo Moretti, 670 sala 15 - CEP. 04372-064
+                                            </div>
+
+                                            <div class="row mt5">
+
+                                                <div class="col" style="width:55%;">
+                                                    Município de São Paulo
+                                                </div>
+
+                                                <div class="col">
+                                                    Estado de São Paulo
+                                                </div>
+
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col" style="width:55%;">
+                                                    CNPJ(MF) 04.648.863/0001-20
+                                                </div>
+
+                                                <div class="col">
+                                                    Inscr. CCM:
+                                                </div>
+
+                                            </div>
+
+                                            <div class="mt8">
+                                                Natureza da Operação:
+                                                <span class="value">
+                                                    Prestação de Serviço
+                                                </span>
+                                            </div>
+
+                                            <div class="line-field">
+                                                Prestação de Serviços de:
+                                                <span class="value">
+                                                    Locação
+                                                </span>
+                                            </div>
+
+                                            <div class="mt8">
+                                                Data da Emissão:
+
+                                                <span class="value" style="margin-left:15px;">
+                                                    <t t-esc="o.invoice_date.strftime('%d') if o.invoice_date else ''"/>
+                                                </span>
+
+                                                /
+
+                                                <span class="value">
+                                                    <t t-esc="o.invoice_date.strftime('%m') if o.invoice_date else ''"/>
+                                                </span>
+
+                                                /
+
+                                                <span class="value">
+                                                    <t t-esc="o.invoice_date.strftime('%Y') if o.invoice_date else ''"/>
+                                                </span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="box client-box">
+
+                                <div class="client-header">
+                                    USUÁRIO FINAL OU DESTINATÁRIO
+                                </div>
+
+                                <div class="client-content">
+
+                                    <div class="row">
+
+                                        <div class="col">
+                                            <span class="label">Nome:</span>
+
+                                            <span class="line-field value">
+                                                <span t-field="o.partner_id.name"/>
+                                            </span>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row mt5">
+
+                                        <div class="col" style="width:65%;">
+                                            <span class="label">Endereço:</span>
+
+                                            <span class="line-field value">
+                                                <span t-esc="o.partner_id.street or ''"/>
+                                            </span>
+                                        </div>
+
+                                        <div class="col" style="padding-left:10px;">
+                                            <span class="label">CEP:</span>
+
+                                            <span class="line-field value">
+                                                <span t-esc="o.partner_id.zip or ''"/>
+                                            </span>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row mt5">
+                                        <div class="col" style="width:50%;">
+                                            <span class="label">Município:</span>
+                                            <span class="line-field value">
+                                                <span t-esc="o.partner_id.city or ''"/>
+                                            </span>
+                                        </div>
+                                        <div class="col" style="width:20%; padding-left:10px;">
+                                            <span class="label">Estado:</span>
+                                            <span class="line-field value">
+                                                <span t-esc="o.partner_id.state_id.code or ''"/>
+                                            </span>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row mt5">
+                                        <div class="col" style="width:55%;">
+                                            <span class="label">Inscr. CNPJ/CPF(MF) Nº:</span>
+                                            <span class="line-field value">
+                                                <span t-esc="o.partner_id.vat or ''"/>
+                                            </span>
+                                        </div>
+                                        <div class="col" style="padding-left:10px;">
+                                            <span class="label">Inscr. Estadual Nº:</span>
+                                            <span class="line-field value">
+                                                Isenta
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="row mt5">
+
+                                        <div class="col" style="width:60%;">
+                                            <span class="label">Condições de Pagamento:</span>
+
+                                            <span class="line-field value">
+                                                <t t-if="o.invoice_date_due">
+                                                    vencimento
+                                                    <span t-esc="o.invoice_date_due.strftime('%d/%m/%Y')"/>
+                                                </t>
+                                            </span>
+                                        </div>
+
+                                        <div class="col" style="padding-left:10px;">
+                                            <span class="label">Inscr. CCM:</span>
+
+                                            <span class="line-field value"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box mt10">
+
+                                <table class="service-table">
+
+                                    <thead>
+
+                                        <tr>
+
+                                            <th style="width:7%;">
+                                                Unid.
+                                            </th>
+
+                                            <th style="width:8%;">
+                                                Quant.
+                                            </th>
+
+                                            <th style="width:53%;">
+                                                DESCRIÇÃO DOS SERVIÇOS
+                                            </th>
+
+                                            <th colspan="2">
+                                                P R E Ç O
+                                            </th>
+
+                                        </tr>
+
+                                        <tr>
+
+                                            <th class="gray"></th>
+                                            <th class="gray"></th>
+                                            <th class="gray"></th>
+
+                                            <th style="width:16%;">
+                                                Unitário
+                                            </th>
+
+                                            <th style="width:16%;">
+                                                TOTAL
+                                            </th>
+
+                                        </tr>
+
+                                    </thead>
+
+                                    <tbody>
+
+                                        <t t-set="line_count" t-value="0"/>
+
+                                        <t t-foreach="o.invoice_line_ids" t-as="line">
+
+                                            <t t-set="line_count" t-value="line_count + 1"/>
+
+                                            <tr>
+
+                                                <td class="center">
+                                                    01
+                                                </td>
+
+                                                <td class="center">
+                                                    <span t-field="line.quantity"/>
+                                                </td>
+
+                                                <td class="service-desc">
+                                                    <span t-field="line.name"/>
+                                                </td>
+
+                                                <td class="center">
+                                                    <span t-esc="'{:,.2f}'.format(line.price_unit).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
+                                                </td>
+
+                                                <td class="center">
+                                                    <span t-esc="'{:,.2f}'.format(line.price_subtotal).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
+                                                </td>
+
+                                            </tr>
+
+                                        </t>
+
+                                        <t t-foreach="range(15 - line_count if line_count &lt; 15 else 0)" t-as="i">
+
+                                            <tr>
+                                                <td> </td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+
+                                        </t>
+
+                                        <tr>
+
+                                            <td colspan="3" class="footer-observation">
+                                                Isento de Autorização conforme Portaria SF nº 074/2003 de 21/10/2003
+                                                <br/>
+                                                Desobrigado de emissão de nota fiscal.
+                                            </td>
+
+                                            <td class="total-label">
+                                                VALOR TOTAL DA FATURA R$
+                                            </td>
+
+                                            <td class="total-value">
+                                                <span t-esc="'{:,.2f}'.format(o.amount_total).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="box receipt-box">
+
+                                <div class="receipt-number">
+                                    Nº
+                                    <span t-esc="o.name.replace('/','') if o.name else '0000'"/>
+                                </div>
+
+                                <div style="font-size:13px;">
+
+                                    Recebi(emos) de <strong>Dica Locacao Ltda</strong>,
+                                    <br/>
+                                    os serviços prestados constantes da Fatura de Serviços.
+
+                                </div>
+                                <div style="margin-top:40px; font-size:12px;">
+
+                                    São Paulo,
+                                    <span class="signature-line"></span>
+
+                                    de
+
+                                    <span class="signature-line" style="width:120px;"></span>
+
+                                    de 20
+
+                                    <span class="signature-line" style="width:40px;"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </main>
+        </t>
+    </template>
+</odoo>

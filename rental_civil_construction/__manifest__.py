@@ -25,6 +25,7 @@ facilitando a administração e o acompanhamento dos processos de locação.
     'license': 'AGPL-3',
     'depends': ['base_setup', 'web', 'l10n_br_account', 'fieldservice'],
     'data': [
+        'report/report_rental_summary.xml',
         'views/product.xml',
         'views/equipment_views.xml',
         'views/account_move.xml',

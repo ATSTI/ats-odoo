@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_rental_summary_prt">
+        <t t-call="web.html_container">
+            <t t-set="docs" t-value="docs.with_context({'lang':docs.partner_id[0].lang})"/>
+            <meta charset="utf-8"/>
+            <div class="page">
+                <h1>Relatório de Locações</h1>
+                <!-- ═══════════════════════════════════════════════
+                     SEÇÃO 1 — AGRUPADO POR CLIENTE
+                ════════════════════════════════════════════════ -->
+                <h2 style="margin-top:24px; border-bottom:2px solid #555; padding-bottom:4px;">Por Cliente</h2>
+                <t t-set="clientes" t-value="docs.mapped('partner_id').sorted(key=lambda r: r.name)"/>
+                <t t-foreach="clientes" t-as="cliente">
+                    <div style="page-break-inside: avoid;">
+                        <h3 style="margin-top:16px; color:#333;">
+                            <span t-esc="cliente.name"/>
+                        </h3>
+                        <table style="border:1px solid #dcdcdc; width:100%; font-size:14px; background-color:#e7e7e7; margin-bottom:8px;">
+                            <tr>
+                                <td style="border:1px solid; text-align:left;  width:40%; height:28px;"><b> Aluguel </b></td>
+                                <td style="border:1px solid; text-align:center; width:10%; height:28px;"><b> Nº Equip </b></td>
+                                <td style="border:1px solid; text-align:left;  width:30%; height:28px;"><b> Localização </b></td>
+                                <td style="border:1px solid; text-align:center; width:20%; height:28px;"><b> Estágio </b></td>
+                            </tr>
+                            <t t-foreach="docs.filtered(lambda r: r.partner_id.id == cliente.id)" t-as="o">
+                                <tr>
+                                    <td style="border:1px solid; text-align:left;  width:40%; height:28px;"><b><span t-esc="o.product_id.name"/></b></td>
+                                    <td style="border:1px solid; text-align:center; width:10%; height:28px;"><span t-esc="o.number_equipment"/></td>
+                                    <td style="border:1px solid; text-align:left;  width:30%; height:28px;"><span t-esc="o.location_id.name"/></td>
+                                    <td style="border:1px solid; text-align:center; width:20%; height:28px;"><span t-esc="o.stage_id.name"/></td>
+                                </tr>
+                            </t>
+                        </table>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+    <template id="report_rental_summary_neq">
+        <t t-call="web.html_container">
+            <t t-set="docs" t-value="docs.with_context({'lang':docs.partner_id[0].lang})"/>
+            <meta charset="utf-8"/>
+            <div class="page">
+                <h1>Relatório de Locações</h1>
+                <!-- ═══════════════════════════════════════════════
+                     SEÇÃO 2 — AGRUPADO POR Nº EQUIPAMENTO
+                ════════════════════════════════════════════════ -->
+                <h2 style="margin-top:32px; border-bottom:2px solid #555; padding-bottom:4px;">Por Número de Equipamento</h2>
+                <t t-set="equipamentos" t-value="docs.sorted(key=lambda r: r.number_equipment)"/>
+                <t t-set="numeros_vistos" t-value="[]"/>
+                <t t-foreach="equipamentos" t-as="o">
+                    <t t-if="o.number_equipment not in numeros_vistos">
+                        <t t-set="numeros_vistos" t-value="numeros_vistos + [o.number_equipment]"/>
+                        <h3 style="margin-top:16px; color:#333;">
+                            Equipamento Nº <span t-esc="o.number_equipment"/>
+                        </h3>
+                        <table style="border:1px solid #dcdcdc; width:100%; font-size:14px; background-color:#e7e7e7; margin-bottom:8px; page-break-inside: avoid;">
+                            <tr>
+                                <td style="border:1px solid; text-align:left;  width:35%; height:28px;"><b> Aluguel </b></td>
+                                <td style="border:1px solid; text-align:left;  width:30%; height:28px;"><b> Cliente </b></td>
+                                <td style="border:1px solid; text-align:left;  width:20%; height:28px;"><b> Localização </b></td>
+                                <td style="border:1px solid; text-align:center; width:15%; height:28px;"><b> Estágio </b></td>
+                            </tr>
+                            <t t-foreach="docs.filtered(lambda r: r.number_equipment == o.number_equipment)" t-as="eq">
+                                <tr>
+                                    <td style="border:1px solid; text-align:left;  width:35%; height:28px;"><b><span t-esc="eq.product_id.name"/></b></td>
+                                    <td style="border:1px solid; text-align:left;  width:30%; height:28px;"><span t-esc="eq.partner_id.name"/></td>
+                                    <td style="border:1px solid; text-align:left;  width:20%; height:28px;"><span t-esc="eq.location_id.name"/></td>
+                                    <td style="border:1px solid; text-align:center; width:15%; height:28px;"><span t-esc="eq.stage_id.name"/></td>
+                                </tr>
+                            </t>
+                        </table>
+                    </t>
+                </t>
+            </div>
+        </t>
+    </template>
+    <template id="report_rental_summary_loc">
+        <t t-call="web.html_container">
+            <t t-set="docs" t-value="docs.with_context({'lang':docs.partner_id[0].lang})"/>
+            <meta charset="utf-8"/>
+            <div class="page">
+                <h1>Relatório de Locações</h1>
+
+                <!-- ═══════════════════════════════════════════════
+                     SEÇÃO 3 — AGRUPADO POR LOCALIZAÇÃO
+                ════════════════════════════════════════════════ -->
+                <h2 style="margin-top:32px; border-bottom:2px solid #555; padding-bottom:4px;">Por Localização</h2>
+                <t t-set="localizacoes" t-value="docs.mapped('location_id').sorted(key=lambda r: r.name)"/>
+                <t t-foreach="localizacoes" t-as="loc">
+                    <h3 style="margin-top:16px; color:#333;">
+                        <span t-esc="loc.name"/>
+                    </h3>
+                    <table style="border:1px solid #dcdcdc; width:100%; font-size:14px; background-color:#e7e7e7; margin-bottom:8px; page-break-inside: avoid;">
+                        <tr>
+                            <td style="border:1px solid; text-align:left;  width:40%; height:28px;"><b> Aluguel </b></td>
+                            <td style="border:1px solid; text-align:center; width:10%; height:28px;"><b> Nº Equip </b></td>
+                            <td style="border:1px solid; text-align:left;  width:30%; height:28px;"><b> Cliente </b></td>
+                            <td style="border:1px solid; text-align:center; width:20%; height:28px;"><b> Estágio </b></td>
+                        </tr>
+                        <t t-foreach="docs.filtered(lambda r: r.location_id.id == loc.id)" t-as="o">
+                            <tr>
+                                <td style="border:1px solid; text-align:left;  width:40%; height:28px;"><b><span t-esc="o.product_id.name"/></b></td>
+                                <td style="border:1px solid; text-align:center; width:10%; height:28px;"><span t-esc="o.number_equipment"/></td>
+                                <td style="border:1px solid; text-align:left;  width:30%; height:28px;"><span t-esc="o.partner_id.name"/></td>
+                                <td style="border:1px solid; text-align:center; width:20%; height:28px;"><span t-esc="o.stage_id.name"/></td>
+                            </tr>
+                        </t>
+                    </table>
+                </t>
+
+            </div>
+        </t>
+    </template>
+    <template id="report_rental_summary_stg">
+        <t t-call="web.html_container">
+            <t t-set="docs" t-value="docs.with_context({'lang':docs.partner_id[0].lang})"/>
+            <meta charset="utf-8"/>
+            <div class="page">
+                <h1>Relatório de Locações</h1>
+                <!-- ═══════════════════════════════════════════════
+                     SEÇÃO 4 — AGRUPADO POR ESTÁGIO
+                ════════════════════════════════════════════════ -->
+                <h2 style="margin-top:32px; border-bottom:2px solid #555; padding-bottom:4px;">Por Estágio</h2>
+                <t t-set="estagios" t-value="docs.mapped('stage_id').sorted(key=lambda r: r.sequence)"/>
+                <t t-foreach="estagios" t-as="estagio">
+                    <h3 style="margin-top:16px; color:#333;">
+                        <span t-esc="estagio.name"/>
+                    </h3>
+                    <table style="border:1px solid #dcdcdc; width:100%; font-size:14px; background-color:#e7e7e7; margin-bottom:8px; page-break-inside: avoid;">
+                        <tr>
+                            <td style="border:1px solid; text-align:left;  width:35%; height:28px;"><b> Aluguel </b></td>
+                            <td style="border:1px solid; text-align:center; width:10%; height:28px;"><b> Nº Equip </b></td>
+                            <td style="border:1px solid; text-align:left;  width:30%; height:28px;"><b> Cliente </b></td>
+                            <td style="border:1px solid; text-align:left;  width:25%; height:28px;"><b> Localização </b></td>
+                        </tr>
+                        <t t-foreach="docs.filtered(lambda r: r.stage_id.id == estagio.id)" t-as="o">
+                            <tr>
+                                <td style="border:1px solid; text-align:left;  width:35%; height:28px;"><b><span t-esc="o.product_id.name"/></b></td>
+                                <td style="border:1px solid; text-align:center; width:10%; height:28px;"><span t-esc="o.number_equipment"/></td>
+                                <td style="border:1px solid; text-align:left;  width:30%; height:28px;"><span t-esc="o.partner_id.name"/></td>
+                                <td style="border:1px solid; text-align:left;  width:25%; height:28px;"><span t-esc="o.location_id.name"/></td>
+                            </tr>
+                        </t>
+                    </table>
+                </t>
+
+            </div>
+        </t>
+    </template>
+</odoo>

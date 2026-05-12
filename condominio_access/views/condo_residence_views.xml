@@ -96,6 +96,7 @@
 
                         <group string="Inquilino e Proprietário">
                             <field name="inquilino_id"/>
+                            <field name="coproprietario_id"/>
                             <field name="proprietario_id"/>
                         </group>
                     </group>

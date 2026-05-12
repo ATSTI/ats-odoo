@@ -82,6 +82,13 @@ class CondoResidence(models.Model):
     comodel_name="res.partner",
     string="Proprietário"
 )
+    
+    coproprietario_id = fields.Many2one(
+    comodel_name="res.partner",
+    string="Co-Proprietário"
+)
+    
+    
 
 
     visitantes_recorrentes_ids = fields.One2many(

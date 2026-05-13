@@ -18,7 +18,7 @@ NFe Integração: Usado para controlar as notas emitidas pelos clientes
     'author': 'ATSTi Soluções',
     'maintainer': 'Carlos Silveira, Mauricio-ATS, ATSTi',
     'website': 'https://github.com/ATSTI/ats-odoo',
-    'depends': ['base'],
+    'depends': ['base', 'pending_payments'],
     'data': [
         'views/responsavel_partner_view.xml',
     ],

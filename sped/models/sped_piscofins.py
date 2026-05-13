@@ -13,12 +13,14 @@ from sped.efd.pis_cofins.registros import Registro0100
 from sped.efd.pis_cofins.registros import Registro0001
 from sped.efd.pis_cofins.registros import Registro0110
 from sped.efd.pis_cofins.registros import Registro0140
+from sped.efd.pis_cofins.registros import Registro0450
 from sped.efd.pis_cofins.registros import Registro0500
 from sped.efd.pis_cofins.registros import RegistroA001
 from sped.efd.pis_cofins.registros import RegistroA990
 from sped.efd.pis_cofins.registros import RegistroC001
 from sped.efd.pis_cofins.registros import RegistroC010
 from sped.efd.pis_cofins.registros import RegistroC100
+from sped.efd.pis_cofins.registros import RegistroC110
 from sped.efd.pis_cofins.registros import RegistroC170
 from sped.efd.pis_cofins.registros import RegistroC190
 from sped.efd.pis_cofins.registros import RegistroC191
@@ -128,7 +130,6 @@ class SpedPisCofins(models.Model):
         """
         Remove special characters and strip spaces
         """
-        """
         if string:
             if not isinstance(string, str):
                 string = str(string, 'utf-8', 'replace')
@@ -136,8 +137,7 @@ class SpedPisCofins(models.Model):
             string = string.encode('utf-8')
             return normalize(
                 'NFKD', string.decode('utf-8')).encode('ASCII', 'ignore').decode()
-        return ''
-        """
+        # return ''
         return string
 
     @api.multi
@@ -304,6 +304,9 @@ class SpedPisCofins(models.Model):
             
         for item_lista in self.query_registro0400():
             arq.read_registro(self.junta_pipe(item_lista))
+
+        for item_lista in self.query_registro0450():
+            arq.read_registro(self.junta_pipe(item_lista))
            
         # TODO - Colocar CONTA e DESCRICAO
         dt = datetime.strptime('2017-11-01','%Y-%m-%d')
@@ -372,7 +375,9 @@ class SpedPisCofins(models.Model):
                 #for item_lista in self.query_registroC101(self.fatura):
                 #    arq.read_registro(self.junta_pipe(item_lista))
 
-            # TODO C110 - Inf. Adiciontal
+            # C110 - Inf. Adiciontal
+            for item_lista in self.query_registroC110(self.fatura):
+                arq.read_registro(self.junta_pipe(item_lista))
             
             # TODO C170 - Itens Nota Fiscal de Compras = Fazendo
             for item_lista in self.query_registroC170(self.fatura):
@@ -796,6 +801,43 @@ class SpedPisCofins(models.Model):
             lista.append(registro_0400)
         return lista        
 
+    def query_registro0450(self):
+        query = """
+                    select distinct
+                        obs.id, obs.message
+                    from
+                        account_invoice as d
+                    inner join
+                        invoice_eletronic as ie
+                            on ie.invoice_id = d.id
+                    inner join
+                        account_fiscal_position_br_account_fiscal_observation_rel as obs_rel
+                            on obs_rel.account_fiscal_position_id = d.fiscal_position_id
+                    inner join
+                        br_account_fiscal_observation as obs
+                            on obs.id = obs_rel.br_account_fiscal_observation_id
+                    left join
+                        br_account_fiscal_document fd 
+                            on fd.id = d.product_document_id
+                    where
+                        ie.data_fatura between '%s' and '%s'
+                        and (ie.model in ('55','01'))
+                        and ie.state in ('done')
+                        and d.fiscal_position_id is not null 
+                """ % (g_intervalo[0], g_intervalo[1])
+        self._cr.execute(query)
+        query_resposta = self._cr.fetchall()
+        lista = []
+        for resposta in query_resposta:
+            resposta_inf = self.env['br_account.fiscal.observation'].browse(resposta[0])
+            registro_0450 = Registro0450()
+            # registro_0450 = registros.Registro0450()
+            registro_0450.COD_INF = str(resposta_inf.id).zfill(6)
+            registro_0450.TXT = self.normalize_str(resposta_inf.message.replace('\n',' ').replace('\r',' '))[:255]
+            # print(resposta_inf.message)
+            lista.append(registro_0450)
+        return lista
+
     def transforma_valor(self, valor):
         valor = ("%.2f" % (float(valor)))
         return str(valor).replace('.', ',')
@@ -917,6 +959,23 @@ class SpedPisCofins(models.Model):
                     #registro_c100.VL_PIS_ST = 0,0
                     #registro_c100.VL_COFINS_ST = 0.0
                 lista.append(registro_c100)
+        return lista
+
+    def query_registroC110(self, doc):
+        lista = []
+        nfe_ids = self.env['invoice.eletronic'].search([
+            ('invoice_id','=',doc),
+        ])
+        for nf in nfe_ids:    
+            if (nf.state == 'done') and (nf.model == '55') and nf.informacoes_legais:
+                for det_obs in nf.fiscal_position_id.fiscal_observation_ids:
+                    for line in nf.informacoes_legais.split('<br />'):
+                        if det_obs.message[:20] in line:
+                            registro_c110 = registros.RegistroC110()
+                            registro_c110.COD_INF = str(det_obs.id).zfill(6)
+                            registro_c110.TXT_COMPL = self.normalize_str(line.replace('\n',' ').replace('\r',' '))[:255]
+                            lista.append(registro_c110)
+                            break
         return lista
 
     def query_registroC170(self, fatura):

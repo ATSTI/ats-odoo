@@ -4,7 +4,11 @@
         <field name="name">Consultar Pendências</field>
         <field name="model_id" ref="model_res_company"/>
         <field name="state">code</field>
-        <field name="code">model._check_pending_payments()</field>
+        <field name="code">
+        companies = model.search([], limit=10)
+for cmp in companies:
+            cmp._check_pending_payments()
+        </field>
         <field name="user_id" ref="base.user_root"/>
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>

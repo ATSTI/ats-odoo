@@ -50,7 +50,7 @@ class ProductTemplate(models.Model):
             },
             'id': 1
         }
-        url = 'http://%s/web/session/authenticate' % (url)
+        url = '%s/web/session/authenticate' % (url)
         response = rq.post(url, json=data, headers=headers)
         session_id = response.cookies.get('session_id')
         return session_id
@@ -67,7 +67,7 @@ class ProductTemplate(models.Model):
             'session_id':session_id
         }
         #json_data = json.dumps(dados)
-        return rq.post("http://{}".format(base_url), 
+        return rq.post("{}".format(base_url), 
         json={
             "jsonrpc": "2.0",
             "method": "call",

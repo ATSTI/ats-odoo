@@ -7,7 +7,7 @@
     'summary': 'Consulta pagamentos de determinada empresa',
     'description': """
 Consulta de Pagamentos Pendentes
-=======================
+================================
 Este módulo adiciona campos e funcionalidades relacionadas a dados de pagamentos 
 pendentes associados às empresas, permitindo melhor controle e rastreabilidade 
 no cadastro de clientes/fornecedores.
@@ -23,7 +23,9 @@ no cadastro de clientes/fornecedores.
     ],
     'license': 'AGPL-3',
     'depends': ['base_setup', 'web', 'l10n_br_account'],
-    'data': [],
+    'data': [
+        "data/ir_cron_data.xml",
+    ],
     "assets": {
         "web.assets_backend": [
             "pending_payments/static/src/js/action_patch.js",

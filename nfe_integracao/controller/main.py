@@ -206,60 +206,83 @@ class IntegracaoPdv(http.Controller):
         if not partner:
             return request.make_json_response({"error": "Parceiro não encontrado."}, status=404)
         
-        dependentes = False
-        if partner.financeiro:
-            dependentes = env['res.partner'].sudo().search([('financeiro', '=', partner.financeiro.id)])
+        dependentes = env['res.partner']
 
-        hoje = datetime.now()
+        if partner.financeiro:
+            dependentes = env['res.partner'].sudo().search([
+                ('financeiro', '=', partner.financeiro.id)
+            ])
+
+        parceiros = dependentes if dependentes else partner
+
+        hoje = fields.Date.today()
         inicio = hoje.replace(day=1)
         proximo_mes = (inicio + timedelta(days=32)).replace(day=1)
         fim = proximo_mes - timedelta(days=1)    
         
-        if dependentes:
-            pendencias = env['account.move'].sudo().search([
-                ('partner_id', 'in', dependentes.ids), 
-                ('state', '=', 'posted'), 
-                ('payment_state', '!=', 'paid'),
-                ('invoice_date_due', '>=', inicio),
-                ('invoice_date_due', '<=', fim),
-                ('move_type', 'in', ['out_invoice', 'out_refund']),
-            ])
-        else:
-            pendencias = env['account.move'].sudo().search([
-                ('partner_id', '=', partner.id), 
-                ('state', '=', 'posted'), 
-                ('payment_state', '!=', 'paid'),
-                ('invoice_date_due', '>=', inicio),
-                ('invoice_date_due', '<=', fim),
-                ('move_type', 'in', ['out_invoice', 'out_refund']),
-            ])
+        pendencias = env['account.move'].sudo().search([
+            ('partner_id', 'in', parceiros.ids), 
+            ('state', '=', 'posted'), 
+            ('payment_state', '!=', 'paid'),
+            ('invoice_date_due', '>=', inicio),
+            ('invoice_date_due', '<=', fim),
+            ('move_type', 'in', ['out_invoice', 'out_refund']),
+        ])
+        
+        company_names = [{'name': prt.name} for prt in parceiros]
+    
         pendencias_data = []
-        msg = company.notify_customers if company.notify else ""
-        if msg:
+    
+        # Custom Message
+        if company.notify and company.notify_customers:
             pendencias_data.append({
-                'company_names' : [{'name': prt.name} for prt in dependentes] if dependentes else [{'name': partner.name}],
+                'company_names': company_names,
                 'pending': False,
-                'mensagem': msg,
+                'mensagem': company.notify_customers,
             })
+
             return request.make_json_response({
                 "pendencias": pendencias_data
             })
+        
+        #Check pending
         for move in pendencias:
-            date_now = fields.Date.today()
-            date_due_limit = move.invoice_date_due + timedelta(days=company.days_to_notify)
-            msg = ""
-            if date_now < date_due_limit and date_now >= move.invoice_date_due:
-                msg = f"""Por favor, contate o financeiro da ATS, whatsapp: {company.mobile}\n
-                Seu sistema será interrompido em {(date_due_limit - date_now).days} dia(s)"""
-            elif date_now >= date_due_limit:
-                msg = f"""Por favor, contate o financeiro da ATS, whatsapp: {company.mobile}\n
-                SEU SISTEMA ESTÁ BLOQUEADO!!!"""
+            if not move.invoice_date_due:
+                continue
+
+            date_due_limit = move.invoice_date_due + timedelta(
+                days=company.days_to_notify
+            )
+
+            if hoje >= move.invoice_date_due and hoje < date_due_limit:
+                dias_restantes = (date_due_limit - hoje).days
+                msg = (
+                    f"Por favor, contate o financeiro da ATS, "
+                    f"whatsapp: {company.mobile}\n"
+                    f"Seu sistema será interrompido em "
+                    f"{dias_restantes} dia(s)"
+                )
+
+            elif hoje >= date_due_limit:
+                msg = (
+                    f"Por favor, contate o financeiro da ATS, "
+                    f"whatsapp: {company.mobile}\n"
+                    f"SEU SISTEMA ESTÁ BLOQUEADO!!!"
+                )
             if msg:
                 pendencias_data.append({
-                    'company_names' : [{'name': prt.name} for prt in dependentes] if dependentes else [{'name': partner.name}],
+                    'company_names': company_names,
                     'pending': True,
                     'mensagem': msg,
                 })
-        return request.make_json_response({
-                "pendencias": pendencias_data
+
+        if not pendencias_data:
+            pendencias_data.append({
+                'company_names': company_names,
+                'pending': False,
+                'mensagem': '',
             })
+
+        return request.make_json_response({
+            "pendencias": pendencias_data
+        })

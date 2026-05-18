@@ -1,166 +1,179 @@
 <odoo>
-
     <template id="report_water_reading_template">
 
         <t t-call="web.html_container">
-            <t t-call="web.external_layout">
+            <t t-call="web.internal_layout">
 
+                <t t-set="company" t-value="env.company"/>
+
+                <style>
+                    @page {
+                        margin-top: 35px;
+                        margin-bottom: 30px;
+                    }
+
+                    .header {
+                        width: 100%;
+                        margin-bottom: 20px;
+                    }
+
+                    .page {
+                        padding-top: 10px;
+                    }
+
+                    h2 {
+                        text-align: center;
+                        margin-bottom: 20px;
+                        font-size: 18px;
+                    }
+
+                    table.water_table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 10px;
+                    }
+
+                    table.water_table th {
+                        background-color: #f2f2f2;
+                        border: 1px solid #ccc;
+                        padding: 6px;
+                        text-align: center;
+                        font-weight: bold;
+                    }
+
+                    table.water_table td {
+                        border: 1px solid #ddd;
+                        padding: 5px;
+                        vertical-align: middle;
+                    }
+
+                    thead {
+                        display: table-header-group;
+                    }
+
+                    tr {
+                        page-break-inside: avoid;
+                    }
+
+                    .resumo-final {
+                        margin-top: 20px;
+                        width: 35%;
+                        float: right;
+                        font-size: 11px;
+                    }
+
+                    .resumo-final table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+
+                    .resumo-final td {
+                        border: 1px solid #999;
+                        padding: 6px;
+                    }
+                </style>
                 <div class="page">
-
-                    <h2 style="text-align:center;">
-                        Relatório de Leituras de Água
-                    </h2>
-
-                    <br/>
+                    <h2>Relatório de Leituras de Água</h2>
 
                     <t t-set="total_consumo" t-value="0"/>
                     <t t-set="total_valor" t-value="0"/>
 
-                    <table class="table table-sm table-bordered">
+                    <table class="water_table">
 
                         <thead>
-
                             <tr>
                                 <th>Residência</th>
-                                <th>Data Referência</th>
-                                <th>Leitura Anterior</th>
-                                <th>Leitura Atual</th>
+                                <th>Referência</th>
+                                <th>Anterior</th>
+                                <th>Atual</th>
                                 <th>Consumo</th>
                                 <th>Valor</th>
-                                <th>Observação</th>
+                                <th>Obs.</th>
                             </tr>
-
                         </thead>
 
                         <tbody>
+
                             <t t-foreach="docs" t-as="leitura">
 
                                 <t t-if="leitura.exists()">
 
-                                    <t t-set="total_consumo"
-                                       t-value="total_consumo + (leitura.consumo or 0)"/>
+                                    <t t-set="obs_limpa"
+                                       t-value="(leitura.obs or '').strip().lower()"/>
 
                                     <t t-set="valor_calculado"
                                        t-value="(leitura.consumo or 0) * metro"/>
 
                                     <t t-set="valor_final"
-                                       t-value="35 if valor_calculado &lt; 35 else valor_calculado"/>
+                                       t-value="0 if obs_limpa == 'sem hidro' else (35 if valor_calculado &lt; 35 else valor_calculado)"/>
+
+                                    <t t-set="total_consumo"
+                                       t-value="total_consumo + (0 if obs_limpa == 'sem hidro' else (leitura.consumo or 0))"/>
 
                                     <t t-set="total_valor"
                                        t-value="total_valor + valor_final"/>
-
                                     <tr>
-
                                         <td>
-
-                                            <t t-if="leitura.residence_id and leitura.residence_id.exists()">
-                                                <span t-field="leitura.residence_id"/>
-                                            </t>
-
-                                            <t t-else="">
-                                                <span>Residência removida</span>
-                                            </t>
-
+                                            <span t-field="leitura.residence_id"/>
                                         </td>
 
                                         <td>
-
-                                            <t t-if="leitura.data_referencia">
-                                                <span t-field="leitura.data_referencia"/>
-                                            </t>
-
+                                            <span t-field="leitura.data_referencia"/>
                                         </td>
 
                                         <td>
-
-                                            <t t-if="leitura.anterior is not None">
-                                                <span t-field="leitura.anterior"/>
-                                            </t>
-
+                                            <span t-field="leitura.anterior"/>
                                         </td>
 
                                         <td>
-
-                                            <t t-if="leitura.atual is not None">
-                                                <span t-field="leitura.atual"/>
-                                            </t>
-
+                                            <span t-field="leitura.atual"/>
                                         </td>
 
                                         <td>
-
-                                            <t t-if="leitura.consumo is not None">
-                                                <span t-field="leitura.consumo"/> m³
-                                            </t>
-
+                                            <span t-field="leitura.consumo"/> m³
                                         </td>
 
                                         <td>
-
-                                            <strong>
-                                                R$
-                                                <t t-esc="'%.2f' % valor_final"/>
-                                            </strong>
-
+                                            <t t-if="obs_limpa != 'sem hidro'">
+                                                R$ <t t-esc="'%.2f' % valor_final"/>
+                                            </t>
+                                            <t t-else="">-</t>
                                         </td>
 
                                         <td>
-
-                                            <t t-if="leitura.obs">
-                                                <span t-field="leitura.obs"/>
-                                            </t>
-
-                                            <t t-else="">
-                                                <span>-</span>
-                                            </t>
-
+                                            <t t-esc="leitura.obs or '-'"/>
                                         </td>
-
                                     </tr>
-
                                 </t>
-
                             </t>
-
                         </tbody>
-
-                        <tfoot>
-                            <tr>
-
-                                <td colspan="4">
-                                    <strong>Total Consumido</strong>
-                                </td>
-
-                                <td colspan="3">
-
-                                    <strong>
-                                        <t t-esc="'%.2f' % total_consumo"/>
-                                    </strong>
-
-                                </td>
-
-                            </tr>
-
-                            <tr>
-
-                                <td colspan="4">
-                                    <strong>Total em R$</strong>
-                                </td>
-
-                                <td colspan="3">
-
-                                    <strong>
-                                        R$
-                                        <t t-esc="'%.2f' % total_valor"/>
-                                    </strong>
-
-                                </td>
-
-                            </tr>
-
-                        </tfoot>
-
                     </table>
+                    <div style="clear: both;"></div>
+                    <div class="resumo-final">
+
+                        <table>
+
+                            <tr>
+                                <td><strong>Total consumido</strong></td>
+                                <td>
+                                    <strong>
+                                        <t t-esc="'%.2f' % total_consumo"/> m³
+                                    </strong>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>Total geral</strong></td>
+                                <td>
+                                    <strong>
+                                        R$ <t t-esc="'%.2f' % total_valor"/>
+                                    </strong>
+                                </td>
+                            </tr>
+
+                        </table>
+
+                    </div>
 
                 </div>
 
@@ -168,5 +181,4 @@
         </t>
 
     </template>
-
 </odoo>

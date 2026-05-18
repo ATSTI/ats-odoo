@@ -5,7 +5,7 @@ from odoo import _
 class CondoResidence(models.Model):
     _name = "condo.residence"
     _description = "Residências do Condomínio"
-    _inherit = ['mail.thread', 'mail.activity.mixin']  # ← adicionar isso
+    _inherit = ['mail.thread', 'mail.activity.mixin']  
 
     leitura_agua_ids = fields.One2many(
         "condo.water.reading",
@@ -53,7 +53,7 @@ class CondoResidence(models.Model):
 
     rua = fields.Char(string="Rua", tracking = True)
     numero = fields.Char(string="Número" ,tracking = True)
-    lote = fields.Char(string="Lote" ,tracking = True)
+    lote = fields.Char(string="Quadra/Lote" ,tracking = True)
 
     moradores = fields.Integer(
         string="Moradores", compute='_compute_moradores', store=True
@@ -178,3 +178,28 @@ class CondoResidence(models.Model):
                 "default_residence_id": self.id,
             }
         }   
+    
+    def action_open_import_water(self):
+        return {
+            "type": "ir.actions.act_window",
+            "res_model": "condo.import.water.wizard",
+            "view_mode": "form",
+            "target": "new",
+        }
+
+    # def action_clear_all_readings(self):
+    #     readings = self.env["condo.water.reading"].search([])
+        
+    #     if readings:
+    #         readings.unlink()
+
+    #     return {
+    #         "type": "ir.actions.client",
+    #         "tag": "display_notification",
+    #         "params": {
+    #             "title": "Concluído",
+    #             "message": "Todas as leituras foram removidas.",
+    #             "type": "success",
+    #             "sticky": False,
+    #         }
+    #     }

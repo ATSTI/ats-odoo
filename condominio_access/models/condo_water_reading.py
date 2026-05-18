@@ -35,20 +35,20 @@ class CondoWaterReading(models.Model):
         for rec in self:
             rec.consumo = abs(rec.atual - rec.anterior)
 
-    @api.onchange("residence_id", "data_referencia")
-    def _onchange_buscar_leitura_anterior(self):
+    # @api.onchange("residence_id", "data_referencia")
+    # def _onchange_buscar_leitura_anterior(self):
 
-        if not self.residence_id or not self.data_referencia:
-            return
+    #     if not self.residence_id or not self.data_referencia:
+    #         return
 
-        leitura_anterior = self.env["condo.water.reading"].search(
-            [
-                ("residence_id", "=", self.residence_id.id),
-                ("data_referencia", "<", self.data_referencia),
-            ],
-            order="data_referencia desc",
-            limit=1
-        )
+    #     leitura_anterior = self.env["condo.water.reading"].search(
+    #         [
+    #             ("residence_id", "=", self.residence_id.id),
+    #             ("data_referencia", "<", self.data_referencia),
+    #         ],
+    #         order="data_referencia desc",
+    #         limit=1
+    #     )
 
-        if leitura_anterior:
-            self.anterior = leitura_anterior.atual
+    #     if leitura_anterior:
+    #         self.anterior = leitura_anterior.atual

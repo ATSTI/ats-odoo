@@ -16,10 +16,11 @@
         'views/condo_residence_views.xml',
         'views/condo_residence_leitura.xml',
         'report/report_water_reading_template.xml',
+        'views/wizard_water_report_view.xml',
         # 'views/menuitem.xml',
         'views/condo_visitor_view.xml',
         'views/res_partner.xml',
     ],
     'installable': True,
     'application': False,
-}
+}   

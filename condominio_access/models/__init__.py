@@ -8,3 +8,4 @@ from . import condo_residence_vehicles
 from . import condominio_recurring_visitor
 from . import wizard_water_report
 from . import report_water_reading
+from . import wizard_import_water

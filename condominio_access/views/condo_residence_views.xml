@@ -64,6 +64,15 @@
                         string="Recalcular Nomes (Lote - Proprietário)"
                         type="object"
                         class="btn btn-secondary"/>
+
+                        <button name="action_open_import_water"
+                            type="object"
+                            string="Importar Leituras"
+                            class="btn-primary"/>
+                        <!-- <button name ='action_clear_all_readings'
+                            type="object"
+                            string="Limpar Leituras"
+                            class="btn-danger"/> -->
             </header>
                 <sheet>
 

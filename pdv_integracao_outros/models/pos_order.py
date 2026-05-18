@@ -262,7 +262,9 @@ class PosSession(models.Model):
             #if vals['name'] == '23-351':
             if ped['nomecliente'] == 'Cliente do Sistema':
                 cli_n = 'Consumidor'
-            prt = prt_obj.search([('name', 'ilike', cli_n)], limit=1)
+            prt = prt_obj.search([('name', '=', cli_n)], limit=1)
+            if not prt:
+                prt = prt_obj.search([('name', 'ilike', cli_n)], limit=1)
             if not prt:
                 prt = prt_obj.search([('id', '=', ped['partner_id'])])
             if prt:

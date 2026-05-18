@@ -40,7 +40,6 @@ class CondoImportWaterWizard(models.TransientModel):
 
         residence_model = self.env["condo.residence"]
         reading_model = self.env["condo.water.reading"]
-        import pudb; pudb.set_trace()
         for row in sheet.iter_rows(min_row=3, values_only=True):
 
             obs = ""   

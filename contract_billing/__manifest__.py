@@ -13,7 +13,7 @@
     """,
     'author': 'Carlos Silveira, Mauricio-ATS, ATSTi Soluções',
     'website': '',
-    'depends': ['l10n_br_contract','l10n_br_account'],
+    'depends': ['l10n_br_contract','l10n_br_account', 'l10n_br_account_payment_brcobranca'],
     'data': [
         #'views/contract_view.xml',
         'views/email_erro_fatura.xml',

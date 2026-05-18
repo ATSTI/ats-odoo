@@ -184,7 +184,8 @@ class ContractContract(models.Model):
                         if invoice.payment_mode_id.fixed_journal_id.bank_id.code_bc == "077":
                             invoice.action_pdf_boleto()
                         else:
-                            file_name = "boleto_nf-"
+                            file_name = invoice.partner_id.name
+                            file_name = '_'.join(file_name.split())
                             tem_boleto = self.env["ir.attachment"].search([
                                ("name", "like", file_name),
                                ("res_model", "=", "account.move"),

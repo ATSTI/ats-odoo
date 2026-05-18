@@ -45,6 +45,8 @@ class AccountStatementImport(models.TransientModel):
             raise UserError("Certificado e chave do banco são obrigatórios para importação.")
 
         file_data, transacoes = self.generate_extract_file(data_ini, data_fim)
+        if not transacoes:
+            raise UserError("Nenhuma transação encontrada no período selecionado.")
         ofx = self.generate_extract_file_ofx(file_data, transacoes)
 
         # converte para base64
@@ -174,7 +176,6 @@ class AccountStatementImport(models.TransientModel):
             # Mapeamento de tipo
             if tipo_trans == "PIX":
                 if tipo_op == "C":
-                    print(t)
                     cnpj_cpf = t['detalhes'].get("cpfCnpjPagador", "")
                 else:
                     cnpj_cpf = t['detalhes'].get("cpfCnpjRecebedor", "")

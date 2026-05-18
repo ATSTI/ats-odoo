@@ -10,14 +10,14 @@
                     name="account_create_invoice"
                     string="Gerar Fatura de Cliente"
                     type="object"
-                    attrs="{'invisible': ['|',('stage_id', '!=', 8), ('customer_invoice', '=', True)]}"
+                    attrs="{'invisible': ['|',('stage_id', '!=', 6), ('customer_invoice', '=', True)]}"
                     groups="account.group_account_invoice"
                 />
                 <button
                     name="create_bills"
                     string="Gerar Fatura de Fornecedor"
                     type="object"
-                    attrs="{'invisible': ['|',('stage_id', '!=', 8), ('bill_invoice', '=', True)]}"
+                    attrs="{'invisible': ['|',('stage_id', '!=', 6), ('bill_invoice', '=', True)]}"
                     groups="account.group_account_invoice"
                 />
             </xpath>

@@ -519,6 +519,24 @@
                                                 <span t-esc="'{:,.2f}'.format(o.amount_total).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
                                             </td>
                                         </tr>
+                                        <t t-if="o.invoice_line_ids">
+                                            <tr style="position: relative;">
+                                                <td colspan="5" style="border:none; padding:0; position:relative; height:0;">
+                                                    <div style="
+                                                        position:absolute;
+                                                        left:255px;
+                                                        top:-330px;
+                                                        font-size:11px;
+                                                        line-height:20px;
+                                                        background:transparent;
+                                                        z-index:10;
+                                                    ">
+                                                        Dados bancários<br/>
+                                                        Pix CNPJ 33590660000129<br/>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </t>
                                     </tbody>
                                 </table>
                             </div>

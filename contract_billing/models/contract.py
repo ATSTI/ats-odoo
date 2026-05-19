@@ -187,7 +187,7 @@ class ContractContract(models.Model):
                             file_name = invoice.partner_id.name
                             file_name = '_'.join(file_name.split())
                             tem_boleto = self.env["ir.attachment"].search([
-                               ("name", "like", file_name),
+                               ("name", "like", file_name[:40]),
                                ("res_model", "=", "account.move"),
                                ("res_id", "=", invoice.id),
                             ])

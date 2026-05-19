@@ -32,7 +32,7 @@ class AccountStatementImport(models.TransientModel):
     # parametros = data inicio e data fim (YYYY-MM-DD)
 
 
-    def import_extract_ofx(self, data_ini=None, data_fim=None):
+    def import_extract_ofx(self, data_ini=None, data_fim=None, journal_id=None):
         if data_ini is None:
             data_ini = self.data_ini 
         if data_fim is None:
@@ -41,6 +41,12 @@ class AccountStatementImport(models.TransientModel):
         if data_ini > data_fim:
             raise UserError("Data início deve ser menor que data fim.")
         
+        if not self.journal_id and journal_id:
+            self.journal_id = journal_id
+ 
+        if  not self.journal_id:
+            raise UserError("Diário é obrigatório para importação.")
+
         if not self.journal_id.bank_inter_cert or not self.journal_id.bank_inter_key:
             raise UserError("Certificado e chave do banco são obrigatórios para importação.")
 

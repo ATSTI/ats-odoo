@@ -20,13 +20,13 @@ class CondoWaterReading(models.Model):
     )
 
     anterior = fields.Float(string="Anterior")
+
     atual = fields.Float(string="Atual")
 
     consumo = fields.Float(
         string="Consumo",
         compute="_compute_consumo",
-        store=True
-    )
+        store=True)
 
     obs = fields.Text(string="Observações")
 

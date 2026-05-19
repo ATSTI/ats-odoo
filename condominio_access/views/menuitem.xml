@@ -1,7 +1,0 @@
-<odoo>
-    <record id="condominio_menu_root" model="ir.ui.menu">
-        <field name="name">Condomínio</field>
-        <field name="web_icon">condominio_access,static/description/condominio.png</field>
-        <field name="sequence">10</field>
-    </record>
-</odoo>

@@ -13,12 +13,19 @@ class CondoResidenceVehicles(models.Model):
     )
 
     possui_veiculo = fields.Boolean(string="Possui Veículo?")
+
     name = fields.Text("Modelo")
+
     marca = fields.Char("Marca")
+
     cor = fields.Char("Cor")
+
     placa = fields.Char("Placa")
+
     possui_tag = fields.Boolean("Possui Tag?", default=False)
+
     numero_tag = fields.Char("Número da Tag")
+
     quantidade = fields.Integer("Quantidade", default=1)
 
     @api.model_create_multi
@@ -34,7 +41,6 @@ class CondoResidenceVehicles(models.Model):
 
     def _sync_residence_tags(self):
         Tag = self.env["condo.residence.tags"]
-
         for vehicle in self.filtered(
             lambda v: v.residence_id and v.possui_tag and v.numero_tag
         ):
@@ -42,7 +48,6 @@ class CondoResidenceVehicles(models.Model):
                 ("residence_id", "=", vehicle.residence_id.id),
                 ("numero_tag", "=", vehicle.numero_tag),
             ], limit=1)
-
             if not existing:
                 Tag.create({
                     "residence_id": vehicle.residence_id.id,

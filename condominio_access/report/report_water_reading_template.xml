@@ -1,11 +1,8 @@
 <odoo>
     <template id="report_water_reading_template">
-
         <t t-call="web.html_container">
             <t t-call="web.internal_layout">
-
                 <t t-set="company" t-value="env.company"/>
-
                 <style>
                     @page {
                         margin-top: 35px;
@@ -74,12 +71,9 @@
                 </style>
                 <div class="page">
                     <h2>Relatório de Leituras de Água</h2>
-
                     <t t-set="total_consumo" t-value="0"/>
                     <t t-set="total_valor" t-value="0"/>
-
                     <table class="water_table">
-
                         <thead>
                             <tr>
                                 <th>Residência</th>
@@ -91,9 +85,7 @@
                                 <th>Obs.</th>
                             </tr>
                         </thead>
-
                         <tbody>
-
                             <t t-foreach="docs" t-as="leitura">
 
                                 <t t-if="leitura.exists()">
@@ -150,9 +142,7 @@
                     </table>
                     <div style="clear: both;"></div>
                     <div class="resumo-final">
-
                         <table>
-
                             <tr>
                                 <td><strong>Total consumido</strong></td>
                                 <td>
@@ -161,7 +151,6 @@
                                     </strong>
                                 </td>
                             </tr>
-
                             <tr>
                                 <td><strong>Total geral</strong></td>
                                 <td>
@@ -170,15 +159,10 @@
                                     </strong>
                                 </td>
                             </tr>
-
                         </table>
-
                     </div>
-
                 </div>
-
             </t>
         </t>
-
     </template>
 </odoo>

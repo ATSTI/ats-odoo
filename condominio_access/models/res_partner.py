@@ -36,12 +36,6 @@ class ResPartner(models.Model):
         string="Data de Nascimento"
     )
 
-    # @api.depends('condo_residence_ids.partner_ids')
-    # def _compute_is_morador(self):
-    #     all_morador_ids = self.env['condo.residence'].search([]).mapped('partner_ids.id')
-    #     for partner in self:
-    #         partner.is_morador = partner.id in all_morador_ids
-
     @api.depends('condo_residence_ids')
     def _compute_is_morador(self):
         for partner in self:
@@ -57,6 +51,5 @@ class ResPartner(models.Model):
             residence = self.env['condo.residence'].search([('proprietario_id.name', '=', prt.name)])
             if len(residence) >= 1:
                 for resd in residence:
-                    
                     prt.residence_id = resd.id
                     prt.condo_residence_ids = [(4, resd.id)]

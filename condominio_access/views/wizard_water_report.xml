@@ -5,13 +5,11 @@
         <field name="model">condo.water.report.wizard</field>
         <field name="arch" type="xml">
             <form string="Relatório Água">
-
                 <group>
                     <field name="mes"/>
                     <field name="ano"/>
                     <field name="metro"/>
                 </group>
-
                 <footer>
                     <button name="action_export_pdf"
                             type="object"
@@ -21,11 +19,9 @@
                     <button string="Cancelar"
                             special="cancel"/>
                 </footer>
-
             </form>
         </field>
     </record>
-
 
 <record id="action_water_report_wizard" model="ir.actions.act_window">
     <field name="name">Relatório Água</field>

@@ -13,6 +13,7 @@ class CondoResidenceTags(models.Model):
     )
 
     name = fields.Text("Descrição")
+    
     numero_tag = fields.Char("Número da TAG")
 
     _sql_constraints = [

@@ -10,5 +10,7 @@ class CondoResidencePets(models.Model):
     )
     
     name =fields.Text("Descrição")
+
     raça = fields.Char("Raça")
+    
     nome = fields.Char("Nome do PET")

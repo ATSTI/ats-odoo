@@ -5,17 +5,14 @@
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
 
-               <!-- Cargo -->
             <xpath expr="//field[@name='function']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
 
-            <!-- Website -->
             <xpath expr="//field[@name='website']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
 
-            <!-- Título -->
             <xpath expr="//field[@name='title']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>

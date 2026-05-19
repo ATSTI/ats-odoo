@@ -75,7 +75,6 @@
                             class="btn-danger"/> -->
             </header>
                 <sheet>
-
                     <div style="width:100%; height:100px; overflow:hidden; border-radius:8px;">
                         <field name="image_1920"
                                     widget="image"
@@ -195,12 +194,10 @@
                                          width="100"
                                         attrs="{'invisible': [('possui_tag', '=', False)]}"/>
                                     <field name="quantidade" width="100"/>
-
                                 </tree>
                             </field>
                         </page>
                     </notebook>
-
                 </sheet>
                 <div class="oe_chatter">
                 <field name="message_follower_ids"/>
@@ -216,14 +213,12 @@
     <field name="model">condo.residence</field>
     <field name="arch" type="xml">
         <search string="Pesquisar Residências">
-
             <field name="name"/>
             <field name="lote"/>
             <field name="rua"/>
             <field name="tipo"/>
             <field name="inquilino_id"/>
             <field name="proprietario_id"/>
-
             <filter string="Ativas"
                     name="active"
                     domain="[('active', '=', True)]"/>
@@ -231,7 +226,6 @@
             <filter string="Inativas"
                     name="inactive"
                     domain="[('active', '=', False)]"/>
-
             <separator/>
 
             <filter string="Com Moradores"
@@ -241,7 +235,6 @@
             <filter string="Sem Moradores"
                     name="without_residents"
                     domain="[('partner_ids', '=', False)]"/>
-
             <separator/>
 
             <filter string="Com Pets"
@@ -312,11 +305,8 @@
     <field name="model">condo.residence</field>
     <field name="arch" type="xml">
         <tree string="Residências">
-
             <!-- <field name="image_128" widget="image" class="oe_avatar"/> -->
-
             <field name="name"/>
-
             <field name="rua"/>
             <field name="numero"/>
             <field name="lote"/>
@@ -337,7 +327,6 @@
             <field name="active"
                    widget="boolean_toggle"
                     optional="hide"/>
-
         </tree>
     </field>
 </record>

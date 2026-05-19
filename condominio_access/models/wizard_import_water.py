@@ -14,48 +14,38 @@ class CondoImportWaterWizard(models.TransientModel):
     _description = "Importar Leituras de Água"
 
     file = fields.Binary(string="Arquivo Excel", required=True)
+    
     filename = fields.Char()
 
     def _normalizar_lote(self, lote, quadra):
         lote = str(lote).strip().upper()
         quadra = str(quadra).strip().upper()
-
         if "." in lote:
             numero, complemento = lote.split(".", 1)
             numero = numero.zfill(2)  # garante 2 dígitos
             lote = f"{quadra}{numero}-{complemento}"
-
         return lote
 
     def action_import(self):
         if not self.file:
             raise UserError("Envie um arquivo.")
-
         wb = openpyxl.load_workbook(
             BytesIO(base64.b64decode(self.file)),
-            data_only=True
-        )
-
+            data_only=True)
         sheet = wb.worksheets[0]
-
         residence_model = self.env["condo.residence"]
         reading_model = self.env["condo.water.reading"]
         for row in sheet.iter_rows(min_row=3, values_only=True):
-
             obs = ""   
             quadra = row[0]
             lote = row[1]      
             data_ref = row[2]  
             anterior = row[6]  
             atual = row[7]      
-
             if not lote:
                 continue
-
             lote = self._normalizar_lote(lote,quadra)
-
             _logger.warning("Buscando lote: [%s]", lote)
-
             residence = residence_model.search([
                 ("lote", "=", lote)
             ], limit=1)
@@ -72,7 +62,6 @@ class CondoImportWaterWizard(models.TransientModel):
             if str(atual).strip().lower() == "sem hidro":
                 atual = 0
                 obs = 'Sem hidro'
-
 
             if isinstance(data_ref, str):
                 data_ref = datetime.strptime(data_ref, "%m/%Y").date()
@@ -92,7 +81,6 @@ class CondoImportWaterWizard(models.TransientModel):
                 "atual": float(atual or 0),
                 "obs": obs or "",
             }
-
             if existing:
                 existing.write(vals)
                 _logger.warning("Atualizado: %s", residence.name)

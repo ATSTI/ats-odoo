@@ -1,0 +1,29 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* invoice_attachment_zipped_download
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2025-01-20 16:06+0000\n"
+"Last-Translator: mymage"
+"Language-Team: none\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.6.2\n"
+
+#. module: invoice_attachment_zipped_download
+#: model:ir.actions.server,name:invoice_attachment_zipped_download.action_download_account_move_attachements
+#: model:ir.actions.server,name:invoice_attachment_zipped_download.action_download_account_move_attachements
+msgid "Download attachments"
+msgstr "Baixar anexos"
+
+#. module: invoice_attachment_zipped_download
+#: model:ir.model,name:invoice_attachment_zipped_download.model_account_move
+msgid "Account Move"
+msgstr "Fatura"
+

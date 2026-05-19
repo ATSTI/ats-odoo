@@ -170,7 +170,7 @@ class FSMEquipment(models.Model):
 
             # Stage específico para troca
             stage_trocas = self.env['fsm.stage'].search(
-                [('name', '=', 'Trocas')], limit=1
+                [('name', 'ilike', 'Trocas')], limit=1
             )
             if stage_trocas:
                 vals['stage_id'] = stage_trocas.id

@@ -23,7 +23,7 @@ facilitando a administração e o acompanhamento dos processos de locação.
         'Otavio Andretta <otavio12257@gmail.com>'
     ],
     'license': 'AGPL-3',
-    'depends': ['base_setup', 'web', 'l10n_br_account', 'fieldservice'],
+    'depends': ['base_setup', 'web', 'l10n_br_account', 'fieldservice', 'fieldservice_account'],
     'data': [
         'report/report_rental_summary.xml',
         'views/product.xml',

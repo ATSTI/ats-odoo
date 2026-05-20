@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="fsm_location_zip_Search_form" model="ir.ui.view">
+        <field name="name">fsm.location.zip_search.form.inherit</field>
+        <field name="model">fsm.location</field>
+        <field name="inherit_id" ref="fieldservice.fsm_location_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='o_address_format']" position="replace">
+                <div class="o_address_format">
+                    <div class="d-flex align-items-center">
+                        <field name="zip" placeholder="ZIP" class="o_address_zip"/>
+                        <button name="zip_search" 
+                            type="object" 
+                            attrs="{'invisible': [('country_id', '!=', 31)]}" 
+                            class="btn-sm btn-link mb4 fa fa-search" 
+                            aria-label="Pesquisar CEP" 
+                            title="Pesquisar CEP"
+                        />
+                    </div>
+                    <field name="street" placeholder="Street..." class="o_address_street"/>
+                    <field name="street2" placeholder="Street 2..." class="o_address_street"/>
+                    <field name="city" placeholder="City" class="o_address_city"/>
+                    <field name="state_id" class="o_address_state" placeholder="State" options="{&quot;no_open&quot;: True}" context="{'country_id': country_id, 'zip': zip}"/>
+                    <field name="country_id" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

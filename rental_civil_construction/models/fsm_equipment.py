@@ -308,4 +308,8 @@ class FSMEquipment(models.Model):
     def account_no_invoice(self):
         self.account_stage = "no"
 
-    
+class FSMLocation(models.Model):
+    _inherit = "fsm.location"
+
+    def zip_search(self):
+        return self.env["l10n_br.zip"].zip_search(self)

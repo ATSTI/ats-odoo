@@ -14,6 +14,6 @@ class AccountMove(models.Model):
             nome_boleto = self.partner_id.name
             nome_boleto = '_'.join(nome_boleto.split())
             inv_number = self.get_invoice_fiscal_number().split("/")[-1].zfill(6)
-            nome_boleto = nome_boleto + '_' + inv_number
-            self.file_boleto_pdf_id.write({'name': f'{nome_boleto[:50]}.pdf'})
+            nome_boleto = nome_boleto[:40] + '_' + inv_number
+            self.file_boleto_pdf_id.write({'name': f'{nome_boleto}.pdf'})
         return res

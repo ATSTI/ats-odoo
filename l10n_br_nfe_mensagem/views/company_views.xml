@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="company_danfe_font_size_form" model="ir.ui.view">
+        <field name="name">nfe.company.danfe_font_size.form</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="l10n_br_nfe.nfe_res_company_form" />
+        <field name="priority">399</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='nfe_danfe_layout']" position="after">
+                <field name="danfe_font_size" />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

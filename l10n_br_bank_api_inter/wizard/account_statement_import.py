@@ -163,8 +163,9 @@ class AccountStatementImport(models.TransientModel):
 
         datas = [self.format_date(t["dataTransacao"]) for t in transacoes_ofx]
         ofx.append("<BANKTRANLIST>")
-        ofx.append(f"<DTSTART>{min(datas)}</DTSTART>")
-        ofx.append(f"<DTEND>{max(datas)}</DTEND>")
+        if len(datas):
+            ofx.append(f"<DTSTART>{min(datas)}</DTSTART>")
+            ofx.append(f"<DTEND>{max(datas)}</DTEND>")
 
         for i, t in enumerate(transacoes_ofx):
             tipo_op = t["tipoOperacao"]

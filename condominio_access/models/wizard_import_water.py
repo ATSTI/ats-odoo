@@ -14,7 +14,6 @@ class CondoImportWaterWizard(models.TransientModel):
     _description = "Importar Leituras de Água"
 
     file = fields.Binary(string="Arquivo Excel", required=True)
-    
     filename = fields.Char()
 
     def _normalizar_lote(self, lote):
@@ -33,29 +32,45 @@ class CondoImportWaterWizard(models.TransientModel):
     def action_import(self):
         if not self.file:
             raise UserError("Envie um arquivo.")
+
         wb = openpyxl.load_workbook(
             BytesIO(base64.b64decode(self.file)),
-            data_only=True)
+            data_only=True
+        )
+
         sheet = wb.worksheets[0]
+
         residence_model = self.env["condo.residence"]
         reading_model = self.env["condo.water.reading"]
-        for row in sheet.iter_rows(min_row=3, values_only=True):   
-            lote = row[3]      
-            data_ref = row[5]  
-            anterior = row[6]  
+
+        criados = 0
+        atualizados = 0
+        nao_encontrados = 0
+
+        for row in sheet.iter_rows(min_row=3, values_only=True):
+
+            lote = row[3]
+            data_ref = row[5]
+            anterior = row[6]
             atual = row[7]
-            obs = row[9]      
+            obs = row[9]
+
             if not lote:
                 continue
+
             lote = self._normalizar_lote(lote)
+
             _logger.warning("Buscando lote: [%s]", lote)
+
             residence = residence_model.search([
                 ("lote", "=", lote)
             ], limit=1)
 
             if not residence:
+                nao_encontrados += 1
                 _logger.warning("NAO ACHOU lote: %s", lote)
                 continue
+
             _logger.warning("ACHOU: %s", residence.name)
 
             if str(anterior).strip().lower() == "sem hidro":
@@ -67,7 +82,10 @@ class CondoImportWaterWizard(models.TransientModel):
                 obs = 'Sem hidro'
 
             if isinstance(data_ref, str):
-                data_ref = datetime.strptime(data_ref, "%m/%Y").date()
+                data_ref = datetime.strptime(
+                    data_ref,
+                    "%m/%Y"
+                ).date()
 
             elif isinstance(data_ref, datetime):
                 data_ref = data_ref.date()
@@ -84,9 +102,28 @@ class CondoImportWaterWizard(models.TransientModel):
                 "atual": float(atual or 0),
                 "obs": obs or "",
             }
+
             if existing:
                 existing.write(vals)
+                atualizados += 1
                 _logger.warning("Atualizado: %s", residence.name)
+
             else:
                 reading_model.create(vals)
+                criados += 1
                 _logger.warning("Criado: %s", residence.name)
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Importação concluída'),
+                'message': _(
+                    f'Criados: {criados} | '
+                    f'Atualizados: {atualizados} | '
+                    f'Não encontrados: {nao_encontrados}'
+                ),
+                'sticky': True,
+                'type': 'success',
+            }
+        }

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <report
+        id="action_report_water_not_found"
+        model="condo.import.water.wizard"
+        string="Lotes Não Encontrados"
+        report_type="qweb-pdf"
+        name="condominio_access.report_water_not_found_template"
+        file="condominio_access.report_water_not_found_template"
+        print_report_name="'Lotes_Nao_Encontrados'"
+    />
+
+    <template id="report_water_not_found_template">
+        <t t-call="web.html_container">
+            <t t-call="web.internal_layout">
+                <div class="page">
+                    <h2>
+                        Lotes Não Encontrados
+                    </h2>
+
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Linha</th>
+                                <th>Lote</th>
+                                <th>Proprietário</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="lines" t-as="line">
+
+                                <td>
+                                    <span t-esc="line.get('linha')"/>
+                                </td>
+
+                                <td>
+                                    <span t-esc="line.get('lote')"/>
+                                </td>
+
+                                <td>
+                                    <span t-esc="line.get('proprietario')"/>
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

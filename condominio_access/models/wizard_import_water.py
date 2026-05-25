@@ -45,7 +45,6 @@ class CondoImportWaterWizard(models.TransientModel):
             anterior = row[6]  
             atual = row[7]
             obs = row[9]      
-            import pudb;pudb.set_trace()
             if not lote:
                 continue
             lote = self._normalizar_lote(lote)

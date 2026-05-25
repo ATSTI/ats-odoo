@@ -17,13 +17,17 @@ class CondoImportWaterWizard(models.TransientModel):
     
     filename = fields.Char()
 
-    def _normalizar_lote(self, lote, quadra):
+    def _normalizar_lote(self, lote):
         lote = str(lote).strip().upper()
-        quadra = str(quadra).strip().upper()
+
         if "." in lote:
             numero, complemento = lote.split(".", 1)
-            numero = numero.zfill(2)  # garante 2 dígitos
-            lote = f"{quadra}{numero}-{complemento}"
+            numero = numero.replace("-", "")
+            lote = f"{numero}-{complemento}"
+
+        else:
+            lote = lote.replace("-", "")
+
         return lote
 
     def action_import(self):
@@ -35,16 +39,16 @@ class CondoImportWaterWizard(models.TransientModel):
         sheet = wb.worksheets[0]
         residence_model = self.env["condo.residence"]
         reading_model = self.env["condo.water.reading"]
-        for row in sheet.iter_rows(min_row=3, values_only=True):
-            obs = ""   
-            quadra = row[0]
-            lote = row[1]      
-            data_ref = row[2]  
+        for row in sheet.iter_rows(min_row=3, values_only=True):   
+            lote = row[3]      
+            data_ref = row[5]  
             anterior = row[6]  
-            atual = row[7]      
+            atual = row[7]
+            obs = row[9]      
+            import pudb;pudb.set_trace()
             if not lote:
                 continue
-            lote = self._normalizar_lote(lote,quadra)
+            lote = self._normalizar_lote(lote)
             _logger.warning("Buscando lote: [%s]", lote)
             residence = residence_model.search([
                 ("lote", "=", lote)

@@ -108,11 +108,11 @@ class ContractContract(models.Model):
         # TODO adapt for multi-countries
 
         if not self.fiscal_operation_id:
-            if isinstance(super_inv_vals, list):
-                for inv_val in super_inv_vals:
-                    inv_val["l10n_latam_document_type_id"] = False
-            else:
-                super_inv_vals["l10n_latam_document_type_id"] = False
+            #if isinstance(super_inv_vals, list):
+            #    for inv_val in super_inv_vals:
+            #        inv_val["l10n_latam_document_type_id"] = False
+            #else:
+            #    super_inv_vals["l10n_latam_document_type_id"] = False
             return super_inv_vals
 
         if not isinstance(super_inv_vals, list):
@@ -140,7 +140,7 @@ class ContractContract(models.Model):
                     line_vals.get("fiscal_operation_line_id")
                 )
                 if not operation_line_id:
-                    raise UserError(_("The contract has no fiscal operation defined!"))
+                    raise UserError(_("The contract has no fiscal operation defined: %s-%s" %(self.name, self.partner_id.name)))
 
                 fiscal_document_type = operation_line_id.get_document_type(
                     self.company_id
@@ -151,16 +151,16 @@ class ContractContract(models.Model):
 
                 if key not in groups:
                     inv_to_append = base_header.copy()
+                    #        "l10n_latam_document_type_id": doc_type_id,
+                    #                ("l10n_latam_document_type_id", "=", doc_type_id),
                     inv_to_append.update(
                         {
                             "invoice_line_ids": [],
-                            "l10n_latam_document_type_id": doc_type_id,
                             "document_serie_id": self.env[
                                 "l10n_br_fiscal.document.serie"
                             ]
                             .search(
                                 [
-                                    ("l10n_latam_document_type_id", "=", doc_type_id),
                                     ("company_id", "=", self.company_id.id),
                                 ],
                                 limit=1,

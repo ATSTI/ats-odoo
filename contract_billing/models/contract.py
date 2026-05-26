@@ -195,7 +195,19 @@ class ContractContract(models.Model):
         if not contracts_to_invoice:
             raise ValidationError(_("O contrato deve estar ativo e não cancelado para gerar faturas."))
         invoices_values = contracts_to_invoice._prepare_recurring_invoices_values(date_ref)
-        moves = self.env["account.move"].create(invoices_values)
+        ref = invoices_values[0].get('ref')
+        mv = self.env["account.move"]
+        # evitando duplicidade da fatura
+        ctr = mv.search([('ref','=',ref), ('partner_id','=',contracts_to_invoice.partner_id.id)])
+        if ctr:
+            for contract in self:
+                if contract.active:
+                    next_date = contract.recurring_next_date or contract.date_start
+                    next_date += relativedelta(months=contract.interval_months or 1)
+                    contract.write({"recurring_next_date": next_date})
+            return ctr
+
+        moves = mv.create(invoices_values)
         contracts_to_invoice._add_contract_origin(moves)
         contracts_to_invoice._invoice_followers(moves)
         for contract in self:

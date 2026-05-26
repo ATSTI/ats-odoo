@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Assets: apenas o JS do módulo, sem FullCalendar -->
+    <template id="website_agenda_assets" inherit_id="website.assets_frontend">
+        <xpath expr="." position="inside">
+            <script src="/website_fsm_orders/static/src/js/OrdersDashboard.js"/>
+        </xpath>
+    </template>
+
+    <!-- Página principal do Dashboard -->
+    <template id="website_agenda_page" name="Dashboard de Compromissos">
+        <t t-call="website.layout">
+            <style>
+                /* ── Variáveis ─────────────────────────────────────── */
+                :root {
+                    --ag-bg:        #F7F8FC;
+                    --ag-card:      #FFFFFF;
+                    --ag-border:    #E8EAF0;
+                    --ag-primary:   #2C5EE8;
+                    --ag-accent:    #F0A500;
+                    --ag-text:      #1A1D2E;
+                    --ag-muted:     #7B8099;
+                    --ag-hoje-bg:   #EEF3FD;
+                    --ag-hoje-bord: #2C5EE8;
+                    --ag-radius:    12px;
+                    --ag-shadow:    0 2px 12px rgba(0,0,0,0.07);
+                }
+
+                body { background: var(--ag-bg); }
+
+                /* ── Layout ────────────────────────────────────────── */
+                .ag-wrapper {
+                    max-width: 860px;
+                    margin: 0 auto;
+                    padding: 40px 16px 80px;
+                    font-family: 'Segoe UI', sans-serif;
+                    color: var(--ag-text);
+                }
+
+                /* ── Cabeçalho ─────────────────────────────────────── */
+                .ag-header { margin-bottom: 32px; }
+                .ag-header h1 {
+                    font-size: 1.8rem;
+                    font-weight: 700;
+                    margin: 0 0 4px;
+                }
+                .ag-header p { color: var(--ag-muted); margin: 0; font-size: 0.95rem; }
+
+                /* ── KPIs ───────────────────────────────────────────── */
+                .ag-kpis {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr 2fr;
+                    gap: 16px;
+                    margin-bottom: 36px;
+                }
+                @media(max-width: 600px) {
+                    .ag-kpis { grid-template-columns: 1fr 1fr; }
+                    .ag-kpi-proximo { grid-column: 1 / -1; }
+                }
+                .ag-kpi {
+                    background: var(--ag-card);
+                    border: 1px solid var(--ag-border);
+                    border-radius: var(--ag-radius);
+                    padding: 20px;
+                    box-shadow: var(--ag-shadow);
+                }
+                .ag-kpi-label {
+                    font-size: 0.72rem;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 0.08em;
+                    color: var(--ag-muted);
+                    margin-bottom: 8px;
+                }
+                .ag-kpi-valor {
+                    font-size: 2rem;
+                    font-weight: 800;
+                    color: var(--ag-primary);
+                    line-height: 1;
+                }
+                .ag-kpi-proximo .ag-kpi-valor {
+                    font-size: 1rem;
+                    font-weight: 700;
+                    color: var(--ag-text);
+                }
+                .ag-kpi-proximo .ag-kpi-sub {
+                    font-size: 0.85rem;
+                    color: var(--ag-muted);
+                    margin-top: 2px;
+                }
+
+                /* ── Grupos de data ─────────────────────────────────── */
+                .agenda-grupo { margin-bottom: 28px; }
+
+                .agenda-grupo-header {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    margin-bottom: 12px;
+                }
+                .agenda-grupo-dia {
+                    font-size: 0.85rem;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 0.06em;
+                    color: var(--ag-muted);
+                }
+
+                /* Badge hoje/amanhã */
+                .agenda-badge {
+                    font-size: 0.7rem;
+                    font-weight: 700;
+                    padding: 2px 8px;
+                    border-radius: 20px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                }
+                .agenda-badge.hoje {
+                    background: var(--ag-primary);
+                    color: #fff;
+                }
+                .agenda-badge.amanha {
+                    background: var(--ag-accent);
+                    color: #fff;
+                }
+
+                /* Grupo de hoje tem destaque */
+                .grupo-hoje .agenda-grupo-dia { color: var(--ag-primary); }
+
+                /* ── Cards de evento ────────────────────────────────── */
+                .agenda-cards { display: flex; flex-direction: column; gap: 10px; }
+
+                .agenda-card {
+                    background: var(--ag-card);
+                    border: 1px solid var(--ag-border);
+                    border-left: 4px solid var(--ag-primary);
+                    border-radius: var(--ag-radius);
+                    padding: 16px 20px;
+                    box-shadow: var(--ag-shadow);
+                    transition: transform 0.15s, box-shadow 0.15s;
+                }
+                .agenda-card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(44,94,232,0.12);
+                }
+                .grupo-hoje .agenda-card {
+                    border-left-color: var(--ag-primary);
+                    background: var(--ag-hoje-bg);
+                }
+
+                .agenda-card-hora {
+                    font-size: 0.78rem;
+                    font-weight: 700;
+                    color: var(--ag-primary);
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    margin-bottom: 4px;
+                }
+                .agenda-card-titulo {
+                    font-size: 1rem;
+                    font-weight: 600;
+                    color: var(--ag-text);
+                }
+                .agenda-card-local {
+                    font-size: 0.82rem;
+                    color: var(--ag-muted);
+                    margin-top: 6px;
+                }
+                .agenda-card-desc {
+                    font-size: 0.82rem;
+                    color: var(--ag-muted);
+                    margin-top: 4px;
+                    border-top: 1px solid var(--ag-border);
+                    padding-top: 6px;
+                }
+
+                /* ── Estados ────────────────────────────────────────── */
+                .agenda-vazio {
+                    text-align: center;
+                    padding: 60px 20px;
+                    color: var(--ag-muted);
+                    font-size: 0.95rem;
+                }
+                #agenda-loading {
+                    text-align: center;
+                    padding: 60px;
+                    color: var(--ag-muted);
+                }
+                #agenda-erro {
+                    display: none;
+                    text-align: center;
+                    padding: 40px;
+                    color: #c0392b;
+                    background: #fdf0ef;
+                    border-radius: var(--ag-radius);
+                    border: 1px solid #f5c6c2;
+                }
+            </style>
+
+            <div id="wrap">
+                <div class="ag-wrapper">
+
+                    <!-- Cabeçalho -->
+                    <div class="ag-header">
+                        <h1>📅 Minha Agenda</h1>
+                        <p>Seus compromissos dos próximos 30 dias.</p>
+                    </div>
+
+                    <!-- KPIs -->
+                    <div class="ag-kpis">
+                        <div class="ag-kpi">
+                            <div class="ag-kpi-label">Total (30 dias)</div>
+                            <div class="ag-kpi-valor" id="kpi-total">—</div>
+                        </div>
+                        <div class="ag-kpi">
+                            <div class="ag-kpi-label">Esta semana</div>
+                            <div class="ag-kpi-valor" id="kpi-semana">—</div>
+                        </div>
+                        <div class="ag-kpi ag-kpi-proximo">
+                            <div class="ag-kpi-label">Próximo compromisso</div>
+                            <div class="ag-kpi-valor" id="kpi-proximo-titulo">—</div>
+                            <div class="ag-kpi-sub" id="kpi-proximo-data"></div>
+                        </div>
+                    </div>
+
+                    <!-- Estado de loading -->
+                    <div id="agenda-loading">⏳ Carregando seus compromissos...</div>
+
+                    <!-- Erro -->
+                    <div id="agenda-erro">
+                        ⚠️ Não foi possível carregar os eventos. Tente recarregar a página.
+                    </div>
+
+                    <!-- Dashboard principal -->
+                    <div id="agenda-dashboard" style="display:none;">
+                        <div id="agenda-lista"></div>
+                    </div>
+
+                </div>
+            </div>
+
+        </t>
+    </template>
+
+</odoo>

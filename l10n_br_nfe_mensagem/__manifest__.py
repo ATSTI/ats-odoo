@@ -20,7 +20,6 @@
     'depends': ['l10n_br_account','l10n_br_nfe', 'l10n_br_fiscal_certificate'],
     'data': [
         "views/account_invoice_view.xml",
-        "views/company_views.xml",
     ],
     'installable': True,
     'application': False,

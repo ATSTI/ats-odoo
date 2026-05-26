@@ -6,7 +6,6 @@ from odoo import models, fields
 class ResCompany(models.Model):
     _inherit = "res.company"
 
-    danfe_font_size = fields.Boolean(string="Aumentar Fonte do DANFE", default=False)
     parameter_field = fields.Boolean(string="Parameter Field", compute="_compute_parameter_field")
 
     def _compute_parameter_field(self):

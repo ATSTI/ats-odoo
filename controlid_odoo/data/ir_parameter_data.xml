@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="ir_cron_controlid_user_id" model="ir.config_parameter">
+        <field name="key">controlid_odoo.user</field>
+        <field name="value">admin</field>
+    </record>
+    <record id="ir_cron_controlid_passwd_id" model="ir.config_parameter">
+        <field name="key">controlid_odoo.passwd</field>
+        <field name="value">admin</field>
+    </record>
+    <record id="ir_cron_controlid_ip_id" model="ir.config_parameter">
+        <field name="key">controlid_odoo.ip</field>
+        <field name="value">X</field>
+    </record>
+</odoo>

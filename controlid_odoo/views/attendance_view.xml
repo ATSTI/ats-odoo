@@ -1,0 +1,14 @@
+<odoo>
+    <record id="hr_attendance_interval_period_tree" model="ir.ui.view">
+        <field name="name">attendance.interval.period.tree</field>
+        <field name="model">hr.attendance</field>
+        <field name="priority">9999</field>
+        <field name="inherit_id" ref="hr_attendance.view_attendance_tree" />
+        <field name="arch" type="xml">
+            <field name="check_out" position="after" >
+                <field name="check_in_interval" />
+                <field name="check_out_interval" />
+            </field>
+        </field>
+    </record>
+</odoo>

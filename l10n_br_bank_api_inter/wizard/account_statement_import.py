@@ -36,6 +36,8 @@ class AccountStatementImport(models.TransientModel):
             data_ini = self.data_ini 
         if data_fim is None:
             data_fim = self.data_fim
+        if journal_id is None:
+            journal_id = self.journal_id.id
 
         if data_ini > data_fim:
             raise UserError("Data início deve ser menor que data fim.")
@@ -52,16 +54,20 @@ class AccountStatementImport(models.TransientModel):
         ofx = self.generate_extract_file_ofx(file_data, transacoes, journal_id)
 
         # converte para base64
+        ofx_importar = self.env['account.statement.import'].create({
+            'data_ini': data_ini,
+            'data_fim': data_fim,
+            'journal_id': journal_id.id
+        })
         ofx_bytes = ofx.encode("latin-1")
-        self.statement_file = base64.b64encode(ofx_bytes)
+        ofx_importar.statement_file = base64.b64encode(ofx_bytes)
 
         # opcional: nome do arquivo
-        self.statement_filename = "extrato_inter.ofx"
-        if self.statement_file:
-            self.import_file_button()
-
+        ofx_importar.statement_filename = "extrato_inter.ofx"
+        if ofx_importar.statement_file:
+            ofx_importar.import_file_button()
         logger.info("OFX gerado com sucesso")
-    
+
     def generate_extract_file(self, data_ini, data_fim, journal_id=None):
         if not journal_id and self.journal_id:
             journal_id = self.journal_id

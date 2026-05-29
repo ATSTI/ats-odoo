@@ -467,7 +467,7 @@ class Document(models.Model):
             response.
         """
         records = (
-            self.search([("state", "in", ["enviada"])], limit=25)
+            self.search([("state_edoc", "in", ["a_enviar"])], limit=25)
             .filtered(filter_processador_edoc_nfse)
             .filtered(filter_prescon)
         )

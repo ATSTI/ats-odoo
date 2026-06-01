@@ -21,11 +21,11 @@
                     />
                 </group>
             </xpath>
-            <!-- <xpath expr="//field[@name='statement_file']" position="attributes">
+            <xpath expr="//field[@name='statement_file']" position="attributes">
                 <attribute
                     name="attrs"
                 >{'invisible': [('import_with_api', '=', True)], 'required': [('import_with_api', '!=', True)]}</attribute>
-            </xpath> -->
+            </xpath>
         </field>
     </record>
 </odoo>

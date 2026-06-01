@@ -28,6 +28,7 @@ Como usar:
         "wizard/bank_api_inter_baixa.xml",
         "wizard/account_statement_import_view.xml",
         "data/automated_query.xml",
+        # "data/cron.xml",
     ],
     'demo': [
         "demo/res_partner_bank.xml",

@@ -54,11 +54,14 @@ class AccountStatementImport(models.TransientModel):
         ofx = self.generate_extract_file_ofx(file_data, transacoes, journal_id)
 
         # converte para base64
-        ofx_importar = self.env['account.statement.import'].create({
-            'data_ini': data_ini,
-            'data_fim': data_fim,
-            'journal_id': journal_id.id
-        })
+        if not self:
+            ofx_importar = self.env['account.statement.import'].create({
+                'data_ini': data_ini,
+                'data_fim': data_fim,
+                'journal_id': journal_id.id
+            })
+        else:
+            ofx_importar = self
         ofx_bytes = ofx.encode("latin-1")
         ofx_importar.statement_file = base64.b64encode(ofx_bytes)
 

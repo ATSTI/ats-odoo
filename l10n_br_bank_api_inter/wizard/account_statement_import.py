@@ -31,40 +31,53 @@ class AccountStatementImport(models.TransientModel):
     # método = import_extract_ofx
     # parametros = data inicio e data fim (YYYY-MM-DD)
 
-
-    def import_extract_ofx(self, data_ini=None, data_fim=None):
+    def import_extract_ofx(self, data_ini=None, data_fim=None, journal_id=None):
         if data_ini is None:
             data_ini = self.data_ini 
         if data_fim is None:
             data_fim = self.data_fim
+        if journal_id is None:
+            journal_id = self.journal_id.id
 
         if data_ini > data_fim:
             raise UserError("Data início deve ser menor que data fim.")
-        
-        if not self.journal_id.bank_inter_cert or not self.journal_id.bank_inter_key:
+
+        journal_id = self.env['account.journal'].browse([journal_id])
+
+        if  not journal_id:
+            raise UserError("Diário é obrigatório para importação.")
+
+        if not journal_id.bank_inter_cert or not journal_id.bank_inter_key:
             raise UserError("Certificado e chave do banco são obrigatórios para importação.")
 
-        file_data, transacoes = self.generate_extract_file(data_ini, data_fim)
-        if not transacoes:
-            raise UserError("Nenhuma transação encontrada no período selecionado.")
-        ofx = self.generate_extract_file_ofx(file_data, transacoes)
+        file_data, transacoes = self.generate_extract_file(data_ini, data_fim, journal_id)
+        ofx = self.generate_extract_file_ofx(file_data, transacoes, journal_id)
 
         # converte para base64
+        if not self:
+            ofx_importar = self.env['account.statement.import'].create({
+                'data_ini': data_ini,
+                'data_fim': data_fim,
+                'journal_id': journal_id.id
+            })
+        else:
+            ofx_importar = self
         ofx_bytes = ofx.encode("latin-1")
-        self.statement_file = base64.b64encode(ofx_bytes)
+        ofx_importar.statement_file = base64.b64encode(ofx_bytes)
 
         # opcional: nome do arquivo
-        self.statement_filename = "extrato_inter.ofx"
-        if self.statement_file:
-            self.import_file_button()
-
+        ofx_importar.statement_filename = "extrato_inter.ofx"
+        if ofx_importar.statement_file:
+            ofx_importar.import_file_button()
         logger.info("OFX gerado com sucesso")
-    
-    def generate_extract_file(self, data_ini, data_fim):
-        clientID = self.journal_id.bank_client_id
-        clientSecret = self.journal_id.bank_secret_id
-        client_cert, client_key = self.get_cert_files()
-        if self.journal_id.bank_environment == "1": #PRODUÇÃO
+
+    def generate_extract_file(self, data_ini, data_fim, journal_id=None):
+        if not journal_id and self.journal_id:
+            journal_id = self.journal_id
+        clientID = journal_id.bank_client_id
+        clientSecret = journal_id.bank_secret_id
+        client_cert, client_key = self.get_cert_files(journal_id)
+        if journal_id.bank_environment == "1": #PRODUÇÃO
             url = "https://cdpj.partners.bancointer.com.br"
         else:
             url = "https://cdpj-sandbox.partners.uatinter.co"
@@ -85,7 +98,7 @@ class AccountStatementImport(models.TransientModel):
         while pagina < totalpaginas:
             opFiltros={"dataInicio": self.format_date(data_ini), "dataFim": self.format_date(data_fim), "pagina": pagina, "tamanhoPagina": 30}
             
-            cabecalhos={"Authorization": "Bearer " + token, "x-conta-corrente": self.journal_id.bank_account_id.acctid, "Content-Type": "Application/json"}
+            cabecalhos={"Authorization": "Bearer " + token, "x-conta-corrente": journal_id.bank_account_id.acctid, "Content-Type": "Application/json"}
 
             response = requests.get("https://cdpj.partners.bancointer.com.br/banking/v2/extrato/completo",
                 params=opFiltros,
@@ -109,7 +122,7 @@ class AccountStatementImport(models.TransientModel):
 
 
     
-    def generate_extract_file_ofx(self, data, transacoes_ofx):
+    def generate_extract_file_ofx(self, data, transacoes_ofx, journal_id=None):
 
         hoje = datetime.now().strftime("%Y%m%d")
 
@@ -147,8 +160,8 @@ class AccountStatementImport(models.TransientModel):
         ofx.append("<STMTRS>")
         ofx.append("<CURDEF>BRL</CURDEF>")
 
-        conta = self.journal_id.bank_account_id.acctid
-        agencia = self.journal_id.bank_account_id.bra_number
+        conta = journal_id.bank_account_id.acctid
+        agencia = journal_id.bank_account_id.bra_number
 
         ofx.append("<BANKACCTFROM>")
         ofx.append("<BANKID>077</BANKID>")
@@ -159,8 +172,9 @@ class AccountStatementImport(models.TransientModel):
 
         datas = [self.format_date(t["dataTransacao"]) for t in transacoes_ofx]
         ofx.append("<BANKTRANLIST>")
-        ofx.append(f"<DTSTART>{min(datas)}</DTSTART>")
-        ofx.append(f"<DTEND>{max(datas)}</DTEND>")
+        if len(datas):
+            ofx.append(f"<DTSTART>{min(datas)}</DTSTART>")
+            ofx.append(f"<DTEND>{max(datas)}</DTEND>")
 
         for i, t in enumerate(transacoes_ofx):
             tipo_op = t["tipoOperacao"]
@@ -176,6 +190,7 @@ class AccountStatementImport(models.TransientModel):
             # Mapeamento de tipo
             if tipo_trans == "PIX":
                 if tipo_op == "C":
+                    # print(t)
                     cnpj_cpf = t['detalhes'].get("cpfCnpjPagador", "")
                 else:
                     cnpj_cpf = t['detalhes'].get("cpfCnpjRecebedor", "")
@@ -229,9 +244,9 @@ class AccountStatementImport(models.TransientModel):
         else:
             raise ValueError(f"Tipo inválido para data: {type(date_str)}")
 
-    def get_cert_files(self):
-        cert_b64 = self.journal_id.bank_inter_cert
-        key_b64 = self.journal_id.bank_inter_key
+    def get_cert_files(self, journal_id=None):
+        cert_b64 = journal_id.bank_inter_cert
+        key_b64 = journal_id.bank_inter_key
 
         # decode
         cert_bytes = base64.b64decode(cert_b64)

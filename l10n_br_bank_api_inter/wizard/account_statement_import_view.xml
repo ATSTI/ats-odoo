@@ -17,7 +17,7 @@
                         name="import_extract_ofx"
                         string="Importar Extrato OFX"
                         type="object"
-                        class="btn-secondary"
+                        class="btn-primary"
                     />
                 </group>
             </xpath>

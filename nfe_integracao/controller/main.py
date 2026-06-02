@@ -254,6 +254,7 @@ class IntegracaoPdv(http.Controller):
                 days=company.days_to_notify
             )
 
+            msg = ""
             if hoje >= move.invoice_date_due and hoje < date_due_limit:
                 dias_restantes = (date_due_limit - hoje).days
                 msg = (

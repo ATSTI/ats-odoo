@@ -417,7 +417,7 @@ class Document(models.Model):
                 # Se precisar do link da nota tem no EVENTO
                 record._change_state(SITUACAO_EDOC_AUTORIZADA)
                 if link:
-                    link = "https://arturnogueira.presconinformatica.com.br/ords/arthur/f?p=719:116::EMITENOTA:NO:116:P116_CODE,P116_CODET,P116_KEY,P116_KEYT:113868,122817,122817EKOH9NPCRBJ62J,HADAIRWX9QPPDRSGL28R91S18V23SQ8K"
+                    #link = "https://arturnogueira.presconinformatica.com.br/ords/arthur/f?p=719:116::EMITENOTA:NO:116:P116_CODE,P116_CODET,P116_KEY,P116_KEYT:113868,122817,122817EKOH9NPCRBJ62J,HADAIRWX9QPPDRSGL28R91S18V23SQ8K"
                     retorno_pdf = self._fetch_pdf_from_urls(record, link, use_url_first=True)
                     self.make_prescon_nfse_pdf(retorno_pdf)
 

@@ -13,15 +13,11 @@
                     <page string="Informações Pessoais">
                     <group> 
                         <group>
+                            <field name="birthdate_date" />
                             <field name="genero" />
                             <field name="peso" />
                             <field name="altura" />
                             <field name="calcado" />
-                            <field name="nadadeira"/>
-                            <field name="bcd" readonly="1"/>
-                            <field name="suit" readonly="1"/>
-                            <field name="reg" readonly="1"/>
-                            <field name="bag" readonly="1"/>
                             <field name="contatonome" />
                             <field name="contatofone" />
                             <field name="alergia" />
@@ -31,7 +27,11 @@
                             <field name="restricaoalimentar" />
                             <field name="segurodan" />
                             <field name="passaporte" />
-                            <field name="birthdate_date" />
+                            <field name="nadadeira"/>
+                            <field name="bcd" readonly="1"/>
+                            <field name="suit" readonly="1"/>
+                            <field name="reg" readonly="1"/>
+                            <field name="bag" readonly="1"/>
                         </group>
                     </group>
                     </page>

@@ -1,10 +1,10 @@
 from odoo import api, fields, models
 from odoo import exceptions, _
-from datetime import datetime
+from datetime import datetime, timedelta
 import sys
 
 sys.path.append(
-    "/home/publico/desenv/odoo/external_libs/odoo16/controlid-relogio-ponto-py"
+    "/opt/odoo16/external_libs/controlid-relogio-ponto-py"
 )
 
 from controlidpy.entities import Session
@@ -24,7 +24,7 @@ class HrAttendance(models.Model):
         passwd = self.env['ir.config_parameter'].sudo().get_param('controlid_odoo.passwd')
         ip = self.env['ir.config_parameter'].sudo().get_param('controlid_odoo.ip')
         session = Session(user, passwd, ip)
-        today = fields.Date.today()
+        today = fields.Date.today() - timedelta(days=1)
         afds = get_afds(session, today.day, today.month, today.year)
         users = get_users_from_afds(session, afds)
         final = transform_afds(afds, users)
@@ -37,7 +37,11 @@ class HrAttendance(models.Model):
             if pis in processed_pis:
                 continue  # já processado
 
-            employee = self.env['hr.employee'].search([('cpf_stripped', '=', pis)], limit=1)
+            employee = self.env['hr.employee'].search([
+                '|',
+                ('cpf_stripped', '=', pis),
+                ('name', 'ilike', line['funcionario']),
+            ], limit=1)
             if not employee:
                 continue
 

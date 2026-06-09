@@ -1,0 +1,162 @@
+<odoo>
+    <template id="report_notasperiodo_document">
+        <t t-call="web.external_layout">
+            <main>
+                <div class="page">
+
+                    <style>
+                        table {
+                            page-break-inside: auto;
+                        }
+
+                        tr {
+                            page-break-inside: avoid;
+                            page-break-after: auto;
+                        }
+
+                        thead {
+                            display: table-header-group;
+                        }
+
+                        tfoot {
+                            display: table-footer-group;
+                        }
+
+                        td, th {
+                            page-break-inside: avoid;
+                        }
+                    </style>
+
+                    <h2 style="text-align:center;">
+                        Relatório de Notas por Período
+                    </h2>
+
+                    <table style="width:100%; margin-bottom:20px;">
+                        <tr>
+                            <td>
+                                <strong>Data Inicial:</strong><br/>
+                                <span t-esc="data_inicial"/>
+                            </td>
+
+                            <td>
+                                <strong>Data Final:</strong><br/>
+                                <span t-esc="data_final"/>
+                            </td>
+
+                            <td>
+                                <strong>Tipo de Documento:</strong><br/>
+                                <span t-esc="tipo_documento"/>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-sm table-bordered"
+                           style="width:100%;">
+
+                        <thead>
+                            <tr>
+                                <th style="width:30%;">
+                                    Cliente
+                                </th>
+
+                                <th style="width:20%;">
+                                    Pedido
+                                </th>
+
+                                <th style="width:20%;">
+                                    Nota Fiscal
+                                </th>
+
+                                <th style="width:15%;">
+                                    Data
+                                </th>
+
+                                <th style="width:15%;"
+                                    class="text-end">
+                                    Valor
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <t t-set="cliente_atual" t-value="0"/>
+
+                            <t t-foreach="notas_fiscais.sorted(key=lambda m: (m.partner_id.name or ''))"
+                               t-as="l">
+
+                                <t t-if="cliente_atual != l.partner_id.id">
+
+                                    <t t-set="cliente_atual"
+                                       t-value="l.partner_id.id"/>
+
+                                    <tr>
+                                        <td colspan="5"
+                                            style="background:#e9ecef;
+                                                   font-weight:bold;
+                                                   font-size:14px;">
+                                            Cliente:
+                                            <span t-esc="l.partner_id.name"/>
+                                        </td>
+                                    </tr>
+
+                                </t>
+
+                                <tr>
+
+                                    <td>
+                                        <span t-esc="l.partner_id.name"/>
+                                    </td>
+
+                                    <td>
+                                        <span t-esc="l.invoice_origin or '-'"/>
+                                    </td>
+
+                                    <td>
+                                        <span t-esc="l.name"/>
+                                    </td>
+
+                                    <td>
+                                        <span t-esc="l.invoice_date.strftime('%d/%m/%Y')"/>
+                                    </td>
+
+                                    <td class="text-end">
+                                        <span t-esc="'{:,.2f}'.format(l.amount_total)"/>
+                                    </td>
+
+                                </tr>
+
+                            </t>
+
+                        </tbody>
+
+                        <t t-set="total_geral"
+                            t-value="sum(notas_fiscais.mapped('amount_total'))"/>
+
+                            <t t-set="quantidade_geral"
+                            t-value="len(notas_fiscais)"/>
+
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4" style="text-align:right;">
+                                        <strong>Total Geral:</strong><br/>
+                                        <strong>Quantidade Geral:</strong>
+                                    </td>
+
+                                    <td class="text-end">
+                                        <strong>
+                                            <span t-esc="'{:,.2f}'.format(total_geral).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
+                                            <br/>
+                                            <span t-esc="quantidade_geral"/>
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </tfoot>
+
+                    </table>
+
+                </div>
+            </main>
+        </t>
+    </template>
+</odoo>

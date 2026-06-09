@@ -1,0 +1,72 @@
+<odoo>
+
+    <!-- VIEW DO WIZARD -->
+    <record id="view_report_notasperiodo_wizard_form" model="ir.ui.view">
+        <field name="name">report.notasperiodo.wizard.form</field>
+        <field name="model">report.notasperiodo.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Relatório de Notas por Período">
+
+                <group>
+                    <group>
+                        <field name="data_inicial" required="1"/>
+                        <field name="data_final" required="1"/>
+                        <field name="tipo_documento" required="1"/>
+                    </group>
+                </group>
+
+                <footer>
+                    <button name="action_print_report"
+                            string="Imprimir Relatório"
+                            type="object"
+                            class="btn-primary"/>
+
+                    <button string="Cancelar"
+                            special="cancel"
+                            class="btn-secondary"/>
+                </footer>
+
+            </form>
+        </field>
+    </record>
+
+
+    <record id="action_notasperiodo_wizard" model="ir.actions.act_window">
+        <field name="name">Relatório de Notas por Período</field>
+        <field name="res_model">report.notasperiodo.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+
+    <record id="report_notasperiodo_wizard" model="ir.actions.report">
+    <field name="name">Relatório de Notas por periodo</field>
+    <field name="model">report.notasperiodo.wizard</field>
+
+    <field name="report_type">qweb-pdf</field>
+
+    <field name="report_name">report_notasfiscais_periodo.report_notasperiodo_document</field>
+
+    <field name="report_file">report_notasfiscais_periodo.report_notasperiodo_document</field>
+
+    <field name="print_report_name">'Relatorio_Comissao'</field>
+
+    <field name="binding_model_id" ref="model_report_notasperiodo_wizard"/>
+    <field name="binding_type">report</field>
+</record>
+
+    <menuitem
+        id="menu_relatorios_notafiscal"
+        name="Relatório Nota Fiscal por Período"
+        parent="account.menu_finance_reports"
+        sequence="90"/>
+
+
+    <menuitem
+        id="menu_report_notasperiodo"
+        name="Relatório Notas por Período"
+        parent="menu_relatorios_notafiscal"
+        action="action_notasperiodo_wizard"
+        sequence="10"/>
+
+</odoo>

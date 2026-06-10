@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="l10n_br_bank_api_inter_desconto_form" model="ir.ui.view">
+        <field name="name">l10n_br_bank_api_inter_descs.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="priority">99</field>
+        <field name="inherit_id" ref="account.view_partner_property_form" />
+        <field name="arch" type="xml">
+            <field name="property_account_payable_id" position="after">
+                <label for="desconto_boleto_inter" string="Desconto boleto Inter (%)" />
+                <field name="desconto_boleto_inter" nolabel="1" />
+            </field>
+        </field>
+    </record>
+
+</odoo>

@@ -17,7 +17,7 @@ Este módulo customiza o campo operating_unit para atender às necessidades espe
     'maintainer': 'OtavioAndretta <otavio12257@gmail.com>, ATSTi',
     'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': [
-        'base','account','sale','operating_unit'
+        'fieldservice_isp_account','sale','operating_unit'
     ],
     'data': [
     ],

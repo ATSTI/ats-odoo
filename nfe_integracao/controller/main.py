@@ -229,14 +229,14 @@ class IntegracaoPdv(http.Controller):
             ('move_type', 'in', ['out_invoice', 'out_refund']),
         ])
         
-        company_names = [{'name': prt.name} for prt in parceiros]
+        company_vats = [{'cnpj_cpf': prt.cnpj_cpf_stripped} for prt in parceiros]
     
         pendencias_data = []
     
         # Custom Message
         if company.notify and company.notify_customers:
             pendencias_data.append({
-                'company_names': company_names,
+                'company_vats': company_vats,
                 'pending': False,
                 'mensagem': company.notify_customers,
             })
@@ -272,14 +272,14 @@ class IntegracaoPdv(http.Controller):
                 )
             if msg:
                 pendencias_data.append({
-                    'company_names': company_names,
+                    'company_vats': company_vats,
                     'pending': True,
                     'mensagem': msg,
                 })
 
         if not pendencias_data:
             pendencias_data.append({
-                'company_names': company_names,
+                'company_vats': company_vats,
                 'pending': False,
                 'mensagem': '',
             })

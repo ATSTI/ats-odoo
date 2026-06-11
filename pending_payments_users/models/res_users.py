@@ -27,6 +27,16 @@ class Users(models.Model):
                 _logger.warning('[PendingPayment] Erro ao verificar pendência no login: %s', e)
         return uid
 
+    def refresh_pending_payment(self):
+        self.ensure_one()
+        _logger.info(f'[PendingPayment] Atualizando pendências para usuário {self.login} (ID: {self.id})')
+        self._check_pending_payments()
+        _logger.info(f'[PendingPayment] Pendências atualizadas: payment_pending={self.payment_pending}, mensage_pai="{self.mensage_pai}"')
+        return {
+            'payment_pending': self.payment_pending,
+            'mensage_pai': self.mensage_pai,
+        }
+
     def _check_pending_payments(self):
         """Verifica pendências de pagamento para a empresa atual do usuário."""
 

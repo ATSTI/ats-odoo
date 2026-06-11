@@ -387,7 +387,9 @@ class Document(models.Model):
                 elif child.tag == "link":
                     link = child.text                    
 
-            protocol_date = self._parse_authorization_datetime(dataEmissaoRPS)
+            # protocol_date = self._parse_authorization_datetime(dataEmissaoRPS)
+            # retorna date somente por isso usando a data atual
+            protocol_date = fields.Datetime.now()
 
             if response.status_code != 200:
                 # if retorno.get("statusEmissao") != 200:
@@ -399,7 +401,7 @@ class Document(models.Model):
                         msg=messages,
                     )
                 )                        
-            elif response.status_code == 200:
+            elif response.status_code == 200 and str(status_emissao) == '200':
                 record.authorization_event_id.set_done(
                     status_code=4,
                     response=_("Processado com Sucesso"),
@@ -412,6 +414,7 @@ class Document(models.Model):
                         "verify_code": codigo_verificacao,
                         "document_number": numero_nota,
                         "authorization_date": protocol_date,
+                        "document_date": protocol_date,
                     }
                 )
                 # Se precisar do link da nota tem no EVENTO
@@ -420,6 +423,15 @@ class Document(models.Model):
                     #link = "https://arturnogueira.presconinformatica.com.br/ords/arthur/f?p=719:116::EMITENOTA:NO:116:P116_CODE,P116_CODET,P116_KEY,P116_KEYT:113868,122817,122817EKOH9NPCRBJ62J,HADAIRWX9QPPDRSGL28R91S18V23SQ8K"
                     retorno_pdf = self._fetch_pdf_from_urls(record, link, use_url_first=True)
                     self.make_prescon_nfse_pdf(retorno_pdf)
+            else:
+                record._change_state(SITUACAO_EDOC_REJEITADA)
+                raise UserError(
+                    _(
+                        "%(status)s - %(msg)s",
+                        status=status_emissao,
+                        msg=messages,
+                    )
+                )
 
     def _eletronic_document_send(self):
         """Send the electronic document to the NFSe provider.

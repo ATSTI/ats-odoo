@@ -28,7 +28,7 @@
     'description': """ Relatorio customizado para a rslabsource de cotação/pedido
     """,
     'category': 'Contacts/Custom',
-    'author': 'ATSTi, Odoo Community Association (OCA)',
+    'author': 'ATSTi',
     'website': 'http://www.atsti.com.br',
     'contributors': [
         'Otavio Andretta <otavio12257@gmail.com>'
@@ -36,6 +36,7 @@
     'depends': ['account', 'l10n_br_sale'],
     'data': [
         'report/report_paper_format.xml',
+        'views/sale_order.xml',
         'report/report_rslabsource_document.xml',
     ],
     'installable': True,

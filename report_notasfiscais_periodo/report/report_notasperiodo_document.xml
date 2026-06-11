@@ -1,0 +1,130 @@
+<odoo>
+    <template id="report_notasperiodo_document">
+        <t t-call="web.external_layout">
+            <main>
+                <div class="page">
+                    <style>
+                        /* ── Reset / base ── */
+                        .rp-report { font-family: 'DejaVu Sans', Arial, sans-serif; font-size: 11px; color: #1a1a2e; }
+
+                        /* ── Header ── */
+                        .rp-title { text-align: center; font-size: 16px; font-weight: 700; letter-spacing: .5px; margin-bottom: 4px; color: #1a1a2e; }
+                        .rp-subtitle { text-align: center; font-size: 11px; color: #6c757d; margin-bottom: 18px; }
+
+                        /* ── Filtros ── */
+                        .rp-filters { display: flex; gap: 0; border: 1px solid #dee2e6; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
+                        .rp-filter-item { flex: 1; padding: 8px 12px; border-right: 1px solid #dee2e6; background: #f8f9fa; }
+                        .rp-filter-item:last-child { border-right: none; }
+                        .rp-filter-label { font-size: 9px; text-transform: uppercase; letter-spacing: .6px; color: #6c757d; font-weight: 600; margin-bottom: 2px; }
+                        .rp-filter-value { font-size: 12px; font-weight: 700; color: #1a1a2e; }
+
+                        /* ── Tabela ── */
+                        .rp-table { width: 100%; border-collapse: collapse; margin-bottom: 0; }
+                        .rp-table thead tr { background: #1a1a2e; color: #ffffff; }
+                        .rp-table thead th { padding: 7px 10px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; border: none; color: #ffffff !important; }
+                        .rp-table thead th.text-end { text-align: right; }
+
+                        .rp-table tbody tr.rp-group { background: #eef0f5; }
+                        .rp-table tbody td.rp-group-cell { padding: 5px 10px; font-weight: 700; font-size: 11px; color: #1a1a2e; border-bottom: 1px solid #dee2e6; }
+
+                        .rp-table tbody tr.rp-row td { padding: 5px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+                        .rp-table tbody tr.rp-row:nth-child(even) td { background: #fafafa; }
+                        .rp-table tbody tr.rp-row td.text-end { text-align: right; font-variant-numeric: tabular-nums; }
+
+                        /* ── Rodapé ── */
+                        .rp-table tfoot tr { background: #1a1a2e; color: #ffffff; }
+                        .rp-table tfoot td { padding: 8px 10px; border: none; }
+                        .rp-table tfoot td.text-end { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+                        /* ── Page break ── */
+                        table { page-break-inside: auto; }
+                        tr { page-break-inside: avoid; page-break-after: auto; }
+                        thead { display: table-header-group; }
+                        tfoot { display: table-footer-group; }
+                        td, th { page-break-inside: avoid; }
+                    </style>
+
+                    <div class="rp-report">
+
+                        <p class="rp-title">Relatório de Notas Fiscais por Período</p>
+                        <p class="rp-subtitle">Emissão: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/></p>
+
+                        <!-- Filtros -->
+                        <div class="rp-filters">
+                            <div class="rp-filter-item">
+                                <div class="rp-filter-label">Data Inicial</div>
+                                <div class="rp-filter-value"><span t-esc="data_inicial"/></div>
+                            </div>
+                            <div class="rp-filter-item">
+                                <div class="rp-filter-label">Data Final</div>
+                                <div class="rp-filter-value"><span t-esc="data_final"/></div>
+                            </div>
+                            <div class="rp-filter-item">
+                                <div class="rp-filter-label">Tipo de Documento</div>
+                                <div class="rp-filter-value"><span t-esc="tipo_documento"/></div>
+                            </div>
+                        </div>
+
+                        <!-- Tabela -->
+                        <table class="rp-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:30%;">Cliente</th>
+                                    <th style="width:20%;">Pedido</th>
+                                    <th style="width:20%;">Nota Fiscal</th>
+                                    <th style="width:15%;">Data</th>
+                                    <th style="width:15%;" class="text-end">Valor (R$)</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <t t-set="cliente_atual" t-value="0"/>
+                                <t t-foreach="notas_fiscais.sorted(key=lambda m: (m.partner_id.name or ''))" t-as="l">
+
+                                    <t t-if="cliente_atual != l.partner_id.id">
+                                        <t t-set="cliente_atual" t-value="l.partner_id.id"/>
+                                        <tr class="rp-group">
+                                            <td colspan="5" class="rp-group-cell">
+                                                <span t-esc="l.partner_id.name"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+
+                                    <tr class="rp-row">
+                                        <td><span t-esc="l.partner_id.name"/></td>
+                                        <td><span t-esc="l.invoice_origin or '—'"/></td>
+                                        <td><span t-esc="l.name"/></td>
+                                        <td><span t-esc="l.invoice_date.strftime('%d/%m/%Y')"/></td>
+                                        <td class="text-end">
+                                            <span t-esc="'{:,.2f}'.format(l.amount_total).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
+                                        </td>
+                                    </tr>
+
+                                </t>
+                            </tbody>
+
+                            <t t-set="total_geral" t-value="sum(notas_fiscais.mapped('amount_total'))"/>
+                            <t t-set="quantidade_geral" t-value="len(notas_fiscais)"/>
+
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3"></td>
+                                    <td style="text-align:right; font-size:10px; letter-spacing:.3px;">
+                                        TOTAL GERAL NO PERÍODO<br/>
+                                        QUANTIDADE NO PERÍODO
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-esc="'{:,.2f}'.format(total_geral).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
+                                        <br/>
+                                        <span t-esc="quantidade_geral"/>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                    </div>
+                </div>
+            </main>
+        </t>
+    </template>
+</odoo>

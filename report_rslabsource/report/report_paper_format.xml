@@ -4,8 +4,10 @@
         <field name="name">Orçamento customizado</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">report_rslabsource.report_rslabsource_document</field>
-        <field name="report_file">report_rslabsource.report_rslabsource_document</field>
+
+        <field name="report_name">report_rslabsource.report_rslabsource</field>
+        <field name="report_file">report_rslabsource.report_rslabsource</field>
+
         <field name="binding_model_id" ref="sale.model_sale_order"/>
         <field name="binding_type">report</field>
     </record>

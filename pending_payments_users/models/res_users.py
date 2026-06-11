@@ -27,6 +27,16 @@ class Users(models.Model):
                 _logger.warning('[PendingPayment] Erro ao verificar pendência no login: %s', e)
         return uid
 
+    def refresh_pending_payment(self):
+        self.ensure_one()
+        _logger.info(f'[PendingPayment] Atualizando pendências para usuário {self.login} (ID: {self.id})')
+        self._check_pending_payments()
+        _logger.info(f'[PendingPayment] Pendências atualizadas: payment_pending={self.payment_pending}, mensage_pai="{self.mensage_pai}"')
+        return {
+            'payment_pending': self.payment_pending,
+            'mensage_pai': self.mensage_pai,
+        }
+
     def _check_pending_payments(self):
         """Verifica pendências de pagamento para a empresa atual do usuário."""
 
@@ -68,17 +78,14 @@ class Users(models.Model):
         for data in pendencias:
             pending = data.get('pending', False)
             mensagem = data.get('mensagem', '')
-            company_names = [
-                normalize(item['name'])
-                for item in data.get('company_names', [])
-            ]
-
-            company_normalized = normalize(company.name)
-
-            match = any(
-                company_normalized in cn or cn in company_normalized
-                for cn in company_names
-            )
+            
+            company_vat = company.cnpj_cpf_stripped
+            company_vats = {
+                item.get('cnpj_cpf')
+                for item in data.get('company_vats', [])
+                if item.get('cnpj_cpf')
+            }
+            match = company_vat in company_vats
 
             if match and pending:
                 found_pending = True
@@ -86,7 +93,7 @@ class Users(models.Model):
                 break
 
         # Atualiza o campo independente do resultado
-        self.write({
+        self.sudo().write({
             'payment_pending': found_pending,
             'mensage_pai': mensagem_pendente if found_pending else '',
         })

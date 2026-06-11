@@ -64,19 +64,18 @@ odoo.define('pending_payments_users.action_patch', function (require) {
 
             return rpc.query({
                 model: 'res.users',
-                method: 'read',
-                args: [[userId], ['payment_pending', 'mensage_pai']],
-                kwargs: {},
+                method: 'refresh_pending_payment',
+                args: [[userId]],
             }).then((result) => {
                 console.log('[PendingPayment] 📦 Resultado RPC:', result);
 
-                if (!result || !result[0]) {
+                if (!result) {
                     console.warn('[PendingPayment] ⚠️ Resultado vazio ou inválido');
                     return;
                 }
 
-                const payment_pending = result[0].payment_pending;
-                const mensage_pai = result[0].mensage_pai;
+                const payment_pending = result.payment_pending;
+                const mensage_pai = result.mensage_pai;
 
                 console.log('[PendingPayment] 💳 payment_pending:', payment_pending);
                 console.log('[PendingPayment] 💬 mensage_pai:', mensage_pai);

@@ -8,7 +8,7 @@
                 <group>
                     <field name="nfe_xml"/>
                     <field name="purchase_id" attrs="{'invisible':[('confirma','!=',False)]}"/>
-                    <!-- <field name="fiscal_position_id" domain="['|', ('fiscal_type', '=', None), ('fiscal_type', '=', 'entrada')]"/> -->
+                    <field name="fiscal_operation_id" />
                     <field name="payment_term_id" />
                     <field name="cadastra_fornecedor" string="Incluir Fornecedor" />
                     <field name="confirma" readonly="1"/>

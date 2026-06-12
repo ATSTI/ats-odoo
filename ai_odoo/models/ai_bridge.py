@@ -6,6 +6,7 @@ import traceback
 from datetime import timedelta
 from io import StringIO
 
+
 import requests
 from werkzeug import urls
 
@@ -16,37 +17,50 @@ class AiBridge(models.Model):
 
     def execute_ai_bridge(self, res_model, res_id, user_content):
         self.ensure_one()
+        
+
         if not self.active or (
             self.group_ids and not self.env.user.groups_id & self.group_ids
         ):
             return {
                 "body": _("%s is not active.", self.name),
-                "args": {"type": "warning", "title": _("AI Bridge Inactive")},
+                "args": {
+                    "type": "warning",
+                    "title": _("AI Bridge Inactive"),
+                },
             }
-        record = self.env[res_model].browse(res_id).exists()
-        if record:
-            execution = self.env["ai.bridge.execution"].create(
-                {
-                    "ai_bridge_id": self.id,
-                    "model_id": self.sudo().env["ir.model"]._get_id(res_model),
-                }
-            )
-            result = execution._execute(user_content, res_id)
-            if result:
-                return result
-            if execution.state == "done":
-                return {
-                    "notification": {
-                        "body": _("%s executed successfully.", self.name),
-                        "args": {"type": "success", "title": _("AI Bridge Executed")},
-                    }
-                }
+
+        record = False
+        if res_id:
+            record = self.env[res_model].browse(res_id).exists()
+        execution = self.env["ai.bridge.execution"].create({
+            "ai_bridge_id": self.id,
+            "model_id": self.sudo().env["ir.model"]._get_id(res_model),
+        })
+        result = execution._execute(user_content, res_id)
+        if result:
+            return result
+
+        if execution.state == "done":
             return {
                 "notification": {
-                    "body": _("%s failed.", self.name),
-                    "args": {"type": "danger", "title": _("AI Bridge Failed")},
+                    "body": _("%s executed successfully.", self.name),
+                    "args": {
+                        "type": "success",
+                        "title": _("AI Bridge Executed"),
+                    },
                 }
             }
+
+        return {
+            "notification": {
+                "body": _("%s failed.", self.name),
+                "args": {
+                    "type": "danger",
+                    "title": _("AI Bridge Failed"),
+                },
+            }
+        }
 
     def _prepare_payload_record(self, user_content=None, record=None, **kwargs):
         # import pudb;pu.db
@@ -154,3 +168,120 @@ class AiBridgeExecution(models.Model):
 
         except Exception as e:
             return {"error": str(e), "raw_response": response}
+
+
+    def _execute_simple(self, system_prompt, user_content, temperature=0):
+        """
+        Chamada direta sem campos de record — para classificação ou
+        qualquer prompt sem contexto de modelo.
+        Retorna o texto da resposta ou None em caso de erro.
+        """
+        self.ensure_one()
+        payload = {
+            "model": "gpt-4o-mini",
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user",   "content": user_content},
+            ],
+            "temperature": temperature,
+        }
+        try:
+            response = requests.post(
+                self.ai_bridge_id.url,
+                json=payload,
+                auth=self._get_auth(),
+                headers=self._get_headers(),
+                timeout=30,
+            )
+            self.payload = payload
+            response.raise_for_status()
+            self.state = "done"
+            self.result = response.content
+            return response.json()["choices"][0]["message"]["content"]
+        except Exception:
+            self.state = "error"
+            self.payload = payload
+            buff = StringIO()
+            traceback.print_exc(file=buff)
+            self.error = buff.getvalue()
+            buff.close()
+            return None
+
+
+    def _execute_agent(self, user_content, tools, execute_func_callback, system_prompt=None):
+        """
+        Ciclo completo de function calling.
+        - Primeira chamada: GPT decide qual tool usar
+        - Odoo executa via execute_func_callback(func_name, args) -> dict
+        - Segunda chamada: GPT formata a resposta final com os dados reais
+        Retorna o texto final ou mensagem de erro.
+        """
+        self.ensure_one()
+        payload = {
+            "model": "gpt-4o-mini",
+            "messages": [
+                {
+                    "role": "system",
+                    "content": system_prompt or "Você é um assistente de negócios do Odoo.",
+                },
+                {"role": "user", "content": user_content},
+            ],
+            "tools": [{"type": "function", "function": f} for f in tools],
+            "tool_choice": "auto",
+            "temperature": 0,
+        }
+        try:
+            # — Primeira chamada —
+            response = requests.post(
+                self.ai_bridge_id.url,
+                json=payload,
+                auth=self._get_auth(),
+                headers=self._get_headers(),
+                timeout=30,
+            )
+            self.payload = payload
+            response.raise_for_status()
+            msg = response.json()["choices"][0]["message"]
+
+            if not msg.get("tool_calls"):
+                self.state = "done"
+                self.result = response.content
+                return msg.get("content", "")
+
+            messages = payload["messages"] + [msg]
+            for tool_call in msg["tool_calls"]:
+                func_name = tool_call["function"]["name"]
+                func_args = json.loads(tool_call["function"]["arguments"])
+                result = execute_func_callback(func_name, func_args)
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tool_call["id"],
+                    "content": json.dumps(result, ensure_ascii=False),
+                })
+
+            # — Segunda chamada: formata a resposta —
+            second_payload = {
+                "model": "gpt-4o-mini",
+                "messages": messages,
+                "temperature": 0,
+            }
+            second_response = requests.post(
+                self.ai_bridge_id.url,
+                json=second_payload,
+                auth=self._get_auth(),
+                headers=self._get_headers(),
+                timeout=30,
+            )
+            second_response.raise_for_status()
+            self.state = "done"
+            self.result = second_response.content
+            return second_response.json()["choices"][0]["message"]["content"]
+
+        except Exception:
+            self.state = "error"
+            self.payload = payload
+            buff = StringIO()
+            traceback.print_exc(file=buff)
+            self.error = buff.getvalue()
+            buff.close()
+            return "Desculpe, ocorreu um erro ao processar sua consulta."

@@ -45,6 +45,43 @@ QUERY_FUNCTIONS = [
             "required": ["days"]
         }
     },
+
+    {
+        "name": "get_top_sellers",
+        "description": "Lista os vendedores mais que mais venderam em um período",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "days": {"type": "integer"},
+                "limit": {"type": "integer", "description": "Quantos vendedores retornar (padrão 5)"}
+            },
+            "required": ["days"]
+        }
+    },
+
+    {
+    "name": "prepare_invoice",
+    "description": "Valida cliente e produtos e prepara uma fatura para confirmação posterior. Retorna os dados da fatura preparada ou erros encontrados. Caso o usuário confirme, então a função 'create_invoice' deve ser chamada com os mesmos dados para criar a fatura de fato.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "partner_name": {"type": "string"},
+            "lines": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "product_name": {"type": "string"},
+                        "qty": {"type": "number"}
+                    },
+                    "required": ["product_name", "qty"]
+                }
+            }
+        },
+        "required": ["partner_name", "lines"]
+    }
+    },
+
     {
     "name": "get_overdue_invoices",
     "description": "Retorna faturas vencidas e o total em aberto. Pode filtrar por cliente e por quantidade de dias para trás.",
@@ -60,6 +97,48 @@ QUERY_FUNCTIONS = [
                 "description": "Buscar apenas faturas vencidas nos últimos X dias"
             }
         }
+    }
+},
+
+{
+    "name": "create_invoice",
+    "description": "Cria uma fatura para um cliente com os produtos, quantidades e preços informados.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "partner_name": {
+                "type": "string",
+                "description": "Nome do cliente"
+            },
+            "lines": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "product_name": {
+                            "type": "string",
+                            "description": "Nome do produto"
+                        },
+                        "qty": {
+                            "type": "number",
+                            "description": "Quantidade"
+                        },
+                        "unit_price": {
+                            "type": "number",
+                            "description": "Preço unitário"
+                        }
+                    },
+                    "required": [
+                        "product_name",
+                        "qty"
+                    ]
+                }
+            }
+        },
+        "required": [
+            "partner_name",
+            "lines"
+        ]
     }
 }
 ]
@@ -154,7 +233,7 @@ class MailMessage(models.Model):
                 f"Hoje é {datetime.now().strftime('%d/%m/%Y')}."
             ),
         )
-
+        import pudb;pudb.set_trace()
         if answer:
             self._post_bot_message(channel, answer)
 
@@ -208,6 +287,90 @@ class MailMessage(models.Model):
                 totals[name] = totals.get(name, 0) + line.product_uom_qty
             top = sorted(totals.items(), key=lambda x: x[1], reverse=True)[:limit]
             return {'top_products': [{'product': p, 'qty': q} for p, q in top]}
+        
+        elif func_name == 'get_top_sellers':
+            limit = args.get('limit', 5)
+
+            lines = self.env['sale.order.line'].search([
+                ('order_id.date_order', '>=', since_str),
+                ('order_id.state', 'in', ['sale', 'done']),
+            ])
+
+            totals = {}
+
+            for line in lines:
+                seller = line.order_id.user_id.name or 'Sem vendedor'
+                totals[seller] = totals.get(seller, 0) + line.price_subtotal
+
+            top = sorted(
+                totals.items(),
+                key=lambda x: x[1],
+                reverse=True
+            )[:limit]
+
+            return {
+                'top_sellers': [
+                    {
+                        'seller': seller,
+                        'amount': amount
+                    }
+                    for seller, amount in top
+                ]
+            }
+        
+        elif func_name == 'prepare_invoice':
+            partner_name = args.get('partner_name')
+            lines = args.get('lines', [])
+            partner = self.env['res.partner'].search([
+                ('name', 'ilike', partner_name)
+            ], limit=1)
+            if not partner:
+                return {
+                    'error': f"Cliente '{partner_name}' não encontrado"
+                }
+            invoice_lines = []
+            for item in lines:
+                product = self.env['product.product'].search([
+                    ('name', 'ilike', item['product_name'])
+                ], limit=1)
+
+                if not product:
+                    return {
+                        'error': f"Produto '{item['product_name']}' não encontrado"
+                    }
+
+                qty = item.get('qty', 1)
+
+                price_unit = item.get('unit_price')
+
+                if price_unit is None:
+                    price_unit = product.lst_price
+
+                invoice_lines.append((0, 0, {
+                    'product_id': product.id,
+                    'quantity': qty,
+                    'price_unit': price_unit,
+                }))
+
+            move = self.env['account.move'].create({
+                'move_type': 'out_invoice',
+                'partner_id': partner.id,
+                'invoice_line_ids': invoice_lines,
+            })
+
+            return {
+                'success': True,
+                'invoice_id': move.id,
+                'invoice_name': move.name,
+                'partner': partner.name,
+                'total': move.amount_total,
+                'message': (
+                    f"Fatura {move.name} criada com sucesso "
+                    f"para o cliente {partner.name}. "
+                    f"Valor total: R$ {move.amount_total:.2f}"
+                )
+            }
+
 
         elif func_name == 'get_overdue_invoices':
             domain = [
@@ -247,7 +410,7 @@ class MailMessage(models.Model):
         return {'error': f"Função '{func_name}' não reconhecida"}
 
     def _post_bot_message(self, channel, content):
-        # import pudb;pudb.set_trace()
+        import pudb;pudb.set_trace()
         odoobot = self.env['res.partner'].search(
             [('name', 'ilike', 'odoobot'), ('active', '=', False)], limit=1
         )

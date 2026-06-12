@@ -206,7 +206,7 @@ class WizardImportNfe(models.TransientModel):
                             vals['fiscal_type'] = '00'
                             ncm = str(item.prod.NCM).zfill(8)
                             ncm = f"{ncm[:4]}.{ncm[4:6]}.{ncm[6:8]}"
-                            pf_ids = self.env['l10n_br_fiscal.ncm'].search([('code', '=', ncm)])
+                            pf_ids = self.env['l10n_br_fiscal.ncm'].search([('code', '=', ncm)], limit=1)
                             if pf_ids:
                                 vals['ncm_id'] = pf_ids.id
                             product = self.env['product.product'].create(vals)

@@ -14,8 +14,8 @@ class AccountMove(models.Model):
         """
 
         if (
-            self.env.company.payment_pending
-            and "BLOQUEADO!!!" in (self.env.company.mensage_pai or "")
+            self.env.user.payment_pending
+            and "BLOQUEADO!!!" in (self.env.user.mensage_pai or "")
         ):
             raise UserError(msg)
         else:

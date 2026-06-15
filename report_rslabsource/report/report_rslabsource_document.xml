@@ -19,9 +19,16 @@
             <div class="page" style="font-family: Arial, sans-serif; font-size: 10px; color: #000;">
 
                <table width="100%" style="border-collapse: collapse; margin-bottom: 6px;">
+               
                     <tr>
+                    <td width="20%" style="vertical-align: middle; text-align: left; padding: 4px;">
+                            <t t-if="o.company_id.logo">
+                                <img t-att-src="image_data_uri(o.company_id.logo)"
+                                    style="max-height: 60px; max-width: 120px;"/>
+                            </t>
+                        </td>
 
-                        <td width="80%" style="vertical-align: middle; padding: 4px; text-align: left;">
+                        <td width="80%" style="vertical-align: middle; padding: 4px; text-align: right;">
                             <strong style="font-size: 12px;">
                                 <t t-esc="o.company_id.name"/>
                             </strong>
@@ -72,14 +79,6 @@
                             </t>
 
                         </td>
-
-                        <td width="20%" style="vertical-align: middle; text-align: right; padding: 4px;">
-                            <t t-if="o.company_id.logo">
-                                <img t-att-src="image_data_uri(o.company_id.logo)"
-                                    style="max-height: 60px; max-width: 120px;"/>
-                            </t>
-                        </td>
-
                     </tr>
                 </table>
                 <hr style="border: 1px solid #000; margin: 4px 0;"/>
@@ -92,13 +91,12 @@
                             </strong>
                         </td>
                         <td width="40%" style="text-align: right;">
-                            <strong>Data:</strong>
-                            <span t-field="o.date_order"
-                                  t-options='{"widget": "date"}'/>
-                            &amp;nbsp;&amp;nbsp;
-                            <strong>Página:</strong>
-                            <span class="page"/> / <span class="topage"/>
-                        </td>
+                        <strong>Data:</strong>
+                        <span t-field="o.date_order" t-options='{"widget": "date"}'/>
+                        &#160;&#160;
+                        <strong>Página:</strong>
+                        <span class="page"/> 1 / <span class="topage"/>
+                    </td>
                     </tr>
                 </table>
 
@@ -181,7 +179,7 @@
                     </tr>
                 </table>
 
-                <table width="100%" style="border-collapse: collapse; border: 1px solid #ccc; margin-bottom: 6px; font-size: 9px;">
+               <table width="100%" style="border-collapse: collapse; border: 1px solid #ccc; margin-bottom: 6px; font-size: 9px;">
                     <thead>
                         <tr style="background-color: #4472C4; color: #fff; text-align: center;">
                             <th style="border: 1px solid #ccc; padding: 3px 4px; width: 12%;">Part Number</th>
@@ -189,7 +187,7 @@
                             <th style="border: 1px solid #ccc; padding: 3px 4px; width: 5%;">NCM</th>
                             <th style="border: 1px solid #ccc; padding: 3px 4px; width: 8%;">Entrega</th>
                             <th style="border: 1px solid #ccc; padding: 3px 4px; width: 6%;">Qtde</th>
-                            <th style="border: 1px solid #ccc; padding: 3px 4px; width: 9%;">V. Unit.</th>
+                            <th style="border: 1px solid #ccc; padding: 3px 4px; width: 9%;">Preço unitário</th>
                             <th style="border: 1px solid #ccc; padding: 3px 4px; width: 5%;">% ICMS</th>
                             <th style="border: 1px solid #ccc; padding: 3px 4px; width: 6%;">Red. ICMS</th>
                             <th style="border: 1px solid #ccc; padding: 3px 4px; width: 5%;">IPI</th>
@@ -201,20 +199,17 @@
                         <t t-foreach="o.order_line" t-as="line">
                             <tr style="vertical-align: top;">
                                 <td style="border: 1px solid #ccc; padding: 3px 4px; text-align: center;">
-                                    <t t-esc="line.product_id.default_code or ''"/>
+                                    <t t-esc="(line.product_id.default_code or '')[:14]"/>
                                 </td>
                                 <td style="border: 1px solid #ccc; padding: 3px 4px;">
-
                                     <div style="font-weight: bold;">
                                         <t t-esc="line.product_id.name.split('] ', 1)[1] if '] ' in line.product_id.name else line.product_id.name"/>
                                     </div>
-
                                     <t t-if="line.product_id.description_sale">
                                         <div style="font-size: 8px; color: #777; margin-top: 2px;">
                                             <t t-esc="line.product_id.description_sale"/>
                                         </div>
                                     </t>
-
                                 </td>
                                 <td style="border: 1px solid #ccc; padding: 3px 4px; text-align: center;">
                                     <t t-if="line.product_id.ncm_id">
@@ -223,7 +218,7 @@
                                 </td>
                                 <td style="border: 1px solid #ccc; padding: 3px 4px; text-align: center;">
                                     <t t-if="o.commitment_date">
-                                        <span t-field="o.commitment_date" t-options='{"widget": "date"}'/>
+                                        <t t-esc="(o.commitment_date.date() - datetime.date.today()).days"/> dias
                                     </t>
                                     <t t-else="">
                                         0 Dias
@@ -233,8 +228,10 @@
                                     <t t-esc="'%.4f' % line.product_uom_qty"/>
                                 </td>
                                 <td style="border: 1px solid #ccc; padding: 3px 4px; text-align: right;">
-                                    <t t-esc="currency_symbol"/>
-                                        <t t-esc="' %.6f' % line.price_unit"/>
+                                    <span style="white-space: nowrap;">
+                                        <t t-esc="currency_symbol"/>
+                                        <t t-esc="'{:,.6f}'.format(line.price_unit).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
+                                    </span>
                                 </td>
                                 <td style="border: 1px solid #ccc; padding: 3px 4px; text-align: center;">
                                     <t t-foreach="line.tax_id" t-as="tax">
@@ -255,14 +252,20 @@
                                 </td>
                                 <td style="border: 1px solid #ccc; padding: 3px 4px; text-align: right;">
                                     <t t-if="line.discount">
-                                        <t t-esc="currency_symbol"/>
-                                        <t t-esc="'%.2f' % (line.price_unit * line.product_uom_qty * line.discount / 100)"/>
+                                        <span style="white-space: nowrap;">
+                                            <!-- <t t-esc="currency_symbol"/> -->
+                                            <t t-esc="'{:,.2f}'.format(line.price_unit * line.product_uom_qty * line.discount / 100).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
+                                        </span>
                                     </t>
-                                    <t t-esc="currency_symbol"/> 0,00
+                                    <t t-else="">
+                                        <span style="white-space: nowrap;"> 0,00</span>
+                                    </t>
                                 </td>
                                 <td style="border: 1px solid #ccc; padding: 3px 4px; text-align: right; font-weight: bold;">
-                                    <t t-esc="currency_symbol"/>
-                                    <t t-esc="'%.2f' % line.price_subtotal"/>
+                                    <span style="white-space: nowrap;">
+                                        <t t-esc="currency_symbol"/>
+                                        <t t-esc="'{:,.2f}'.format(line.price_subtotal).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
+                                    </span>
                                 </td>
                             </tr>
                         </t>
@@ -278,48 +281,54 @@
                     </tfoot>
                 </table>
                 <table width="100%" style="border-collapse: collapse; margin-bottom: 8px; font-size: 9px;">
-                    <tr style="vertical-align: top;">
-                        <td width="55%" style="padding: 4px 0;">
-                            <strong>Obs:</strong>
-                            <t t-if="o.note">
-                                <span t-field="o.note"/>
-                            </t>
-                        </td>
-                        <td width="30%">
-                            <table width="100%" style="border-collapse: collapse;">
-                                <tr>
-                                    <td style="padding: 2px 6px; border: 1px solid #ccc;">Total dos Produtos</td>
-                                    <td style="padding: 2px 6px; border: 1px solid #ccc; text-align: left;">
-                                        <t t-esc="currency_symbol"/>
-                                        <t t-esc="'%.2f' % o.amount_untaxed"/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 2px 6px; border: 1px solid #ccc;">Valor do IPI</td>
-                                    <td style="padding: 2px 6px; border: 1px solid #ccc; text-align: left;">
-                                        <t t-esc="currency_symbol"/>
-                                        <t t-esc="'%.2f' % o.amount_tax"/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 2px 6px; border: 1px solid #ccc;">Frete/Seguro</td>
-                                    <td style="padding: 2px 6px; border: 1px solid #ccc; text-align: left;">
-                                        <t t-esc="currency_symbol"/> 0,00
-                                    </td>
-                                </tr>
-                                <tr style="font-weight: bold;">
-                                    <td style="padding: 3px 6px; border: 2px solid #000; background-color: #f0f0f0;">
-                                        Total do Orçamento
-                                    </td>
-                                    <td style="padding: 3px 6px; border: 2px solid #000; background-color: #f0f0f0; text-align: left;">
-                                        <t t-esc="currency_symbol"/>
-                                        <t t-esc="'%.2f' % o.amount_total"/>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
+    <tr style="vertical-align: top;">
+        <td width="55%" style="padding: 4px 0;">
+            <strong>Obs:</strong>
+            <t t-if="o.note">
+                <span t-field="o.note"/>
+            </t>
+        </td>
+        <td width="30%">
+            <table width="100%" style="border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 2px 6px; border: 1px solid #ccc;">Total dos Produtos</td>
+                    <td style="padding: 2px 6px; border: 1px solid #ccc; text-align: left;">
+                        <span style="white-space: nowrap;">
+                            <t t-esc="currency_symbol"/>
+                            <t t-esc="'{:,.2f}'.format(o.amount_untaxed).replace(',','X').replace('.', ',').replace('X','.')"/>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 2px 6px; border: 1px solid #ccc;">Valor do IPI</td>
+                    <td style="padding: 2px 6px; border: 1px solid #ccc; text-align: left;">
+                        <span style="white-space: nowrap;">
+                            <t t-esc="currency_symbol"/>
+                            <t t-esc="'{:,.2f}'.format(o.amount_tax).replace(',','X').replace('.', ',').replace('X','.')"/>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 2px 6px; border: 1px solid #ccc;">Frete/Seguro</td>
+                    <td style="padding: 2px 6px; border: 1px solid #ccc; text-align: left;">
+                        <span style="white-space: nowrap;"><t t-esc="currency_symbol"/> 0,00</span>
+                    </td>
+                </tr>
+                <tr style="font-weight: bold;">
+                    <td style="padding: 3px 6px; border: 2px solid #000; background-color: #f0f0f0;">
+                        Total do Orçamento
+                    </td>
+                    <td style="padding: 3px 6px; border: 2px solid #000; background-color: #f0f0f0; text-align: left;">
+                        <span style="white-space: nowrap;">
+                            <t t-esc="currency_symbol"/>
+                            <t t-esc="'{:,.2f}'.format(o.amount_total).replace(',','X').replace('.', ',').replace('X','.')"/>
+                        </span>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
 
                 <t t-if="o.payment_term_id">
                     <table width="100%" style="border-collapse: collapse; border: 1px solid #ccc; margin-bottom: 6px; font-size: 9px;">

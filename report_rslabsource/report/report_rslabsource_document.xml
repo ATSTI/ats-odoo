@@ -369,7 +369,13 @@
             <div class="page" style="page-break-before: always; font-family: Arial, sans-serif; font-size: 10px; color: #000;">
                 <table width="100%" style="border-collapse: collapse; margin-bottom: 6px;">
                     <tr>
-                        <td width="80%" style="vertical-align: middle; padding: 4px; text-align: left;">
+                    <td width="20%" style="vertical-align: middle; text-align: left; padding: 4px;">
+                            <t t-if="o.company_id.logo">
+                                <img t-att-src="image_data_uri(o.company_id.logo)"
+                                    style="max-height: 60px; max-width: 120px;"/>
+                            </t>
+                        </td>
+                        <td width="80%" style="vertical-align: middle; padding: 4px; text-align: right;">
                             <strong style="font-size: 12px;">
                                 <t t-esc="o.company_id.name"/>
                             </strong><br/>
@@ -406,12 +412,6 @@
 
                             <t t-if="o.company_id.website">
                                 Site: <t t-esc="o.company_id.website"/>
-                            </t>
-                        </td>
-                        <td width="20%" style="vertical-align: middle; text-align: right; padding: 4px;">
-                            <t t-if="o.company_id.logo">
-                                <img t-att-src="image_data_uri(o.company_id.logo)"
-                                    style="max-height: 60px; max-width: 120px;"/>
                             </t>
                         </td>
                     </tr>

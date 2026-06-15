@@ -19,7 +19,7 @@ class WizardImportNfe(models.TransientModel):
     nfe_xml = fields.Binary(u'XML da NFe')
     purchase_id = fields.Many2one('purchase.order',
                                   string='Pedido')
-    fiscal_position_id = fields.Many2one('account.fiscal.position',
+    fiscal_operation_id = fields.Many2one('l10n_br_fiscal.operation',
                                          string='Posição Fiscal')
     payment_term_id = fields.Many2one('account.payment.term',
                                       string='Forma de Pagamento')
@@ -71,7 +71,7 @@ class WizardImportNfe(models.TransientModel):
             "zip":emit.enderEmit.CEP,
             "street_name":emit.enderEmit.xLgr,
             "street_number":emit.enderEmit.nro,
-            "street2":emit.enderEmit.xCpl,
+            "street2":emit.enderEmit.xCpl if hasattr(emit.enderEmit, "xCpl") else '',
             "district":emit.enderEmit.xBairro,
             "city_id":city.id,
             "state_id":city.state_id.id,
@@ -115,7 +115,7 @@ class WizardImportNfe(models.TransientModel):
             date_planned=datetime_obj,
             date_order=datetime_obj,
             payment_term_id=self.payment_term_id.id,
-            fiscal_position_id=self.fiscal_position_id.id,
+            fiscal_operation_id=self.fiscal_operation_id.id,
             partner_ref=num_nfe,
             # document_number=num_nfe,
             # document_serie_id=datetime_obj,
@@ -206,7 +206,7 @@ class WizardImportNfe(models.TransientModel):
                             vals['fiscal_type'] = '00'
                             ncm = str(item.prod.NCM).zfill(8)
                             ncm = f"{ncm[:4]}.{ncm[4:6]}.{ncm[6:8]}"
-                            pf_ids = self.env['l10n_br_fiscal.ncm'].search([('code', '=', ncm)])
+                            pf_ids = self.env['l10n_br_fiscal.ncm'].search([('code', '=', ncm)], limit=1)
                             if pf_ids:
                                 vals['ncm_id'] = pf_ids.id
                             product = self.env['product.product'].create(vals)
@@ -222,6 +222,11 @@ class WizardImportNfe(models.TransientModel):
             'order_id':order_id,'partner_id':partner_id, 'product_qty_xml':float(quantidade), 'product_uom_xml':uom_xml.id,
             'num_item_xml':nitem
         })
+        order_line._onchange_fiscal_operation_id()
+        order_line._onchange_product_id_fiscal()
+        order_line._onchange_fiscal_operation_line_id()
+        order_line.write({'price_unit': preco_unitario, 'product_qty': quantidade})
+        order_line._onchange_commercial_quantity()
         return order_line
 
     def get_items_purchase(self, nfe, order_id):
@@ -245,6 +250,7 @@ class WizardImportNfe(models.TransientModel):
         purchase_dict = {}
         purchase_dict.update(self.get_main_purchase(nfe))
         order = self.env['purchase.order'].create(purchase_dict)
+        order._onchange_fiscal_operation_id()
         purchase_dict = {}
         order_id = order.id
         purchase_dict.update(self.get_items_purchase(nfe, order_id))

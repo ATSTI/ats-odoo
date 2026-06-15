@@ -86,6 +86,10 @@ $(document).ready(function () {
                 if (ev.location) {
                     html += '  <div class="agenda-card-local">📍 ' + ev.location + '</div>';
                 }
+
+                if (ev.endereco) {
+                    html += '  <div class="agenda-card-endereco">🏠 ' + ev.endereco + '</div>';
+                }
                 if (ev.description) {
                     html += '  <div class="agenda-card-desc">' + ev.description + '</div>';
                 }

@@ -29,7 +29,7 @@
     """,
     'author': 'ATS Soluções',
     'website': '',
-    'depends': ['fieldservice', 'hr', 'base', 'account', 'fieldservice_isp_account', 'l10n_br_fiscal'],
+    'depends': ['hr', 'fieldservice_isp_account', 'l10n_br_fiscal', 'fieldservice_operating_unit', 'account_operating_unit'],
     'data': [
         'views/fsm_order_view.xml',
         'views/res_partner_view.xml',

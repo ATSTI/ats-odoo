@@ -9,10 +9,11 @@ class FSMOrder(models.Model):
 
     loc_location = fields.Char(related="location_id.partner_id.contact_address", string="Endereço do Local")
     customer_address = fields.Char(
-    string="Endereço",
-    related="customer_id.contact_address",
-    store=False
-)
+        string="Endereço",
+        related="customer_id.contact_address",
+        store=False
+    )
+
     @api.onchange('person_id')
     def _onchange_person_id(self):
         if self.person_id:
@@ -79,6 +80,57 @@ class FSMOrder(models.Model):
             res.update({"name": f"{names} - {old_name}"})
         res._create_calendar_event()
         return res
+
+    def prepare_bills(self):
+        jrnl = self.env["account.journal"].search(
+            [
+                ("company_id", "=", self.env.company.id),
+                ("type", "=", "purchase"),
+                ("active", "=", True),
+            ],
+            limit=1,
+        )
+        fpos = self.person_id.partner_id.property_account_position_id
+        invoice_line_vals = []
+        for cost in self.contractor_cost_ids:
+            template = cost.product_id.product_tmpl_id
+            accounts = template.get_product_accounts()
+            account = accounts["expense"]
+            taxes = template.supplier_taxes_id
+            tax_ids = fpos.map_tax(taxes)
+            invoice_line_vals.append(
+                (
+                    0,
+                    0,
+                    {
+                        "analytic_account_id": self.location_id.analytic_account_id.id,
+                        "product_id": cost.product_id.id,
+                        "quantity": cost.quantity,
+                        "name": cost.product_id.display_name,
+                        "price_unit": cost.price_unit,
+                        "account_id": account.id,
+                        "fsm_order_ids": [(4, self.id)],
+                        "tax_ids": [(6, 0, tax_ids.ids)],
+                    },
+                )
+            )
+        vals = {
+            "partner_id": self.person_id.partner_id.id,
+            "move_type": "in_invoice",
+            "journal_id": jrnl.id or False,
+            "fiscal_position_id": fpos.id or False,
+            "fsm_order_ids": [(4, self.id)],
+            "company_id": self.env.company.id,
+            "invoice_line_ids": invoice_line_vals,
+        }
+        if self.operating_unit_id:
+            fiscal_vals = {
+                "operating_unit_id": self.operating_unit_id.id,
+                "document_type_id": 40, # 01 Nota Fiscal
+                "fiscal_operation_id": self.company_id.sale_fiscal_operation_id.id,
+            }
+            vals.update(fiscal_vals)
+        return vals
     
     def action_complete(self):
         res = super(FSMOrder, self).action_complete()
@@ -128,39 +180,15 @@ class FSMOrder(models.Model):
             }
             price_list = self.location_id.customer_id.property_product_pricelist
 
+        if self.operating_unit_id:
+            fiscal_vals = {
+                "operating_unit_id": self.operating_unit_id.id,
+                "document_type_id": 40, # 01 Nota Fiscal
+                "fiscal_operation_id": self.company_id.sale_fiscal_operation_id.id,
+            }
+            invoice_vals.update(fiscal_vals)
+
         invoice_line_vals = []
-        for cost in self.contractor_cost_ids:
-            # 23 Artur; 32 Cosmopolis; 33 Holambra
-            if self.company_id.id == 1 and jrnl.id == 23 or self.company_id.id == 2 and jrnl.id == 32 or self.company_id.id == 3 and jrnl.id == 33:
-                break
-            price = price_list.get_product_price(
-                product=cost.product_id,
-                quantity=cost.quantity,
-                partner=invoice_vals.get("partner_id"),
-                date=False,
-                uom_id=False,
-            )
-            template = cost.product_id.product_tmpl_id
-            accounts = template.get_product_accounts()
-            account = accounts["income"]
-            taxes = template.taxes_id
-            tax_ids = fpos.map_tax(taxes)
-            invoice_line_vals.append(
-                (
-                    0,
-                    0,
-                    {
-                        "product_id": cost.product_id.id,
-                        "analytic_account_id": self.location_id.analytic_account_id.id,
-                        "quantity": cost.quantity,
-                        "name": cost.product_id.display_name,
-                        "price_unit": price,
-                        "account_id": account.id,
-                        "fsm_order_ids": [(4, self.id)],
-                        "tax_ids": [(6, 0, tax_ids.ids)],
-                    },
-                )
-            )
         for line in self.employee_timesheet_ids:
             price = price_list.get_product_price(
                 product=line.product_id,

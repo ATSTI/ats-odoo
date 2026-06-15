@@ -11,6 +11,7 @@
         Permite criar parcelas em faturas de clientes e fornecedores
         informando o número de parcela, dia da parcela, e valor de entrada se necessário,
         e opção para editar as parcelas conforme necessidade.
+        Permite colocar forma de pagamento diferenciada para cada parcela.
     """,
     'author': 'ATSTi Soluções',
     'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',

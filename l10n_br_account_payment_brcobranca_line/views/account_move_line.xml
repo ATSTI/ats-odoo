@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record model="ir.ui.view" id="account_move_line_form_view">
+        <field name="name">account.move.line.form (in l10n_br_bank_api_inter)</field>
+        <field name="model">account.move.line</field>
+        <field
+            name="inherit_id"
+            ref="l10n_br_account_payment_order.cnab_view_move_line_form_inherit"
+        />
+        <field name="arch" type="xml">
+            <field name="payment_method_code" position="after">
+                <button
+                    name="generate_pdf_boleto_line"
+                    type="object"
+                    string="Gerar Boleto"
+                    class="oe_highlight"
+                    attrs="{'invisible': [('payment_method_code', 'not in', ('400', '240', '500'))]}"
+                />
+            </field>
+
+        </field>
+    </record>
+
+</odoo>

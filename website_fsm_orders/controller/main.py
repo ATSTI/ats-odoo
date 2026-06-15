@@ -34,6 +34,11 @@ class WebsiteCalendarView(http.Controller):
             start_str = start_dt.strftime('%Y-%m-%d %H:%M:%S')
             end_str = stop_dt.strftime('%Y-%m-%d %H:%M:%S')
 
+            loc = fo.location_id
+            partes = [loc.street, loc.street2, loc.city, loc.state_id.name, loc.zip]
+            endereco = ', '.join(p for p in partes if p)
+
+
             resultado.append({
                 'id': fo.id,
                 'title': fo.name,
@@ -42,6 +47,7 @@ class WebsiteCalendarView(http.Controller):
                 'allDay': False,
                 'location': fo.location_id.name or '',
                 'description': fo.description or '',
+                'endereco': endereco,
             })
 
         return resultado

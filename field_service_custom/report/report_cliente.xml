@@ -102,6 +102,15 @@
                         <div id="total" class="row">
                             <div style="float: right;" t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ml-auto">
                                 <table class="table table-sm" style="page-break-inside: avoid;">
+                                 <tr>
+                                        <td class="text-left"><strong>Total de Itens</strong></td>
+                                        <td class="text-right">
+                                            <strong>
+                                                <t t-esc="int(sum(l.quantity for l in o.invoice_line_ids if not l.display_type))"/>
+                                            </strong>   
+                                        </td>
+                                        <td colspan="2"/>
+                                    </tr>
                                     <tr class="border-black o_subtotal" style="">
                                         <td><strong>Subtotal: </strong></td>
                                         <td class="text-right">
@@ -138,6 +147,7 @@
                                             <span class="text-nowrap" t-field="o.amount_total"/>
                                         </td>
                                     </tr>
+
 
                                     <t t-if ="o.payment_state == 'paid' and o.get_payment_date()">
                                         <tr>

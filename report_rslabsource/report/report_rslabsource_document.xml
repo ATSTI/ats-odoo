@@ -102,8 +102,7 @@
 
                 <table width="100%" style="border-collapse: collapse; border: 1px solid #000; margin-bottom: 8px; font-size: 9px;">
                     <tr>
-                        <td colspan="4"
-                            style="background-color: #e0e0e0; padding: 3px 6px; font-weight: bold; border-bottom: 1px solid #000;">
+                        <td colspan="4" style="background-color: #e0e0e0; padding: 3px 6px; font-weight: bold; border-bottom: 1px solid #000;">
                             Dados do Cliente
                         </td>
                     </tr>
@@ -111,8 +110,9 @@
                     <tr>
                         <td colspan="4" style="padding: 4px 6px;">
                             <strong>
-                                <t t-esc="o.partner_id.ref or ''"/>
-                                <t t-if="o.partner_id.ref"> - </t>
+                                <t t-if="o.partner_id.ref">
+                                    <t t-esc="o.partner_id.ref"/> -
+                                </t>
                                 <t t-esc="o.partner_id.name"/>
                             </strong>
                         </td>
@@ -120,71 +120,59 @@
 
                     <tr>
                         <td colspan="4" style="padding: 2px 6px;">
-                            Endereço:
+                            <strong>Endereço:</strong>
                             <t t-esc="o.partner_id.street or ''"/>
-                            <t t-if="o.partner_id.street2">
-                                - <t t-esc="o.partner_id.street2"/>
-                            </t>
+                            <t t-if="o.partner_id.street2"> - <t t-esc="o.partner_id.street2"/></t>
                         </td>
                     </tr>
 
                     <tr>
                         <td width="25%" style="padding: 2px 6px;">
-                            Bairro:
-                            <t t-esc="o.partner_id.district or ''"/>
+                            <strong>Bairro:</strong> <t t-esc="o.partner_id.district or ''"/>
                         </td>
-
                         <td width="25%" style="padding: 2px 6px;">
-                            CEP:
-                            <t t-esc="o.partner_id.zip or ''"/>
+                            <strong>CEP:</strong> <t t-esc="o.partner_id.zip or ''"/>
                         </td>
-
                         <td width="25%" style="padding: 2px 6px;">
-                            Cidade:
-                            <t t-esc="o.partner_id.city or ''"/>
+                            <strong>Cidade:</strong> <t t-esc="o.partner_id.city or ''"/>
                         </td>
-
                         <td width="25%" style="padding: 2px 6px;">
-                            UF:
-                            <t t-esc="o.partner_id.state_id.code or ''"/>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td width="25%" style="padding: 2px 6px;">
-                            CNPJ/CPF:
-                            <t t-esc="o.partner_id.vat or ''"/>
-                        </td>
-
-                        <td width="25%" style="padding: 2px 6px;">
-                            I.E:
-                            <t t-esc="o.partner_id.inscr_est or ''"/>
+                            <strong>UF:</strong> <t t-esc="o.partner_id.state_id.code or ''"/>
                         </td>
                     </tr>
 
                     <tr>
                         <td colspan="2" style="padding: 2px 6px;">
-                            Telefone:
+                            <strong>CNPJ/CPF:</strong> <t t-esc="o.partner_id.vat or ''"/>
+                        </td>
+                        <td colspan="2" style="padding: 2px 6px;">
+                            <strong>I.E:</strong> <t t-esc="o.partner_id.inscr_est or ''"/>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2" style="padding: 2px 6px;">
+                            <strong>Telefone:</strong>
                             <t t-esc="o.partner_id.phone or ''"/>
-
-                            <t t-if="o.partner_id.mobile">
-                                / <t t-esc="o.partner_id.mobile"/>
-                            </t>
+                            <t t-if="o.partner_id.mobile"> / <t t-esc="o.partner_id.mobile"/></t>
                         </td>
-
                         <td colspan="2" style="padding: 2px 6px;">
-                            E-mail:
-                            <t t-esc="o.partner_id.email or ''"/>
-                        </td>
-
-                        <td colspan="2" style="padding: 2px 6px;">
-                            <strong>Contato:</strong>
-                            <t t-esc="o.partner_id.email or ''"/>
-                            <t t-if="o.partner_id.phone">
-                                &#160;|&#160;<t t-esc="o.partner_id.phone"/>
-                            </t>
+                            <strong>E-mail:</strong> <t t-esc="o.partner_id.email or ''"/>
                         </td>
                     </tr>
+
+                    <t t-if="o.partner_id.child_ids">
+                        <tr>
+                            <td colspan="4" style="padding: 2px 6px;">
+                                <strong>Contato(s):</strong>
+                                <t t-foreach="o.partner_id.child_ids" t-as="child">
+                                    <t t-esc="child.name"/>
+                                    <t t-if="child.phone"> (<t t-esc="child.phone"/>)</t>
+                                    <t t-if="not child_last"> · </t>
+                                </t>
+                            </td>
+                        </tr>
+                    </t>
                 </table>
 
                <table width="100%" style="border-collapse: collapse; border: 1px solid #ccc; margin-bottom: 6px; font-size: 9px;">

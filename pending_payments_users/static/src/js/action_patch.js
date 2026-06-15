@@ -1,8 +1,6 @@
 odoo.define('pending_payments_users.action_patch', function (require) {
     'use strict';
 
-    console.log('[PendingPayment] 🔵 Módulo carregado');
-
     // Primeira vez da sessão
     if (!sessionStorage.getItem('pending_assets_reload')) {
         console.log('[PendingPayment] 🔄 Primeiro carregamento da sessão — agendando reload');
@@ -11,7 +9,6 @@ odoo.define('pending_payments_users.action_patch', function (require) {
             const navbar = document.querySelector('.o_main_navbar');
             if (navbar) {
                 clearInterval(wait);
-                console.log('[PendingPayment] 🟢 Navbar encontrada — recarregando em 300ms');
                 setTimeout(() => {
                     console.log('[PendingPayment] 🔁 RECARREGANDO O ODOO');
                     window.location.reload();
@@ -38,36 +35,21 @@ odoo.define('pending_payments_users.action_patch', function (require) {
             });
         },
 
-        // Hook de switch de empresa
-        do_action(action, options) {
-            console.log('[PendingPayment] 🔀 do_action chamado — action:', action);
-            const result = this._super(...arguments);
-            if (action && action.tag === 'reload_context') {
-                console.log('[PendingPayment] 🏢 Switch de empresa detectado — reavaliando pendência');
-                this._checkPendingPayment();
-            }
-            return result;
-        },
-
         _checkPendingPayment() {
             console.log('[PendingPayment] 🔍 _checkPendingPayment() iniciado');
 
             const userId = session.uid;
-            console.log('[PendingPayment] 👤 userId:', userId);
 
             if (!userId) {
                 console.warn('[PendingPayment] ⚠️ userId não disponível — abortando');
                 return Promise.resolve();
             }
 
-            console.log('[PendingPayment] 📡 Chamando RPC res.users.read...');
-
             return rpc.query({
                 model: 'res.users',
                 method: 'refresh_pending_payment',
                 args: [[userId]],
             }).then((result) => {
-                console.log('[PendingPayment] 📦 Resultado RPC:', result);
 
                 if (!result) {
                     console.warn('[PendingPayment] ⚠️ Resultado vazio ou inválido');
@@ -77,12 +59,8 @@ odoo.define('pending_payments_users.action_patch', function (require) {
                 const payment_pending = result.payment_pending;
                 const mensage_pai = result.mensage_pai;
 
-                console.log('[PendingPayment] 💳 payment_pending:', payment_pending);
-                console.log('[PendingPayment] 💬 mensage_pai:', mensage_pai);
-
                 if (mensage_pai) {
                     const title = payment_pending ? 'Controle Sistema' : 'Aviso';
-                    console.log('[PendingPayment] 🔔 Exibindo notificação — title:', title, '— message:', mensage_pai);
 
                     setTimeout(() => {
                         this.displayNotification({
@@ -95,7 +73,6 @@ odoo.define('pending_payments_users.action_patch', function (require) {
 
                         setTimeout(() => {
                             $('.close.o_notification_close').remove();
-                            console.log('[PendingPayment] 🗑️ Botão fechar removido');
                         }, 100);
                     }, 1000);
                 } else {
@@ -107,5 +84,4 @@ odoo.define('pending_payments_users.action_patch', function (require) {
         },
     });
 
-    console.log('[PendingPayment] 🟢 WebClient.include() aplicado com sucesso');
 });

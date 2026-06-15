@@ -176,6 +176,14 @@
                             E-mail:
                             <t t-esc="o.partner_id.email or ''"/>
                         </td>
+
+                        <td colspan="2" style="padding: 2px 6px;">
+                            <strong>Contato:</strong>
+                            <t t-esc="o.partner_id.email or ''"/>
+                            <t t-if="o.partner_id.phone">
+                                &#160;|&#160;<t t-esc="o.partner_id.phone"/>
+                            </t>
+                        </td>
                     </tr>
                 </table>
 
@@ -239,7 +247,7 @@
                                         <t t-esc="'%.2f' % icms_tax[0].amount"/>
                                     </t>
                                     <t t-else="">
-                                        -
+                                        0,00
                                     </t>
                                 </td>
                                 <td style="border: 1px solid #ccc; padding: 3px 4px; text-align: center;">
@@ -251,7 +259,7 @@
                                         <t t-esc="'%.2f' % ipi_tax[0].amount"/>
                                     </t>
                                     <t t-else="">
-                                        -
+                                        0,00
                                     </t>
                                 </td>
                                 <td style="border: 1px solid #ccc; padding: 3px 4px; text-align: right;">

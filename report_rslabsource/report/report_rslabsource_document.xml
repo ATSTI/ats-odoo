@@ -225,29 +225,33 @@
                                     </t>
                                 </td>
                                 <td style="border: 1px solid #ccc; padding: 3px 4px; text-align: center;">
-                                    <t t-esc="'%.4f' % line.product_uom_qty"/>
+                                    <t t-esc="'%.2f' % line.product_uom_qty"/>
                                 </td>
                                 <td style="border: 1px solid #ccc; padding: 3px 4px; text-align: right;">
                                     <span style="white-space: nowrap;">
                                         <t t-esc="currency_symbol"/>
-                                        <t t-esc="'{:,.6f}'.format(line.price_unit).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
+                                        <t t-esc="'{:,.2f}'.format(line.price_unit).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
                                     </span>
                                 </td>
                                 <td style="border: 1px solid #ccc; padding: 3px 4px; text-align: center;">
-                                    <t t-foreach="line.tax_id" t-as="tax">
-                                        <t t-if="'icms' in tax.name.lower() or 'ICMS' in tax.name">
-                                            <t t-esc="'%.2f' % tax.amount"/>
-                                        </t>
+                                    <t t-set="icms_tax" t-value="line.tax_id.filtered(lambda t: 'icms' in t.name.lower())"/>
+                                    <t t-if="icms_tax">
+                                        <t t-esc="'%.2f' % icms_tax[0].amount"/>
+                                    </t>
+                                    <t t-else="">
+                                        -
                                     </t>
                                 </td>
                                 <td style="border: 1px solid #ccc; padding: 3px 4px; text-align: center;">
                                     0,00
                                 </td>
                                 <td style="border: 1px solid #ccc; padding: 3px 4px; text-align: center;">
-                                    <t t-foreach="line.tax_id" t-as="tax">
-                                        <t t-if="'ipi' in tax.name.lower() or 'IPI' in tax.name">
-                                            <t t-esc="'%.2f' % tax.amount"/>
-                                        </t>
+                                    <t t-set="ipi_tax" t-value="line.tax_id.filtered(lambda t: 'ipi' in t.name.lower())"/>
+                                    <t t-if="ipi_tax">
+                                        <t t-esc="'%.2f' % ipi_tax[0].amount"/>
+                                    </t>
+                                    <t t-else="">
+                                        -
                                     </t>
                                 </td>
                                 <td style="border: 1px solid #ccc; padding: 3px 4px; text-align: right;">
@@ -281,54 +285,54 @@
                     </tfoot>
                 </table>
                 <table width="100%" style="border-collapse: collapse; margin-bottom: 8px; font-size: 9px;">
-    <tr style="vertical-align: top;">
-        <td width="55%" style="padding: 4px 0;">
-            <strong>Obs:</strong>
-            <t t-if="o.note">
-                <span t-field="o.note"/>
-            </t>
-        </td>
-        <td width="30%">
-            <table width="100%" style="border-collapse: collapse;">
-                <tr>
-                    <td style="padding: 2px 6px; border: 1px solid #ccc;">Total dos Produtos</td>
-                    <td style="padding: 2px 6px; border: 1px solid #ccc; text-align: left;">
-                        <span style="white-space: nowrap;">
-                            <t t-esc="currency_symbol"/>
-                            <t t-esc="'{:,.2f}'.format(o.amount_untaxed).replace(',','X').replace('.', ',').replace('X','.')"/>
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="padding: 2px 6px; border: 1px solid #ccc;">Valor do IPI</td>
-                    <td style="padding: 2px 6px; border: 1px solid #ccc; text-align: left;">
-                        <span style="white-space: nowrap;">
-                            <t t-esc="currency_symbol"/>
-                            <t t-esc="'{:,.2f}'.format(o.amount_tax).replace(',','X').replace('.', ',').replace('X','.')"/>
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="padding: 2px 6px; border: 1px solid #ccc;">Frete/Seguro</td>
-                    <td style="padding: 2px 6px; border: 1px solid #ccc; text-align: left;">
-                        <span style="white-space: nowrap;"><t t-esc="currency_symbol"/> 0,00</span>
-                    </td>
-                </tr>
-                <tr style="font-weight: bold;">
-                    <td style="padding: 3px 6px; border: 2px solid #000; background-color: #f0f0f0;">
-                        Total do Orçamento
-                    </td>
-                    <td style="padding: 3px 6px; border: 2px solid #000; background-color: #f0f0f0; text-align: left;">
-                        <span style="white-space: nowrap;">
-                            <t t-esc="currency_symbol"/>
-                            <t t-esc="'{:,.2f}'.format(o.amount_total).replace(',','X').replace('.', ',').replace('X','.')"/>
-                        </span>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-</table>
+                    <tr style="vertical-align: top;">
+                        <td width="55%" style="padding: 4px 0;">
+                            <strong>Obs:</strong>
+                            <t t-if="o.note">
+                                <span t-field="o.note"/>
+                            </t>
+                        </td>
+                        <td width="30%">
+                            <table width="100%" style="border-collapse: collapse;">
+                                <tr>
+                                    <td style="padding: 2px 6px; border: 1px solid #ccc;">Total dos Produtos</td>
+                                    <td style="padding: 2px 6px; border: 1px solid #ccc; text-align: left;">
+                                        <span style="white-space: nowrap;">
+                                            <t t-esc="currency_symbol"/>
+                                            <t t-esc="'{:,.2f}'.format(o.amount_untaxed).replace(',','X').replace('.', ',').replace('X','.')"/>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 2px 6px; border: 1px solid #ccc;">Valor do IPI</td>
+                                    <td style="padding: 2px 6px; border: 1px solid #ccc; text-align: left;">
+                                        <span style="white-space: nowrap;">
+                                            <t t-esc="currency_symbol"/>
+                                            <t t-esc="'{:,.2f}'.format(o.amount_tax).replace(',','X').replace('.', ',').replace('X','.')"/>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 2px 6px; border: 1px solid #ccc;">Frete/Seguro</td>
+                                    <td style="padding: 2px 6px; border: 1px solid #ccc; text-align: left;">
+                                        <span style="white-space: nowrap;"><t t-esc="currency_symbol"/> 0,00</span>
+                                    </td>
+                                </tr>
+                                <tr style="font-weight: bold;">
+                                    <td style="padding: 3px 6px; border: 2px solid #000; background-color: #f0f0f0;">
+                                        Total do Orçamento
+                                    </td>
+                                    <td style="padding: 3px 6px; border: 2px solid #000; background-color: #f0f0f0; text-align: left;">
+                                        <span style="white-space: nowrap;">
+                                            <t t-esc="currency_symbol"/>
+                                            <t t-esc="'{:,.2f}'.format(o.amount_total).replace(',','X').replace('.', ',').replace('X','.')"/>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
 
                 <t t-if="o.payment_term_id">
                     <table width="100%" style="border-collapse: collapse; border: 1px solid #ccc; margin-bottom: 6px; font-size: 9px;">

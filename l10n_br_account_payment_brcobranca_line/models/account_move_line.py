@@ -16,6 +16,23 @@ from odoo.addons.l10n_br_account_payment_brcobranca.constants.br_cobranca import
 class AccountMove(models.Model):
     _inherit = "account.move"
 
+    def button_draft(self):
+        super().button_draft()
+        for record in self:
+            for line in record.line_ids:
+                if line.payment_mode_id.payment_method_code in BR_CODES_PAYMENT_ORDER:                
+                    # Verificar a situação do CNAB para apenas apagar
+                    # a linha ou mandar uma solicitação de Baixa
+                    line.update_cnab_for_cancel_invoice()
+                    file_boleto_ids = self.env["ir.attachment"].search([
+                        ("name", "ilike", "boleto_nf"),
+                        ("res_model", "=", self._name),
+                        ("res_id", "=", self.id),
+                    ])                    
+                    # file_pdf = self.file_boleto_pdf_id
+                    self.file_boleto_pdf_id = False
+                    file_boleto_ids.unlink()
+
     def _get_nosso_numero_line(self, move_line, boletos):
         brcobranca_api_url = get_brcobranca_api_url(self.env)
         brcobranca_service_url = brcobranca_api_url + "/api/boleto/nosso_numero"
@@ -39,8 +56,6 @@ class AccountMove(models.Model):
 
     def generate_boleto_pdf_line(self, move_line=False):
         file_pdf = self.file_boleto_pdf_id
-        self.file_boleto_pdf_id = False
-        file_pdf.unlink()
 
         if move_line:
             receivable_ids = move_line
@@ -59,8 +74,13 @@ class AccountMove(models.Model):
 
         pdf_string = self._get_brcobranca_boleto(boletos)
 
-        inv_number = self.get_invoice_fiscal_number().split("/")[-1].zfill(8)
+        # inv_number = self.get_invoice_fiscal_number().split("/")[-1].zfill(8)
+        inv_number = move_line.name.replace("/", "_").replace("-", "_")
         file_name = "boleto_nf-" + inv_number + ".pdf"
+        if file_pdf:
+            if file_pdf.name == file_name:
+                self.file_boleto_pdf_id = False
+                file_pdf.unlink()
 
         self.file_boleto_pdf_id = self.env["ir.attachment"].create(
             {
@@ -94,8 +114,8 @@ class AccountMove(models.Model):
         if move_line.payment_mode_id.payment_method_code not in BR_CODES_PAYMENT_ORDER:
             return
         for index, interval in enumerate(move_line):
-            inv_number = self.get_invoice_fiscal_number().split("/")[-1]
-            numero_documento = inv_number + "/" + str(index + 1).zfill(2)
+            # inv_number = self.get_invoice_fiscal_number().split("/")[-1]
+            numero_documento = move_line.name.split("-")[0] #.replace("/", "").replace("-", "")
             cnab_config = interval.payment_mode_id.cnab_config_id
             sequence = cnab_config.own_number_sequence_id.next_by_id()
 
@@ -120,20 +140,39 @@ class AccountMoveLine(models.Model):
         """
         Creates a new attachment with the Boleto PDF
         """
-        if self.own_number and self.pdf_boleto_id:
-            return
+        inv_number = self.name.replace("/", "_").replace("-", "_")
+        file_name = "boleto_nf-" + inv_number + ".pdf"
+        if self.own_number and self.move_id.file_boleto_pdf_id.name == file_name:
+            raise UserError(
+                _(
+                    "Boleto já gerado para esta linha."
+                )
+            )
         filtered_invoice_ids = self.filtered(
                 lambda s: (
                     s.payment_mode_id and s.payment_mode_id.auto_create_payment_order
                 )
             )
+        
+        if self.payment_line_ids:
+            # caso ja incluido e mudou vencimento ou valor
+            # precisa excluir e gerar novamente para atualizar o boleto
+            for payment_line in self.payment_line_ids:
+                if payment_line.order_id.state in ("draft", "open"):
+                    payment_line.unlink()
+                else:
+                    raise UserError(
+                        _(
+                            "Arquivo CNAB já gerado, não é possível alterar o boleto "
+                        )
+                    )
         if not self.payment_line_ids:
             if filtered_invoice_ids:            
                 # Criação das Linha na Ordem de Pagamento
                 applicable_lines = False
                 for move in self.move_id:
                     if move.state != "posted":
-                        raise UserError(_("The invoice %s is not in Posted state") % move.name)
+                        raise UserError(_("A fatura %s não foi 'Confirmada'") % move.name)
                     applicable_lines = move.line_ids.filtered(
                         lambda x: (
                             not x.reconciled
@@ -158,3 +197,6 @@ class AccountMoveLine(models.Model):
                         vals = self._prepare_payment_line_vals(payorder)
                         self.env["account.payment.line"].create(vals)
         self.move_id.generate_boleto_pdf_line(filtered_invoice_ids)
+        return {
+            'type': 'ir.actions.act_window_close'
+        }

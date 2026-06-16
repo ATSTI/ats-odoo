@@ -35,6 +35,21 @@
         </field>
     </record>
 
+    <record id="fsm_order_form_custom_ordenate" model="ir.ui.view">
+        <field name="name">fsm.order.form.ordenate</field>
+        <field name="model">fsm.order</field>
+        <field name="priority" eval="17"/>
+        <field name="inherit_id" ref="fieldservice.fsm_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='customer_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='location_id']" position="before">
+                <field name="customer_id"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="fsm_order_kanban_view_order_by_created" model="ir.ui.view">
         <field name="name">fsm.order.kanban.order.by.create_date</field>
         <field name="model">fsm.order</field>

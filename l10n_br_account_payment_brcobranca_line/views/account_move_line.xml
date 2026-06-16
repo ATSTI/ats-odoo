@@ -14,7 +14,7 @@
                     name="generate_pdf_boleto_line"
                     type="object"
                     string="Gerar Boleto"
-                    class="oe_highlight"
+                    class="btn-primary"
                     attrs="{'invisible': [('payment_method_code', 'not in', ('400', '240', '500'))]}"
                 />
             </field>

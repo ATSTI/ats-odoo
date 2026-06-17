@@ -389,7 +389,7 @@ class Document(models.Model):
 
             protocol_date = self._parse_authorization_datetime(dataEmissaoRPS)
 
-            if response.status_code != 200:
+            if response.status_code != 200 or str(status_emissao) != '200':
                 # if retorno.get("statusEmissao") != 200:
                 record._change_state(SITUACAO_EDOC_REJEITADA)
                 raise UserError(
@@ -399,7 +399,7 @@ class Document(models.Model):
                         msg=messages,
                     )
                 )                        
-            elif response.status_code == 200:
+            elif response.status_code == 200 and str(status_emissao) == '200':
                 record.authorization_event_id.set_done(
                     status_code=4,
                     response=_("Processado com Sucesso"),

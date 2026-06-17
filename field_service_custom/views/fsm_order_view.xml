@@ -29,9 +29,9 @@
                     /> -->
                 </group>
             </xpath>
-            <xpath expr="//field[@name='company_id']" position="after">
+            <!-- <xpath expr="//field[@name='company_id']" position="after">
                 <field name="operating_unit_id" groups="base.group_multi_company"/>
-            </xpath>
+            </xpath> -->
         </field>
     </record>
 

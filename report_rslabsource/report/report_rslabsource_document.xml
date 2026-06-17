@@ -47,7 +47,7 @@
                             <br/>
 
                             <t t-if="o.company_id.city">
-                                <t t-esc="o.company_id.city"/>
+                                <t t-esc="o.company_id.city_id.name"/>
                             </t>
 
                             <t t-if="o.company_id.state_id">
@@ -412,7 +412,7 @@
                             <br/>
 
                             <t t-if="o.company_id.website">
-                                Site: <t t-esc="o.company_id.website"/>
+                                <t t-esc="o.company_id.website"/>
                             </t>
                         </td>
                     </tr>

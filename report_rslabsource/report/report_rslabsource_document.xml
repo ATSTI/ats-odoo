@@ -95,7 +95,7 @@
                         <span t-field="o.date_order" t-options='{"widget": "date"}'/>
                         &#160;&#160;
                         <strong>Página:</strong>
-                        <span class="page"/> 1 / <span class="topage"/>
+                        <span class="page"/> 1 / 2 <span class="topage"/>
                     </td>
                     </tr>
                 </table>
@@ -224,7 +224,7 @@
                                 <td style="border: 1px solid #ccc; padding: 4px 5px; text-align: center;">
                                     <t t-esc="'%.2f' % line.product_uom_qty"/>
                                 </td>
-                                <td style="border: 1px solid #ccc; padding: 4px 5px; text-align: right;">
+                                <td style="border: 1px solid #ccc; padding: 4px 5px; text-align: center;">
                                     <span style="white-space: nowrap;">
                                         <t t-esc="currency_symbol"/>
                                         <t t-esc="'{:,.2f}'.format(line.price_unit).replace(',', 'X').replace('.', ',').replace('X', '.')"/>
@@ -251,7 +251,7 @@
                                         0,00
                                     </t>
                                 </td>
-                                <td style="border: 1px solid #ccc; padding: 4px 5px; text-align: right;">
+                                <td style="border: 1px solid #ccc; padding: 4px 5px; text-align: center;">
                                     <t t-if="line.discount">
                                         <span style="white-space: nowrap;">
                                             <!-- <t t-esc="currency_symbol"/> -->
@@ -262,7 +262,7 @@
                                         <span style="white-space: nowrap;"> 0,00</span>
                                     </t>
                                 </td>
-                                <td style="border: 1px solid #ccc; padding: 4px 5px; text-align: right; font-weight: bold;">
+                                <td style="border: 1px solid #ccc; padding: 4px 5px; text-align: center; font-weight: bold;">
                                     <span style="white-space: nowrap;">
                                         <t t-esc="currency_symbol"/>
                                         <t t-esc="'{:,.2f}'.format(line.price_subtotal).replace(',', 'X').replace('.', ',').replace('X', '.')"/>

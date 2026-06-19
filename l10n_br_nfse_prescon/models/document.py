@@ -128,6 +128,14 @@ class Document(models.Model):
                 "descricao": line.name[:100] if line.name else "Servico",
                 "valor": self.fiscal_amount_total,
             }
+        obs = ""
+        if self.manual_customer_additional_data:
+            obs += self.manual_customer_additional_data
+        if self.manual_fiscal_additional_data:
+            if obs:
+                obs += " "
+            obs += self.manual_fiscal_additional_data  
+        obs = obs
         return {
             "cofins": self.amount_cofins_value or 0,
             "csll": self.amount_csll_value or 0,
@@ -137,7 +145,7 @@ class Document(models.Model):
             "ir": self.amount_irpj_value or 0,
             "issRetido": self.amount_issqn_wh_value,
             "item": itens,
-            "obs": self.manual_customer_additional_data + " " + self.manual_fiscal_additional_data or "",
+            "obs": obs,
             "pisPasep": self.amount_pis_value or 0
         }
 

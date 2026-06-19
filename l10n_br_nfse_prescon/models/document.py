@@ -137,7 +137,7 @@ class Document(models.Model):
             "ir": self.amount_irpj_value or 0,
             "issRetido": self.amount_issqn_wh_value,
             "item": itens,
-            "obs": self.manual_fiscal_additional_data or "",
+            "obs": self.manual_customer_additional_data + " " + self.manual_fiscal_additional_data or "",
             "pisPasep": self.amount_pis_value or 0
         }
 

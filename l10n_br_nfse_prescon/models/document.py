@@ -135,7 +135,6 @@ class Document(models.Model):
             if obs:
                 obs += " "
             obs += self.manual_fiscal_additional_data  
-        obs = obs
         return {
             "cofins": self.amount_cofins_value or 0,
             "csll": self.amount_csll_value or 0,

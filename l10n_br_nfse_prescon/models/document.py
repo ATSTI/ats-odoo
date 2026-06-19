@@ -128,14 +128,9 @@ class Document(models.Model):
                 "descricao": line.name[:100] if line.name else "Servico",
                 "valor": self.fiscal_amount_total,
             }
-        obs = ""
-        if self.manual_customer_additional_data:
-            obs += self.manual_customer_additional_data
-        if self.manual_fiscal_additional_data:
-            if obs:
-                obs += " "
-            obs += self.manual_fiscal_additional_data  
-        obs = obs
+        customer_add = self.manual_customer_additional_data or ""
+        fiscal_add = self.manual_fiscal_additional_data or ""
+        obs = " ".join(filter(None, [customer_add, fiscal_add]))  
         return {
             "cofins": self.amount_cofins_value or 0,
             "csll": self.amount_csll_value or 0,

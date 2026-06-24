@@ -43,7 +43,8 @@ class CondoImportWaterWizard(models.TransientModel):
         for idx, row in enumerate(
             sheet.iter_rows(min_row=3, values_only=True),
             start=3
-        ):
+        ):  
+            # import pudb;pudb.set_trace()
             lote = row[3]
             data_ref = row[5]
             anterior = row[6]
@@ -86,8 +87,8 @@ class CondoImportWaterWizard(models.TransientModel):
             vals = {
                 "residence_id": residence.id,
                 "data_referencia": data_ref,
-                "anterior": float(anterior or 0),
-                "atual": float(atual or 0),
+                "anterior": float(0 if str(anterior).strip() in ("", "-", "None") else anterior),
+                "atual": float(0 if str(atual).strip() in ("", "-", "None") else atual),
                 "obs": obs or "",}
             if existing:
                 existing.write(vals)

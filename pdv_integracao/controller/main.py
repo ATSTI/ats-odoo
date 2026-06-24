@@ -884,6 +884,11 @@ class IntegracaoPdv(http.Controller):
             ncm = http.request.env['l10n_br_fiscal.ncm'].search([
                 ('code', '=', p['ncm_id'][1][:10])
             ], limit=1)
+            categ_id = http.request.env['product.category'].search([
+                '|',
+                ('id', '=', p['categ_id'][0]),
+                ('complete_name', 'ilike', p['categ_id'][1])
+            ], limit=1)
             prod = http.request.env['product.product'].create({
                 'name': p['name'],
                 'default_code': code,

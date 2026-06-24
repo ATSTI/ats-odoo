@@ -204,6 +204,8 @@ class AccountStatementImport(models.TransientModel):
                 trntype = "OTHER"
 
             descricao = t.get("descricao", "")
+            if not descricao:
+                descricao = "Nao informado"
             memo = f"{t.get('titulo','')}: \"{descricao}\" - {cnpj_cpf}"
 
             fitid = t.get("idTransacao", str(i))

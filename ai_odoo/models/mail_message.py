@@ -1,147 +1,116 @@
 # models/mail_message.py
 import json
+import ast
 from datetime import datetime, timedelta
 from odoo import models, api, fields
 from odoo.fields import Datetime
 
+EXCLUDED_PREFIXES = ('message_', 'website_', 'activity_')
+
 QUERY_FUNCTIONS = [
     {
-        "name": "get_sales_total",
-        "description": "Retorna o total de vendas em um período de dias",
+        "name": "query_odoo",
+        "description": "Executa consultas em modelos Odoo autorizados",
         "parameters": {
             "type": "object",
             "properties": {
-                "days": {"type": "integer", "description": "Número de dias para trás a partir de hoje"},
-                "state": {
+                "model": {
+                    "type": "string"
+                },
+                "operation": {
                     "type": "string",
-                    "enum": ["sale", "done", "all"],
-                    "description": "Estado do pedido"
-                }
-            },
-            "required": ["days"]
-        }
-    },
-    {
-        "name": "get_sales_by_partner",
-        "description": "Retorna o total comprado por um cliente específico em um período",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "partner_name": {"type": "string", "description": "Nome parcial do cliente"},
-                "days": {"type": "integer", "description": "Número de dias para trás"}
-            },
-            "required": ["partner_name", "days"]
-        }
-    },
-    {
-        "name": "get_top_products",
-        "description": "Lista os produtos mais vendidos em um período",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "days": {"type": "integer"},
-                "limit": {"type": "integer", "description": "Quantos produtos retornar (padrão 5)"}
-            },
-            "required": ["days"]
-        }
-    },
-
-    {
-        "name": "get_top_sellers",
-        "description": "Lista os vendedores mais que mais venderam em um período",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "days": {"type": "integer"},
-                "limit": {"type": "integer", "description": "Quantos vendedores retornar (padrão 5)"}
-            },
-            "required": ["days"]
-        }
-    },
-
-    {
-    "name": "prepare_invoice",
-    "description": "Valida cliente e produtos e prepara uma fatura para confirmação posterior. Retorna os dados da fatura preparada ou erros encontrados. Caso o usuário confirme, então a função 'create_invoice' deve ser chamada com os mesmos dados para criar a fatura de fato.",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "partner_name": {"type": "string"},
-            "lines": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "product_name": {"type": "string"},
-                        "qty": {"type": "number"}
-                    },
-                    "required": ["product_name", "qty"]
-                }
-            }
-        },
-        "required": ["partner_name", "lines"]
-    }
-    },
-
-    {
-    "name": "get_overdue_invoices",
-    "description": "Retorna faturas vencidas e o total em aberto. Pode filtrar por cliente e por quantidade de dias para trás.",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "partner_name": {
-                "type": "string",
-                "description": "Nome do cliente (opcional)"
-            },
-            "days": {
-                "type": "integer",
-                "description": "Buscar apenas faturas vencidas nos últimos X dias"
-            }
-        }
-    }
-},
-
-{
-    "name": "create_invoice",
-    "description": "Cria uma fatura para um cliente com os produtos, quantidades e preços informados.",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "partner_name": {
-                "type": "string",
-                "description": "Nome do cliente"
-            },
-            "lines": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "product_name": {
-                            "type": "string",
-                            "description": "Nome do produto"
-                        },
-                        "qty": {
-                            "type": "number",
-                            "description": "Quantidade"
-                        },
-                        "unit_price": {
-                            "type": "number",
-                            "description": "Preço unitário"
-                        }
-                    },
-                    "required": [
-                        "product_name",
-                        "qty"
+                    "enum": [
+                        "search_read",
+                        "search_count",
+                        "read_group"
                     ]
+                },
+                "domain": {
+                    "type": "array"
+                },
+                "fields": {
+                    "type": "array"
+                },
+                "groupby": {
+                    "type": "array"
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "order": {
+                    "type": "string"
                 }
-            }
-        },
-        "required": [
-            "partner_name",
-            "lines"
-        ]
+            },
+            "required": [
+                "model",
+                "operation"
+            ]
+        }
+    },
+    {
+        "name": "get_model_fields",
+        "description": "Retorna os campos disponíveis de um modelo Odoo",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "model": {
+                    "type": "string",
+                    "description": "Nome técnico do modelo"
+                }
+            },
+            "required": ["model"]
+        }
+    },
+]
+
+MODEL_FIELDS_WHITELIST = {
+    "sale.order": [
+        "name", "partner_id", "date_order", "amount_total",
+        "state", "user_id", "team_id", "invoice_status",
+    ],
+    "sale.order.line": [
+        "order_id", "product_id", "product_uom_qty",
+        "price_unit", "price_subtotal", "state",
+    ],
+    "account.move": [
+        "name", "partner_id", "invoice_date", "amount_total",
+        "state", "move_type", "payment_state", "invoice_date_due",
+    ],
+    "res.partner": [
+        "name", "email", "phone", "city", "state_id",
+        "customer_rank", "supplier_rank",
+    ],
+    "product.product": [
+        "name", "list_price", "standard_price",
+        "categ_id", "type", "active",
+    ],
+    "stock.picking": [
+        "name", "partner_id", "date_done", "state",
+        "picking_type_id", "origin",
+    ],
+    "crm.lead": [
+        "name", "partner_id", "expected_revenue", "stage_id",
+        "user_id", "date_deadline", "probability",
+    ],
+}
+
+FIELD_DESCRIPTIONS = {
+    "account.move": {
+        "invoice_date": "data de emissão da fatura",
+        "invoice_date_due": "data de vencimento da fatura — use para filtrar faturas vencidas ou a vencer",
+        "payment_state": "estado do pagamento: not_paid, partial, paid, reversed",
+        "move_type": "tipo: out_invoice=venda, in_invoice=compra, out_refund=devolução venda",
+        "state": "estado: draft=rascunho, posted=confirmada, cancel=cancelada",
+    },
+    "sale.order": {
+        "state": "estado: draft=orçamento, sale=pedido confirmado, done=concluído, cancel=cancelado",
+        "invoice_status": "estado faturamento: upselling, invoiced, to invoice, nothing",
+    },
+    "crm.lead": {
+        "probability": "probabilidade de fechamento em %",
+        "stage_id": "etapa do funil de vendas",
     }
 }
-]
 
 
 class MailMessage(models.Model):
@@ -160,28 +129,16 @@ class MailMessage(models.Model):
             if msg.model != 'mail.channel' or msg.res_id != openai_channel.id:
                 continue
             # import pudb;pudb.set_trace()
-            odoobot = self.env['res.partner'].search(
-                [('name', 'ilike', 'odoobot'), ('active', '=', False)], limit=1
-            )
+            odoobot = self.env.ref('base.partner_root')
             if msg.author_id == odoobot:
                 continue
 
             user_content = str(msg.body).replace('<p>', '').replace('</p>', '').strip()
-            category = self._classify_message(user_content)
-
-            if category in ('consulta', 'fatura'):
-                self._run_query_agent(user_content, openai_channel)
-
-            elif category == 'outro':
-                bridge = self.env['ai.bridge'].search([('name', 'ilike', 'OpenAI')], limit=1)
-                if bridge:
-                    bridge.execute_ai_bridge(bridge.model_id.model, [], user_content)
-
-            else:
-                bridge = self.env['ai.bridge'].search([('name', 'ilike', category)], limit=1)
-                if bridge:
-                    ids = self.env[bridge.model_id.model].search(eval(bridge.domain)).ids
-                    bridge.execute_ai_bridge(bridge.model_id.model, ids, user_content)
+            # category = self._classify_message(user_content)
+            # if category == 'consulta':
+            self._run_query_agent(user_content, openai_channel)
+            # elif category == 'acao':
+            #     self._run_action_agent(user_content, openai_channel)
 
         return messages
 
@@ -219,7 +176,7 @@ class MailMessage(models.Model):
 
         execution = self.env['ai.bridge.execution'].create({
             'ai_bridge_id': bridge.id,
-            'model_id': bridge.sudo().env['ir.model']._get_id('sale.order'),
+            'model_id': bridge.sudo().model_id.id,
         })
 
         answer = execution._execute_agent(
@@ -227,193 +184,145 @@ class MailMessage(models.Model):
             tools=QUERY_FUNCTIONS,
             execute_func_callback=lambda fn, args: self._execute_query_function(fn, args),
             system_prompt=(
-                f"Você é um assistente de negócios integrado ao Odoo. "
-                f"Use as funções disponíveis para buscar os dados necessários e "
-                f"responda de forma clara e objetiva em português. "
-                f"Hoje é {datetime.now().strftime('%d/%m/%Y')}."
+                f"""
+                Você é um assistente de negócios integrado ao Odoo.
+
+                Você possui acesso apenas à ferramenta query_odoo.
+
+                Antes de consultar um modelo,
+                utilize get_model_fields para conhecer
+                os campos disponíveis.
+
+                Nunca invente nomes de campos.
+
+                Sempre use limites razoáveis.
+
+                Quando receber os resultados,
+                resuma-os de forma objetiva em português.
+
+                Caso não existam dados,
+                informe isso claramente.
+                Hoje é {datetime.now().strftime('%d/%m/%Y')}.
+                """
             ),
+            
         )
-        import pudb;pudb.set_trace()
+
         if answer:
             self._post_bot_message(channel, answer)
 
+    def _validate_domain(self, domain):
+        if not isinstance(domain, list):
+            return []
+        allowed_operators = {'=', '!=', '>', '<', '>=', '<=', 'in', 'not in', 'like', 'ilike'}
+        for item in domain:
+            if isinstance(item, (str,)):  # '&', '|', '!'
+                continue
+            if not (isinstance(item, (list, tuple)) and len(item) == 3):
+                return []
+            field, op, _ = item
+            if op not in allowed_operators:
+                return []
+            if '.' in str(field):  # bloqueia dot-notation
+                return []
+        return domain
+
     def _execute_query_function(self, func_name, args):
-        """Executa a query no ORM do Odoo e retorna dict com os dados."""
-        since = Datetime.now() - timedelta(days=args.get('days', 30))
-        since_str = since.strftime('%Y-%m-%d %H:%M:%S')
-        # import pudb;pudb.set_trace()
 
-        if func_name == 'get_sales_total':
-            state = args.get('state', 'sale')
-            domain = [('date_order', '>=', since_str)]
-            if state != 'all':
-                domain.append(('state', '=', state))
-            orders = self.env['sale.order'].search(domain)
-            return {
-                'total': sum(orders.mapped('amount_total')),
-                'currency': orders[:1].currency_id.name if orders else 'BRL',
-                'count': len(orders),
-                'period_days': args.get('days', 30),
-            }
+        allowed_models = {
+            "sale.order",
+            "sale.order.line",
+            "account.move",
+            "res.partner",
+            "product.product",
+            "stock.picking",
+            "crm.lead",
+        }
 
-        elif func_name == 'get_sales_by_partner':
-            partner_name = args.get('partner_name', '')
-            partner = self.env['res.partner'].search(
-                [('name', 'ilike', partner_name)], limit=1
-            )
-            if not partner:
-                return {'error': f"Cliente '{partner_name}' não encontrado"}
-            orders = self.env['sale.order'].search([
-                ('partner_id', 'child_of', partner.id),
-                ('date_order', '>=', since_str),
-                ('state', 'in', ['sale', 'done']),
-            ])
-            return {
-                'partner': partner.name,
-                'total': sum(orders.mapped('amount_total')),
-                'count': len(orders),
-                'period_days': args.get('days', 30),
-            }
+        if func_name == "get_model_fields":
+            model_name = args.get("model")
+            if model_name not in allowed_models:
+                return {"error": f"Modelo {model_name} não permitido"}
 
-        elif func_name == 'get_top_products':
-            limit = args.get('limit', 5)
-            lines = self.env['sale.order.line'].search([
-                ('order_id.date_order', '>=', since_str),
-                ('order_id.state', 'in', ['sale', 'done']),
-            ])
-            totals = {}
-            for line in lines:
-                name = line.product_id.name
-                totals[name] = totals.get(name, 0) + line.product_uom_qty
-            top = sorted(totals.items(), key=lambda x: x[1], reverse=True)[:limit]
-            return {'top_products': [{'product': p, 'qty': q} for p, q in top]}
-        
-        elif func_name == 'get_top_sellers':
-            limit = args.get('limit', 5)
-
-            lines = self.env['sale.order.line'].search([
-                ('order_id.date_order', '>=', since_str),
-                ('order_id.state', 'in', ['sale', 'done']),
-            ])
-
-            totals = {}
-
-            for line in lines:
-                seller = line.order_id.user_id.name or 'Sem vendedor'
-                totals[seller] = totals.get(seller, 0) + line.price_subtotal
-
-            top = sorted(
-                totals.items(),
-                key=lambda x: x[1],
-                reverse=True
-            )[:limit]
+            allowed_fields = MODEL_FIELDS_WHITELIST.get(model_name, [])
+            model = self.env[model_name]
+            descriptions = FIELD_DESCRIPTIONS.get(model_name, {})
 
             return {
-                'top_sellers': [
-                    {
-                        'seller': seller,
-                        'amount': amount
-                    }
-                    for seller, amount in top
-                ]
-            }
-        
-        elif func_name == 'prepare_invoice':
-            partner_name = args.get('partner_name')
-            lines = args.get('lines', [])
-            partner = self.env['res.partner'].search([
-                ('name', 'ilike', partner_name)
-            ], limit=1)
-            if not partner:
-                return {
-                    'error': f"Cliente '{partner_name}' não encontrado"
+                field_name: {
+                    "type": model._fields[field_name].type,
+                    "string": model._fields[field_name].string,
+                    "description": descriptions.get(field_name, ""),
                 }
-            invoice_lines = []
-            for item in lines:
-                product = self.env['product.product'].search([
-                    ('name', 'ilike', item['product_name'])
-                ], limit=1)
+                for field_name in allowed_fields
+                if field_name in model._fields
+            }
+        
+        elif func_name == "query_odoo":
+            model_name = args.get("model")
 
-                if not product:
+            if model_name not in allowed_models:
+                return {
+                    "error": f"Modelo {model_name} não permitido"
+                }
+
+            model = self.env[model_name]
+
+            operation = args["operation"]
+            allowed_fields = set(MODEL_FIELDS_WHITELIST.get(model_name, []))
+            requested = set(args.get("fields") or [])
+            safe_fields = list(requested & allowed_fields) or list(allowed_fields)
+
+            if operation == "search_read":
+                try:
+                    
+                    return model.search_read(
+                        domain=self._validate_domain(args.get("domain", [])),
+                        fields=safe_fields,
+                        limit=min(args.get("limit", 50), 100),
+                        order=args.get("order")
+                    )
+                except Exception as e:
                     return {
-                        'error': f"Produto '{item['product_name']}' não encontrado"
+                        "error": f"Erro na consulta (search_read): {str(e)}"
                     }
 
-                qty = item.get('qty', 1)
-
-                price_unit = item.get('unit_price')
-
-                if price_unit is None:
-                    price_unit = product.lst_price
-
-                invoice_lines.append((0, 0, {
-                    'product_id': product.id,
-                    'quantity': qty,
-                    'price_unit': price_unit,
-                }))
-
-            move = self.env['account.move'].create({
-                'move_type': 'out_invoice',
-                'partner_id': partner.id,
-                'invoice_line_ids': invoice_lines,
-            })
-
-            return {
-                'success': True,
-                'invoice_id': move.id,
-                'invoice_name': move.name,
-                'partner': partner.name,
-                'total': move.amount_total,
-                'message': (
-                    f"Fatura {move.name} criada com sucesso "
-                    f"para o cliente {partner.name}. "
-                    f"Valor total: R$ {move.amount_total:.2f}"
-                )
-            }
-
-
-        elif func_name == 'get_overdue_invoices':
-            domain = [
-                ('move_type', '=', 'out_invoice'),
-                ('payment_state', '!=', 'paid'),
-                ('invoice_date_due', '<', datetime.now().strftime('%Y-%m-%d')),
-            ]
-            days = args.get('days')
-            partner_name = args.get('partner_name')
-            if days:
-                limit_date = fields.Date.today() - timedelta(days=days)
-
-                domain.append(
-                    ('invoice_date_due', '>=', limit_date)
-                )
-            if partner_name:
-                partner = self.env['res.partner'].search(
-                    [('name', 'ilike', partner_name)], limit=1
-                )
-                if partner:
-                    domain.append(('partner_id', 'child_of', partner.id))
-            invoices = self.env['account.move'].search(domain)
-            return {
-                'count': len(invoices),
-                'total_overdue': sum(invoices.mapped('amount_residual')),
-                'invoices': [
-                    {
-                        'name': inv.name,
-                        'partner': inv.partner_id.name,
-                        'amount': inv.amount_residual,
-                        'due_date': inv.invoice_date_due.strftime('%d/%m/%Y') if inv.invoice_date_due else None,
+            elif operation == "search_count":
+                try:
+                    return {
+                        "count": model.search_count(
+                            self._validate_domain(args.get("domain", []))
+                        )
                     }
-                    for inv in invoices[:10]
-                ],
-            }
+                except Exception as e:
+                    return {
+                        "error": f"Erro na contagem (search_count): {str(e)}"
+                    }
 
-        return {'error': f"Função '{func_name}' não reconhecida"}
+            elif operation == "read_group":
+                try:
+                    return model.read_group(
+                        domain=self._validate_domain(args.get("domain", [])),
+                        fields=safe_fields,
+                        groupby=args.get("groupby", []),
+                        limit=args.get("limit", 50),
+                        lazy=False
+                    )
+                except Exception as e:
+                    return {
+                        "error": f"Erro na consulta agrupada (read_group): {str(e)}"
+                    }
+
+            return {
+                "error": "Operação inválida"
+            }
+        else:
+            return {
+                "error": "Função não permitida"
+            }
 
     def _post_bot_message(self, channel, content):
-        import pudb;pudb.set_trace()
-        odoobot = self.env['res.partner'].search(
-            [('name', 'ilike', 'odoobot'), ('active', '=', False)], limit=1
-        )
+        odoobot = self.env.ref('base.partner_root')
         channel.message_post(
             body=content.replace('\n', '<br>'),
             message_type='comment',

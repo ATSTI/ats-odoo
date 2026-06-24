@@ -154,7 +154,7 @@ class AiBridgeExecution(models.Model):
                 return {"error": "Canal 'OpenAi' não encontrado."}
 
 
-            odoobot = self.env['res.partner'].search([('name','ilike','odoobot'), ('active', '=', False)], limit=1)
+            odoobot = self.env.ref('base.partner_root')
             author_id = odoobot.id if odoobot else self.env.user.partner_id.id
 
             msg_id = channel.message_post(
@@ -208,80 +208,58 @@ class AiBridgeExecution(models.Model):
             return None
 
 
-    def _execute_agent(self, user_content, tools, execute_func_callback, system_prompt=None):
-        """
-        Ciclo completo de function calling.
-        - Primeira chamada: GPT decide qual tool usar
-        - Odoo executa via execute_func_callback(func_name, args) -> dict
-        - Segunda chamada: GPT formata a resposta final com os dados reais
-        Retorna o texto final ou mensagem de erro.
-        """
+    def _execute_agent(self, user_content, tools, execute_func_callback, system_prompt=None, max_iterations=10):
         self.ensure_one()
-        payload = {
-            "model": "gpt-4o-mini",
-            "messages": [
-                {
-                    "role": "system",
-                    "content": system_prompt or "Você é um assistente de negócios do Odoo.",
-                },
-                {"role": "user", "content": user_content},
-            ],
-            "tools": [{"type": "function", "function": f} for f in tools],
-            "tool_choice": "auto",
-            "temperature": 0,
-        }
-        try:
-            # — Primeira chamada —
-            response = requests.post(
-                self.ai_bridge_id.url,
-                json=payload,
-                auth=self._get_auth(),
-                headers=self._get_headers(),
-                timeout=30,
-            )
-            self.payload = payload
-            response.raise_for_status()
-            msg = response.json()["choices"][0]["message"]
-
-            if not msg.get("tool_calls"):
-                self.state = "done"
-                self.result = response.content
-                return msg.get("content", "")
-
-            messages = payload["messages"] + [msg]
-            for tool_call in msg["tool_calls"]:
-                func_name = tool_call["function"]["name"]
-                func_args = json.loads(tool_call["function"]["arguments"])
-                result = execute_func_callback(func_name, func_args)
-                messages.append({
-                    "role": "tool",
-                    "tool_call_id": tool_call["id"],
-                    "content": json.dumps(result, ensure_ascii=False),
-                })
-
-            # — Segunda chamada: formata a resposta —
-            second_payload = {
+        messages = [
+            {"role": "system", "content": system_prompt or "Você é um assistente de negócios do Odoo."},
+            {"role": "user", "content": user_content},
+        ]
+        payload_tools = [{"type": "function", "function": f} for f in tools]
+        
+        for _ in range(max_iterations):
+            payload = {
                 "model": "gpt-4o-mini",
                 "messages": messages,
+                "tools": payload_tools,
+                "tool_choice": "auto",
                 "temperature": 0,
             }
-            second_response = requests.post(
-                self.ai_bridge_id.url,
-                json=second_payload,
-                auth=self._get_auth(),
-                headers=self._get_headers(),
-                timeout=30,
-            )
-            second_response.raise_for_status()
-            self.state = "done"
-            self.result = second_response.content
-            return second_response.json()["choices"][0]["message"]["content"]
+            try:
+                response = requests.post(
+                    self.ai_bridge_id.url,
+                    json=payload,
+                    auth=self._get_auth(),
+                    headers=self._get_headers(),
+                    timeout=30,
+                )
+                response.raise_for_status()
+                msg = response.json()["choices"][0]["message"]
+                messages.append(msg)
 
-        except Exception:
-            self.state = "error"
-            self.payload = payload
-            buff = StringIO()
-            traceback.print_exc(file=buff)
-            self.error = buff.getvalue()
-            buff.close()
-            return "Desculpe, ocorreu um erro ao processar sua consulta."
+                # Sem tool_calls → resposta final
+                if not msg.get("tool_calls"):
+                    self.state = "done"
+                    self.result = response.content
+                    return msg.get("content", "")
+
+                # Executa todas as tools da rodada
+               
+                for tool_call in msg["tool_calls"]:
+                    func_name = tool_call["function"]["name"]
+                    func_args = json.loads(tool_call["function"]["arguments"])
+                    result = execute_func_callback(func_name, func_args)
+                    messages.append({
+                        "role": "tool",
+                        "tool_call_id": tool_call["id"],
+                        "content": json.dumps(result, ensure_ascii=False, default=str),
+                    })
+
+            except Exception:
+                self.state = "error"
+                buff = StringIO()
+                traceback.print_exc(file=buff)
+                self.error = buff.getvalue()
+                buff.close()
+                return "Desculpe, ocorreu um erro ao processar sua consulta."
+
+        return "Não foi possível completar a consulta no número máximo de iterações."

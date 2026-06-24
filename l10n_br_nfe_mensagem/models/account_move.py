@@ -7,12 +7,13 @@ from odoo.exceptions import UserError
 from odoo.addons.l10n_br_fiscal.constants.fiscal import (
     MODELO_FISCAL_NFE,
  )
-
+from odoo.addons.l10n_br_account_payment_order.constants import (
+    BR_CODES_PAYMENT_ORDER,
+ )
 
 class AccountMove(models.Model):
     _inherit = "account.move"
-    _inherits = {"l10n_br_fiscal.document": "fiscal_document_id"}
-      
+
     # xml_error_message = fields.Text(
     #     readonly=True,
     #     string="XML validation errors",
@@ -21,9 +22,27 @@ class AccountMove(models.Model):
   
     @api.onchange("partner_id")
     def _onchange_partner_id(self):
-        result = super()._onchange_partner_id()
+        self._valida_cadastro()
+        return super()._onchange_partner_id()
+
+    @api.onchange("document_type_id")
+    def _onchange_document_type_id(self):
+        self._valida_cadastro()
+
+    @api.onchange("payment_mode_id")
+    def _onchange_payment_mode_id(self):
+        self._valida_cadastro()
+
+    def _valida_cadastro(self):
         self.xml_error_message = False
-        if self.partner_id and self.document_type_id and self.document_type_id.code == MODELO_FISCAL_NFE:
+        nfe = self.partner_id \
+            and self.document_type_id.code == MODELO_FISCAL_NFE
+        if (
+            nfe
+            or (
+                self.payment_mode_id.payment_method_code in BR_CODES_PAYMENT_ORDER
+            )
+        ):
             max = ""
             if self.partner_id.street_name and self.partner_id.district:
                 max = self.partner_id.street_name or "" + self.partner_id.street2 or "" + self.partner_id.district or ""
@@ -51,18 +70,30 @@ class AccountMove(models.Model):
                 fone = re.sub('[^0-9]', '', self.partner_id.phone)
                 if len(fone) > 13:
                     erros += "\n Número de telefone inválido."
-            if len(max) > 60:
+            if nfe and len(max) > 60:
                 erros += "\n Rua + Bairro + Complemento deve ser menor que 60 caracteres."
-            if self.partner_id.name and len(self.partner_id.name) > 60:
+            if (
+                nfe
+                and self.partner_id.name
+                and len(self.partner_id.name) > 60
+            ):
                 erros += "\n Nome deve ser menor que 60 caracteres."
-            if self.partner_id.legal_name and len(self.partner_id.legal_name) > 60:
+            if (
+                nfe
+                and self.partner_id.legal_name
+                and len(self.partner_id.legal_name) > 60
+            ):
                 erros += "\n Razão social deve ser menor que 60 caracteres."
-            if self.fiscal_operation_id.name and len(self.fiscal_operation_id.name) > 60:
+            
+            if (
+                nfe
+                and self.fiscal_operation_id.name
+                and len(self.fiscal_operation_id.name) > 60
+            ):
                 erros += "\n Natureza da operação deve ser menor que 60 caracteres."
 
             # erros = "\n".join(erros)
             self.xml_error_message = erros or False
-        return result
 
     def action_post(self):
         if self.document_type_id and self.document_type_id.code in (

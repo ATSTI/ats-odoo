@@ -27,6 +27,15 @@
         file="field_service_custom.report_account_fullist"
     />
 
+    <report
+    id="report_selected_products"
+    string="Produtos Selecionados"
+    model="account.move.product.print"
+    report_type="qweb-pdf"
+    name="field_service_custom.report_selected_products_document"
+    file="field_service_custom.report_selected_products_document"
+/>
+
     <record id="termica_paperformat_id" model="report.paperformat">
         <field name="name">Impressora Termica</field>
         <field name="default" eval="True"/>
@@ -43,6 +52,9 @@
         <field name="dpi">130</field>
     </record>
     <record id="field_service_custom.report_lavanderia_document_id" model="ir.actions.report">
+        <field name="paperformat_id" ref="field_service_custom.termica_paperformat_id" />
+    </record>
+    <record id="field_service_custom.report_selected_products" model="ir.actions.report">
         <field name="paperformat_id" ref="field_service_custom.termica_paperformat_id" />
     </record>
     <!-- <record id="account_invoices" model="ir.actions.report">

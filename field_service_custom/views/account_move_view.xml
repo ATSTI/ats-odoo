@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_move_fsm_form" model="ir.ui.view">
+        <field name="name">view.account.move.fsm.fsm</field>
+        <field name="model">account.move</field>
+        <field name="priority">9999</field>
+        <field name="inherit_id" ref="account.view_move_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']/tree" position="inside">
+                <field name="date_line" />
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/field[@name='name']" position="after">
+                <group>
+                    <field name="date_line" />
+                </group>
+            </xpath>
+            
+            <xpath expr="//header" position="inside">
+                
+                <button name="action_open_product_print_wizard"
+                        type="object"
+                        class="btn-primary"
+                        string="Impressão Cupom - produtos"/>
+                
+                </xpath>
+        </field>
+    </record>
+
+    <record id="action_group_account_move_line" model="ir.actions.server">
+        <field name="name">Agrupar Linhas</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">
+            action = records.action_group_products_lines()
+        </field>
+    </record> 
+</odoo>

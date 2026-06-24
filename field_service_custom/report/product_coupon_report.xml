@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_selected_products_document" name="Cupom Produtos Selecionados">
+        <t t-call="web.basic_layout">
+            <t t-set="o" t-value="doc"/>
+            <div class="page">
+                <div class="oe_structure"/>
+                <br/>
+                <table style="width:49%; height: 60px; float: left;">
+                    <tr><td style="height: 30px"></td></tr>
+                    <tr>
+                        <td style="text-align: left; width:100%">
+                            <b style="font-size:18px" t-field="o.company_id.name"/>
+                            <br/> <span t-field="o.company_id.street"/>, <span t-field="o.company_id.street_number"/>
+                            <br/> <span t-field="o.company_id.district"/> - <span t-field="o.company_id.city_id.name"/>
+                            <br/>
+                            <br/> <b>Cliente:</b> <span t-field="o.partner_id.name"/>
+                            <br/> <b>Fatura:</b> <span t-field="o.name"/>
+                        </td>
+                    </tr>
+                </table>
+                <table style="width:49%; height: 30px; text-align: right;">
+                    <tr>
+                        <td style="width:40%">
+                            <div style="width: 100%; float: right;">
+                                <img t-attf-src="data:image/*;base64,{{o.company_id.logo}}"
+                                     t-att-alt="o.company_id.name" style="width:50%; height:50%"/>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <br/>
+                <br/>
+                <h3 style="text-align:center;">Impressão Cupom</h3>
+                <table style="width:100%;" name="selected_lines_table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50%; text-align: left;"><span>Item</span></th>
+                            <th style="width: 10%; text-align: center;"><span>Quantidade</span></th>
+                            <th style="width: 20%; text-align: right;"><span>Preço Unitário</span></th>
+                            <th style="width: 20%; text-align: right;"><span>Preço Total</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="lines" t-as="line">
+                            <td style="text-align: left;">
+                                <span t-field="line.product_id.name"/>
+                            </td>
+                            <td style="text-align: center;">
+                                <span t-field="line.quantity"/>
+                            </td>
+                            <td style="text-align: right;">
+                                <span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                            <td style="text-align: right;">
+                                <span t-field="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br/>
+                <br/>
+                <div class="clearfix">
+                    <div id="total" class="row">
+                        <div style="float: right;" class="col-6 ml-auto">
+                            <table class="table table-sm" style="page-break-inside: avoid;">
+                                <tr>
+                                    <td class="text-left"><strong>Total de Itens</strong></td>
+                                    <td class="text-right">
+                                        <strong><t t-esc="int(sum(l.quantity for l in lines))"/></strong>
+                                    </td>
+                                </tr>
+                                <tr class="border-black o_total">
+                                    <td><strong>Total: </strong></td>
+                                    <td class="text-right">
+                                        <span t-esc="sum(lines.mapped('price_subtotal'))" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

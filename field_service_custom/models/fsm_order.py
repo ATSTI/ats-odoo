@@ -103,6 +103,7 @@ class FSMOrder(models.Model):
                     0,
                     0,
                     {
+                        "date_line": self.scheduled_date_start,
                         "analytic_account_id": self.location_id.analytic_account_id.id,
                         "product_id": cost.product_id.id,
                         "quantity": cost.quantity,
@@ -122,6 +123,7 @@ class FSMOrder(models.Model):
             "fsm_order_ids": [(4, self.id)],
             "company_id": self.env.company.id,
             "invoice_line_ids": invoice_line_vals,
+            "team_id": False,
         }
         if self.operating_unit_id:
             fiscal_vals = {
@@ -147,47 +149,57 @@ class FSMOrder(models.Model):
             return res
 
     def account_prepare_invoice(self):
-        jrnl = self.env["account.journal"].search(
-            [
-                ("company_id", "=", self.env.company.id),
-                ("type", "=", "sale"),
-                ("active", "=", True),
-            ],
-            limit=1,
-        )
+        if not self.customer_id:
+            raise ValidationError(_("Customer empty"))
+        
+        invoice_exists = self.env['account.move'].search([
+            ("partner_id", "=", self.customer_id.id),
+            ("move_type", "=", "out_invoice"),
+            ("state", "=", "draft"),
+        ])
+        if len(invoice_exists) > 1:
+            raise UserError("Mais de uma Fatura Aberta Foi Encontrada para este Parceiro")
         if self.bill_to == "contact":
-            if not self.customer_id:
-                raise ValidationError(_("Customer empty"))
-            fpos = self.customer_id.property_account_position_id
-            invoice_vals = {
-                "partner_id": self.customer_id.id,
-                "move_type": "out_invoice",
-                "journal_id": jrnl.id or False,
-                "fiscal_position_id": fpos.id or False,
-                "fsm_order_ids": [(4, self.id)],
-            }
+            partner = self.customer_id.id,
             price_list = self.customer_id.property_product_pricelist
-
+            fpos = self.customer_id.property_account_position_id
         else:
+            partner = self.location_id.customer_id.id,
+            price_list = self.location_id.customer_id.property_product_pricelist
             fpos = self.location_id.customer_id.property_account_position_id
+        if not invoice_exists:
+            jrnl = self.env["account.journal"].search(
+                [
+                    ("company_id", "=", self.env.company.id),
+                    ("type", "=", "sale"),
+                    ("active", "=", True),
+                ],
+                limit=1,
+            )
+            
             invoice_vals = {
-                "partner_id": self.location_id.customer_id.id,
+                "partner_id": partner,
                 "move_type": "out_invoice",
                 "journal_id": jrnl.id or False,
                 "fiscal_position_id": fpos.id or False,
                 "fsm_order_ids": [(4, self.id)],
                 "company_id": self.env.company.id,
+                "team_id": False,
             }
-            price_list = self.location_id.customer_id.property_product_pricelist
-
-        if self.operating_unit_id:
-            fiscal_vals = {
-                "operating_unit_id": self.operating_unit_id.id,
-                "document_type_id": 40, # 01 Nota Fiscal
-                "fiscal_operation_id": self.company_id.sale_fiscal_operation_id.id,
+            if self.operating_unit_id:
+                fiscal_vals = {
+                    "operating_unit_id": self.operating_unit_id.id,
+                    "document_type_id": 40, # 01 Nota Fiscal
+                    "fiscal_operation_id": self.company_id.sale_fiscal_operation_id.id,
+                }
+                invoice_vals.update(fiscal_vals)
+        else:
+            invoice_vals = {
+                "partner_id": self.customer_id.id,
+                "move_type": "out_invoice",
+                "fsm_order_ids": [(4, self.id)],
+                "existing_invoice": invoice_exists.id,
             }
-            invoice_vals.update(fiscal_vals)
-
         invoice_line_vals = []
         for line in self.employee_timesheet_ids:
             price = price_list.get_product_price(
@@ -207,6 +219,7 @@ class FSMOrder(models.Model):
                     0,
                     0,
                     {
+                        "date_line": self.scheduled_date_start,
                         "product_id": line.product_id.id,
                         "analytic_account_id": line.account_id.id,
                         "quantity": line.unit_amount,
@@ -223,12 +236,15 @@ class FSMOrder(models.Model):
 
     def account_create_invoice(self):
         invoice_vals = self.account_prepare_invoice()
-        invoice = self.env["account.move"].sudo().create(invoice_vals)
-        invoice.payment_reference = self.name
-        # for line in invoice.invoice_line_ids:
-        #     line.fiscal_operation_id = invoice.fiscal_operation_id.id
-        #     line._onchange_product_id_fiscal()
-        # invoice.action_post()
+        if invoice_vals.get("existing_invoice"):
+            invoice = self.env["account.move"].browse(invoice_vals["existing_invoice"])
+            invoice.write({
+                "invoice_line_ids": invoice_vals.get("invoice_line_ids", [])
+            })
+        else:
+            invoice = self.env["account.move"].sudo().create(invoice_vals)
+
+        invoice.payment_reference = invoice.payment_reference + self.name
         self.account_stage = "invoiced"
         return invoice
 

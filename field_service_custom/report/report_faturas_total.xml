@@ -32,8 +32,17 @@
                             <tr style="background-color:#f3f6fb;">
                                 <td style="border:1px solid #ccc; text-align:center; width:20%; padding:6px;">
                                     <b>Data/Hora do Serviço:</b><br/>
-                                    <span t-field="o.fsm_order_ids.scheduled_date_start" t-options="{'widget': 'datetime', 'format': 'HH:mm dd/MM/yyyy'}"/>
-                                </td>
+                                    
+                                    <t t-if="o.fsm_order_ids">
+                                        <span t-field="o.fsm_order_ids[0].scheduled_date_start"
+                                              t-options="{'widget': 'datetime', 'format': 'HH:mm dd/MM/yyyy'}"/>
+                                        </t>
+                                        
+                                        <t t-else="">
+                                            <span t-field="o.invoice_date"
+                                                  t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
+                                            </t>
+                                        </td>
                                 <td style="border:1px solid #ccc; text-align:center; width:40%; padding:6px;">
                                     <b>Cliente</b><br/>
                                     <span style="font-size:14px;" t-field="o.partner_id.name"/>
@@ -66,7 +75,7 @@
                                             <t t-esc="item"/>
                                         </td>
                                         <td style="border:1px solid #ddd; text-align:left; padding:5px;">
-                                            <span t-field="line.product_id.name"/>
+                                            <span t-field="line.product_id.name"/> - <span t-field="line.date_line" />
                                         </td>
                                         <td style="border:1px solid #ddd; text-align:center; padding:5px;">
                                             <span t-esc="round(line.quantity, 0)"/>

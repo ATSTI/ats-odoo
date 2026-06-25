@@ -1,6 +1,6 @@
 from odoo import api, fields, models
 from odoo import exceptions, _
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 import sys
 
 sys.path.append(

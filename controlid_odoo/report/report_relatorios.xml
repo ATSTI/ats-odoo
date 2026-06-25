@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="report_controlid_attendance" model="ir.actions.report">
+        <field name="name">Relatorio de Pontos</field>
+        <field name="model">report.attendance.register</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">controlid_odoo.report_attendance_pontos</field>
+        <field name="report_file">controlid_odoo.report_attendance_pontos</field>
+    </record>
+</odoo>

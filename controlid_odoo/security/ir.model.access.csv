@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_report_attendance_register,report.attendance.register,model_report_attendance_register,,1,1,1,1

@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_attendance_pontos">
+        <t t-call="web.html_container">
+            <t t-foreach="docs.employee_ids" t-as="emp">
+            <t t-set="docs" t-value="docs.with_context({'lang':emp.user_id.partner_id.lang})"/>
+                <t t-call="web.external_layout">
+                    <style>
+                        .table-pontos {
+                            width: 100%;
+                            border-collapse: collapse;
+                            font-size: 9px;
+                        }
+                        .table-pontos th {
+                            background-color: #f0f0f0;
+                            border: 1px solid #ccc;
+                            padding: 3px 5px;
+                            text-align: center;
+                            font-weight: bold;
+                        }
+                        .table-pontos td {
+                            border: 1px solid #ccc;
+                            padding: 3px 5px;
+                            text-align: center;
+                            vertical-align: middle;
+                        }
+                        .td-data {
+                            width: 8%;
+                            text-align: left;
+                        }
+                        .td-marcacoes {
+                            width: 30%;
+                            text-align: center;
+                        }
+                        .td-numerico {
+                            width: 9%;
+                            text-align: center;
+                        }
+                        .td-escala {
+                            width: 8%;
+                            text-align: center;
+                        }
+                    </style>
+                    <div class="page">
+                        <t t-set="company" t-value="emp.user_id.company_id" />
+                        <table style="border: 1px solid; width: 100%; border-collapse: collapse; font-size: 14px;">
+                            <tr>
+                                <td style="padding: 3px 5px; text-align: left; vertical-align: middle;">
+                                    <strong>EMPRESA: </strong><span t-field="company.name"/>
+                                </td>
+                                <td style="padding: 3px 5px; text-align: left; vertical-align: middle;">
+                                    <strong>CNPJ: </strong><span t-field="company.vat"/>
+                                </td>
+                                <td style="padding: 3px 5px; text-align: left; vertical-align: middle;">
+                                    <strong>IE: </strong><span t-field="company.l10n_br_ie_code"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 3px 5px; text-align: left; vertical-align: middle">
+                                    <strong>ENDEREÇO:</strong>
+                                    <span t-field="company.street"/>;
+                                    Nº <span t-field="company.street_number"/>;
+                                    BAIRRO: <span t-field="company.district"/>;
+                                    CEP: <span t-field="company.zip"/>;
+                                    CIDADE: <span t-field="company.city"/>;
+                                    UF: <span t-field="company.state_id.code"/>;
+                                </td>
+                                <td/>
+                                <td/>
+                            </tr>
+                            <tr>
+                                <td style="padding: 3px 5px; text-align: left; vertical-align: middle;">
+                                    <strong>FUNCIONÁRIO: </strong><span t-field="emp.name"/>
+                                </td>
+                                <td style="padding: 3px 5px; text-align: left; vertical-align: middle;">
+                                    <strong>CPF: </strong><span t-field="emp.cpf"/>
+                                </td>
+                                <td style="padding: 3px 5px; text-align: left; vertical-align: middle;">
+                                    <strong>ADMISSÃO: </strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 3px 5px; text-align: left; vertical-align: middle;">
+                                    <strong>CARGO: </strong>
+                                </td>
+                                <td style="padding: 3px 5px; text-align: left; vertical-align: middle;">
+                                    <strong>SETOR: </strong>
+                                </td>
+                                <td style="padding: 3px 5px; text-align: left; vertical-align: middle;">
+                                    <strong>INTER: </strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 3px 5px; text-align: left; vertical-align: middle;">
+                                    <strong>PERÍODO: </strong>
+                                    DE  <span t-field="docs.date_from" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/>
+                                    ATÉ  <span t-field="docs.date_to" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/>
+                                </td>
+                                <td style="padding: 3px 5px; text-align: left; vertical-align: middle;">
+                                    <strong>DATA DE EMISSÃO: </strong>
+                                </td>
+                                <td/>
+                            </tr>
+                            <tr>
+                                <td style="padding: 3px 5px; text-align: left; vertical-align: middle; height: 20px; width 100%">
+                                    <strong>OBSERVAÇÕES: </strong>
+                                </td>
+                                <td/>
+                                <td/>
+                            </tr>
+                        </table>
+                        <!-- ===== TÍTULO DA FOLHA ===== -->
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <h5 style="font-weight: bold; border: 1px solid black; padding: 4px; background-color: #f0f0f0;">
+                                    FOLHA DE PONTO DE
+                                    <span t-field="docs.date_from" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/>
+                                    ATÉ
+                                    <span t-field="docs.date_to" t-options='{"widget": "date", "format": "dd/MM/yyyy"}'/>
+                                </h5>
+                            </div>
+                        </div>
+    
+                        <!-- ===== TABELA DE MARCAÇÕES ===== -->
+                        <table class="table-pontos">
+                            <thead>
+                                <tr>
+                                    <th class="td-data">DATA</th>
+                                    <th class="td-marcacoes">MARCAÇÕES</th>
+                                    <th class="td-numerico">TRAB.</th>
+                                    <th class="td-numerico">DESC.</th>
+                                    <th class="td-numerico">ABONO</th>
+                                    <th class="td-numerico">EXTRAS</th>
+                                    <th class="td-numerico">BH</th>
+                                    <th class="td-escala">ESCALA</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="count_days" t-value="abs(docs.date_to - docs.date_from).days" />
+                                <t t-set="total_worked_hours" t-value="0.0" />
+                                <t t-foreach="range(count_days + 1)" t-as="dia">
+                                    <t t-set="target_date" t-value="docs.date_from + datetime.timedelta(days=dia)"/>
+                                    <t t-set="att" t-value="docs.attendance_ids.filtered(lambda a: a.check_in and a.check_in.date() == target_date and a.employee_id.id == emp.id)"/>
+                                    <tr>
+                                        <td class="td-data">
+                                            <span t-esc="target_date" 
+                                                t-options='{"widget": "date", "format": "EEE dd/MM"}'/>
+                                        </td>
+
+                                        <t t-set="off_day" t-value="docs.check_is_work_day(target_date)" />
+                                        <t t-if="off_day in ['SAB', 'DOM', 'FER']">
+                                            <td class="td-marcacoes">
+                                                <span t-esc="off_day"/>
+                                                <span t-esc="off_day"/>
+                                                <span t-esc="off_day"/>
+                                                <span t-esc="off_day"/>
+                                            </td>
+                                            <td/>
+                                        </t>
+                                        <t t-else="">
+                                            <t t-if="att">
+                                                <td class="td-marcacoes">
+                                                    <span t-field="att[0].check_in" 
+                                                        t-options='{"widget": "datetime", "format": "HH:mm:ss"}'/>
+                                                    &amp;nbsp;
+                                                    <span t-field="att[0].check_out" 
+                                                        t-options='{"widget": "datetime", "format": "HH:mm:ss"}'/>
+                                                    <span t-field="att[0].check_in_interval" 
+                                                        t-options='{"widget": "datetime", "format": "HH:mm:ss"}'/>
+                                                    <span t-field="att[0].check_out_interval" 
+                                                        t-options='{"widget": "datetime", "format": "HH:mm:ss"}'/>
+                                                </td>
+                                                <td class="td-numerico">
+                                                    <t t-esc="'%02d:%02d' % (int(att.worked_hours), int(round((att.worked_hours % 1) * 60)))"/>
+        
+                                                    <t t-set="total_worked_hours" t-value="total_worked_hours + att.worked_hours"/>
+                                                </td>
+                                            </t>
+                                            <t t-else="">
+                                                <td/>
+                                                <td>-</td> 
+                                            </t>
+                                        </t>
+                                        
+                                        
+                                        <td class="td-numerico"></td>
+                                        <td class="td-numerico"></td>
+                                        <td class="td-numerico"></td>
+                                        <td class="td-numerico"></td>
+                                        <td class="td-escala">Padrão</td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        <br/>
+                        <!-- ===== TOTAIS E RESUMO ===== -->
+                        <table style="width:100%">
+                            <tr>
+                                <td style="60%">
+                                    <table style="width:80%; border-collapse:collapse; font-size:8px;">
+                                        <tr>
+                                            <!-- TOTAIS -->
+                                            <td style="width:65%; vertical-align:top;">
+                                                <table style="width:100%; border-collapse:collapse;" border="1">
+                                                    <thead>
+                                                        <tr>
+                                                            <th colspan="3">TOTAIS DO PERÍODO</th>
+                                                        </tr>
+                                                        <tr>
+                                                            <th colspan="2" style="text-align:right;" border="0">PAGO:</th>
+                                                            <th>DESC:</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        <tr>
+                                                            <td><strong>HORAS TRABALHADAS:</strong></td>
+                                                            <td style="text-align:center;">
+                                                                <strong t-esc="'%02d:%02d' % (int(total_worked_hours), int(round((total_worked_hours % 1) * 60)))"/>
+                                                            </td>
+                                                            <td></td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td><strong>TOTAL DESCONTADO:</strong></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td><strong>HORAS ABONADAS:</strong></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td><strong>SAÍDA ANTECIPADA:</strong></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td><strong>ATRASOS:</strong></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td><strong>FALTAS:</strong></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td><strong>DSR:</strong></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td><strong>ADICIONAL NOTURNO:</strong></td>
+                                                            <td colspan="2"></td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td><strong>SALDO BH PERÍODO:</strong></td>
+                                                            <td colspan="2"></td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td><strong>SALDO BH GERAL:</strong></td>
+                                                            <td colspan="2"></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+
+                                            <!-- EXTRAS -->
+                                            <td style="width:35%; vertical-align:top;">
+                                                <table style="width:100%; border-collapse:collapse;" border="1">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style="width:60%"><strong>EXTRA 60%:</strong></td>
+                                                            <td style="width:40%"></td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td style="width:60%"><strong>EXTRA 100%:</strong></td>
+                                                            <td style="width:40%"></td>
+                                                        </tr>
+
+                                                        <!-- linhas vazias para alinhar -->
+                                                        <tr><td style="height: 10px"></td><td style="height: 10px"></td></tr>
+                                                        <tr><td style="height: 10px"></td><td style="height: 10px"></td></tr>
+                                                        <tr><td style="height: 10px"></td><td style="height: 10px"></td></tr>
+                                                        <tr><td style="height: 10px"></td><td style="height: 10px"></td></tr>
+                                                        <tr><td style="height: 10px"></td><td style="height: 10px"></td></tr>
+                                                        <tr><td style="height: 10px"></td><td style="height: 10px"></td></tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td style="width: 40%">
+                                    <table style="width:100%; border-collapse:collapse; font-size:10px">
+                                        <thead>
+                                            <tr style="background-color: #e8e8e8; font-weight: bold; border-collapse:collapse;">
+                                                <th colspan="2">
+                                                    ESCALA PADRÃO CADASTRADA:
+                                                    <!-- <span t-field="o.scale_type"/> -->
+                                                    VIRADA:
+                                                    <!-- <span t-field="o.scale_turn_time"/> -->
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody style="font-size: 8px;">
+                                            <tr>
+                                                <td><strong>SEG:</strong></td>
+                                                <td>9:00</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>TER:</strong></td>
+                                                <td>9:00</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>QUA:</strong></td>
+                                                <td>9:00</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>QUI:</strong></td>
+                                                <td>9:00</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>SEX:</strong></td>
+                                                <td>9:00</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>SAB:</strong></td>
+                                                <td>SABADO</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>DOM:</strong></td>
+                                                <td>DOMINGO</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" >
+                                                    <div style="margin-top: 16px; font-size: 8px; border: 1px solid #ccc; padding: 8px;">
+                                                        <p>__________________________________    _______/_______/________</p>
+                                                        <p><strong>LOCAL E DATA</strong></p>
+                                                        <br/>
+                                                        <br/>
+                                                        <p> __________________________________</p>
+                                                        <p>
+                                                            ASSINATURA:
+                                                            <span t-field="emp.registration"/>
+                                                            -
+                                                            <span t-field="emp.name"/>
+                                                        </p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+    
+                        
+    
+                        <!-- ===== RODAPÉ ===== -->
+                        <!-- <div class="row mt-2">
+                            <div class="col-12 text-center" style="font-size: 7px; color: #888;">
+                                <span t-field="o.company_id.footer_report"/>
+                            </div>
+                        </div> -->
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

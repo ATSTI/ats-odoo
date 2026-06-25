@@ -18,9 +18,13 @@ Controlid devices.
     'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': ['hr_attendance', 'l10n_br_hr'],
     'data': [
+        'security/ir.model.access.csv',
         'views/attendance_view.xml',
         'data/ir_parameter_data.xml',
         'data/ir_cron_data.xml',
+        'wizard/report_attendance_register_view.xml',
+        'report/report_relatorios.xml',
+        'report/report_attendance.xml'
     ],
     'installable': True,
     'application': False,

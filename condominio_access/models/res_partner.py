@@ -36,6 +36,8 @@ class ResPartner(models.Model):
         string="Data de Nascimento"
     )
 
+    user_id = fields.Integer("ID do usuário")
+
     @api.depends('condo_residence_ids')
     def _compute_is_morador(self):
         for partner in self:

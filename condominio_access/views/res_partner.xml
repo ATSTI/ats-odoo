@@ -19,6 +19,7 @@
 
             <field name='category_id' position="after">
                 <field name="data_nascimento"/>
+                <field name="user_id"/>
             </field>
 
             <xpath expr="//notebook" position="inside">

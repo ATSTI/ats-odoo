@@ -873,6 +873,11 @@ class IntegracaoPdv(http.Controller):
         preco = dados['price']
         
         in_date = datetime.now()
+        categ_id = http.request.env['product.category'].search([
+            '|',
+            ('id', '=', p['categ_id'][0]),
+            ('complete_name', 'ilike', p['categ_id'][1])
+        ], limit=1)
         prod = http.request.env['product.product'].search([('default_code', '=', code)], limit=1)
         if not prod:
             p = dados['product'][0]
@@ -889,7 +894,7 @@ class IntegracaoPdv(http.Controller):
                 'default_code': code,
                 'list_price': preco,
                 'detailed_type': 'product',
-                'categ_id': categ_id.id,
+                'categ_id': categ_id,
                 'barcode': p['barcode'],
                 'tipo_venda': p['tipo_venda'],
                 'fiscal_type': p['fiscal_type'],

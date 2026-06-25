@@ -175,7 +175,7 @@ class FSMOrder(models.Model):
                     ("active", "=", True),
                 ],
                 limit=1,
-            )
+            )  #TODO checar aq depois a questao de duplicar o KANBAN, pois aquilo é o diário
             
             invoice_vals = {
                 "partner_id": partner,

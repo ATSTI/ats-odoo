@@ -4,9 +4,31 @@ from odoo import fields, models, _, api
 from odoo.exceptions import UserError, ValidationError
 from datetime import datetime, timedelta, date
 import base64
+import logging
+_logger = logging.getLogger(__name__)
 
 class AccountMove(models.Model):
     _inherit = "account.move"
+
+    @api.model
+    def default_get(self, fields_list):
+        res = super().default_get(fields_list)
+
+        journal_id = self.env.context.get('default_journal_id')
+
+        if journal_id:
+            res['journal_id'] = journal_id
+
+        return res
+    
+    @api.onchange('partner_id')
+    def _onchange_partner_keep_journal(self):
+        journal_id = self.env.context.get('default_journal_id')
+
+        if journal_id:
+            self.journal_id = journal_id
+
+
 
     @api.onchange('partner_id')
     def _onchange_partner_id(self):

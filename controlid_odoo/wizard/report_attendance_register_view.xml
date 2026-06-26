@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="report_attendance_register_view" model="ir.ui.view">
+        <field name="name">report.attendance.register.form</field>
+        <field name="model">report.attendance.register</field>
+        <field name="arch" type="xml">
+            <form string="IMprimir Registro de Pontos">
+                <group>
+                    <group>
+                        <field name="employee_ids" widget="many2many_tags"/>
+                        <field name="date_from" />
+                        <field name="date_to"/>
+                    </group>
+                </group>
+                <footer>
+                    <button
+                        name="action_print_report"
+                        string="Imprimir"
+                        class="btn-primary"
+                        type="object"
+                    />
+                    <button string="Cancel" class="btn-default" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_attendance_action_graph" model="ir.actions.act_window">
+        <field name="name">Attendance Analysis</field>
+        <field name="res_model">hr.attendance</field>
+        <field name="view_mode">graph,pivot</field>
+        <field name="view_id"></field>  <!-- force empty -->
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No data yet!
+            </p>
+        </field>
+    </record>
+
+    <record id="action_report_attendance_view" model="ir.actions.act_window">
+        <field name="name">Registro de Pontos</field>
+        <field name="res_model">report.attendance.register</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="hr_attendance.menu_hr_attendance_report" model="ir.ui.menu">
+        <field name="action" eval="False"/>
+        <field name="name">Relatórios</field>
+    </record>
+
+    <menuitem id="menu_attendance_graph"
+        name="Gráfico"
+        parent="hr_attendance.menu_hr_attendance_report"
+        action="hr_attendance_action_graph"
+        sequence="10"/>
+
+    <menuitem id="menu_attendance_wizard"
+        name="Folha de Ponto"
+        parent="hr_attendance.menu_hr_attendance_report"
+        action="controlid_odoo.action_report_attendance_view"
+        sequence="11"/>
+
+</odoo>

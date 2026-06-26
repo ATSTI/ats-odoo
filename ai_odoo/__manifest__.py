@@ -7,12 +7,13 @@
     'category': 'Others',
     'license': 'AGPL-3',
     'sequence': 2,
-    'summary': 'Agente Intermediador - Contatos e Vendas',
+    'summary': 'Integração com OpenAI - dados, faturas, produtos e muito mais',
     'description': """
-        Este Módulo tem a adição do campo "Agente Intermediador" e pode estar disponivel tanto em contatos quanto em vendas
-    """,
+        Este módulo tem como função integrar um agente de IA no chat do odoo, com ele você conseguirá informações de forma
+        mais rápida e eficiente, usando a linguagem humana para poder criar faturas, saber vendas, faturas em aberto, top sellers, clientes que mais compram, entre outras coisas
+        """,
     'author': 'ATSTi Soluções',
-    'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
+    'maintainer': 'Otávio Andretta,Carlos R. Silveira, Mauricio-ATS, ATSTi',
     'website': '',
     'depends': ['ai_oca_bridge'],
     'data': [

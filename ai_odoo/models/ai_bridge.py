@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*- © 2017 Carlos R. Silveira, ATSti
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 import json
@@ -208,15 +207,19 @@ class AiBridgeExecution(models.Model):
             return None
 
 
-    def _execute_agent(self, user_content, tools, execute_func_callback, system_prompt=None, max_iterations=10):
+    def _execute_agent(self, user_content, tools, execute_func_callback, system_prompt=None, history=None, max_iterations=10):        
         self.ensure_one()
         messages = [
             {"role": "system", "content": system_prompt or "Você é um assistente de negócios do Odoo."},
-            {"role": "user", "content": user_content},
         ]
+        if history:
+            messages.extend(history)
+        messages.append({"role": "user", "content": user_content})
+
         payload_tools = [{"type": "function", "function": f} for f in tools]
-        
+
         for _ in range(max_iterations):
+        
             payload = {
                 "model": "gpt-4o-mini",
                 "messages": messages,

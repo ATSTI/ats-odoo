@@ -4,7 +4,10 @@ import ast
 from datetime import datetime, timedelta
 from odoo import models, api, fields
 from odoo.fields import Datetime
+from odoo.tools import html2plaintext
 
+HISTORY_LIMIT = 20      # nº de mensagens anteriores a considerar
+HISTORY_MAX_CHARS = 1000  # corta mensagens muito longas pra não explodir tokens
 EXCLUDED_PREFIXES = ('message_', 'website_', 'activity_')
 
 QUERY_FUNCTIONS = [
@@ -136,7 +139,7 @@ class MailMessage(models.Model):
             user_content = str(msg.body).replace('<p>', '').replace('</p>', '').strip()
             # category = self._classify_message(user_content)
             # if category == 'consulta':
-            self._run_query_agent(user_content, openai_channel)
+            self._run_query_agent(user_content, openai_channel, exclude_message_id=msg.id)
             # elif category == 'acao':
             #     self._run_action_agent(user_content, openai_channel)
 
@@ -167,10 +170,9 @@ class MailMessage(models.Model):
             return 'outro'
         return answer.strip().lower().split()[0]  # pega só a primeira palavra
 
-    def _run_query_agent(self, user_content, channel):
+    def _run_query_agent(self, user_content, channel, exclude_message_id=None):
         """Delega toda a chamada com function calling para ai.bridge.execution."""
         bridge = self.env['ai.bridge'].search([('name', 'ilike', 'OpenAI')], limit=1)
-        # import pudb;pudb.set_trace()
         if not bridge:
             return
 
@@ -179,10 +181,13 @@ class MailMessage(models.Model):
             'model_id': bridge.sudo().model_id.id,
         })
 
+        history = self._get_channel_history(channel, exclude_message_id=exclude_message_id)
+
         answer = execution._execute_agent(
             user_content=user_content,
             tools=QUERY_FUNCTIONS,
             execute_func_callback=lambda fn, args: self._execute_query_function(fn, args),
+            history=history,
             system_prompt=(
                 f"""
                 Você é um assistente de negócios integrado ao Odoo.
@@ -205,7 +210,6 @@ class MailMessage(models.Model):
                 Hoje é {datetime.now().strftime('%d/%m/%Y')}.
                 """
             ),
-            
         )
 
         if answer:
@@ -320,6 +324,32 @@ class MailMessage(models.Model):
             return {
                 "error": "Função não permitida"
             }
+        
+
+    
+    def _get_channel_history(self, channel, exclude_message_id=None, limit=HISTORY_LIMIT):
+        """Reconstrói o histórico do canal no formato role/content a partir
+        das mensagens já postadas no chatter (sem precisar guardar estado extra)."""
+        odoobot = self.env.ref('base.partner_root')
+        domain = [
+            ('model', '=', 'mail.channel'),
+            ('res_id', '=', channel.id),
+            ('message_type', '=', 'comment'),
+        ]
+        if exclude_message_id:
+            domain.append(('id', '!=', exclude_message_id))
+
+        messages = self.search(domain, order='id desc', limit=limit)
+        messages = messages.sorted(key=lambda m: m.id)  # volta pra ordem cronológica
+
+        history = []
+        for msg in messages:
+            body = html2plaintext(msg.body or '').strip()
+            if not body:
+                continue
+            role = 'assistant' if msg.author_id.id == odoobot.id else 'user'
+            history.append({'role': role, 'content': body[:HISTORY_MAX_CHARS]})
+        return history
 
     def _post_bot_message(self, channel, content):
         odoobot = self.env.ref('base.partner_root')

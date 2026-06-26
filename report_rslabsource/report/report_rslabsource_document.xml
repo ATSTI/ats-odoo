@@ -165,7 +165,7 @@
                         <tr>
                             <td colspan="4" style="padding: 2px 6px;">
                                 <strong>Contato(s):</strong>
-                                <t t-foreach="o.partner_id.child_ids" t-as="child">
+                                <t t-foreach="o.partner_id.child_ids[:2]" t-as="child">
                                     <t t-esc="child.name"/>
                                     <t t-if="child.phone"> (<t t-esc="child.phone"/>)</t>
                                     <t t-if='child.email'> (<t t-esc ='child.email'/>)</t>
@@ -514,7 +514,14 @@
                     <br/><br/>
 
                     <span style="color:#1f4e79;">
-                        VENDAS2@RSLABSOURCE.COM.BR
+                    <t t-if = 'o.user_id.email'>
+                        <t t-esc='o.user_id.email'/>
+                    </t>
+                    <t t-else="">
+                    Vendedor sem email em seu cadastro
+
+                    </t>
+
                     </span>
 
                     <br/><br/>

@@ -873,35 +873,34 @@ class IntegracaoPdv(http.Controller):
         preco = dados['price']
         
         in_date = datetime.now()
-        categ_id = http.request.env['product.category'].search([
-            '|',
-            ('id', '=', p['categ_id'][0]),
-            ('complete_name', 'ilike', p['categ_id'][1])
-        ], limit=1)
         prod = http.request.env['product.product'].search([('default_code', '=', code)], limit=1)
         if not prod:
             p = dados['product'][0]
-            ncm = http.request.env['l10n_br_fiscal.ncm'].search([
-                ('code', '=', p['ncm_id'][1][:10])
-            ], limit=1)
-            categ_id = http.request.env['product.category'].search([
-                '|',
-                ('id', '=', p['categ_id'][0]),
-                ('complete_name', 'ilike', p['categ_id'][1])
-            ], limit=1)
+            ncm = http.request.env['l10n_br_fiscal.ncm']
+            if p.get('ncm_id', False):
+                ncm = ncm.search([
+                    ('code', '=', p['ncm_id'][1][:10])
+                ], limit=1)
+            categ_id = http.request.env['product.category']
+            if p.get('categ_id', False):
+                categ_id = categ_id.search([
+                    '|',
+                    ('id', '=', p['categ_id'][0]),
+                    ('complete_name', 'ilike', p['categ_id'][1])
+                ], limit=1)
             prod = http.request.env['product.product'].create({
                 'name': p['name'],
                 'default_code': code,
                 'list_price': preco,
                 'detailed_type': 'product',
-                'categ_id': categ_id,
-                'barcode': p['barcode'],
-                'tipo_venda': p['tipo_venda'],
-                'fiscal_type': p['fiscal_type'],
-                'icms_origin': p['icms_origin'],
-                'ncm_id': ncm.id,
-                'tax_icms_or_issqn': p['tax_icms_or_issqn'],
-                'fiscal_genre_id': p['fiscal_genre_id'][0],
+                'categ_id': categ_id.id or 1,
+                'barcode': p['barcode'] if p.get('barcode') else False,
+                'tipo_venda': p['tipo_venda'] if p.get('tipo_venda') else False,
+                'fiscal_type': p['fiscal_type'] if p.get('fiscal_type') else False,
+                'icms_origin': p['icms_origin'] if p.get('icms_origin') else False,
+                'ncm_id': ncm.id or False,
+                'tax_icms_or_issqn': p['tax_icms_or_issqn'] if p.get('tax_icms_or_issqn') else False,
+                'fiscal_genre_id': p['fiscal_genre_id'][0] if p.get('fiscal_genre_id') else False,
             })
         if prod.list_price != preco:
             prod.write({

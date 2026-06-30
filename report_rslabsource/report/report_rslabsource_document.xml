@@ -93,9 +93,6 @@
                         <td width="40%" style="text-align: right;">
                         <strong>Data:</strong>
                         <span t-field="o.date_order" t-options='{"widget": "date"}'/>
-                        &#160;&#160;
-                        <strong>Página:</strong>
-                        <span class="page"/> 1 / 2 <span class="topage"/>
                     </td>
                     </tr>
                 </table>
@@ -332,7 +329,7 @@
                 </table>
 
                 <t t-if="o.payment_term_id">
-                    <table width="100%" style="border-collapse: collapse; border: 1px solid #ccc; margin-bottom: 6px; font-size: 12px;">
+                    <table width="100%" style="border-collapse: collapse; border: 1px solid #ccc; margin-bottom: px; font-size: 12px;">
                         <tr style="background-color: #e0e0e0;">
                             <td colspan="2" style="padding: 3px 6px; font-weight: bold; border-bottom: 1px solid #ccc;">
                                 Condições de Pagamento
@@ -533,6 +530,9 @@
                 </div>
 
             </div>
+            <div class="footer" style="text-align:right; font-size:11px; padding:4px 15px;">
+            Página: <span class="page"/> / <span class="topage"/>
+        </div>
         </t>
     </template>
 

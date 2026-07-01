@@ -21,6 +21,7 @@
                                 <br/>
                                 <br/> <b>Cliente:</b> <span t-field="o.partner_id.name"></span>
                                 <br/> <b>Fatura:</b> <span t-field="o.name"></span>
+                                <br/> <b>Operating Unit:</b> <span t-field="o.operating_unit_id.name"/>
                             </td>
                         </tr>
                     </table>

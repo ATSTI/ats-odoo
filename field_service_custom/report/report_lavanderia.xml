@@ -37,6 +37,8 @@
                             -----------------------------------------------------<br/>
                             <strong>FATURA: <t t-esc="o.name"/></strong>
                             <br/>
+                            <strong>Operating Unit: <t t-esc="o.operating_unit_id.name"/></strong>
+                            <br/>
                             <strong>CLIENTE: <t t-esc="o.partner_id.name"/></strong>
                             <br/>
                             <strong>Endereço: </strong>

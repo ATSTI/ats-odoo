@@ -10,6 +10,11 @@ _logger = logging.getLogger(__name__)
 class AccountMove(models.Model):
     _inherit = "account.move"
 
+    @api.onchange("operating_unit_id")
+    def _onchange_operating_unit(self):
+        for line in self.line_ids:
+            line.operating_unit_id = self.operating_unit_id
+
     @api.model
     def default_get(self, fields_list):
         res = super().default_get(fields_list)

@@ -97,32 +97,15 @@ class AccountMove(models.Model):
                     'func': 'cron',
                     'line': 0,
                 })
-                # raise ValueError('Fatura sem linhas para basear o produto.')
-
-            produto = inv.invoice_line_ids[0].product_id
-            conta = inv.invoice_line_ids[0].account_id
-
-            if not produto or not conta:
-                raise ValueError('Produto ou conta da linha original não encontrada.')
-
             try:
-                inv.write({'invoice_line_ids': [(5, 0, 0)]})
-                inv.write({
-                    'invoice_line_ids': [(0, 0, {
-                        'move_id': inv.id,
-                        'product_id': produto.id,
-                        'name': produto.name,
-                        'quantity': 1,
+                for line in inv.invoice_line_ids:
+                    line.write({                       
                         'price_unit': total_ajustado,
-                        'account_id': conta.id,
-                    })]
-                })
+                    })
                 inv._compute_amount()
                 inv.with_context(check_move_validity=False).action_post()
-
                 status_final = inv.state
                 msg_log += ' | Fatura: %s - %s (mult.=%s) \n' %(inv.name, status_final, str(multiplicador))
-
             except Exception as e:
                 log_model.create({
                     'name': 'Cron',

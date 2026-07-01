@@ -40,17 +40,15 @@
                 <!-- carregar estrutura de impostos -->
                 <t t-set="tax_totals" t-value="doc.tax_totals"/>
                 <!-- Subtotal -->
-                <t t-if="tax_totals.get('subtotals')">&gt;
-                  <tr>
-                      <td style="border-top:1px solid #999;">
-                          <strong>
-                              <span t-esc="tax_totals['subtotals'][0]['name']"/>
-                          </strong>
-                      </td>
-                      <td style="text-align: right; border-top:1px solid #999;">
-                      <span t-esc="tax_totals['subtotals'][0]['formatted_amount']"/>
-                      </td>
-                  </tr>
+                <t t-if="tax_totals.get('subtotals')">
+                    <tr>
+                        <td style="border-top:1px solid #999;">
+                            <strong>Valor Impostos Inclusos</strong>
+                        </td>
+                        <td style="text-align: right; border-top:1px solid #999;">
+                            <span t-esc="tax_totals['subtotals'][0]['formatted_amount']"/>
+                        </td>
+                    </tr>
                 </t>
                 <!-- Impostos -->
                 <t t-foreach="tax_totals['groups_by_subtotal']['Valor Sem Impostos']" t-as="tax">

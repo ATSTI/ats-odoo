@@ -91,12 +91,11 @@ class PaymentOrderLine(models.Model):
                     'accept': 'application/json',
                     'content-type': 'application/x-www-form-urlencoded',
                 }
-
                 data = {
                     'grant_type': 'client_credentials',
-                    'client_id': "63f3a0f9-2cce-4bd0-81a6-e59c4369f811",
-                    'client_secret': "67837173-eee2-424e-bd53-9382d106f698",
-                    'refresh_token': "TG-68386dce65f462000124cc8f-2431081876",
+                    'client_id': diario.l10n_br_bradesco_id,
+                    'client_secret': diario.l10n_br_bradesco_secret,
+                    'refresh_token': diario.l10n_br_bradesco_token,
                 }
                 if diario.tipo_ambiente_boleto == "1":
                     url_connect = self.url_token
@@ -108,71 +107,61 @@ class PaymentOrderLine(models.Model):
                 diario.write({'l10n_br_bradesco_token': token, 'write_date': agora})
             return cert_path, key_path, token, id_bradesco, secret
 
-    # def buscando_boleto_inter(self, moveline, nosso_numero):
-    #     url_boleto = self.url + '/cobranca/v2/boletos/%s' %(nosso_numero)
-
-    #     cert_path, key_path, token, id_inter, secret = self.buscar_token(diario)
-    #     headers = {
-    #         "Authorization": "Bearer " + token
-    #     }
-
-    #     response = requests.get(url_boleto, headers=headers, cert=(cert_path, key_path))
-    #     if response.status_code != 200:
-    #         moveline.write({'codigo_barra': 'Busca Boleto falhou.'})
-    #     if response.status_code == 200:
-    #         json_p = response.json()
-    #         nosso_numero = json_p["nossoNumero"]
-    #         linha_digitavel = json_p["linhaDigitavel"]
-    #         codigo_barras = json_p["codigoBarras"]
-    #         moveline.write({'nosso_numero': nosso_numero,
-    #                 'codigo_barra': codigo_barras,
-    #                 'linha_digitavel': linha_digitavel,
-    #                 'boleto_emitido': True,})
-    #         move = self.env['payment.order.line'].search(
-    #                 [('src_bank_account_id', '=',
-    #         diario.bank_account_id.id),
-    #                 ('move_line_id', '=', moveline.id),
-    #                 ('state', 'not in', ('cancelled', 'rejected'))])
-    #         if move:
-    #             move.write({'state':'processed'})
-
-    # def pegar_pdf_inter(self, moveline, nosso_numero):
-    #     url_pdf = self.url + '/cobranca/v2/boletos/%s/pdf' %(nosso_numero)
-
-    #     cert_path, key_path, token, id_inter, secret = self.buscar_token(moveline.payment_mode_id.journal_id)
-
-    #     request_body = "client_id=" + id_inter + "&client_secret=" + secret + "&scope=boleto-cobranca.write boleto-cobranca.read extrato.read&grant_type=client_credentials"
-    #     headers = {
-    #         "Accept": "application/json",
-    #         "Content-Type": "application/json",
-    #         "Authorization": "Bearer " + token,
-    #     }
-
-    #     response = requests.get(url_pdf, headers=headers, cert=(cert_path, key_path), data=request_body)
-    #     json_p = response.json()
-    #     if response.status_code != 200:
-    #         moveline.write({'codigo_barra': 'Busca PDF falhou.'})
-    #         #raise ValueError("Não foi possível resgatar as informações do boleto.")
-    #     else:
-    #         pdf = BytesIO(base64.b64decode(json_p['pdf']))
-    #         nome_boleto = 'boleto_%s_%s.pdf' %(moveline.invoice_id.number, str(moveline.name or moveline.id))
-    #         arq_temp = open('/tmp/'+nome_boleto, "wb")
-    #         arq_temp.write(pdf.read())
-    #         arq_temp.close()
-    #         arq_temp = open('/tmp/'+nome_boleto, "rb")
-    #         pdf = arq_temp.read()
-    #         arq_temp.close()
-    #         # TODO
-    #         # anexar o PDF na FATURA
-    #         attachment_obj = self.env['ir.attachment']
-    #         attachment_obj.create(dict(
-    #             name=nome_boleto,
-    #             datas_fname=nome_boleto,
-    #             datas=base64.b64encode(pdf),
-    #             mimetype='application/pdf',
-    #             res_model='account.invoice',
-    #             res_id=moveline.invoice_id.id,
-    #         ))
+    def _vals_homologacao_bradesco(self):
+        # =====================================================================
+        # OBS .  só aceita os dados exatos que estão na documentacao
+        # =====================================================================
+        payload = {
+            "nuCPFCNPJ": 31759489,
+            "filialCPFCNPJ": 1,
+            "ctrlCPFCNPJ": 55,
+            "idProduto": 9,
+            "nuNegociacao": 285600000000222652,
+            "nuCliente": "1",
+            "dtEmissaoTitulo": "27.05.2025",
+            "dtVencimentoTitulo": "27.08.2025",
+            "vlNominalTitulo": "500.00",
+            "cdEspecieTitulo": 2,
+            "cindcdAceitSacdo": "2",
+            "percentualJuros": 0,
+            "vlJuros": "5.00",
+            "qtdeDiasJuros": 1,
+            "percentualMulta": "20.00",
+            "vlMulta": 0,
+            "qtdeDiasMulta": 1,
+            "percentualDesconto1": 0,
+            "vlDesconto1": "50.00",
+            "dataLimiteDesconto1": "29.05.2025",
+            "nomePagador": "CLIENTE",
+            "logradouroPagador": "AVENIDA COPACABANA",
+            "nuLogradouroPagador": "237",
+            "cepPagador": 0,
+            "complementoCepPagador": 0,
+            "bairroPagador": "ALPHAVILLE",
+            "municipioPagador": "BARUERI",
+            "ufPagador": "SP",
+            "cdIndCpfcnpjPagador": 1,
+            "nuCpfcnpjPagador": 98765432111,
+            "nomeSacadorAvalista": "PARCEIRO",
+            "logradouroSacadorAvalista": "AV SAO PAULO",
+            "nuLogradouroSacadorAvalista": "4",
+            "complementoLogradouroSacadorAvalista": "",
+            "cepSacadorAvalista": 0,
+            "complementoCepSacadorAvalista": 0,
+            "bairroSacadorAvalista": "VILA 237",
+            "municipioSacadorAvalista": "OSASCO",
+            "ufSacadorAvalista": "SP",
+            "cdIndCpfcnpjSacadorAvalista": 1,
+            "nuCpfcnpjSacadorAvalista": 12345678999,
+            "enderecoSacadorAvalista": "RUA BRA",
+            "dddFoneSacadorAvalista": 0,
+            "foneSacadorAvalista": 0,
+            "listaMsgs": [
+                {"mensagem": "$$.*$$"},
+                {"mensagem": "$$.*$$"}
+            ]
+        }
+        return payload
 
     def send_information_to_banco_bradesco(self, moveline):
         if moveline:
@@ -262,8 +251,7 @@ class PaymentOrderLine(models.Model):
                 url_connect = self.url
             else:
                 url_connect = self.url_sandbox
-
-            # url_cobranca = "https://openapi.bradesco.com.br/boleto/cobranca-registro/v1/cobranca"
+                vals = self._vals_homologacao_bradesco()
             response = requests.post(url_connect, json=vals, headers=headers, cert=cert)
 
             nosso_numero = ''
@@ -283,16 +271,15 @@ class PaymentOrderLine(models.Model):
                     ('state', 'not in', ('cancelled', 'rejected'))])
                 if move:
                     move.write({'state':'processed'})
-
-                # self.pegar_pdf_inter(moveline, nosso_numero)
-
+                return True
             elif response.status_code == 401:
                 moveline.write({'codigo_barra': 'Erro autorização consultar API'})
+                return False
             else:
                 msg_erro = 'Erro:\n%s' %(response.text)
                 moveline.invoice_id.message_post(body=_(msg_erro))
                 moveline.write({'codigo_barra': 'Houve erro na API'})
-                #raise UserError('Houve um erro com a API do Banco Inter:\n%s' % response.text)
+                return False
 
     def baixa_faturas(self, move_line_id, valor, journal_id, juros):
         invoices = move_line_id.invoice_id
@@ -339,123 +326,33 @@ class PaymentOrderLine(models.Model):
         pay = Payment.create(vals)
         pay.post()
 
-    # def search_information_to_banco_inter(self, diario):
-    #     # teste pegar PDF
-    #     # moveline = self.env['account.move.line'].browse([40787])
-    #     # nosso_numero = '00841740287'
-    #     # self.pegar_pdf_inter(moveline, nosso_numero)
-    #     # # self.buscando_boleto_inter(moveline, nosso_numero)
-    #     # return True
-
-    #     diario = self.env['account.journal'].browse([diario])
-
-    #     cert_path, key_path, token, id_inter, secret = self.buscar_token(diario)
-
-    #     headers = {
-    #         "Authorization": "Bearer " + token
-    #     }
-    #     dia = fields.Date.today().day
-    #     data_ini = fields.Date.today().strftime('%Y-%m-%d') # '2021-08-01' # fields.Datatime.now()
-    #     data_ini = data_ini[:8] + str(dia-5).zfill(2)
-    #     data_fim =  fields.Date.today().strftime('%Y-%m-%d') # '2021-09-24' #fields.Datatime.now()
-
-    #     opFiltros = {
-    #         'dataInicial': data_ini,
-    #         'dataFinal': data_fim,
-    #         'situacao': 'PAGO',
-    #         'tipoOrdenacao': 'ASC',
-    #         'itensPorPagina': 10,
-    #         'paginaAtual': 0
-    #     }
-    #     #    'filtrarDataPor': 'EMISSAO',
-    #     #    'nome': '',
-    #     #    'email': '',
-    #     #    'cpfCnpj': '',
-    #     #    'nossoNumero': '',
-    #     #    'ordenarPor': 'NOSSONUMERO',
-
-    #     response = requests.get(
-    #         self.url + "/cobranca/v2/boletos",
-    #         params=opFiltros,
-    #         headers=headers,
-    #         cert=(cert_path, key_path)
-    #     )
-    #     if response.status_code == 200:
-    #         json_p = response.json()
-    #         for boleto in json_p["content"]:
-    #             line = self.env['account.move.line'].search([
-    #                 ('nosso_numero', '=', boleto['nossoNumero']),
-    #             ])
-    #             valor = boleto["valorTotalRecebimento"]
-    #             valor_nominal = boleto["valorNominal"]
-    #             juros = valor - valor_nominal
-    #             if not line:
-    #                 rotulo = boleto['seuNumero'][-2:]
-    #                 fatura = boleto['seuNumero']
-    #                 fatura = fatura[:len(fatura)-2]
-    #                 invoice = self.env['account.invoice'].search([
-    #                    ('number', '=', fatura)
-    #                 ])
-    #                 if invoice:
-    #                     line = self.env['account.move.line'].search([
-    #                         ('name', '=', rotulo),
-    #                         ('invoice_id', '=', invoice.id),
-    #                     ])
-    #                 if line and not line.nosso_numero:
-    #                     line.write({'nosso_numero': boleto['nossoNumero']})
-    #             if not line:
-    #                 continue
-    #             move = self.env['payment.order.line'].search(
-    #                 [('src_bank_account_id', '=',
-    #                 diario.bank_account_id.id),
-    #                 ('move_line_id', '=', line.id),
-    #                 ('state', 'in', ('draft', 'processed'))])
-    #             if move:
-    #                 if line.invoice_id.state == 'open':
-    #                     move.write({'state':'paid'})
-    #                     self.baixa_faturas(line, valor, diario, juros)
-    #     #elif response.status_code == 401:
-    #     #    raise UserError("Erro de autorização ao consultar a API do Banco Inter")
-    #     #else:
-    #     #    raise UserError('Houve um erro com a API do Banco Inter:\n%s' % response.text)
-    #     else:
-    #          x = "deu erro" + response.text
-
     def action_register_boleto(self, move_lines):
-        boleto = 'N'
+        not_boleto = False
+        gerado = False
         for item in move_lines:
-            if boleto == 'S':
-                continue
-            if item.payment_mode_id.type != 'receivable':
-                boleto = 'N'
-            else:
-                boleto = 'S'
-            if not item.payment_mode_id.boleto:
-                boleto = 'N'
-            else:
-                boleto = 'S'
-        if not boleto:
+            if item.payment_mode_id.boleto:
+                not_boleto = True
+            if item.boleto_emitido:
+                gerado = True
+        if not not_boleto:
             raise UserError(_('Modo de pagamento não é boleto!'))
-        # aqui se for INTER , executo outra coisa
-        boleto_inter = 'N'
-        for move_line in move_lines:
-            if move_line.nosso_numero:
+        if gerado:
+            raise UserError(_('Boleto ja emitido!'))
+        for line in move_lines:
+            if line.nosso_numero:
                 continue
-            #if boleto_inter == 'S':
-            #    continue
-            if move_line.payment_mode_id.boleto:
-                order_line = self.generate_payment_order_line(move_line)
+            if line.payment_mode_id.boleto:
+                order_line = self.generate_payment_order_line(line)
             else:
                 continue
-            move_line.write({'l10n_br_order_line_id': order_line.id})
+            line.write({'l10n_br_order_line_id': order_line.id})
             self |= order_line
-            if move_line.payment_mode_id and move_line.payment_mode_id.journal_id.l10n_br_use_boleto_bradesco:
-                self.send_information_to_banco_bradesco(move_line)
+            if line.payment_mode_id and line.payment_mode_id.journal_id.l10n_br_use_boleto_bradesco:
+                gerado = self.send_information_to_banco_bradesco(line)
                 if len(move_lines)>3:
                     time.sleep(3)
-                boleto_inter = 'S'
-        if boleto_inter == 'N':
-            move_lines.write({'boleto_emitido': True})
+                if gerado:
+                    line.write({'boleto_emitido': True})
         return self
 
     def generate_boleto_list(self):

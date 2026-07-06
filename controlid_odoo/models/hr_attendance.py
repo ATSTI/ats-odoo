@@ -19,12 +19,12 @@ class HrAttendance(models.Model):
     check_in_interval = fields.Datetime("Entrada de intervalo")
     check_out_interval = fields.Datetime("Saida de intervalo")
 
-    def controlid_get_checkings(self):
+    def controlid_get_checkings(self, dias):
         user = self.env['ir.config_parameter'].sudo().get_param('controlid_odoo.user')
         passwd = self.env['ir.config_parameter'].sudo().get_param('controlid_odoo.passwd')
         ip = self.env['ir.config_parameter'].sudo().get_param('controlid_odoo.ip')
         session = Session(user, passwd, ip)
-        today = fields.Date.today() - timedelta(days=1)
+        today = fields.Date.today() - timedelta(days=dias)
         afds = get_afds(session, today.day, today.month, today.year)
         users = get_users_from_afds(session, afds)
         final = transform_afds(afds, users)

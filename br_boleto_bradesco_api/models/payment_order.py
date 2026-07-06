@@ -10,7 +10,7 @@ import tempfile
 import requests
 from io import BytesIO
 from unidecode import unidecode
-#from ..boleto.document import Boleto
+from odoo.addons.br_boleto.boleto.document import Boleto
 
 
 class PaymentOrderLine(models.Model):
@@ -270,7 +270,10 @@ class PaymentOrderLine(models.Model):
                     ('move_line_id', '=', moveline.id),
                     ('state', 'not in', ('cancelled', 'rejected'))])
                 if move:
-                    move.write({'state':'processed'})
+                    move.write({
+                        'state':'processed',
+                        'nosso_numero': nosso_numero,
+                    })
                 return True
             elif response.status_code == 401:
                 moveline.write({'codigo_barra': 'Erro autorização consultar API'})
@@ -353,6 +356,22 @@ class PaymentOrderLine(models.Model):
                     time.sleep(3)
                 if gerado:
                     line.write({'boleto_emitido': True})
+                    boleto_list = order_line.generate_boleto_list()
+                    pdf_string = Boleto.get_pdfs(boleto_list)
+                    if pdf_string:
+                        nome_boleto = 'boleto_%s_%s.pdf' %(
+                            line.name, str(line.id)
+                        )
+                        attachment_obj = self.env['ir.attachment']
+                        vls_boleto = {
+                            'name': nome_boleto,
+                            'datas_fname': nome_boleto,
+                            'datas': base64.b64encode(pdf_string),
+                            'mimetype': 'application/pdf',
+                            'res_model': 'account.invoice',
+                            'res_id': line.invoice_id.id,
+                        }
+                        attachment_obj.sudo().create(vls_boleto)
         return self
 
     def generate_boleto_list(self):
@@ -360,15 +379,6 @@ class PaymentOrderLine(models.Model):
             raise UserError(
                 _('Boletos cancelados ou rejeitados não permitem a impressão'))
         return  super(PaymentOrderLine, self).generate_boleto_list()
-
-    def action_print_boleto(self):
-        for item in self:
-            if item.payment_mode_id.type != 'receivable':
-                raise UserError(_('Modo de pagamento não é boleto!'))
-            if not item.payment_mode_id.boleto:
-                raise UserError(_('Modo de pagamento não é boleto!'))
-        return self.env.ref(
-            'br_boleto.action_boleto_payment_order_line').report_action(self)
 
 
 class AccountMoveLine(models.Model):

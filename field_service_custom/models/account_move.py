@@ -34,6 +34,23 @@ class AccountMove(models.Model):
             self.journal_id = journal_id
 
 
+    def action_invoice_sent(self):
+        self.ensure_one()
+
+        action = super().action_invoice_sent()
+
+        attachments = self.env["ir.attachment"].search([
+            ("res_model", "=", "account.move"),
+            ("res_id", "=", self.id),
+        ])
+
+        ctx = dict(action.get("context", {}))
+        ctx["default_attachment_ids"] = [(6, 0, attachments.ids)]
+        action["context"] = ctx
+
+        return action
+
+
 
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
@@ -130,3 +147,28 @@ class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 
     date_line = fields.Date(string='Data da Linha', help='Data da linha de fatura', default=datetime.now())
+
+
+
+class AccountPaymentRegister(models.TransientModel):
+    _inherit = "account.payment.register"
+
+    def _create_payment_vals_from_wizard(self):
+        vals = super()._create_payment_vals_from_wizard()
+        if self.line_ids:
+            move = self.line_ids.move_id[:1]
+            vals["operating_unit_id"] = move.operating_unit_id.id
+
+        return vals
+
+
+class AccountPayment(models.Model):
+    _inherit = "account.payment"
+
+    @api.depends("move_id.operating_unit_id", "journal_id")
+    def _compute_operating_unit_id(self):
+        for payment in self:
+            if payment.move_id and payment.move_id.operating_unit_id:
+                payment.operating_unit_id = payment.move_id.operating_unit_id #prioriedade, pegar a operating da fatura e salvar no payment
+            else:
+                payment.operating_unit_id = payment.journal_id.operating_unit_id #journal nao usamos, mas caso nao tenha fatura, pega a operating do journal

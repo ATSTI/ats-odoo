@@ -326,6 +326,7 @@ class PosSession(models.Model):
                 #if len(prod):
                 #    print (f"ITEM : {line.product_id.default_code}")
                 codpro = line['product_id']
+                discount = line['discount']
                 if isinstance(codpro, int):
                     prd = prod_obj.search([('id', '=', codpro)], limit=1)
                 else:
@@ -357,7 +358,7 @@ class PosSession(models.Model):
                     "full_product_name" :line['name'],
                     "qty": line['qty'],
                     "price_unit": line['price_unit'],
-                    "discount": desconto,
+                    "discount": discount + desconto,
                     "price_subtotal": sub_total,
                     "price_subtotal_incl": sub_total,
 

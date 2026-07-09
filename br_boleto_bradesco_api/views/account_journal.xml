@@ -9,7 +9,7 @@
                 <group>
                     <group string="Boleto Banco Bradesco">
                         <field name="l10n_br_use_boleto_bradesco"/>
-                        <field name="l10n_br_tipo_ambiente_boleto"/>
+                        <field name="tipo_ambiente_boleto"/>
                         <field name="l10n_br_bradesco_cert"/>
                         <field name="l10n_br_bradesco_key"/>
                         <field name="l10n_br_bradesco_id"/>

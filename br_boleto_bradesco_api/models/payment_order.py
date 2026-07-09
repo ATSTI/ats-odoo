@@ -9,6 +9,7 @@ import base64
 import tempfile
 import requests
 from io import BytesIO
+import unicodedata
 from unidecode import unidecode
 from odoo.addons.br_boleto.boleto.document import Boleto
 
@@ -21,6 +22,11 @@ class PaymentOrderLine(models.Model):
     url_token = "https://openapi.bradesco.com.br/auth/server-mtls/v2/token"
     url_token_sandbox = "https://openapisandbox.prebanco.com.br/auth/server-mtls/v2/token"
 
+    def remover_acentos(self, texto):
+        # Normaliza a string para o formato NFKD (separa o caractere do acento)
+        texto_normalizado = unicodedata.normalize('NFKD', texto)
+        # Filtra mantendo apenas caracteres que não sejam acentos (marcas)
+        return "".join(c for c in texto_normalizado if not unicodedata.combining(c))
 
     def generate_payment_order_line(self, move_line):
         """Gera um objeto de payment.order ao imprimir um boleto"""
@@ -75,12 +81,12 @@ class PaymentOrderLine(models.Model):
             cert_path = tempfile.mkstemp()[1] + '.crt'
             key_path = tempfile.mkstemp()[1] + '.key'
 
-            arq_temp = open(cert_path, "w")
-            arq_temp.write(cert.decode())
+            arq_temp = open(cert_path, "wb")
+            arq_temp.write(cert)
             arq_temp.close()
 
-            arq_temp = open(key_path, "w")
-            arq_temp.write(key.decode())
+            arq_temp = open(key_path, "wb")
+            arq_temp.write(key)
             arq_temp.close()
 
             agora = datetime.now()
@@ -170,12 +176,12 @@ class PaymentOrderLine(models.Model):
             taxa_mora = 0
             valor_juros = 0
             if diario.l10n_br_valor_juros_mora:
-                taxa_mora = diario.l10n_br_valor_juros_mora
+                taxa_mora = int(diario.l10n_br_valor_juros_mora*100)
                 valor_juros = self.amount_total * (taxa_mora/100)
             taxa_multa = 0
             valor_multa = 0
             if diario.l10n_br_valor_multa:
-                taxa_multa = diario.l10n_br_valor_multa
+                taxa_multa = int(diario.l10n_br_valor_multa*100)
                 valor_multa = self.amount_total * (taxa_multa/100)
             partner_id = moveline.partner_id.commercial_partner_id
             cliente = unidecode(partner_id.legal_name or partner_id.name)
@@ -196,27 +202,27 @@ class PaymentOrderLine(models.Model):
                 "idProduto": 9,
                 "nuNegociacao": nu_negociacao,
                 "nuCliente": str(moveline.l10n_br_order_line_id.identifier),
-                "dtEmissaoTitulo": moveline.l10n_br_order_line_id.emission_date.strftime('%d-%m-%Y'),
-                "dtVencimentoTitulo": moveline.l10n_br_order_line_id.date_maturity.strftime('%d-%m-%Y'),
-                "vlNominalTitulo": str(moveline.l10n_br_order_line_id.amount_total),
+                "dtEmissaoTitulo": moveline.l10n_br_order_line_id.emission_date.strftime('%d.%m.%Y'),
+                "dtVencimentoTitulo": moveline.l10n_br_order_line_id.date_maturity.strftime('%d.%m.%Y'),
+                "vlNominalTitulo": "%.02f" % moveline.l10n_br_order_line_id.amount_total,
                 "cdEspecieTitulo": 2,
                 "cindcdAceitSacdo": "2",
                 "percentualJuros": str(taxa_mora),
-                "vlJuros": str(valor_juros),
+                "vlJuros": "%.02f" % valor_juros,
                 "qtdeDiasJuros": 1,
                 "percentualMulta": str(taxa_multa),
-                "vlMulta": str(valor_multa),
+                "vlMulta": "%.02f" % valor_multa,
                 "qtdeDiasMulta": 1,
                 "percentualDesconto1": 0,
                 "vlDesconto1": "0",
                 "dataLimiteDesconto1": "",
                 "nomePagador": cliente,
-                "logradouroPagador": moveline.move_id.partner_id.street,
+                "logradouroPagador": self.remover_acentos(moveline.move_id.partner_id.street),
                 "nuLogradouroPagador": moveline.move_id.partner_id.number,
                 "cepPagador": moveline.move_id.partner_id.zip[:5],
                 "complementoCepPagador": moveline.move_id.partner_id.zip[6:9],
-                "bairroPagador": moveline.move_id.partner_id.district,
-                "municipioPagador": moveline.move_id.partner_id.city_id.name,
+                "bairroPagador": self.remover_acentos(moveline.move_id.partner_id.district),
+                "municipioPagador": self.remover_acentos(moveline.move_id.partner_id.city_id.name),
                 "ufPagador": moveline.move_id.partner_id.state_id.code,
                 "cdIndCpfcnpjPagador": tipo_cpfcnpj,
                 "nuCpfcnpjPagador": cnpj_cpf,
@@ -240,6 +246,15 @@ class PaymentOrderLine(models.Model):
             }
 
             cert_path, key_path, token, id_bradesco, secret = self.buscar_token(diario)
+            cert = base64.b64decode(diario.l10n_br_bradesco_cert)
+            key = base64.b64decode(diario.l10n_br_bradesco_key)
+            arq_temp = open(cert_path, "wb")
+            arq_temp.write(cert)
+            arq_temp.close()
+
+            arq_temp = open(key_path, "wb")
+            arq_temp.write(key)
+            arq_temp.close()
 
             headers = {
                 "Accept": "application/json",

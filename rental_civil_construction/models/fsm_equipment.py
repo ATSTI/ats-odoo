@@ -14,14 +14,18 @@ ACCOUNT_STAGES = [
 class FSMEquipment(models.Model):
     _inherit = 'fsm.equipment'
 
-    date_rental_start = fields.Date(string='Data de Início da Locação', required=True)
+    date_rental_start = fields.Date(
+        string='Data de Início da Locação', 
+        required=True, 
+        default=lambda self: fields.Date.today() + timedelta(days=1)
+    )
     date_rental_end = fields.Date(string='Data de Término da Locação')
 
     product_id = fields.Many2one('product.product', string='Produto', required=True, domain="[('is_rental', '=', True)]")
     partner_id = fields.Many2one('res.partner', string='Parceiro', required=True)
 
     display_name_custom = fields.Char(string="Descrição")
-    number_equipment = fields.Char(string='Número do Equipamento', required=True)
+    number_equipment = fields.Char(string='Número do Equipamento')
 
     account_stage = fields.Selection(
         ACCOUNT_STAGES,
@@ -109,14 +113,24 @@ class FSMEquipment(models.Model):
             elif invoices:
                 fsm.account_stage = "confirmed"
                 fsm.stage_id = stage_faturar.id
-            else:
-                fsm.account_stage = "draft"
-                fsm.stage_id = stage_faturar.id
 
     @api.onchange('date_rental_start')
     def _onchange_date_rental_start(self):
         if self.date_rental_start and self.product_id.rental_duration:
             self.date_rental_end = self.date_rental_start + timedelta(days=self.product_id.rental_duration)
+        if (
+            self.date_rental_start <= fields.Date.today() 
+            and self.date_rental_end >= fields.Date.today()
+            and not (self.stage_id.name in ['À FATURAR', 'CONCLUIDO', 'CANCELADO'])
+        ):
+            self.stage_id = self.env['fsm.stage'].search([('name', 'ilike', 'Em Locação')], limit=1).id
+        elif (
+            (self.date_rental_start > fields.Date.today()
+            or self.date_rental_end < fields.Date.today()) 
+            and not (self.stage_id.name in ['À FATURAR', 'CONCLUIDO', 'CANCELADO'])
+        ):
+            self.stage_id = self.env['fsm.stage'].search([('name', 'ilike', 'Novo')], limit=1).id
+
     
     @api.constrains('date_rental_start', 'date_rental_end')
     def _check_rental_dates(self):
@@ -147,16 +161,22 @@ class FSMEquipment(models.Model):
                 raise ValidationError(
                     'Esse número de equipamento já está em uso para este produto.'
                 )
+            else:
+                self._onchange_display_name()
 
     @api.onchange('product_id','number_equipment')
     def _onchange_display_name(self):
         for record in self:
             if record.product_id and record.number_equipment:
-                record.display_name_custom = f"{record.product_id.name} - {record.number_equipment}"
+                record.display_name_custom = f"{record.product_id.name} - {record.number_equipment}" 
 
-    def write(self, vals):
-        res = super().write(vals)
-        return res    
+    def copy(self, default=None):
+        default = dict(default or {})
+        default.update({
+            "name": "",
+            "number_equipment": False,
+        })
+        return super().copy(default)
 
     @api.model
     def create(self, vals):

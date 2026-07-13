@@ -20,6 +20,12 @@ class FiscalDocument(models.Model):
         res = super().action_send_email()
 
         if isinstance(res, dict) and res.get("context"):
+            template = self.env["mail.template"].search(
+                [("name", "ilike", "ENVIO DE EMAIL")], limit=1
+            )
+            if template:
+                res["context"]["default_template_id"] = template.id
+
             invoice = self.env["account.move"].search(
                 [("fiscal_document_id", "=", self.id)], limit=1
             )
@@ -34,7 +40,6 @@ class FiscalDocument(models.Model):
                 default_attachment_ids = res["context"].get(
                     "default_attachment_ids", []
                 )
-                # evita duplicar
                 novos = [
                     att_id
                     for att_id in fatura_attachment_ids

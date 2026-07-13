@@ -211,11 +211,11 @@
                                     </t>
                                 </td>
                                 <td style="border: 1px solid #ccc; padding: 4px 5px; text-align: center;">
-                                    <t t-if="o.commitment_date">
-                                        <t t-esc="(o.commitment_date.date() - datetime.date.today()).days"/> dias
+                                    <t t-if="line.customer_lead">
+                                        <t t-esc="'%.0f' % line.customer_lead"/> dias
                                     </t>
                                     <t t-else="">
-                                        0 Dias
+                                        0 dias
                                     </t>
                                 </td>
                                 <td style="border: 1px solid #ccc; padding: 4px 5px; text-align: center;">

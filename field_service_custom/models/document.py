@@ -15,6 +15,37 @@ class FiscalDocument(models.Model):
 
         return res
 
+
+    def action_send_email(self):
+        res = super().action_send_email()
+
+        if isinstance(res, dict) and res.get("context"):
+            invoice = self.env["account.move"].search(
+                [("fiscal_document_id", "=", self.id)], limit=1
+            )
+            if invoice:
+                fatura_attachment_ids = self.env["ir.attachment"].search(
+                    [
+                        ("res_model", "=", "account.move"),
+                        ("res_id", "=", invoice.id),
+                    ]
+                ).ids
+
+                default_attachment_ids = res["context"].get(
+                    "default_attachment_ids", []
+                )
+                # evita duplicar
+                novos = [
+                    att_id
+                    for att_id in fatura_attachment_ids
+                    if att_id not in default_attachment_ids
+                ]
+                res["context"]["default_attachment_ids"] = (
+                    default_attachment_ids + novos
+                )
+
+        return res
+
     def _copy_pdf_to_invoice_attachment(self):
         self.ensure_one()
         # import pudb;pudb.set_trace()

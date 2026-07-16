@@ -14,6 +14,7 @@
         'security/ir.model.access.csv',
         'views/wizard_water_report.xml',
         'report/report_water_not_found_template.xml',
+        'report/helpdesk_ticket_report.xml',
         'views/condo_residence_views.xml',
         'views/condo_residence_leitura.xml',
         'report/report_water_reading_template.xml',

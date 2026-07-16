@@ -38,6 +38,11 @@ class ResPartner(models.Model):
 
     UserID = fields.Integer("ID do usuário")
 
+
+    @api.onchange('email')
+    def onchange_email(self):
+        return
+
     @api.depends('condo_residence_ids')
     def _compute_is_morador(self):
         for partner in self:

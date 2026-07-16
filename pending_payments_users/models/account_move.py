@@ -15,12 +15,10 @@ class AccountMove(models.Model):
 
         if (
             self.env.user.payment_pending
-            and "BLOQUEADO!!!" in (self.env.user.mensage_pai or "")
+            and self.env.user.overdue
         ):
             raise UserError(msg)
         else:
             return res
-
-
 
    

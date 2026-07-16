@@ -1,26 +1,25 @@
 # -*- coding:utf-8 -*-
 
 from odoo import models, fields, api, tools, _
-# from odoo.addons.point_of_sale.wizard.pos_box import PosBox
-# from odoo.exceptions import UserError
 from datetime import datetime, date, timedelta
-# from unidecode import unidecode
 import logging
-# import psycopg2
 import os
 import fnmatch
 import json
-# import odoorpc
-
-# from . import atscon as con
 
 
 _logger = logging.getLogger(__name__)
-path_file = '/opt/odoo16/arquivos'
-path_file_return = '/opt/odoo16/retornos/retorno.json'
 
 class PosSession(models.Model):
     _inherit = 'pos.session'
+
+    def _path_file(self):
+        path_file = '/opt/odoo16/arquivos' + '_' + self._cr.dbname
+        return path_file
+
+    def _path_file_return(self):
+        path_file_return = '/opt/odoo16/retornos/retorno_%s.json' %(self._cr.dbname)
+        return path_file_return
 
     def excluir_pedido_pos(self, pos_id, pos_cx):
         pos = self.env['pos.order'].browse([pos_id])
@@ -125,6 +124,8 @@ class PosSession(models.Model):
 
     def insere_caixa_integracao(self):
         # lê arquivos na pasta
+        path_file = self._path_file()
+        path_file_return = self._path_file_return()
         arquivos = sorted(fnmatch.filter(os.listdir(path_file), "cai_*.json"))
         # para cada arquivo na pasta
         num_arq = 1
@@ -203,6 +204,8 @@ class PosSession(models.Model):
         gera um arquivo com todos os pedidos da sessao
         pra ser enviado para o pdv evitando o envio dos 
         arquivos que ja estao neste retorno"""
+        path_file = self._path_file()
+        path_file_return = self._path_file_return()
         arquivos = sorted(fnmatch.filter(os.listdir(path_file), "ped_*.json"))
         num_arq = 1
         ses = 0
@@ -415,7 +418,6 @@ class PosSession(models.Model):
                 new_move = ped_id._create_invoice(move_vals)
                 ped_id.write({'account_move': new_move.id, 'state': 'invoiced'})
                 new_move.sudo().with_company(ped_id.company_id)._post()
-            
             ped_id._create_order_picking()
         if ses:
             # crio um arquivo com todos os pedidos desta sessao
@@ -438,6 +440,7 @@ class PosSession(models.Model):
 
     def insere_devolucao_integracao(self):
         # arquivos = os.listdir(path_file)
+        path_file = self._path_file()
         arquivos = fnmatch.filter(os.listdir(path_file), "dev_*.json")
         # para cada arquivo na pasta
         num_arq = 1
@@ -503,6 +506,7 @@ class PosSession(models.Model):
                 pick_ids.button_validate()
 
     def insere_sangria(self):
+        path_file = self._path_file()
         arquivos = sorted(fnmatch.filter(os.listdir(path_file), "san_*.json"))
         # para cada arquivo na pasta
         num_arq = 1

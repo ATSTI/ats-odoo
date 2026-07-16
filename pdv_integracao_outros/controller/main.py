@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-#
-#    Copyright © 2019–; Brasil; IT Brasil; Todos os direitos reservados
-#    Copyright © 2019–; Brazil; IT Brasil; All rights reserved
-#
+
 from datetime import datetime
 import logging
 from datetime import timedelta
@@ -12,19 +9,21 @@ import re
 import os
 from odoo import http
 from odoo.http import request
-from math import floor
 logger = logging.getLogger(__name__)
-import werkzeug
-import werkzeug.exceptions
-import werkzeug.utils
-import werkzeug.wrappers
-import werkzeug.wsgi
-from werkzeug.urls import url_decode, iri_to_uri
+
 
 path_file = '/opt/odoo16/arquivos'
 path_file_return = '/opt/odoo16/retornos/retorno.json'
 
 class IntegracaoPdv(http.Controller):
+
+    def _path_file(self):
+        path_file = '/opt/odoo16/arquivos' + '_' + http._cr.dbname
+        return path_file
+
+    def _path_file_return(self):
+        path_file_return = '/opt/odoo16/retornos/retorno.json' + '_' + http._cr.dbname
+        return path_file_return
 
     @http.route('/produtoconsulta', type='json', auth="user", csrf=False)
     def website_produtoconsulta(self, **kwargs):
@@ -532,6 +531,8 @@ class IntegracaoPdv(http.Controller):
         data = json.loads(request.httprequest.data)
         dados_json = data['params']
         nome_arquivo = f"{data['tipo']}_{dados_json['name'].replace('/', '_')}"
+        path_file = self._path_file()
+        path_file_return = self._path_file_return()
         arquivo = f"{path_file}/{nome_arquivo}.json"
         arquivo = arquivo.replace('\'', '')
         with open(arquivo, 'w') as f:
@@ -618,6 +619,8 @@ class IntegracaoPdv(http.Controller):
         data = json.loads(request.httprequest.data)
         dados_json = data['params']
         nome_arquivo = dados_json['name']
+        path_file = self._path_file()
+        path_file_return = self._path_file_return()
         arquivo = f"{path_file}/{nome_arquivo}.json"
         with open(arquivo, 'w') as f:
            f.write(json.dumps(dados_json))

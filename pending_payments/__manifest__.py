@@ -21,6 +21,7 @@ no cadastro de clientes/fornecedores.
     'depends': ['base', 'account', 'website'],
     'data': [
         'views/res_company.xml',
+        'views/account_move_view.xml',
     ],
     'installable': True,
     'application': False,

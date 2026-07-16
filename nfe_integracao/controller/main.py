@@ -227,6 +227,7 @@ class IntegracaoPdv(http.Controller):
             ('invoice_date_due', '>=', inicio),
             ('invoice_date_due', '<=', fim),
             ('move_type', 'in', ['out_invoice', 'out_refund']),
+            ('free_access', '=', False)
         ])
         
         company_vats = [{'cnpj_cpf': prt.cnpj_cpf_stripped} for prt in parceiros]
@@ -249,13 +250,14 @@ class IntegracaoPdv(http.Controller):
         for move in pendencias:
             if not move.invoice_date_due:
                 continue
-
+            
+            date_due = move.invoice_date_due + timedelta(days=1)
             date_due_limit = move.invoice_date_due + timedelta(
                 days=company.days_to_notify
             )
 
             msg = ""
-            if hoje >= move.invoice_date_due and hoje < date_due_limit:
+            if hoje >= date_due and hoje < date_due_limit:
                 dias_restantes = (date_due_limit - hoje).days
                 msg = (
                     f"Por favor, contate o financeiro da ATS, "
@@ -263,6 +265,7 @@ class IntegracaoPdv(http.Controller):
                     f"Seu sistema será interrompido em "
                     f"{dias_restantes} dia(s)"
                 )
+                overdue = False
 
             elif hoje >= date_due_limit:
                 msg = (
@@ -270,11 +273,13 @@ class IntegracaoPdv(http.Controller):
                     f"whatsapp: {company.mobile}\n"
                     f"SEU SISTEMA ESTÁ BLOQUEADO!!!"
                 )
+                overdue = True
             if msg:
                 pendencias_data.append({
                     'company_vats': company_vats,
                     'pending': True,
                     'mensagem': msg,
+                    'overdue': overdue if overdue else False
                 })
 
         if not pendencias_data:
@@ -283,6 +288,8 @@ class IntegracaoPdv(http.Controller):
                 'pending': False,
                 'mensagem': '',
             })
+
+        logger.info(f"Pendências para {company_name} ({company_vat}): {pendencias_data}")
 
         return request.make_json_response({
             "pendencias": pendencias_data

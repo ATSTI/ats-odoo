@@ -18,11 +18,11 @@ path_file_return = '/opt/odoo16/retornos/retorno.json'
 class IntegracaoPdv(http.Controller):
 
     def _path_file(self):
-        path_file = '/opt/odoo16/arquivos' + '_' + http._cr.dbname
+        path_file = '/opt/odoo16/arquivos' + '_' + http.request._cr.dbname
         return path_file
 
     def _path_file_return(self):
-        path_file_return = '/opt/odoo16/retornos/retorno.json' + '_' + http._cr.dbname
+        path_file_return = '/opt/odoo16/retornos/retorno.json' + '_' + http.request._cr.dbname
         return path_file_return
 
     @http.route('/produtoconsulta', type='json', auth="user", csrf=False)

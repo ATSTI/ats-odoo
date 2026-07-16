@@ -100,7 +100,7 @@ class DocumentLineMixin(models.AbstractModel):
         return super()._compute_fiscal_tax_ids()
 
     def get_benefit_type(self, cst):
-        if cst in ['30', '40']:
+        if cst in ['30', '40', '400']:
             return '1'
         if cst in ['20']:
             return '2'

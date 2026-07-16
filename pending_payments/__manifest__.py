@@ -24,7 +24,6 @@ no cadastro de clientes/fornecedores.
     'license': 'AGPL-3',
     'depends': ['base_setup', 'web', 'l10n_br_account'],
     'data': [
-        "data/ir_cron_data.xml",
     ],
     "assets": {
         "web.assets_backend": [

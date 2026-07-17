@@ -7,6 +7,12 @@
             <xpath expr="//field[@name='amount_total']" position="after">
                 <field name="moeda_cotacao"/>
             </xpath>
+
+            <xpath expr="//group[@name='order_details']" position="inside">
+                <field name="numero_orcamento"/>
+                <field name="purchase_order_id"/>
+                <field name="numero_pedido_compra"/>
+            </xpath>    
         </field>
     </record>
 </odoo>

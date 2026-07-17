@@ -37,7 +37,11 @@
     'data': [
         'report/report_paper_format.xml',
         'views/sale_order.xml',
-        'report/report_rslabsource_document.xml',
+        'views/purchase_order.xml',
+        'report/report_rslabsource_orcamento_document.xml',
+        'report/report_rslabsource_pedido_venda_document.xml',
+        'report/report_rslabsource_pedido_compra_document.xml',
+        'report/report_rslabsource_orcamento_document.xml',
     ],
     'installable': True,
     'application': False,

@@ -13,4 +13,32 @@
 
         <field name="print_report_name">'RS_ORÇAMENTO_%s' % (object.name)</field>
     </record>
+
+    <record id="action_event_equipamentos_reports3" model="ir.actions.report">
+        <field name="name">Pedido de Venda Customizado</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+
+        <field name="report_name">report_rslabsource.report_rslabsource_pedido_venda</field>
+        <field name="report_file">report_rslabsource.report_rslabsource_pedido_venda</field>
+
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+
+        <field name="print_report_name">'RS_PV_%s' % (object.name)</field>
+    </record>
+
+    <record id="action_event_equipamentos_reports2" model="ir.actions.report">
+        <field name="name">Pedido de Compra Customizado</field>
+        <field name="model">purchase.order</field>
+        <field name="report_type">qweb-pdf</field>
+
+        <field name="report_name">report_rslabsource.report_rslabsource_pedido_compra</field>
+        <field name="report_file">report_rslabsource.report_rslabsource_pedido_compra</field>
+
+        <field name="binding_model_id" ref="purchase.model_purchase_order"/>
+        <field name="binding_type">report</field>
+
+        <field name="print_report_name">'RS_PC_%s' % (object.name)</field>
+    </record>
 </odoo>

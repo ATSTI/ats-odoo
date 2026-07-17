@@ -44,7 +44,11 @@ class Document(models.Model):
         Minimal setup dest  for cases with VAT specification
         commonly known as 'CPF na nota'. 
         """  
-        res = super()._export_many2one(field_name, xsd_required, class_obj)
+        res = super(Document, self)._export_many2one(
+            field_name,
+            xsd_required,
+            class_obj
+        )
         if (self.partner_cnpj_cpf and len(self.partner_cnpj_cpf) <= 11) or (self.partner_id.vat and len(punctuation_rm(self.partner_id.vat)) <= 11):
             # CPF
             res.CPF = self.partner_cnpj_cpf or punctuation_rm(self.partner_id.vat)
@@ -63,9 +67,7 @@ class Document(models.Model):
         """
         Setup dest for cases without VAT specification and anonymous consumer.
         """
-        res = super()._export_many2one(field_name, xsd_required, class_obj)
-        res = None
-        return res
+        return None
 
     def _serialize(self, edocs):
         edocs = super()._serialize(edocs)

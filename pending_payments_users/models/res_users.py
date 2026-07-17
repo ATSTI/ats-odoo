@@ -12,7 +12,7 @@ class Users(models.Model):
 
     payment_pending = fields.Boolean(string="Pagamento Pendente", default=False)
     mensage_pai = fields.Char(string="Mensagem Pai", default=False)
-    trava = fields.Boolean(string="Trava", default=False)
+    overdue = fields.Boolean(string="Vencido", default=False)
 
     # Logo no Login já verifico se existe pendencia
     @classmethod
@@ -36,12 +36,11 @@ class Users(models.Model):
         return {
             'payment_pending': self.payment_pending,
             'mensage_pai': self.mensage_pai,
+            'overdue': self.overdue,
         }
 
     def _check_pending_payments(self):
         """Verifica pendências de pagamento para a empresa atual do usuário."""
-        if self.trava:
-            return True
         config_url = config.get("owner_pending_url")
         if not config_url:
             _logger.warning('[PendingPayment] owner_pending_url não configurado no odoo.conf')
@@ -87,12 +86,14 @@ class Users(models.Model):
             if match and pending:
                 found_pending = True
                 mensagem_pendente = mensagem
+                overdue = data.get('overdue', False)
                 break
 
         # Atualiza o campo independente do resultado
         self.sudo().write({
             'payment_pending': found_pending,
             'mensage_pai': mensagem_pendente if found_pending else '',
+            'overdue': overdue if found_pending else False,
         })
 
         return True

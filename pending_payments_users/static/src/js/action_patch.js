@@ -58,23 +58,34 @@ odoo.define('pending_payments_users.action_patch', function (require) {
 
                 const payment_pending = result.payment_pending;
                 const mensage_pai = result.mensage_pai;
+                const overdue = result.overdue;
 
                 if (mensage_pai) {
                     const title = payment_pending ? 'Controle Sistema' : 'Aviso';
-
-                    setTimeout(() => {
+                    const sticky = overdue ? true : false;
+                    const showNotification = () => {
                         this.displayNotification({
                             title: title,
                             message: mensage_pai,
                             type: 'warning',
-                            sticky: true,
+                            sticky: sticky,
                         });
-                        console.log('[PendingPayment] ✅ Notificação exibida');
+                    };
 
+                    // Mostra imediatamente
+                    showNotification();
+
+                    if (sticky) {
+                        // Remove botão de fechar notificação
                         setTimeout(() => {
                             $('.close.o_notification_close').remove();
                         }, 100);
-                    }, 1000);
+                    } else {
+                        // Mostra novamente a cada 1 minuto
+                        setInterval(() => {
+                            showNotification();
+                        }, 60000);
+                    }
                 } else {
                     console.log('[PendingPayment] ✅ Sem mensagem — nenhuma notificação necessária');
                 }

@@ -215,13 +215,20 @@
                     </thead>
                     <tbody>
                         <t t-foreach="o.order_line" t-as="line">
-                            <tr style="vertical-align: top;">
+                            <t t-if="line.display_type">
+                                <tr>
+                                    <td colspan="11" style="border: 1px solid #ccc; padding: 4px 5px; font-weight: bold; background-color: #f5f5f5;">
+                                        <t t-esc="line.name"/>
+                                    </td>
+                                </tr>
+                            </t>
+                            <tr t-else="" style="vertical-align: top;">
                                 <td style="border: 1px solid #ccc; padding: 4px 5px; text-align: center;">
                                     <t t-esc="(line.product_id.default_code or '')[:14]"/>
                                 </td>
                                 <td style="border: 1px solid #ccc; padding: 4px 5px;">
                                     <div style="font-weight: bold;">
-                                        <t t-esc="line.product_id.name.split('] ', 1)[1] if '] ' in line.product_id.name else line.product_id.name"/>
+                                        <t t-esc="line.product_id.name.split('] ', 1)[1] if line.product_id.name and '] ' in line.product_id.name else line.product_id.name"/>
                                     </div>
                                     <t t-if="line.product_id.description_purchase">
                                         <div style="font-size: 12px; color: #777; margin-top: 2px;">
@@ -235,8 +242,8 @@
                                     </t>
                                 </td>
                                 <td style="border: 1px solid #ccc; padding: 4px 5px; text-align: center;">
-                                    <t t-if="line.date_planned">
-                                        <t t-esc="line.date_planned.strftime('%d/%m/%Y')"/>
+                                    <t t-if="line.date_planned and o.date_order">
+                                        <t t-esc="(line.date_planned.date() - o.date_order.date()).days"/> dias
                                     </t>
                                     <t t-else="">
                                         -
@@ -295,7 +302,7 @@
                         <tr>
                             <td colspan="4" style="border: 1px solid #ccc; padding: 4px 5px;"/>
                             <td style="border: 1px solid #ccc; padding: 4px 5px; text-align: center; font-weight: bold;">
-                                <t t-esc="'%.2f' % sum(o.order_line.mapped('product_qty'))"/>
+                                <t t-esc="'%.2f' % sum(o.order_line.filtered(lambda l: not l.display_type).mapped('product_qty'))"/>
                             </td>
                             <td colspan="6" style="border: 1px solid #ccc; padding: 4px 5px;"/>
                         </tr>

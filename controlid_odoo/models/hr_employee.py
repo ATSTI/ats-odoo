@@ -5,7 +5,12 @@ class HrEmployee(models.Model):
 
     _inherit = 'hr.employee'
 
-    cpf_stripped = fields.Char("CPF Stripped", compute="_compute_cpf_stripped", store=True)
+    cpf_stripped = fields.Char(
+        "CPF Stripped",
+        compute="_compute_cpf_stripped",
+        store=True,
+        groups="hr.group_hr_user",
+    )
 
     @api.depends('cpf')
     def _compute_cpf_stripped(self):

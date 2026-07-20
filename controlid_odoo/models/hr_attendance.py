@@ -54,7 +54,7 @@ class HrAttendance(models.Model):
             vals = {'employee_id': employee.id}
 
             for count, line_employee in enumerate(lines_employee):
-                dt = datetime.strptime(line_employee['data'], "%d/%m/%Y %H:%M")
+                dt = datetime.strptime(line_employee['data'], "%d/%m/%Y %H:%M") + timedelta(hours=3)
                 vals[IN_OR_OUT[count]] = dt
 
             self.create(vals)

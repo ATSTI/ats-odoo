@@ -17,7 +17,7 @@ class StockPicking(models.Model):
         config_passwd = self.env['ir.config_parameter'].sudo().get_param('stock_picking.passwd')
         config_url = self.env['ir.config_parameter'].sudo().get_param('stock_picking.url')
         # buscar picking que ainda não foram enviados
-        if self.model_name == 'stock.picking' and self:
+        if self._name == 'stock.picking' and self:
             stq_origem = self
         else:
             stq_origem = self.env['stock.picking'].search([('location_dest_id', '=', 43), ('state', '=', 'done'),], order="id desc", limit=5)

@@ -118,7 +118,7 @@ class PosSession(models.Model):
         ses_config_ids = ses_conf.search([])
         for cn in ses_config_ids:
             for employee in cn.employee_ids:
-                if employee.user_id.id == user or user == 0:
+                if employee.user_id.id == user:
                     return cn
         return False
 
@@ -130,7 +130,7 @@ class PosSession(models.Model):
         # para cada arquivo na pasta
         num_arq = 1
         user_adic = []
-        ses = self.env['pos.session']       
+        ses = self.env['pos.session']
         for i in arquivos:
             f = open(path_file + '/' + i, mode="r")
             arq = json.load(f)            
@@ -220,7 +220,7 @@ class PosSession(models.Model):
             ped = json.load(f)
             user = ped['user_id']
             # chaplin so usa um usuario e no pedido vem todos
-            ses_config = self.get_pos_config(0)
+            ses_config = self.get_pos_config(user)
             if not ses_config:
                 # nao encontrou um pos_config para este usuario
                 continue
@@ -414,7 +414,7 @@ class PosSession(models.Model):
             if metodo_pag and metodo_pag.name[:2] == '4-':
                 ped_id.write({'to_invoice': True})
                 move_vals = ped_id._prepare_invoice_vals()
-                move_vals['invoice_origin'] = 'POS/' + move_vals['invoice_origin']
+                move_vals['invoice_origin'] = 'PDV/' + move_vals['invoice_origin']
                 new_move = ped_id._create_invoice(move_vals)
                 ped_id.write({'account_move': new_move.id, 'state': 'invoiced'})
                 new_move.sudo().with_company(ped_id.company_id)._post()

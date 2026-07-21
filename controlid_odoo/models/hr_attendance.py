@@ -10,7 +10,7 @@ sys.path.append(
 from controlidpy.entities import Session
 from controlidpy.functions import get_afds, get_users_from_afds, transform_afds
 
-IN_OR_OUT = ['check_in','check_out','check_in_interval','check_out_interval']
+IN_OR_OUT = ['check_in','check_in_interval','check_out_interval','check_out']
 
 class HrAttendance(models.Model):
 

@@ -159,6 +159,25 @@
                             </field>
                         </page>
 
+                        <page string="Registro de Atividades" name="logs_page">
+                            <field name="logs_ids" nolabel="1" readonly="1">
+                                <tree string="Histórico de Atividades"
+                                    decoration-success="status == 'concluido'"
+                                    decoration-warning="status == 'pendente'"
+                                    create="false"
+                                    delete="false"
+                                    default_order="id desc">
+
+                                    <field name="partner_id"/>
+                                    <field name="data_entrada"/>
+                                    <field name="data_saida"/>
+                                    <field name="tempo_permanencia"
+                                        widget="float_time"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+
                         <page string="Tags" name="tags_page">
                             <field name="tag_ids">
                                 <tree string="Tags da Moradia"

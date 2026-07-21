@@ -36,6 +36,12 @@ class CondoResidence(models.Model):
         string="Veículos"
     )
 
+    logs_ids = fields.One2many(
+        "condo.residence.logs",
+        "residence_id",
+        string="Logs"
+    )
+
     is_water_reader = fields.Boolean(
     compute="_compute_is_water_reader")
 

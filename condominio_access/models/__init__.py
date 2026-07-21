@@ -5,6 +5,7 @@ from . import res_partner
 from . import condo_residence_tags
 from . import condo_residence_pets
 from . import condo_residence_vehicles
+from . import condo_residence_logs
 from . import condominio_recurring_visitor
 from . import wizard_water_report
 from . import report_water_reading

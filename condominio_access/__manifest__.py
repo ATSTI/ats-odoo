@@ -8,7 +8,7 @@
     'category': 'Services',
     'author': 'ATS Soluções',
     'maintainer': 'Otávio Andretta <otavio12257@gmail.com>',
-    'depends': ['contacts', 'base','web_widget_image_webcam'],
+    'depends': ['contacts', 'base','web_widget_image_webcam', 'helpdesk_mgmt'],
     'data': [
         'views/security.xml',
         'security/ir.model.access.csv',

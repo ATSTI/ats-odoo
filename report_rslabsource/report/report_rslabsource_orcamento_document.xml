@@ -131,7 +131,7 @@
                             <strong>CEP:</strong> <t t-esc="o.partner_id.zip or ''"/>
                         </td>
                         <td width="25%" style="padding: 2px 6px;">
-                            <strong>Cidade:</strong> <t t-esc="o.partner_id.city or ''"/>
+                            <strong>Cidade:</strong> <t t-esc="o.partner_id.city_id.name or o.partner_id.city or ''"/>
                         </td>
                         <td width="25%" style="padding: 2px 6px;">
                             <strong>UF:</strong> <t t-esc="o.partner_id.state_id.code or ''"/>

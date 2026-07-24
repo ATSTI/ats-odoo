@@ -19,7 +19,7 @@
             <div class="page" style="font-family: Arial, sans-serif; font-size: 13px; color: #000;">
 
                <table width="100%" style="border-collapse: collapse; margin-bottom: 6px;">
-               
+
                     <tr>
                         <td width="30%" style="vertical-align: middle; text-align: left; padding: 4px;">
                             <t t-if="o.company_id.logo">
@@ -173,7 +173,7 @@
                     </t>
                 </table>
 
-               <table width="100%" style="border-collapse: collapse; border: 1px solid #ccc; margin-bottom: 6px; font-size: 13px;">
+               <table width="100%" style="border-collapse: collapse; border: 1px solid #ccc; margin-bottom: 6px; font-size: 9px;">
                     <thead>
                         <tr style="background-color: #4472C4; color: #fff; text-align: center;">
                             <th style="border: 1px solid #ccc; padding: 4px 5px; width: 12%;">Part Number</th>
@@ -278,7 +278,7 @@
                         </tr>
                     </tfoot>
                 </table>
-                <table width="100%" style="border-collapse: collapse; margin-bottom: 8px; font-size: 12px;">
+                <table width="100%" style="border-collapse: collapse; margin-bottom: 8px; font-size: 12px; page-break-inside: avoid;">
                     <tr style="vertical-align: top;">
                         <td width="55%" style="padding: 4px 0;">
                             <strong>Obs:</strong>
@@ -329,7 +329,7 @@
                 </table>
 
                 <t t-if="o.payment_term_id">
-                    <table width="100%" style="border-collapse: collapse; border: 1px solid #ccc; margin-bottom: px; font-size: 12px;">
+                    <table width="100%" style="border-collapse: collapse; border: 1px solid #ccc; margin-bottom: 6px; font-size: 12px; page-break-inside: avoid;">
                         <tr style="background-color: #e0e0e0;">
                             <td colspan="2" style="padding: 3px 6px; font-weight: bold; border-bottom: 1px solid #ccc;">
                                 Condições de Pagamento
@@ -363,169 +363,171 @@
                     </table>
                 </div> -->
 
-            </div>
-            <div class="page" style="page-break-before: always; font-family: Arial, sans-serif; font-size: 13px; color: #000;">
-                <table width="100%" style="border-collapse: collapse; margin-bottom: 6px;">
-                    <tr>
-                        <td width="30%" style="vertical-align: middle; text-align: left; padding: 4px;">
-                            <t t-if="o.company_id.logo">
-                                <img t-att-src="image_data_uri(o.company_id.logo)"
-                                    style="max-height: 110px; max-width: 220px;"/>
-                            </t>
-                        </td>
-                        <td width="80%" style="vertical-align: middle; padding: 4px; text-align: right;">
-                            <strong style="font-size: 16px;">
-                                <t t-esc="o.company_id.name"/>
-                            </strong><br/>
+                <div style="page-break-inside: avoid; font-family: Arial, sans-serif; font-size: 13px; color: #000; margin-top: 10px;">
 
-                            <t t-esc="o.company_id.street"/><br/>
+                    <table width="100%" style="border-collapse: collapse; margin-bottom: 6px;">
+                        <tr>
+                            <td width="30%" style="vertical-align: middle; text-align: left; padding: 4px;">
+                                <t t-if="o.company_id.logo">
+                                    <img t-att-src="image_data_uri(o.company_id.logo)"
+                                        style="max-height: 110px; max-width: 220px;"/>
+                                </t>
+                            </td>
+                            <td width="80%" style="vertical-align: middle; padding: 4px; text-align: right;">
+                                <strong style="font-size: 16px;">
+                                    <t t-esc="o.company_id.name"/>
+                                </strong><br/>
 
-                            <t t-if="o.company_id.city">
-                                <t t-esc="o.company_id.city"/> -
-                            </t>
+                                <t t-esc="o.company_id.street"/><br/>
 
-                            <t t-if="o.company_id.state_id">
-                                <t t-esc="o.company_id.state_id.code"/>
-                            </t>
+                                <t t-if="o.company_id.city">
+                                    <t t-esc="o.company_id.city"/> -
+                                </t>
 
-                            <t t-if="o.company_id.zip">
-                                &amp;nbsp; CEP: <t t-esc="o.company_id.zip"/>
-                            </t>
+                                <t t-if="o.company_id.state_id">
+                                    <t t-esc="o.company_id.state_id.code"/>
+                                </t>
 
-                            <t t-if="o.company_id.phone">
-                                &amp;nbsp; Telefone: <t t-esc="o.company_id.phone"/>
-                            </t>
+                                <t t-if="o.company_id.zip">
+                                    &amp;nbsp; CEP: <t t-esc="o.company_id.zip"/>
+                                </t>
 
-                            <br/>
+                                <t t-if="o.company_id.phone">
+                                    &amp;nbsp; Telefone: <t t-esc="o.company_id.phone"/>
+                                </t>
 
-                            <t t-if="o.company_id.cnpj_cpf">
-                                CNPJ: <t t-esc="o.company_id.cnpj_cpf"/>
-                            </t>
+                                <br/>
 
-                            <t t-if="o.company_id.inscr_est">
-                                &amp;nbsp;&amp;nbsp; I.E: <t t-esc="o.company_id.inscr_est"/>
-                            </t>
+                                <t t-if="o.company_id.cnpj_cpf">
+                                    CNPJ: <t t-esc="o.company_id.cnpj_cpf"/>
+                                </t>
 
-                            <br/>
+                                <t t-if="o.company_id.inscr_est">
+                                    &amp;nbsp;&amp;nbsp; I.E: <t t-esc="o.company_id.inscr_est"/>
+                                </t>
 
-                            <t t-if="o.company_id.website">
-                                <t t-esc="o.company_id.website"/>
-                            </t>
-                        </td>
-                    </tr>
-                </table>
+                                <br/>
+
+                                <t t-if="o.company_id.website">
+                                    <t t-esc="o.company_id.website"/>
+                                </t>
+                            </td>
+                        </tr>
+                    </table>
 
 
-                <table width="100%"
-                    style="border-collapse:collapse; border:1px solid #000; font-size:12px;">
+                    <table width="100%"
+                        style="border-collapse:collapse; border:1px solid #000; font-size:12px;">
 
-                    <tr>
-                        <td style="padding:6px; border-bottom:1px solid #000;">
+                        <tr>
+                            <td style="padding:6px; border-bottom:1px solid #000;">
 
-                            <strong>OBSERVAÇÕES GERAIS:</strong>
+                                <strong>OBSERVAÇÕES GERAIS:</strong>
 
-                            <br/><br/>
+                                <br/><br/>
 
-                            CONDIÇÃO DE PAGAMENTO:
-                            <t t-esc="o.payment_term_id.name if o.payment_term_id else 'A COMBINAR'"/>
+                                CONDIÇÃO DE PAGAMENTO:
+                                <t t-esc="o.payment_term_id.name if o.payment_term_id else 'A COMBINAR'"/>
 
-                            <br/>
+                                <br/>
 
-                            VALIDADE DA PROPOSTA:
-                            <t t-if="o.validity_date">
-                                <t t-esc="o.validity_date.strftime('%d/%m/%Y')"/>
-                            </t>
-                            <t t-else="">
-                                15 DIAS
-                            </t>
+                                VALIDADE DA PROPOSTA:
+                                <t t-if="o.validity_date">
+                                    <t t-esc="o.validity_date.strftime('%d/%m/%Y')"/>
+                                </t>
+                                <t t-else="">
+                                    15 DIAS
+                                </t>
 
-                            <br/>
+                                <br/>
 
-                            FRETE/SEGURO:
-                            CIF (POR CONTA DO EMITENTE)
+                                FRETE/SEGURO:
+                                CIF (POR CONTA DO EMITENTE)
 
-                            <br/><br/>
+                                <br/><br/>
 
-                            OS PRAZOS DE ENTREGA ESTÃO NO LIMITE MÁXIMO.
-                            TEMOS COMO ROTINA ANTECIPAR A ENTREGA DOS PRAZOS PREVIAMENTE ESTIPULADOS.
+                                OS PRAZOS DE ENTREGA ESTÃO NO LIMITE MÁXIMO.
+                                TEMOS COMO ROTINA ANTECIPAR A ENTREGA DOS PRAZOS PREVIAMENTE ESTIPULADOS.
 
-                            <br/>
+                                <br/>
 
-                            ANTES DA CONFIRMAÇÃO DA COMPRA, POR FAVOR,
-                            VERIFIQUE SE OS PRODUTOS ORÇADOS ESTÃO DE ACORDO
-                            COM AS SUAS EXIGÊNCIAS.
+                                ANTES DA CONFIRMAÇÃO DA COMPRA, POR FAVOR,
+                                VERIFIQUE SE OS PRODUTOS ORÇADOS ESTÃO DE ACORDO
+                                COM AS SUAS EXIGÊNCIAS.
 
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
 
-                    <tr>
-                        <td style="padding:6px;">
+                        <tr>
+                            <td style="padding:6px;">
 
-                            <strong>DADOS BANCÁRIOS:</strong>
+                                <strong>DADOS BANCÁRIOS:</strong>
 
-                            <br/><br/>
+                                <br/><br/>
 
-                            <strong>RS LABSOURCE SUPRIMENTOS ANALÍTICOS LTDA</strong>
+                                <strong>RS LABSOURCE SUPRIMENTOS ANALÍTICOS LTDA</strong>
 
-                            <br/>
+                                <br/>
 
-                            CNPJ: 28.550.919/0001-78
+                                CNPJ: 28.550.919/0001-78
 
-                            <br/>
+                                <br/>
 
-                            BANCO: SANTANDER (033)
+                                BANCO: SANTANDER (033)
 
-                            <br/>
+                                <br/>
 
-                            AGÊNCIA: 0237
+                                AGÊNCIA: 0237
 
-                            <br/>
+                                <br/>
 
-                            CONTA CORRENTE: 13002427-7
+                                CONTA CORRENTE: 13002427-7
 
-                            <br/>
-                            <br/>
-                            CHAVE PIX: 28.550.919/0001-78
+                                <br/>
+                                <br/>
+                                CHAVE PIX: 28.550.919/0001-78
 
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
 
-                </table>
+                    </table>
 
-                <div style="margin-top:120px; text-align:right; font-size:12px;">
+                    <div style="margin-top:40px; text-align:right; font-size:12px;">
 
-                    <strong>ATENCIOSAMENTE,</strong>
+                        <strong>ATENCIOSAMENTE,</strong>
 
-                    <br/><br/>
+                        <br/><br/>
 
-                    <t t-esc="o.user_id.name"/>
+                        <t t-esc="o.user_id.name"/>
 
-                    <br/><br/>
-                    <t t-if = 'o.user_id.phone'>
-                        Telefone:
-                        <t t-esc="o.user_id.phone"/>
-                    </t>
-                    <t t-else="">
-                        Telefone: (19) 3877-5025
-                    </t>
-                    <br/><br/>
+                        <br/><br/>
+                        <t t-if = 'o.user_id.phone'>
+                            Telefone:
+                            <t t-esc="o.user_id.phone"/>
+                        </t>
+                        <t t-else="">
+                            Telefone: (19) 3877-5025
+                        </t>
+                        <br/><br/>
 
-                    <span style="color:#1f4e79;">
-                    <t t-if = 'o.user_id.email'>
-                        <t t-esc='o.user_id.email'/>
-                    </t>
-                    <t t-else="">
-                    Vendedor sem email em seu cadastro
+                        <span style="color:#1f4e79;">
+                        <t t-if = 'o.user_id.email'>
+                            <t t-esc='o.user_id.email'/>
+                        </t>
+                        <t t-else="">
+                        Vendedor sem email em seu cadastro
 
-                    </t>
+                        </t>
 
-                    </span>
+                        </span>
 
-                    <br/><br/>
+                        <br/><br/>
 
-                    ARTUR NOGUEIRA,
-                    <span t-field="o.date_order"
-                        t-options='{"widget":"date"}'/>
+                        ARTUR NOGUEIRA,
+                        <span t-field="o.date_order"
+                            t-options='{"widget":"date"}'/>
+
+                    </div>
 
                 </div>
 

@@ -169,6 +169,7 @@
                                     default_order="id desc">
 
                                     <field name="partner_id"/>
+                                    <field name="num_tag"/>
                                     <field name="data_entrada"/>
                                     <field name="data_saida"/>
                                     <field name="tempo_permanencia"
@@ -182,6 +183,8 @@
                             <field name="tag_ids">
                                 <tree string="Tags da Moradia"
                                       editable="bottom">
+                                    <field name="residence_id" invisible="1"/>
+                                    <field name="partner_id"/>
                                     <field name="name"/>
                                     <field name="numero_tag"/>
                                 </tree>

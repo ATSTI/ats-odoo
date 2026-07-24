@@ -16,6 +16,14 @@ class CondoResidenceTags(models.Model):
     
     numero_tag = fields.Char("Número da TAG")
 
+    partner_id = fields.Many2one(
+        "res.partner",
+        string="Responsável",
+        ondelete="cascade",
+        required=True,
+        domain="['|', ('condo_residence_ids', 'in', [residence_id]), ('residence_owner_ids', 'in', [residence_id])]",
+    )
+
     _sql_constraints = [
         (
             "unique_tag_per_residence",

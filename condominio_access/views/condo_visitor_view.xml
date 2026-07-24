@@ -211,9 +211,13 @@
         <field name="arch" type="xml">
 
             <tree decoration-success="status == 'concluido'"
-                  decoration-warning="status == 'pendente'">
+                  decoration-warning="status == 'pendente'"
+                  create="false"
+                  delete="false"
+                  default_order="id desc">
 
                 <field name="partner_id"/>
+                <field name="num_tag"/>
                 <field name="data_entrada"/>
                 <field name="data_saida"/>
                 <field name="status"/>

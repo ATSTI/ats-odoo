@@ -20,6 +20,8 @@ class CondoResidenceLogs(models.Model):
         required=True,
     )
 
+    num_tag = fields.Char(string="TAG", readonly=True)
+
     data_entrada = fields.Datetime(string="Entrada")
 
     data_saida = fields.Datetime(string="Saída")

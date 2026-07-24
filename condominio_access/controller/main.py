@@ -25,6 +25,8 @@ class AccessLogs(http.Controller):
         for record in data["records"]:
             timestamp = int(record.get("CreateTime", 0))
             user_id = record.get("UserID")
+            no_card = record.get("CardNo")
+            no_card = int(no_card, 16) if no_card else None
             if not user_id:
                 continue
 
@@ -49,9 +51,14 @@ class AccessLogs(http.Controller):
                 "1": "Saída",
             }.get(door, "Desconhecida")
 
-            morador = Partner.search([('UserID', '=', user_id)], limit=1)
-            if morador and morador.condo_residence_ids:
-                residence = morador.condo_residence_ids[0]
+            partners = Partner.search([])
+            morador = partners.filtered(
+                lambda p: p.UserID and str(user_id) in p.UserID.split()
+            )
+            tag = request.env['condo.residence.tags'].search([('numero_tag', '=', no_card)])
+            if morador.id in tag.mapped('partner_id').ids:
+                if tag and tag.residence_id:
+                    residence = tag[0].residence_id
                 if door_name == "Entrada":
                     inicio = date - timedelta(seconds=15)
                     fim = date + timedelta(seconds=15)
@@ -66,12 +73,14 @@ class AccessLogs(http.Controller):
                         CondoLogs.create({
                             "residence_id": residence.id,
                             "partner_id": morador.id,
+                            "num_tag": no_card,
                             "data_entrada": date,
                         })
                 elif door_name == "Saída":
                     log = CondoLogs.search([
                         ("residence_id", "=", residence.id),
                         ("partner_id", "=", morador.id),
+                        ("num_tag", "=", no_card),
                         ("status", "=", "pendente"),
                     ], order="data_entrada desc", limit=1)
                     if log:
@@ -80,6 +89,7 @@ class AccessLogs(http.Controller):
                         })
             print(
                 "UserID:", user_id,
+                "\n Tag:", no_card,
                 "\nData/Hora:", date,
                 "\nDoor:", door_name,
                 "\n==============================="

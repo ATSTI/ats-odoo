@@ -36,8 +36,7 @@ class ResPartner(models.Model):
         string="Data de Nascimento"
     )
 
-    UserID = fields.Integer("ID do usuário")
-
+    UserID = fields.Char("ID do usuário")
 
     @api.onchange('email')
     def onchange_email(self):

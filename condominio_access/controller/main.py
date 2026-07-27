@@ -56,6 +56,16 @@ class AccessLogs(http.Controller):
                 lambda p: p.UserID and str(user_id) in p.UserID.split()
             )
             tag = request.env['condo.residence.tags'].search([('numero_tag', '=', no_card)])
+            if not morador or not tag:
+                inbox = request.env['mail.channel'].sudo().search([('name', 'ilike', 'Registros')])
+                if inbox:
+                    msg = f'Contato da Tag {no_card} não encontrado no Odoo, faça o cadastro do Contato e das Tags\n'
+                    inbox.message_post(
+                        body=msg,
+                        message_type='comment',    
+                        author_id=request.env.ref('base.partner_root').id,    
+                        subtype_xml_id='mail.mt_comment'
+                    )
             if morador.id in tag.mapped('partner_id').ids:
                 if tag and tag.residence_id:
                     residence = tag[0].residence_id

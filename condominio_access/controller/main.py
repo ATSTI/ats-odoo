@@ -80,10 +80,12 @@ class AccessLogs(http.Controller):
                         ("data_entrada", "<=", fim),
                     ], limit=1)
                     if not log_existente:
+                        vehicle = request.env['condo.residence.vehicles'].search([('numero_tag', '=', no_card)],limit=1)
                         CondoLogs.create({
                             "residence_id": residence.id,
                             "partner_id": morador.id,
                             "num_tag": no_card,
+                            "vehicle_placa": vehicle.placa if vehicle else "",
                             "data_entrada": date,
                         })
                 elif door_name == "Saída":

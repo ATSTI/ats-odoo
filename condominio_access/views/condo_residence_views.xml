@@ -170,6 +170,7 @@
 
                                     <field name="partner_id"/>
                                     <field name="num_tag"/>
+                                    <field name="vehicle_placa" />
                                     <field name="data_entrada"/>
                                     <field name="data_saida"/>
                                     <field name="tempo_permanencia"

@@ -10,11 +10,11 @@ class SaleOrder(models.Model):
         readonly=True,
     )
 
-    purchase_order_id = fields.Many2one('purchase.order', string='Pedido de Compra de Origem')
+    # purchase_order_id = fields.Many2one('purchase.order', string='Pedido de Compra de Origem')
 
     numero_pedido_compra = fields.Char(
         string='Nº do Pedido de Compra',
-        related='purchase_order_id.name',
+
         store=True,
     )
 

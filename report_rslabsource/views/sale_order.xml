@@ -10,8 +10,8 @@
 
             <xpath expr="//group[@name='order_details']" position="inside">
                 <field name="numero_orcamento"/>
-                <field name="purchase_order_id"/>
                 <field name="numero_pedido_compra"/>
+                <!-- <field name="purchase_order_id"/> -->
             </xpath>    
         </field>
     </record>

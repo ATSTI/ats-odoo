@@ -153,4 +153,17 @@
 
         </field>
     </record>
+
+    <record id="view_res_partner_residence_tab" model="ir.ui.view">
+        <field name="name">res.partner.residence.tab</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='active']" position="before">
+                <field name="is_morador" invisible="1"/>
+                <field name="residence_owner_ids" widget="many2many_tags" context="{'default_proprietario_id': active_id}" optional="hide"/>
+                <field name="condo_residence_ids" widget="many2many_tags" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>

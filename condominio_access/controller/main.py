@@ -15,6 +15,9 @@ class AccessLogs(http.Controller):
     @http.route('/access_logs', type='json', auth='user', csrf=False)
     def get_access_logs(self, **kwargs):
         raw = kwargs.get("raw_response", "")
+        file = "/tmp/registros/" + datetime.now().strftime("%Y%m%d_%H%M%S") + ".txt"
+        with open(file, "w", encoding="utf-8") as arquivo:
+            arquivo.write(raw)
         data = self.text2json(raw)
 
         CondoLogs = request.env['condo.residence.logs'].sudo()
@@ -45,6 +48,8 @@ class AccessLogs(http.Controller):
             last_records[key] = timestamp
 
             date = datetime.fromtimestamp(timestamp) - timedelta(hours=1)
+            inicio = date - timedelta(seconds=25)
+            fim = date + timedelta(seconds=25)
 
             door_name = {
                 "0": "Entrada",
@@ -94,8 +99,6 @@ class AccessLogs(http.Controller):
                 if tag and tag.residence_id:
                     residence = tag[0].residence_id
                 if door_name == "Entrada":
-                    inicio = date - timedelta(seconds=15)
-                    fim = date + timedelta(seconds=15)
 
                     log_existente = CondoLogs.search([
                         ("residence_id", "=", residence.id),

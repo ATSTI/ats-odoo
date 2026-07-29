@@ -30,6 +30,25 @@ def filter_processador_edoc_nfe(record):
 class DocumentNfe(models.Model):
     _inherit = "l10n_br_fiscal.document"
 
+    def xml_autorizacao_temp(self, xml_string):
+        root = etree.fromstring(xml_string)
+        ns = {None: "http://www.portalfiscal.inf.br/nfe"}
+        new_root = etree.Element("nfeProc", nsmap=ns)
+
+        protNFe_node = etree.Element("protNFe")
+        infProt = etree.SubElement(protNFe_node, "infProt")
+        etree.SubElement(infProt, "tpAmb").text = "2"
+        etree.SubElement(infProt, "verAplic").text = ""
+        etree.SubElement(infProt, "dhRecbto").text = None
+        etree.SubElement(infProt, "nProt").text = ""
+        etree.SubElement(infProt, "digVal").text = ""
+        etree.SubElement(infProt, "cStat").text = ""
+        etree.SubElement(infProt, "xMotivo").text = ""
+
+        new_root.append(root)
+        new_root.append(protNFe_node)
+        return etree.tostring(new_root)
+
     def make_pdf(self):
         if not self.filtered(filter_processador_edoc_nfe):
             return super().make_pdf()
@@ -44,7 +63,7 @@ class DocumentNfe(models.Model):
         else:
             arquivo = self.send_file_id
             xml_string = base64.b64decode(arquivo.datas)
-            xml_string = self.temp_xml_autorizacao(xml_string)
+            xml_string = self.xml_autorizacao_temp(xml_string)
 
         # Teste Usando impressao via ReportLab Pytrustnfe
         evento_xml = []

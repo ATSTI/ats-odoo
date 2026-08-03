@@ -4,7 +4,19 @@ from odoo.exceptions import ValidationError, UserError
 class CondoResidence(models.Model):
     _name = "condo.residence"
     _description = "Residências do Condomínio"
-    _inherit = ['mail.thread', 'mail.activity.mixin']  
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+
+    ticket_ids = fields.One2many(
+    "helpdesk.ticket",
+    "residence_id",
+    string="Chamados",
+)
+
+    helpdesk_ticket_count = fields.Integer(
+    compute="_compute_helpdesk_ticket_count")
+
+    helpdesk_ticket_active_count = fields.Integer(
+    compute="_compute_helpdesk_ticket_count")  
 
     leitura_agua_ids = fields.One2many(
         "condo.water.reading",
@@ -166,6 +178,33 @@ class CondoResidence(models.Model):
         residences = self.env['condo.residence'].search([])
         for rec in residences:
             rec._compute_name()
+
+    def _compute_helpdesk_ticket_count(self):
+        Ticket = self.env["helpdesk.ticket"]
+
+        for rec in self:
+            tickets = Ticket.search([
+                ("residence_id", "=", rec.id)
+            ])
+
+            rec.helpdesk_ticket_count = len(tickets)
+            rec.helpdesk_ticket_active_count = len(
+                tickets.filtered(lambda t: not t.stage_id.is_close)
+            )
+
+    def action_view_helpdesk_tickets(self):
+        self.ensure_one()
+
+        return {
+            "type": "ir.actions.act_window",
+            "name": "Chamados",
+            "res_model": "helpdesk.ticket",
+            "view_mode": "tree,form",
+            "domain": [("residence_id", "=", self.id)],
+            "context": {
+                "default_residence_id": self.id,
+            },
+        }
 
     # def action_clear_all_readings(self):
     #     readings = self.env["condo.water.reading"].search([])

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_condo_visitor_cancel_wizard_form" model="ir.ui.view">
+        <field name="name">condo.visitor.cancel.wizard.form</field>
+        <field name="model">condo.visitor.cancel.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Cancelar Visita">
+                <group>
+                    <field name="visitor_id" invisible="1"/>
+                    <field name="motivo"
+                           placeholder="Informe a justificativa do cancelamento..."/>
+                </group>
+
+                <footer>
+                    <button name="action_confirm"
+                            string="Confirmar Cancelamento"
+                            type="object"
+                            class="btn-danger"/>
+
+                    <button string="Fechar"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

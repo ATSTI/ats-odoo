@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError, UserError
+import re
 
 
 class CondoVisitor(models.Model):
@@ -7,11 +8,14 @@ class CondoVisitor(models.Model):
     _description = "Visitantes do Condomínio"
     _order = "status desc, data_entrada desc"
     _rec_name = "name"
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char(
         string="Descrição",
         compute="_compute_name",
         store=True)
+
+    documento = fields.Char("CPF do visitante", store = True)
 
     visitante_id = fields.Many2one(
     "res.partner",
@@ -63,12 +67,51 @@ class CondoVisitor(models.Model):
     status = fields.Selection([
         ('esperado', 'Esperado'),
         ('presente', 'Presente'),
-        ('saiu', 'Saiu')
+        ('saiu', 'Saiu'),
+        ('cancelado', 'Cancelado')
     ], default='esperado', string="Status")
 
     tempo_permanencia = fields.Float(
         string="Tempo (h)",
         compute="_compute_tempo_permanencia")
+
+
+    # def formatar_cpf(valor):
+    #     apenas_numeros = re.sub(r'\D', '', str(valor))
+    #     cpf_com_11 = apenas_numeros.zfill(11)
+    #     return f"{cpf_com_11[:3]}.{cpf_com_11[3:6]}.{cpf_com_11[6:9]}-{cpf_com_11[9:]}"
+
+
+    @api.onchange("documento")
+    def _compute_visitante_id(self):
+        for rec in self:
+            visitante = False
+            if rec.documento:
+                doc_limpo = "".join(c for c in rec.documento if c.isdigit())
+                if len(doc_limpo) == 11:
+                    doc_original = re.sub(
+                        r"(\d{3})(\d{3})(\d{3})(\d{2})",
+                        r"\1.\2.\3-\4",
+                        doc_limpo,
+                    )
+                elif len(doc_limpo) == 14:
+                    doc_original = re.sub(
+                        r"(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})",
+                        r"\1.\2.\3/\4-\5",
+                        doc_limpo,
+                    )
+                else:
+                    doc_original = rec.documento
+
+                visitante = self.env["res.partner"].search([
+                    "|",
+                    ("vat", "=ilike", doc_original),
+                    ("vat", "=ilike", doc_limpo),
+                ], limit=1)
+
+            rec.visitante_id = visitante
+
+
 
     def _default_residence_partners(self):
         Residence = self.env["condo.residence"]
@@ -124,6 +167,20 @@ class CondoVisitor(models.Model):
             rec.status = 'saiu'
             rec.data_saida = fields.Datetime.now()
 
+    def action_cancelado(self):
+        self.ensure_one()
+
+        return {
+            "type": "ir.actions.act_window",
+            "name": "Cancelar visita",
+            "res_model": "condo.visitor.cancel.wizard",
+            "view_mode": "form",
+            "target": "new",
+            "context": {
+                "default_visitor_id": self.id,
+            },
+        }
+
     @api.constrains('data_saida', 'data_entrada')
     def _check_datas(self):
         for rec in self:
@@ -151,9 +208,24 @@ class CondoVisitor(models.Model):
     def _onchange_visitante_recorrente(self):
         if not self.visitante_id:
             return
-        residencias = self.env['condo.residence'].search([('visitantes_recorrentes_ids.partner_id','=',self.visitante_id.id)])
+
+        residencias = self.env['condo.residence'].search([
+            ('visitantes_recorrentes_ids.partner_id', '=', self.visitante_id.id)
+        ])
+
         if not residencias:
             return
+
+        if len(residencias) == 1:
+            residencia = residencias[0]
+            recorrente = residencia.visitantes_recorrentes_ids.filtered(
+                lambda r: r.partner_id == self.visitante_id
+            )[:1]
+
+            self.residence_id = residencia
+            self.morador_id = recorrente.morador_id
+            self.autorizado_por = recorrente.autorizado_por
+
         nomes = ", ".join(residencias.mapped('name'))
         return {
             'warning': {

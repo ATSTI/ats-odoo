@@ -10,5 +10,8 @@ access_condo_recurring_visitor,access_condo_recurring_visitor,model_condo_recurr
 
 access_condo_residence_water_reader,access.condo.residence.water.reader,model_condo_residence,condominio_access.group_condo_water_reader,1,1,0,0
 access_condo_water_reading_water_reader,access.condo.water.reading.water.reader,model_condo_water_reading,condominio_access.group_condo_water_reader,1,1,1,0
+
 access_condo_water_report_wizard,access_condo_water_report_wizard,model_condo_water_report_wizard,,1,1,1,1
 acess_condo_import_water_wizard,access_condo_import_water_wizard,model_condo_import_water_wizard,,1,1,1,1
+
+access_condo_visitor_cancel_wizard,access_condo_visitor_cancel_wizard,model_condo_visitor_cancel_wizard,,1,1,1,1

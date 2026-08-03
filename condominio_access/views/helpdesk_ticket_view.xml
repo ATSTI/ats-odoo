@@ -1,0 +1,12 @@
+<odoo>
+    <record id="view_helpdesk_ticket_form_inherit_residence" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.form.inherit.residence</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="helpdesk_mgmt.ticket_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="residence_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

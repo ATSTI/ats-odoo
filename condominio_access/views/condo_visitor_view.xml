@@ -148,25 +148,35 @@
                 <button name="action_saida"
                         type="object"
                         string="Registrar Saída"
-                        class="btn-danger"
+                        class="btn-secondary"
                         attrs="{'invisible': [('status', '=', 'saiu')]}"/>
+
+                <button name="action_cancelado"
+                        type="object"
+                        string="Cancelar Visita"
+                        class="btn-danger"
+                        attrs="{'invisible': [('status', '=', 'cancelado')]}"/>
 
                 <field name="status" widget="statusbar"/>
             </header>
 
                 <sheet>
                     <div class="oe_title d-flex align-items-center gap-3">
-
+                        <!-- Foto do visitante -->
                         <field name="foto"
-                               widget="image"
-                                class="oe_avatar me-2"
-                               style="width:100px; height:100px; border-radius:50%; object-fit:cover;"/>
+                            widget="image"
+                            class="oe_avatar me-2"
+                            style="width:100px; height:100px; border-radius:50%; object-fit:cover;"/>
 
-                        <h1>
-                            <field name="visitante_id"/>
-                        </h1>
-
+                        <!-- Bloco do documento com a string em cima -->
+                        <div class="d-flex flex-column justify-content-center">
+                            <label for="documento" class="oe_edit_only" string="Documento"/>
+                            <h1>
+                                <field name="documento" placeholder="Ex: 000.000.000-00"/>
+                            </h1>
+                        </div>
                     </div>
+
 
                     <group col="2">
                         <group string="Dados do Visitante">
@@ -193,6 +203,11 @@
                         </group>
                     </group>
                 </sheet>
+                <div class="oe_chatter">
+                <field name="message_follower_ids"/>
+                <field name="activity_ids"/>
+                <field name="message_ids"/>
+            </div>
             </form>
 
         </field>

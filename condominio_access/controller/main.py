@@ -15,6 +15,9 @@ class AccessLogs(http.Controller):
     @http.route('/access_logs', type='json', auth='user', csrf=False)
     def get_access_logs(self, **kwargs):
         raw = kwargs.get("raw_response", "")
+        file = "/tmp/registros/" + datetime.now().strftime("%Y%m%d_%H%M%S") + ".txt"
+        with open(file, "w", encoding="utf-8") as arquivo:
+            arquivo.write(raw)
         data = self.text2json(raw)
 
         CondoLogs = request.env['condo.residence.logs'].sudo()
@@ -44,7 +47,9 @@ class AccessLogs(http.Controller):
 
             last_records[key] = timestamp
 
-            date = datetime.fromtimestamp(timestamp) + timedelta(hours=3)
+            date = datetime.fromtimestamp(timestamp) - timedelta(hours=1)
+            inicio = date - timedelta(seconds=25)
+            fim = date + timedelta(seconds=25)
 
             door_name = {
                 "0": "Entrada",
@@ -57,9 +62,33 @@ class AccessLogs(http.Controller):
             )
             tag = request.env['condo.residence.tags'].search([('numero_tag', '=', no_card)])
             if not morador or not tag:
+                desconhecido = Partner.browse(1556)
+                # Usuario não cadastrado cria Log proprio indefinido
+                log_existente = CondoLogs.search([
+                    ("partner_id", "=", desconhecido.id),
+                    ("num_tag", '=', no_card),
+                    ("data_entrada", ">=", inicio),
+                    ("data_entrada", "<=", fim),
+                ], limit=1)
+                if not log_existente:
+                    CondoLogs.create({
+                        "partner_id": desconhecido.id,
+                        "num_tag": no_card,
+                        "data_entrada": date,
+                    })
+                elif door_name == "Saída":
+                    log = CondoLogs.search([
+                        ("partner_id", "=", desconhecido.id),
+                        ("num_tag", "=", no_card),
+                        ("status", "=", "pendente"),
+                    ], order="data_entrada desc", limit=1)
+                    if log:
+                        log.write({
+                            "data_saida": date,
+                        })
                 inbox = request.env['mail.channel'].sudo().search([('name', 'ilike', 'Registros')])
                 if inbox:
-                    msg = f'Contato da Tag {no_card} não encontrado no Odoo, faça o cadastro do Contato e das Tags\n'
+                    msg = f'Contato da Tag {no_card} não encontrado no Odoo, faça o cadastro do Contato e das Tags\n Horario: {date}\n'
                     inbox.message_post(
                         body=msg,
                         message_type='comment',    
@@ -70,8 +99,6 @@ class AccessLogs(http.Controller):
                 if tag and tag.residence_id:
                     residence = tag[0].residence_id
                 if door_name == "Entrada":
-                    inicio = date - timedelta(seconds=15)
-                    fim = date + timedelta(seconds=15)
 
                     log_existente = CondoLogs.search([
                         ("residence_id", "=", residence.id),
@@ -80,10 +107,12 @@ class AccessLogs(http.Controller):
                         ("data_entrada", "<=", fim),
                     ], limit=1)
                     if not log_existente:
+                        vehicle = request.env['condo.residence.vehicles'].search([('numero_tag', '=', no_card)],limit=1)
                         CondoLogs.create({
                             "residence_id": residence.id,
                             "partner_id": morador.id,
                             "num_tag": no_card,
+                            "vehicle_placa": vehicle.placa if vehicle else "",
                             "data_entrada": date,
                         })
                 elif door_name == "Saída":

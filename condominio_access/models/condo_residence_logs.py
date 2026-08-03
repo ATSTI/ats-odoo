@@ -22,6 +22,10 @@ class CondoResidenceLogs(models.Model):
 
     num_tag = fields.Char(string="TAG", readonly=True)
 
+    vehicle_placa = fields.Char(
+        string="Placa do Veículo"
+    )
+
     data_entrada = fields.Datetime(string="Entrada")
 
     data_saida = fields.Datetime(string="Saída")

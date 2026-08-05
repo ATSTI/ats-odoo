@@ -10,8 +10,8 @@
     "version": "14.0.1.0.2",
     "development_status": "Beta",
     "depends": [
-        "l10n_br_nfe",
         "l10n_br_account",
+        "l10n_br_nfe",
         "l10n_br_delivery_nfe",
     ],
     "data": [

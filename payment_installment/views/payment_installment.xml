@@ -21,7 +21,7 @@
                         </group>
                     </group>    
                     <field nolabel="1" name="parcela_ids"> 
-                        <tree name="parcelamento" string="Parcelamento" colors="grey:reconciled==True;red:date_maturity&lt;current_date" editable="bottom">
+                        <tree name="parcelamento" string="Parcelamento" colors="grey:reconciled==True;red:date_maturity &lt; current_date" editable="bottom">
                             <field name="move_id" invisible="1" />
                             <field name="currency_id" invisible="1" />
                             <field name="numero_fatura" />
@@ -33,23 +33,7 @@
                     <button name="action_confirma_parcela" type="object" states="draft" class="btn-success" string="Confirmar Parcelas" groups="account.group_account_invoice"/>
                 </page>
             </xpath>
-            <!-- <xpath expr="//notebook" position="inside">
-                <page name="vencimentos" string="Vencimentos">
-                    <field nolabel="1" name="receivable_move_line_ids">
-                        <tree name="vencimentos" string="Vencimentos" colors="grey:reconciled==True;red:date_maturity&lt;current_date">
-                            <field name="date_maturity"/>
-                            <field name="name"/>
-                            <field name="payment_mode_id"/>
-                            <field name="ref"/>
-                            <field name="debit"/>
-                            <field name="credit"/>
-                            <field name="reconciled" string="Pago" />
-                            <button name="action_register_payment" type="object" string="Register Payment" groups="account.group_account_invoice" icon="fa-usd"/>
-                            <button name="open_wizard_print_boleto" type="object" string="Boletos" icon="fa-barcode"/>
-                        </tree>
-                    </field>
-                </page>
-            </xpath> -->
+
         </field>
     </record>
     

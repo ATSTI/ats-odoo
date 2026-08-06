@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="document_cancel_nfse_wizard_form" model="ir.ui.view">
+        <field name="name">l10n_br_fiscal.document.cancel.nfse.wizard</field>
+        <field name="model">l10n_br_fiscal.document.cancel.wizard</field>
+        <field name="inherit_id" ref="l10n_br_fiscal_edi.document_cancel_wizard_form" />
+        <field name="arch" type="xml">
+            <field name="justification" position="replace">
+                <field name="justification" invisible="1" />
+                <field name="motivo_cancelamento" />
+            </field>
+        </field>
+    </record>
+</odoo>

@@ -1,8 +1,7 @@
 ATSTI Odoo — Branch 18.0
 Descrição
 
-Este branch reúne os módulos personalizados da ATSTI para o Odoo 18.0, contemplando adaptações fiscais brasileiras, integrações, customizações de relatórios, automações, entre outros. Tem como objetivo prover funcionalidades específicas que não existem no Odoo padrão, para clientes no Brasil.
-Licença
+Branch de funcionamento dos módulos da Empresa Especifica, devido a não conversão do módulo l10n_br_account (novembro de 2025) através desse branch fiz a conversão por jeitos mais simples e menos funcionais que o pessoal da localização. Quando migrarem esse branch não terá mais função
 
 GPL-3.0 – Software livre.
 GitHub

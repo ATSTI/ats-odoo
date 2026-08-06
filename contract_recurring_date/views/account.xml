@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="br_account_tag_ids_form" model="ir.ui.view">
+        <field name="name">br_account.tag_ids.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <label for="journal_id" position="before">
+		    <field
+                       name="move_tag_ids"
+                       widget="many2many_tags"
+                       options="{'color_field': 'color'}"
+                    />
+            </label>
+        </field>
+    </record>
+
+</odoo>

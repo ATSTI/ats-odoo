@@ -9,7 +9,7 @@ class CrmLead(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Enviar mensagem no whatsapp'),
+            'name': _('Send WhatsApp Message'),
             'res_model': 'whatsapp.evolution.composer',  
             'view_mode': 'form',
             'target': 'new',

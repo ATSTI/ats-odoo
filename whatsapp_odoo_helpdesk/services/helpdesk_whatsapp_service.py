@@ -8,6 +8,7 @@ class HelpdeskWhatsappService(models.AbstractModel):
         """
         Processa respostas do menu do WhatsApp.
         """
+        odoo_bot = self.env.ref("base.partner_root")
         if not ticket or not partner:
             return
         menu_options = {
@@ -21,6 +22,12 @@ class HelpdeskWhatsappService(models.AbstractModel):
         if not selected:
             if instance:
                 instance.send_text(phone_number, "Opção inválida. Escolha 1️⃣, 2️⃣ ou 3️⃣.", partner=partner)
+                channel = self.env['discuss.channel']._find_or_create_whatsapp_channel(partner, instance)
+                channel.with_context(from_webhook=True).message_post(body="Opção inválida. Escolha 1️⃣, 2️⃣ ou 3️⃣.", 
+                    message_type='comment',
+                    subtype_id=1,  # Subtipo 'Discussão'
+                    author_id=odoo_bot.id
+                )
             return
         team_name = selected["team"]
         Team = self.env["helpdesk.ticket.team"].sudo()
@@ -34,7 +41,6 @@ class HelpdeskWhatsappService(models.AbstractModel):
             return
 
         ticket.message_subscribe(partner_ids=followers.mapped("partner_id").ids)
-        odoo_bot = self.env.ref("base.partner_root")
         Channel = self.env["discuss.channel"].sudo()
         for user in followers:
             user_partner = user.partner_id
@@ -43,21 +49,26 @@ class HelpdeskWhatsappService(models.AbstractModel):
                 ("channel_partner_ids", "in", [odoo_bot.id]),
                 ("channel_partner_ids", "in", [user_partner.id]),
             ], limit=1)
-
             if not chat:
                 chat = Channel.create({
                     "channel_type": "chat",
                     "name": f"Chat OdooBot - {user.name}",
-                    "channel_partner_ids": [(6, 0, [odoo_bot.id, user_partner.id])],
                 })
-          
-            chat.message_post(
-                body=f"📩 Novo chamado direcionado ao time {team.name} (de {partner.name})"
-                     f"🎟️ Ticket:  ID: {ticket.id}  Nome do Ticket: {ticket.name}",
-                message_type="comment",
-                subtype_xmlid="mail.mt_comment",
-                author_id=odoo_bot.id,
-            )
-    
+                chat.channel_partner_ids = [(4, odoo_bot.id), (4, user_partner.id)]
+            if chat:
+                chat.ensure_one()
+                chat.message_post(
+                    body=f"📩 Novo chamado direcionado ao time {team.name} (de {partner.name})\n"
+                        f"🎟️ Ticket: ID {ticket.id} — {ticket.name}",
+                    message_type="comment",
+                    subtype_xmlid="mail.mt_comment",
+                    author_id=odoo_bot.id,
+                )
         if instance:
             instance.send_text(phone_number, selected["msg"], partner=partner)
+            channel = self.env['discuss.channel'].sudo()._find_or_create_whatsapp_channel(partner, instance)
+            channel.with_context(from_webhook=True).message_post(body=selected["msg"], 
+                message_type='comment',
+                subtype_id=1,  # Subtipo 'Discussão'
+                author_id=odoo_bot.id
+            )

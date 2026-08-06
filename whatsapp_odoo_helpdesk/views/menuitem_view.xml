@@ -1,0 +1,8 @@
+<odoo>
+    <record id="whatsapp_evolution_base.whatsapp_evolution_menu_root" model="ir.ui.menu">
+        <field name="web_icon">whatsapp_odoo_helpdesk,static/description/menu_zap.png</field>
+    </record>
+    <record id="whatsapp_contact_management.whatsapp_contact_management_menu_root" model="ir.ui.menu">
+        <field name="web_icon">whatsapp_odoo_helpdesk,static/description/menu_zap_contact.png</field>
+    </record>
+</odoo>

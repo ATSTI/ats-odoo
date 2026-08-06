@@ -1,0 +1,244 @@
+# Copyright 2020 KMEE
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
+import logging
+from datetime import datetime, timedelta
+import phonenumbers
+
+from odoo import _, models, fields
+from odoo.exceptions import UserError
+
+from .arquivo_certificado import ArquivoCertificado
+
+_logger = logging.getLogger(__name__)
+
+try:
+    from erpbrasil.bank.inter.api import ApiInter
+    from erpbrasil.bank.inter.boleto import BoletoInter
+except ImportError:
+    _logger.error("Biblioteca erpbrasil.bank.inter não instalada")
+
+try:
+    from febraban.cnab240.user import User, UserAddress, UserBank
+except ImportError:
+    _logger.error("Biblioteca febraban não instalada")
+
+try:
+    from erpbrasil.base import misc
+except ImportError:
+    _logger.error("Biblioteca erpbrasil.base não instalada")
+
+
+class AccountPaymentOrder(models.Model):
+    _inherit = "account.payment.order"
+
+    def _generate_bank_inter_boleto_data(self, move_line=None):
+        dados = []
+        myself = User(
+            name=self.company_id.legal_name,
+            identifier=misc.punctuation_rm(self.company_id.vat) or misc.punctuation_rm(self.company_id.cnpj_cpf),
+            bank=UserBank(
+                bankId=self.company_partner_bank_id.bank_id.code_bc,
+                bankName=self.company_partner_bank_id.bank_id.name,
+                accountNumber=self.company_partner_bank_id.acc_number,
+                branchCode=self.company_partner_bank_id.bra_number,
+                accountVerifier=self.company_partner_bank_id.acc_number_dig,
+            ),
+            address=UserAddress(
+                streetLine1=self.company_id.street or "",
+                streetLine2=self.company_id.street_number or "",
+                district=self.company_id.district or "",
+                city=self.company_id.city_id.name or "",
+                stateCode=self.company_id.state_id.code or "",
+                zipCode=misc.punctuation_rm(self.company_id.zip),
+            ),
+        )
+        multa = {}
+        if self.journal_id.bank_multa_type:
+            multa["taxa"] = self.journal_id.bank_multa_value
+            multa["codigo"] = self.journal_id.bank_multa_type
+        mora = {}
+        if self.journal_id.bank_mora_type:
+            mora["taxa"] = self.journal_id.bank_mora_value
+            mora["codigo"] = self.journal_id.bank_mora_type
+
+        for line in self.payment_line_ids:
+            if move_line and line.move_line_id.id != move_line.id:
+                continue
+            ddd = telefone = ''
+            email = ''
+            if line.partner_id.email:
+                email = line.partner_id.email[:line.partner_id.email.find(';')] if line.partner_id.email.find(';') > 0 else line.partner_id.email
+            vcto = line.ml_maturity_date or line.move_line_id.date_maturity
+            if line.partner_id.mobile:
+                if line.partner_id.mobile.find('+55') == 0:
+                    telefone = line.partner_id.mobile
+                else:
+                    telefone = line.partner_id.mobile.split()[0]
+                telefone = str(phonenumbers.parse(telefone, "BR").national_number)
+                ddd = telefone[0:2]
+                telefone = telefone[2:]
+            payer = User(
+                name=line.partner_id.legal_name or line.partner_id.name,
+                identifier=misc.punctuation_rm(line.partner_id.vat) or misc.punctuation_rm(line.partner_id.cnpj_cpf),
+                email=email,
+                ddd=ddd,
+                telefone=telefone,
+                address=UserAddress(
+                    streetLine1=line.partner_id.street or "",
+                    streetLine2=line.partner_id.street_number or "",
+                    district=line.partner_id.district or "",
+                    city=line.partner_id.city_id.name or "",
+                    stateCode=line.partner_id.state_id.code or "",
+                    zipCode=misc.punctuation_rm(line.partner_id.zip),
+                ),
+            )
+            slip = BoletoInter(
+                sender=myself,
+                amount=line.amount_currency,
+                payer=payer,
+                issue_date=line.create_date,
+                due_date=vcto,
+                identifier=line.document_number,
+                instructions=[],
+                multa=multa,
+                mora=mora,
+            )
+            if vcto >= datetime.now().date() and not line.move_line_id.codigo_solicitacao:
+                dados.append(slip)
+        return dados
+
+    def _generate_bank_inter_boleto(self, move_line=None):
+        with ArquivoCertificado(self.journal_id, "w") as (key, cert):
+            token = self.generated_api_token("escrita")
+            api = ApiInter(
+                cert=(cert, key),
+                conta_corrente=(
+                    self.company_partner_bank_id.acc_number
+                    + self.company_partner_bank_id.acc_number_dig
+                ),
+                client_id=self.journal_id.bank_client_id,
+                client_secret=self.journal_id.bank_secret_id,
+                client_environment=self.journal_id.bank_environment,
+                token=token,
+            )            
+            data = self._generate_bank_inter_boleto_data(move_line=move_line)
+            for item in data:
+                # print(item._emissao_data())
+                resposta = api.boleto_inclui(item._emissao_data())
+                if resposta.get("erro"):
+                    erro = self.generate_error_message(resposta)
+                    raise UserError(f"{erro}")
+                # print(resposta)
+                payment_line_id = self.payment_line_ids.filtered(
+                    lambda line: line.document_number == item._identifier
+                )
+                if payment_line_id:
+                    payment_line_id.digitable_line = resposta["codigoSolicitacao"]
+                    payment_line_id.move_line_id.codigo_solicitacao = resposta["codigoSolicitacao"]
+        return False, False
+
+    def _gererate_bank_inter_api(self, move_line=None):
+        """Realiza a conexão com o a API do banco inter"""
+        if self.payment_type == "inbound":
+            return self._generate_bank_inter_boleto(move_line)
+        else:
+            raise NotImplementedError
+
+    # não consegui usar
+    # 
+    # def api_inter(self, token, key, cert, tipo):
+    #     token = self.generated_api_token(tipo)
+    #     api = ApiInter(
+    #         cert=(cert, key),
+    #         conta_corrente=(
+    #             self.company_partner_bank_id.acc_number
+    #             + self.company_partner_bank_id.acc_number_dig
+    #         ),
+    #         client_id=self.journal_id.bank_client_id,
+    #         client_secret=self.journal_id.bank_secret_id,
+    #         client_environment=self.journal_id.bank_environment,
+    #         token=token,
+    #     )
+    #     return api
+
+    def generated_api_token(self, tipo):
+        if tipo == "escrita":
+            token_date = self.journal_id.bank_token_date
+            token = self.journal_id.bank_token
+            if not token_date or not self.journal_id.bank_token:
+                token_date = datetime.strptime('2024-01-01 01:00:00', '%Y-%m-%d %H:%M:%S')
+        else:
+            token_date = self.journal_id.bank_token_date_read
+            token = self.journal_id.bank_token_read
+            if not token_date or not self.journal_id.bank_token_read:
+                token_date = datetime.strptime('2024-01-01 01:00:00', '%Y-%m-%d %H:%M:%S')
+        tempo_token = (datetime.now() - token_date).total_seconds()
+        with ArquivoCertificado(self.journal_id, "w") as (key, cert):
+            # O tempo de vida de um token gerado é de uma hora
+            if tempo_token > 3600:
+                api = ApiInter(
+                    cert=(cert, key),
+                    conta_corrente=(
+                        self.company_partner_bank_id.acc_number
+                        + self.company_partner_bank_id.acc_number_dig
+                    ),
+                    client_id=self.journal_id.bank_client_id,
+                    client_secret=self.journal_id.bank_secret_id,
+                    client_environment=self.journal_id.bank_environment,
+                    token=None,
+                )
+                token = api._prepare_token()
+                if tipo == "escrita":
+                    self.journal_id.bank_token = token
+                    self.journal_id.bank_token_date = datetime.now()
+                else:
+                    self.journal_id.bank_token_read = token
+                    self.journal_id.bank_token_date_read = datetime.now()
+        return token
+
+    def open2generated(self, move_line=None):
+        self.ensure_one()
+        try:
+            if (
+                self.company_partner_bank_id.bank_id
+                == self.env.ref("l10n_br_base.res_bank_077")
+                and self.payment_method_id.code == "240"
+            ):
+                self._gererate_bank_inter_api(move_line=move_line)
+                self.write({
+                    "date_generated": fields.Date.context_today(self),
+                    "state": "uploaded",
+                    "generated_user_id": self._uid,
+                })
+            else:
+                return super().open2generated()
+        except Exception as error:
+            raise UserError(str(error))
+
+    def generate_error_message(self, data):
+        messages = []
+
+        title = data.get("title")
+        detail = data.get("detail")
+
+        if title:
+            messages.append(title)
+
+        if detail:
+            messages.append(detail)
+
+        violacoes = data.get("violacoes", [])
+        for v in violacoes:
+            razao = v.get("razao")
+
+            if razao:
+                messages.append(
+                    f"\n• {razao}"
+                )
+
+        erro = "\n".join(messages).strip()
+        message = 'ERRO: %s' % (
+            erro,
+        )
+        return message

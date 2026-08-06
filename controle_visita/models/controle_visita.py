@@ -16,7 +16,7 @@ class ControleVisita(models.Model):
     socio_id = fields.Many2one('res.partner', string="Socio", required=True)
     carteirinha = fields.Char('Carteirinha')
     data_visita = fields.Datetime(string="Data Visita", default=fields.Datetime.now)
-    user_id = fields.Many2one('res.users', string='Usuário', index=True, 
+    user_id = fields.Many2one('res.users', string='Usuário', index=True,
         track_visibility='onchange', track_sequence=2, default=lambda self: self.env.user)
     cobrado = fields.Boolean(string='Cobrado')
 
@@ -70,44 +70,36 @@ class ControleVisita(models.Model):
     @api.model
     def create(self, values):
         result = super(ControleVisita, self).create(values)
-        mes_ini = '%s/%s/01 03:01:00' %(
+        # 05/08/2026 clube solicitou que seja ANUAL o numero 
+        # de visitas, e não mensal.
+        # O plano familiar tem 10 visitas por ano,
+        # e o plano individual tem 5 visitas por ano
+        mes_ini = '%s/01/01 00:00:00' %(
             result.data_visita.year,
-           str(result.data_visita.month).zfill(2)
-           )
-        dia = 30
-        if result.data_visita.month == 2:
-            dia = 28
-        if result.data_visita.month in (1,3,5,7,8,10,12):
-            dia = 31
-        mes_fim = '%s/%s/%s 20:59:00' %(
-           result.data_visita.year,
-           str(result.data_visita.month).zfill(2),
-           str(dia))
+        )
+        #    str(result.data_visita.month).zfill(2)
+        #    )
+        # dia = 30
+        # if result.data_visita.month == 2:
+        #     dia = 28
+        # if result.data_visita.month in (1,3,5,7,8,10,12):
+        #     dia = 31
+        mes_fim = '%s/12/31 21:59:00' %(
+           result.data_visita.year
+        )
+        #    str(result.data_visita.month).zfill(2),
+        #    str(dia))
         visita_ids = self.env['controle.visita'].search([
                 ('socio_id','=', result.socio_id.id),
                 ('data_visita', '>', mes_ini),
                 ('data_visita', '<', mes_fim),
                 ])
-        num_visita = 4
+        num_visita = 10
         if result.socio_id.categoria == '2':
-            num_visita = 2        
+            num_visita = 5
         if len(visita_ids) > num_visita:
-            #visitas = ''
-            #for vst in visita_ids:
-            #    #dt_visita = vst.data_visita + timedelta(hours=-3)
-            #    #dt = '%s-%s %s:%s' %(
-            #    #    str(dt_visita.day).zfill(2),
-            #    #    str(dt_visita.month).zfill(2),
-            #    #    str(dt_visita.hour).zfill(2),
-            #    #    str(dt_visita.minute).zfill(2)
-            #    # )
-            #    #if visitas == '':
-            #    #    visitas += dt
-            #    #else:
-            #    #    visitas += ', ' + dt
-            # TODO gerar um pedido de VENDA
             visitas = 'Convidado : %s' %(result.name)
-            self.gerar_venda(result.socio_id, 
+            self.gerar_venda(result.socio_id,
                 result.user_id, visitas)
             result['cobrado'] = True
         return result

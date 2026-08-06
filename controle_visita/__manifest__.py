@@ -21,4 +21,3 @@
         'views/controle_visita_views.xml',
     ],
 }
-

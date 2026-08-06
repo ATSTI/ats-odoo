@@ -11,6 +11,7 @@ from odoo.exceptions import UserError
 class ControleVisita(models.Model):
     _name = 'controle.visita'
     _description = 'Controle Visita'
+    _order = 'data_visita desc, id desc'
 
     name = fields.Char('Nome Visitante', required=True)
     socio_id = fields.Many2one('res.partner', string="Socio", required=True)

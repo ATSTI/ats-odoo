@@ -150,15 +150,11 @@ class CondoVisitor(models.Model):
     def action_entrada(self):
         for rec in self:
             visitante = rec.visitante_id
-            if not visitante.vat or not visitante.image_1920:
+            if not visitante.vat:
                 raise UserError(
-                    "Para dar entrada, o visitante precisa ter:\n"
-                    "- Nome\n"
-                    "- Nome completo\n"
+                    "Para dar entrada, o visitante precisa ter:\n"  
                     "- CPF\n"
-                    "- Foto"
                 )
-
             rec.status = 'presente'
             rec.data_entrada = fields.Datetime.now()
 

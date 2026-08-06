@@ -150,7 +150,7 @@ class CondoVisitor(models.Model):
     def action_entrada(self):
         for rec in self:
             visitante = rec.visitante_id
-            if not visitante.legal_name or not visitante.vat or not visitante.image_1920:
+            if not visitante.vat or not visitante.image_1920:
                 raise UserError(
                     "Para dar entrada, o visitante precisa ter:\n"
                     "- Nome\n"

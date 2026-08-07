@@ -1,5 +1,5 @@
 <odoo>
-    <record id="view_res_partner_residence_tab" model="ir.ui.view">
+    <record id="view_res_partner_residence_tab1" model="ir.ui.view">
         <field name="name">res.partner.residence.tab</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
@@ -154,7 +154,7 @@
         </field>
     </record>
 
-    <record id="view_res_partner_residence_tab" model="ir.ui.view">
+    <record id="view_res_partner_residence_tab2" model="ir.ui.view">
         <field name="name">res.partner.residence.tab</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_tree"/>

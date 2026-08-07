@@ -11,6 +11,13 @@ class CondoRecurringVisitor(models.Model):
         ondelete="cascade"
     )
 
+    morador_id = fields.Many2one(
+        "res.partner",
+        string="Morador",
+        required=True,
+        domain="[('is_morador','=',True)]"
+    )
+
     partner_id = fields.Many2one(
         "res.partner",
         string="Visitante",

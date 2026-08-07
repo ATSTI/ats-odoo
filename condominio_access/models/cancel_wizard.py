@@ -21,5 +21,6 @@ class VisitorCancelWizard(models.TransientModel):
             message_type="comment",
             subtype_xmlid="mail.mt_note",
         )
+        self.visitor_id.cancel_reason = self.motivo
 
         return {"type": "ir.actions.act_window_close"}

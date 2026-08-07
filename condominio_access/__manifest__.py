@@ -12,6 +12,7 @@
     'data': [
         'views/security.xml',
         'security/ir.model.access.csv',
+        'views/res_partner.xml',
         'views/wizard_water_report.xml',
         'report/report_water_not_found_template.xml',
         'report/helpdesk_ticket_report.xml',
@@ -20,7 +21,6 @@
         'report/report_water_reading_template.xml',
         'views/wizard_water_report_view.xml',
         'views/condo_visitor_view.xml',
-        'views/res_partner.xml',
         'views/helpdesk_ticket_view.xml',
         'views/wizard_cancelar_visita.xml',
     ],

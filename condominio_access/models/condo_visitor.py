@@ -15,6 +15,11 @@ class CondoVisitor(models.Model):
         compute="_compute_name",
         store=True)
 
+    cancel_reason = fields.Text(
+    string="Justificativa da Negativa",
+    readonly=True,
+)
+
     documento = fields.Char("CPF do visitante", store = True)
 
     visitante_id = fields.Many2one(
@@ -59,10 +64,9 @@ class CondoVisitor(models.Model):
     data_saida = fields.Datetime(string="Saída")
 
     autorizado_por = fields.Many2one(
-    "res.partner",
-    string="Autorizado por",
-    required=True,
-    domain="[('is_morador','=',True)]")
+        "res.partner",
+        string="Autorizado por",
+        required=True)
 
     status = fields.Selection([
         ('esperado', 'Esperado'),
@@ -74,6 +78,11 @@ class CondoVisitor(models.Model):
     tempo_permanencia = fields.Float(
         string="Tempo (h)",
         compute="_compute_tempo_permanencia")
+
+
+    modelo = fields.Char("Modelo")
+    placa = fields.Char("Placa")
+    cor = fields.Char("Cor")
 
 
     # def formatar_cpf(valor):
@@ -177,6 +186,29 @@ class CondoVisitor(models.Model):
             },
         }
 
+
+    @api.onchange('visitante_id')
+    def _onchange_visitante_negado(self):
+        if not self.visitante_id:
+            return
+
+        ultima_negada = self.env['condo.visitor'].search([
+            ('visitante_id', '=', self.visitante_id.id),
+            ('status', '=', 'cancelado'),
+            ('cancel_reason', '!=', False),
+        ], order='id desc', limit=1)
+
+        if ultima_negada:
+            return {
+                'warning': {
+                    'title': 'Visitante já foi negado',
+                    'message': (
+                        f'Este visitante já teve uma entrada negada.\n\n'
+                        f'Justificativa:\n{ultima_negada.cancel_reason}'
+                    ),
+                }
+            }
+
     @api.constrains('data_saida', 'data_entrada')
     def _check_datas(self):
         for rec in self:
@@ -184,6 +216,7 @@ class CondoVisitor(models.Model):
                 if rec.data_saida < rec.data_entrada:
                     raise ValidationError("A saída não pode ser antes da entrada.")
 
+    #TODO filtrar o campo residencia com base no campo MORADOR, para que o usuário não precise selecionar a residência manualmente.
     @api.depends("morador_id")
     def _compute_residence_id(self):
         Residence = self.env["condo.residence"]

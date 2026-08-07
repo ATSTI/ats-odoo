@@ -107,6 +107,13 @@
                                        widget="float_time"/>
                             </div>
 
+                            <div class="small mb-3">
+                                <strong>Veículo:</strong><br/>
+                                Modelo: <field name="modelo"/><br/>
+                                Placa: <field name="placa"/><br/>
+                                Cor: <field name="cor"/>
+                            </div>
+
                             <div class="mt-2">
                                 <span t-if="record.status.raw_value == 'presente'"
                                       class="badge bg-success w-100 text-center">
@@ -177,6 +184,9 @@
                         </div>
                     </div>
 
+                    <field name="cancel_reason"
+                    invisible="1"/>
+
 
                     <group col="2">
                         <group string="Dados do Visitante">
@@ -188,6 +198,14 @@
                             <field name="morador_id"/>
                             <field name="residence_id"/>
                             <field name="autorizado_por"/>
+                        </group>
+                    </group>
+
+                    <group col="2">
+                        <group string="Veículo">
+                            <field name="modelo"/>
+                            <field name="placa"/>
+                            <field name="cor"/>
                         </group>
                     </group>
 

@@ -252,8 +252,12 @@ class CondoVisitor(models.Model):
             )[:1]
 
             self.residence_id = residencia
-            self.morador_id = recorrente.morador_id
-            self.autorizado_por = recorrente.autorizado_por
+            self.morador_id = residencia.partner_ids.filtered(
+                lambda p: p.is_morador
+            )[:1]
+            self.autorizado_por = self.morador_id
+            # self.morador_id = recorrente.morador_id
+            # self.autorizado_por = recorrente.autorizado_por
 
         nomes = ", ".join(residencias.mapped('name'))
         return {

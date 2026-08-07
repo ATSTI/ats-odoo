@@ -331,17 +331,17 @@ class PosSession(models.Model):
                 codpro = line['product_id']
                 discount = line['discount']
                 if isinstance(codpro, int):
-                    prd = prod_obj.search([('id', '=', codpro)], limit=1)
+                    prd = prod_obj.sudo().search([('id', '=', codpro)], limit=1)
                 else:
-                    prd = prod_obj.search([('default_code', '=', codpro)], limit=1)
+                    prd = prod_obj.sudo().search([('default_code', '=', codpro)], limit=1)
                 if prd.default_code != line['codpro']:
-                    prd = prod_obj.search([('default_code', '=', line['codpro'])], limit=1)
+                    prd = prod_obj.sudo().search([('default_code', '=', line['codpro'])], limit=1)
                 descricao  = line['name']
                 if not prd:
                     if 'Troca' in descricao:
                         prd = prod_obj.search([('default_code', '=', 'troca')])
                 if not prd:
-                    prd = prod_obj.search([('name', 'ilike', line['name'])], limit=1)
+                    prd = prod_obj.sudo().search([('name', 'ilike', line['name'])], limit=1)
                     if len(str(line['product_id'])) < 10 and not prd:
                         prd = prod_obj.search([('id', '=', line['product_id'])])
                     if not prd:

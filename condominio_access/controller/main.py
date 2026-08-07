@@ -15,21 +15,44 @@ class AccessLogs(http.Controller):
     @http.route('/access_logs', type='json', auth='user', csrf=False)
     def get_access_logs(self, **kwargs):
         raw = kwargs.get("raw_response", "")
-        file = "/tmp/registros/" + datetime.now().strftime("%Y%m%d_%H%M%S") + ".txt"
-        with open(file, "w", encoding="utf-8") as arquivo:
-            arquivo.write(raw)
+        # file = "/tmp/registros/" + datetime.now().strftime("%Y%m%d_%H%M%S") + ".txt"
+        # with open(file, "w", encoding="utf-8") as arquivo:
+        #     arquivo.write(raw)
         data = self.text2json(raw)
 
         CondoLogs = request.env['condo.residence.logs'].sudo()
         Partner = request.env['res.partner'].sudo()
+        Tags = request.env['condo.residence.tags'].sudo()
+        Vehicles = request.env['condo.residence.vehicles'].sudo()
+
+        # ---- Dados que não mudam por registro: carregados UMA vez, fora do loop ----
+        desconhecido = Partner.browse(1556)
+        inbox = request.env['mail.channel'].sudo().search([('name', 'ilike', 'Registros')])
+
+        door_name_map = {
+            "0": "Entrada",
+            "1": "Saída",
+        }
+
+        partner_by_userid = {}
+        for p in Partner.search([('UserID', '!=', False)]):
+            for uid in p.UserID.split():
+                partner_by_userid[uid] = p
+
+        tag_by_card = {}
+        for t in Tags.search([]):
+            tag_by_card[t.numero_tag] = t
+
+        vehicles_com_tag = Vehicles.search([('possui_tag', '=', True)])
 
         last_records = {}
 
+        import pudb;pu.db
         for record in data["records"]:
             timestamp = int(record.get("CreateTime", 0))
             user_id = record.get("UserID")
             no_card = record.get("CardNo")
-            no_card = int(no_card, 16) if no_card else None
+            no_card = str(int(no_card, 16)) if no_card else None
             if not user_id:
                 continue
 
@@ -51,34 +74,37 @@ class AccessLogs(http.Controller):
             inicio = date - timedelta(seconds=25)
             fim = date + timedelta(seconds=25)
 
-            door_name = {
-                "0": "Entrada",
-                "1": "Saída",
-            }.get(door, "Desconhecida")
+            door_name = door_name_map.get(door, "Desconhecida")
 
-            partners = Partner.search([])
-            morador = partners.filtered(
-                lambda p: p.UserID and str(user_id) in p.UserID.split()
-            )
-            tag = request.env['condo.residence.tags'].search([('numero_tag', '=', no_card)])
-            if not morador or not tag:
-                desconhecido = Partner.browse(1556)
+            tag = tag_by_card.get(no_card, Tags.browse())
+            morador = partner_by_userid.get(str(user_id), Partner.browse()) or tag.partner_id if tag else Partner.browse()
+
+            vehicle = Vehicles.browse()
+            if no_card is not None:
+                card_str = str(no_card).lower()
+                for v in vehicles_com_tag:
+                    if v.numero_tag and card_str in v.numero_tag.lower():
+                        vehicle = v
+                        break
+
+            if not morador and not tag:
+                desconhecido_id = desconhecido.id
                 # Usuario não cadastrado cria Log proprio indefinido
                 log_existente = CondoLogs.search([
-                    ("partner_id", "=", desconhecido.id),
+                    ("partner_id", "=", desconhecido_id),
                     ("num_tag", '=', no_card),
                     ("data_entrada", ">=", inicio),
                     ("data_entrada", "<=", fim),
                 ], limit=1)
                 if not log_existente:
                     CondoLogs.create({
-                        "partner_id": desconhecido.id,
+                        "partner_id": desconhecido_id,
                         "num_tag": no_card,
                         "data_entrada": date,
                     })
                 elif door_name == "Saída":
                     log = CondoLogs.search([
-                        ("partner_id", "=", desconhecido.id),
+                        ("partner_id", "=", desconhecido_id),
                         ("num_tag", "=", no_card),
                         ("status", "=", "pendente"),
                     ], order="data_entrada desc", limit=1)
@@ -86,18 +112,17 @@ class AccessLogs(http.Controller):
                         log.write({
                             "data_saida": date,
                         })
-                inbox = request.env['mail.channel'].sudo().search([('name', 'ilike', 'Registros')])
                 if inbox:
                     msg = f'Contato da Tag {no_card} não encontrado no Odoo, faça o cadastro do Contato e das Tags\n Horario: {date}\n'
                     inbox.message_post(
                         body=msg,
-                        message_type='comment',    
-                        author_id=request.env.ref('base.partner_root').id,    
+                        message_type='comment',
+                        author_id=request.env.ref('base.partner_root').id,
                         subtype_xml_id='mail.mt_comment'
                     )
+
             if morador.id in tag.mapped('partner_id').ids:
-                if tag and tag.residence_id:
-                    residence = tag[0].residence_id
+                residence = tag.residence_id
                 if door_name == "Entrada":
 
                     log_existente = CondoLogs.search([
@@ -107,7 +132,6 @@ class AccessLogs(http.Controller):
                         ("data_entrada", "<=", fim),
                     ], limit=1)
                     if not log_existente:
-                        vehicle = request.env['condo.residence.vehicles'].search([('numero_tag', '=', no_card)],limit=1)
                         CondoLogs.create({
                             "residence_id": residence.id,
                             "partner_id": morador.id,
@@ -126,12 +150,12 @@ class AccessLogs(http.Controller):
                         log.write({
                             "data_saida": date,
                         })
-            print(
-                "UserID:", user_id,
-                "\n Tag:", no_card,
-                "\nData/Hora:", date,
-                "\nDoor:", door_name,
-                "\n==============================="
+                        if log.partner_id == desconhecido:
+                            log.write({'partner_id': morador.id})
+
+            _logger.info(
+                "UserID: %s | Tag: %s | Data/Hora: %s | Door: %s",
+                user_id, no_card, date, door_name,
             )
 
     def text2json(self, text):

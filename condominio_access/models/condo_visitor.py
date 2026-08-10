@@ -34,6 +34,8 @@ class CondoVisitor(models.Model):
     required=True,
     domain="[('is_morador','=',True)]")
 
+    nome_rua = fields.Char("Nome da rua", related="residence_id.rua", store=True)
+
     residence_partner_ids = fields.Many2many(
     "res.partner",
     compute="_compute_residence_partners")

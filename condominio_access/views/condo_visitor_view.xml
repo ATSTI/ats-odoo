@@ -197,6 +197,7 @@
                         <group string="Dados do Morador">
                             <field name="morador_id"/>
                             <field name="residence_id"/>
+                            <field name="nome_rua"/>
                             <field name="autorizado_por"/>
                         </group>
                     </group>

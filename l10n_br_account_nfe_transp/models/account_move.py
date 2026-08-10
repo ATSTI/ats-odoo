@@ -20,6 +20,10 @@ class AccountMove(models.Model):
                 self.invoice_incoterm_id = record.incoterm_id.id
                 self.carrier_id = record.carrier_id.id
 
+    @api.onchange('nfe40_transporta')
+    def nfe40_transporta_onchange(self):
+        if self.nfe40_transporta and self.carrier_id:
+            self.carrier_id.partner_id = self.nfe40_transporta
 
 class TranspFrete(models.Model):
     _name = "transp.frete"

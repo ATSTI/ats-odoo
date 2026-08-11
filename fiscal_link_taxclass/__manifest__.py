@@ -20,9 +20,9 @@ Este módulo adiciona ao ncm e ao cfop o taxclassification e faz a busca a parti
         'l10n_br_fiscal',
     ],
     'data': [
-        'data/l10n_br_fiscal.tax.classification.csv',
-        'views/ncm.xml',
-        'views/cfop.xml',
+        # 'data/l10n_br_fiscal.ncm.csv',
+        #'views/ncm.xml',
+        #'views/cfop.xml',
     ],
     'post_init_hook': 'post_init_hook',
     'installable': True,

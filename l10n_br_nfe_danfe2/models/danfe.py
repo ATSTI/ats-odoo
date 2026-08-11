@@ -8,6 +8,7 @@ from io import BytesIO
 from textwrap import wrap
 import math
 
+from erpbrasil.base.fiscal import cnpj_cpf
 from reportlab.lib import utils
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import mm, cm
@@ -28,20 +29,6 @@ from datetime import datetime, timedelta
 def chunks(cString, nLen):
     for start in range(0, len(cString), nLen):
         yield cString[start : start + nLen]
-
-
-def format_cnpj_cpf(value):
-    if len(value) < 12:  # CPF
-        cValue = "%s.%s.%s-%s" % (value[:-8], value[-8:-5], value[-5:-2], value[-2:])
-    else:
-        cValue = "%s.%s.%s/%s-%s" % (
-            value[:-12],
-            value[-12:-9],
-            value[-9:-6],
-            value[-6:-2],
-            value[-2:],
-        )
-    return cValue
 
 
 def getdateByTimezone(cDateUTC, timezone=None):
@@ -359,7 +346,7 @@ class danfe(object):
         self.string(
             self.nLeft + 101,
             self.nlin + 46,
-            format_cnpj_cpf(tagtext(oNode=elem_emit, cTag="CNPJ")),
+            cnpj_cpf.formata(tagtext(oNode=elem_emit, cTag="CNPJ")),
         )
 
         styles = getSampleStyleSheet()
@@ -475,9 +462,9 @@ class danfe(object):
         )
         cnpj_cpf = tagtext(oNode=elem_dest, cTag="CNPJ")
         if cnpj_cpf:
-            cnpj_cpf = format_cnpj_cpf(cnpj_cpf)
+            cnpj_cpf = cnpj_cpf.formata(cnpj_cpf)
         else:
-            cnpj_cpf = format_cnpj_cpf(tagtext(oNode=elem_dest, cTag="CPF"))
+            cnpj_cpf = cnpj_cpf.formata(tagtext(oNode=elem_dest, cTag="CPF"))
         self.string(nMr - 69, self.nlin + 7.5, cnpj_cpf)
         cDt, cHr = getdateByTimezone(tagtext(oNode=elem_ide, cTag="dhEmi"), timezone)
         self.string(nMr - 24, self.nlin + 7.7, cDt + " " + cHr)
@@ -553,9 +540,9 @@ class danfe(object):
         )
         cnpj_cpf = tagtext(oNode=elem, cTag="CNPJ")
         if cnpj_cpf:
-            cnpj_cpf = format_cnpj_cpf(cnpj_cpf)
+            cnpj_cpf = cnpj_cpf.formata(cnpj_cpf)
         else:
-            cnpj_cpf = format_cnpj_cpf(tagtext(oNode=elem, cTag="CPF"))
+            cnpj_cpf = cnpj_cpf.formata(tagtext(oNode=elem, cTag="CPF"))
         self.string(nMr - 69, self.nlin + 7.5, cnpj_cpf)
         self.string(nMr - 24, self.nlin + 7.5, tagtext(oNode=elem, cTag="IE"))
         cEnd = "%s, %s %s" % (
@@ -827,7 +814,7 @@ obsCont[@xCampo='NomeVendedor']"
         self.string(
             nMr - 25,
             self.nlin + 7.7,
-            format_cnpj_cpf(cnpj_cpf),
+            cnpj_cpf.formata(cnpj_cpf),
         )
         self.canvas.setFont("NimbusSanL-Regu", 8)
         self.string(
@@ -1233,7 +1220,7 @@ obsCont[@xCampo='NomeVendedor']"
 
         res_partner = tagtext(oNode=infNFe, cTag="xNome")
         self.string(82, 18, res_partner)
-        cnpj = format_cnpj_cpf(tagtext(oNode=elem_infNFe, cTag="CNPJ"))
+        cnpj = cnpj_cpf.formata(tagtext(oNode=elem_infNFe, cTag="CNPJ"))
         self.string(82, 24, cnpj)
         chave_acesso = tagtext(oNode=elem_infNFe, cTag="chNFe")
         self.string(82, 30, chave_acesso)

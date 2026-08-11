@@ -335,8 +335,8 @@ class IntegracaoPdv(http.Controller):
         for usr in user_ids:
             user = {}
             barcode = ''
-            if usr.barcode:
-                barcode = usr.barcode
+            if usr.partner_id.barcode:
+                barcode = usr.partner_id.barcode
             user['codusuario'] = usr.id
             user['nomeusuario'] = usr.name
             user['codbarra'] = barcode

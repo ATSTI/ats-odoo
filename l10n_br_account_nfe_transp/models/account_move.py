@@ -49,19 +49,41 @@ class TranspFrete(models.Model):
         comodel_name="l10n_br_delivery.carrier.vehicle",
         string="Veiculo",
     )
-    vehicle = fields.Char("Veículo/Modelo")
+    # vehicle = fields.Char("Veículo/Modelo")
+    # plate = fields.Char(
+    #     string="Placa",
+    #     size=7,
+    # )
+    # rntc_code = fields.Char(
+    #     string="ANTT Code",
+    #     size=32,
+    # )
+    # state_id = fields.Many2one(
+    #     comodel_name="res.country.state",
+    #     string="UF",
+    #     domain="[('country_id.code', '=', 'BR')]",
+    # )
+    vehicle = fields.Char(
+        related='vehicle_id.name',
+        string="Veículo/Modelo",
+        store=True,
+    )
     plate = fields.Char(
+        related='vehicle_id.plate',
         string="Placa",
-        size=7,
+        store=True,
     )
     rntc_code = fields.Char(
+        related='vehicle_id.rntc_code',
         string="ANTT Code",
-        size=32,
+        store=True,
     )
     state_id = fields.Many2one(
+        related='vehicle_id.state_id',
         comodel_name="res.country.state",
         string="UF",
         domain="[('country_id.code', '=', 'BR')]",
+        store=True,
     )
     am_id = fields.Many2one(
         comodel_name="account.move", 
@@ -127,16 +149,17 @@ class TranspFrete(models.Model):
             if not vol.isnumeric():
                 raise UserError(_("Preencher somente com números!"))
 
-    @api.onchange("vehicle_id")
-    def _onchange_vehicle_id(self):
-        if self.vehicle_id and self.carrier_id:
-            # for vehicle in self.carrier_id.vehicle_ids:
-            vehicle = self.vehicle_id
-            self.vehicle = vehicle.name
-            self.plate = vehicle.plate
-            self.rntc_code = vehicle.rntc_code
-            #self.vehicle_id = vehicle.id
-            self.state_id = vehicle.state_id.id            
+    # @api.onchange("vehicle_id")
+    # def _onchange_vehicle_id(self):
+    #     import pudb;pu.db
+    #     if self.vehicle_id and self.carrier_id:
+    #         # for vehicle in self.carrier_id.vehicle_ids:
+    #         vehicle = self.vehicle_id
+    #         self.vehicle = vehicle.name
+    #         self.plate = vehicle.plate
+    #         self.rntc_code = vehicle.rntc_code
+    #         #self.vehicle_id = vehicle.id
+    #         self.state_id = vehicle.state_id.id            
 
     @api.onchange("nfe40_transporta")
     def _onchange_nfe40_transporta(self):

@@ -1,9 +1,12 @@
 <odoo>
-    <record id='purchase_order_form_inherit' model='ir.ui.view'>
-        <field name='name'>purchase.order.form.inherit</field>
-        <field name='model'>purchase.order</field>
-        <field name='inherit_id' ref='purchase.purchase_order_form'/>
-        <field name='arch' type='xml'>
+
+    <!-- Formulário do Pedido de Compra -->
+    <record id="purchase_order_form_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+
             <xpath expr="//field[@name='amount_total']" position="after">
                 <field name="moeda_cotacao"/>
             </xpath>
@@ -12,10 +15,10 @@
                 <field name="sale_order_id"/>
                 <field name="numero_orcamento"/>
                 <field name="numero_pedido_venda"/>
-            </xpath>    
+            </xpath>
+
         </field>
     </record>
-
 
 
     <record id="purchase_order_tree_inherit_dates" model="ir.ui.view">
@@ -24,12 +27,13 @@
         <field name="inherit_id" ref="purchase.purchase_order_kpis_tree"/>
         <field name="arch" type="xml">
 
-            <xpath expr="//field[@name='date_order']" position="attributes">
-                <attribute name="string">Data da Compra</attribute>
-                 <attribute name="widget">date</attribute>
+            <xpath expr="//field[@name='date_order']" position="replace">
+                <field name="date_approve"
+                       string="Data da Compra"
+                       widget="date"/>
             </xpath>
 
-            <xpath expr="//field[@name='date_order']" position="after">
+            <xpath expr="//field[@name='activity_ids']" position="before">
                 <field name="date_planned"
                        string="Data de Entrega"
                        widget="date"/>

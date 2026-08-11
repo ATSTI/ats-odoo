@@ -47,7 +47,6 @@ class AccessLogs(http.Controller):
 
         last_records = {}
 
-        import pudb;pu.db
         for record in data["records"]:
             timestamp = int(record.get("CreateTime", 0))
             user_id = record.get("UserID")

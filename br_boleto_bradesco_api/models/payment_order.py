@@ -28,6 +28,7 @@ class PaymentOrderLine(models.Model):
         # Filtra mantendo apenas caracteres que não sejam acentos (marcas)
         return "".join(c for c in texto_normalizado if not unicodedata.combining(c))
 
+
     def generate_payment_order_line(self, move_line):
         """Gera um objeto de payment.order ao imprimir um boleto"""
         order_name = self.env['ir.sequence'].next_by_code('payment.order')
@@ -91,6 +92,7 @@ class PaymentOrderLine(models.Model):
 
             agora = datetime.now()
             tempo_token = diario.write_date
+            # import pudb;pu.db
             if (agora - tempo_token).total_seconds() > 3500:
                 cert = (cert_path, key_path)
                 headers = {
@@ -110,6 +112,7 @@ class PaymentOrderLine(models.Model):
                 response = requests.post(url_connect, headers=headers, data=data, cert=cert)
                 response.raise_for_status()
                 token = response.json().get("access_token")
+                print(token)
                 diario.write({'l10n_br_bradesco_token': token, 'write_date': agora})
             return cert_path, key_path, token, id_bradesco, secret
 
@@ -170,19 +173,22 @@ class PaymentOrderLine(models.Model):
         return payload
 
     def send_information_to_banco_bradesco(self, moveline):
+        # import pudb;pu.db
         if moveline:
             diario = moveline.payment_mode_id.journal_id
             instrucao = diario.l10n_br_boleto_instrucoes or ''
             taxa_mora = 0
             valor_juros = 0
             if diario.l10n_br_valor_juros_mora:
-                taxa_mora = int(diario.l10n_br_valor_juros_mora*100)
-                valor_juros = self.amount_total * (taxa_mora/100)
+                taxa_mora = int(diario.l10n_br_valor_juros_mora)
+                valor_juros = self.amount_total * (taxa_mora/30/100)
+                #valor_juros = 0
             taxa_multa = 0
             valor_multa = 0
             if diario.l10n_br_valor_multa:
-                taxa_multa = int(diario.l10n_br_valor_multa*100)
-                valor_multa = self.amount_total * (taxa_multa/100)
+                taxa_multa = int(diario.l10n_br_valor_multa)
+                #valor_multa = self.amount_total * (taxa_multa/100)
+                valor_multa = 0
             partner_id = moveline.partner_id.commercial_partner_id
             cliente = unidecode(partner_id.legal_name or partner_id.name)
             email = partner_id.email or ""
@@ -193,13 +199,13 @@ class PaymentOrderLine(models.Model):
             bank = diario.bank_account_id
             nu_negociacao = bank.bra_number + '0000000' + bank.acc_number.zfill(7)
             tipo_cpfcnpj = 2 if moveline.move_id.partner_id.is_company else 1
-            cnpj_cpf = re.sub('[^0-9]', '', moveline.move_id.partner_id.cnpj_cpf or '')
+            cnpj_cpf = int(re.sub('[^a-zA-Z0-9]', '', moveline.move_id.partner_id.cnpj_cpf or ''))
 
             vals = {
-                "nuCPFCNPJ": emitente_cnpj_raiz,
-                "filialCPFCNPJ": emitente_cnpj_filial,
-                "ctrlCPFCNPJ": emitente_cnpj_dv,
-                "idProduto": 9,
+                "nuCPFCNPJ": int(emitente_cnpj_raiz),
+                "filialCPFCNPJ": int(emitente_cnpj_filial),
+                "ctrlCPFCNPJ": int(emitente_cnpj_dv),
+                "idProduto": 4,
                 "nuNegociacao": nu_negociacao,
                 "nuCliente": str(moveline.l10n_br_order_line_id.identifier),
                 "dtEmissaoTitulo": moveline.l10n_br_order_line_id.emission_date.strftime('%d.%m.%Y'),
@@ -244,6 +250,7 @@ class PaymentOrderLine(models.Model):
                     {"mensagem": instrucao}
                 ]
             }
+            print(vals)
 
             cert_path, key_path, token, id_bradesco, secret = self.buscar_token(diario)
             cert = base64.b64decode(diario.l10n_br_bradesco_cert)
@@ -268,7 +275,7 @@ class PaymentOrderLine(models.Model):
                 url_connect = self.url_sandbox
                 vals = self._vals_homologacao_bradesco()
             response = requests.post(url_connect, json=vals, headers=headers, cert=cert)
-
+            print(response.text)
             nosso_numero = ''
             if response.status_code == 200:
                 json_p = response.json()
@@ -291,7 +298,9 @@ class PaymentOrderLine(models.Model):
                     })
                 return True
             elif response.status_code == 401:
-                moveline.write({'codigo_barra': 'Erro autorização consultar API'})
+                msg_erro = 'Erro:\n%s' %(response.text)
+                moveline.invoice_id.message_post(body=_(msg_erro))
+                moveline.write({'codigo_barra': 'Houve erro na API'})
                 return False
             else:
                 msg_erro = 'Erro:\n%s' %(response.text)
@@ -387,6 +396,8 @@ class PaymentOrderLine(models.Model):
                             'res_id': line.invoice_id.id,
                         }
                         attachment_obj.sudo().create(vls_boleto)
+                else:
+                    raise UserError(_('Erro ao enviar boleto para o banco!'))
         return self
 
     def generate_boleto_list(self):

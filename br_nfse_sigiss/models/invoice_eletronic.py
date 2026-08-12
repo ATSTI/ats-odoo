@@ -114,7 +114,7 @@ class InvoiceEletronic(models.Model):
         
         tomador = {
             'tipo_cpfcnpj': 2 if partner.is_company else 1,
-            'cnpj_cpf_destinatario': re.sub('[^0-9]', '',
+            'cnpj_cpf_destinatario': re.sub('[^a-zA-Z0-9]', '',
                                partner.cnpj_cpf or ''),
             'im_destinatario': re.sub(
                 '[^0-9]', '', partner.inscr_mun or ''),                   
@@ -134,7 +134,7 @@ class InvoiceEletronic(models.Model):
         city_prestador = self.company_id.partner_id.city_id
         prestador = {
             'cnpj': re.sub(
-                '[^0-9]', '', self.company_id.partner_id.cnpj_cpf or ''),
+                '[^a-zA-Z0-9]', '', self.company_id.partner_id.cnpj_cpf or ''),
             'inscricao_municipal': re.sub(
                 '[^0-9]', '', self.company_id.partner_id.inscr_mun or ''),
             'cidade': '%s%s' % (city_prestador.state_id.ibge_code,
@@ -200,7 +200,7 @@ class InvoiceEletronic(models.Model):
             'codigo_nbs': '1.2001.10.00',
             'exterior_dest': '0',             
             'exterior_prestacao_servico': '0',             
-            'cnpj_cpf_destinatario': re.sub('[^0-9]', '',
+            'cnpj_cpf_destinatario': re.sub('[^a-zA-Z0-9]', '',
                                partner.cnpj_cpf or ''),
             'pessoa_destinatario': 'J' if partner.is_company else 'F',
             'ie_destinatario': partner.inscr_est or '',

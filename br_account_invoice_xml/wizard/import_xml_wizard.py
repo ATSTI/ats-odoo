@@ -441,7 +441,7 @@ class ImportXmlWizard(models.TransientModel):
         
         obj = {
             'cnpj_cpf': re.sub(
-                "[^0-9]", "", fatura.company_id.cnpj_cpf or ''),
+                "[^a-zA-Z0-9]", "", fatura.company_id.cnpj_cpf or ''),
             'estado': '35',
             'ambiente':1,
             'chave_nfe': '35180563910657000106550010000054201000054204',

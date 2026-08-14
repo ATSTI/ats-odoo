@@ -30,8 +30,9 @@ class PosOrder(models.Model):
         vals = super()._prepare_invoice_vals()
 
         pos_config_id = self.session_id.config_id
-        nfce_vals = self._prepare_nfce_vals(pos_config_id)
-        vals.update(nfce_vals)
+        if self.company_id.document_type_id:
+            nfce_vals = self._prepare_nfce_vals(pos_config_id)
+            vals.update(nfce_vals)
 
         return vals
 

@@ -1,6 +1,5 @@
 <odoo>
 
-    <!-- Formulário do Pedido de Compra -->
     <record id="purchase_order_form_inherit" model="ir.ui.view">
         <field name="name">purchase.order.form.inherit</field>
         <field name="model">purchase.order</field>

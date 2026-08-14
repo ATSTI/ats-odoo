@@ -226,13 +226,16 @@
                                     </t>
                                 </td>
                                 <td style="border: 1px solid #ccc; padding: 4px 5px; text-align: center;">
-                                    <t t-if="line.customer_lead">
-                                        <t t-esc="'%.0f' % line.customer_lead"/> dias
+                                    <t t-if="line.customer_lead and o.date_order">
+                                        <!-- Soma os dias de lead à data do pedido e formata como dd/mm/yy -->
+                                        <t t-set="data_prevista" t-value="o.date_order + datetime.timedelta(days=int(line.customer_lead))"/>
+                                        <span t-esc="data_prevista.strftime('%d/%m/%y')"/>
                                     </t>
                                     <t t-else="">
-                                        0 dias
+                                        -
                                     </t>
                                 </td>
+
                                 <td style="border: 1px solid #ccc; padding: 4px 5px; text-align: center;">
                                     <t t-esc="'%.2f' % line.product_uom_qty"/>
                                 </td>

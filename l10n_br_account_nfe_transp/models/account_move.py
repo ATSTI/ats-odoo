@@ -20,6 +20,20 @@ class AccountMove(models.Model):
                 self.invoice_incoterm_id = record.incoterm_id.id
                 self.carrier_id = record.carrier_id.id
 
+    @api.onchange('nfe40_transporta')
+    def nfe40_transporta_onchange(self):
+        if self.nfe40_transporta and self.carrier_id:
+            self.carrier_id.partner_id = self.nfe40_transporta
+
+    @api.onchange('partner_shipping_id')
+    def partner_shipping_id_onchange(self):
+        if self.partner_shipping_id and self.partner_id:
+            vals_prt = {
+                'company_type': self.partner_id.company_type,
+                'legal_name': self.partner_id.name,
+                'vat': self.partner_id.vat,
+            }
+            self.partner_shipping_id.write(vals_prt)
 
 class TranspFrete(models.Model):
     _name = "transp.frete"

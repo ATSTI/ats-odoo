@@ -152,8 +152,6 @@ class PosSession(models.Model):
                         px.action_pos_session_closing_control()
                     if px.state == "closing_control" and state == "closed":
                         px._validate_session()
-                    if px.state == "closed" and state == "closed":
-                        continue
                     else:    
                         px_ids = {}
                         px_ids['tipo'] = 'sessao'
@@ -525,6 +523,9 @@ class PosSession(models.Model):
             #session = self.env['pos.session'].sudo().search([('name', 'ilike', caixa)])
             # TODO incluir no arquivo o user_id
             ses_config = self.get_pos_config(int(lt['user_id']))
+            if not ses_config:
+                # nao encontrou um pos_config para este usuario
+                continue
             session = self.env['pos.session'].search([
                 ('name', 'like', caixa),
                 ('config_id', '=', ses_config.id),
@@ -534,9 +535,9 @@ class PosSession(models.Model):
             if session.state == 'closed':
                 os.remove(path_file + '/' + i)
                 continue
-            lista_st = []
-            for lt_st in session.statement_ids:
-                lista_st.append(lt_st.id)
+            # lista_st = []
+            # for lt_st in session.statement_ids:
+            #     lista_st.append(lt_st.id)
 
             motivo = lt['motivo']
             valor = lt['amount']

@@ -8,6 +8,12 @@
         <field name="inherit_id" ref="l10n_br_account.invoice_form" />
         <field name="priority">399</field>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="domain">[('type', '!=', 'delivery')]</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="partner_shipping_id" domain="[('type', '=', 'delivery'), ('parent_id', '=', partner_id)]" />
+            </xpath>
             <xpath expr="//page[@name='other_info']" position="after">
                 <page name="transp_frete" string="Transporte/Frete" >
                     <group

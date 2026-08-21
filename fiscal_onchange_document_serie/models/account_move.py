@@ -7,6 +7,9 @@ class AccountMove(models.Model):
     def _onchange_document_type(self):
         for rec in self:
             if rec.document_type_id:
-                domain = self.env['l10n_br_fiscal.document.serie'].search([('document_type_id', '=', rec.document_type_id.id, 'active', '=', True)])
+                domain = self.env['l10n_br_fiscal.document.serie'].search([
+                    ('document_type_id', '=', rec.document_type_id.id),
+                    ('active', '=', True)
+                ])
                 if domain:
                     rec.document_serie_id = domain[0]

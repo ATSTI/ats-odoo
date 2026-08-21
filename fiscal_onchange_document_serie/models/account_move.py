@@ -13,3 +13,4 @@ class AccountMove(models.Model):
                 ])
                 if domain:
                     rec.document_serie_id = domain[0]
+                    rec.document_number = False

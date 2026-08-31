@@ -124,12 +124,12 @@ class FSMEquipment(models.Model):
             and not (self.stage_id.name in ['À FATURAR', 'CONCLUIDO', 'CANCELADO'])
         ):
             self.stage_id = self.env['fsm.stage'].search([('name', 'ilike', 'Em Locação')], limit=1).id
-        elif (
-            (self.date_rental_start > fields.Date.today()
-            or self.date_rental_end < fields.Date.today()) 
-            and not (self.stage_id.name in ['À FATURAR', 'CONCLUIDO', 'CANCELADO'])
-        ):
-            self.stage_id = self.env['fsm.stage'].search([('name', 'ilike', 'Novo')], limit=1).id
+        # elif (
+        #     (self.date_rental_start > fields.Date.today()
+        #     or self.date_rental_end < fields.Date.today()) 
+        #     and not (self.stage_id.name in ['À FATURAR', 'CONCLUIDO', 'CANCELADO'])
+        # ):
+        #     self.stage_id = self.env['fsm.stage'].search([('name', 'ilike', 'Novo')], limit=1).id
 
     
     @api.constrains('date_rental_start', 'date_rental_end')
@@ -145,7 +145,7 @@ class FSMEquipment(models.Model):
     @api.constrains('product_id', 'number_equipment')
     def _check_number_equipment(self):
         for record in self:
-            if not (record.product_id and record.number_equipment):
+            if not (record.product_id and record.number_equipment) or record.env.context.get('create_child_pre_change_number'):
                 continue
 
             excluded_stages = self.env['fsm.stage'].search([
@@ -211,6 +211,27 @@ class FSMEquipment(models.Model):
 
             self.notes = f"{base_notes}{row}</tbody></table>"
 
+    def write(self, vals):
+        if vals.get('number_equipment') and self.number_equipment and vals.get('number_equipment') != self.number_equipment:
+            self._create_chil_id(self.number_equipment)
+        return super().write(vals)
+
+    def _create_chil_id(self, old_number):
+        self.ensure_one()
+        child_id = self.copy().with_context(create_child_pre_change_number=True)
+        
+        stage_trocas = self.env['fsm.stage'].search([('name', 'ilike', 'Trocas')], limit=1)
+        
+        child_id.write({
+            'parent_id': self.id,
+            'stage_id': stage_trocas.id if stage_trocas else False,
+            'number_equipment': old_number,
+        })
+        child_id._onchange_display_name()
+        
+        return child_id
+
+
     def copy(self, default=None):
         default = dict(default or {})
         default.update({
@@ -241,6 +262,7 @@ class FSMEquipment(models.Model):
         if not vals.get('name') or vals.get('name', '/') == '/':
             vals['name'] = self.env['ir.sequence'].next_by_code('fsm.order')
 
+        vals['stage_id'] = self.env['fsm.stage'].search([('name', 'ilike', 'Em Locação')], limit=1).id
         record = super().create(vals)
 
         return record

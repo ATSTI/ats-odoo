@@ -142,6 +142,9 @@
                                             <field name="display_name_custom"/>
                                         </strong>
                                     </div>
+                                    <div>
+                                        <field name="partner_id"/>
+                                    </div>
                                     <div class="o_row">
                                         <field name="date_rental_start"/>
                                         <span> - </span>

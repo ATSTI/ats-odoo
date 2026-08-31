@@ -181,14 +181,14 @@ class PaymentOrderLine(models.Model):
             valor_juros = 0
             if diario.l10n_br_valor_juros_mora:
                 taxa_mora = int(diario.l10n_br_valor_juros_mora)
-                valor_juros = self.amount_total * (taxa_mora/30/100)
-                #valor_juros = 0
+                #valor_juros = self.amount_total * (taxa_mora/30/100)
+                valor_juros = 0
             taxa_multa = 0
             valor_multa = 0
             if diario.l10n_br_valor_multa:
                 taxa_multa = int(diario.l10n_br_valor_multa)
-                #valor_multa = self.amount_total * (taxa_multa/100)
-                valor_multa = 0
+                valor_multa = self.amount_total * (taxa_multa/100)
+                #valor_multa = 0
             partner_id = moveline.partner_id.commercial_partner_id
             cliente = unidecode(partner_id.legal_name or partner_id.name)
             email = partner_id.email or ""
@@ -199,8 +199,12 @@ class PaymentOrderLine(models.Model):
             bank = diario.bank_account_id
             nu_negociacao = bank.bra_number + '0000000' + bank.acc_number.zfill(7)
             tipo_cpfcnpj = 2 if moveline.move_id.partner_id.is_company else 1
-            cnpj_cpf = int(re.sub('[^a-zA-Z0-9]', '', moveline.move_id.partner_id.cnpj_cpf or ''))
+            cnpj_cpf = int(re.sub('[^0-9]', '', moveline.move_id.partner_id.cnpj_cpf or ''))
 
+            #    "vlJuros": "%.02f" % valor_juros,
+            #    "vlMulta": "%.02f" % valor_multa,
+            # estava passando assim, mas aparecia no Bradesco como valor
+            #    "percentualMulta": str(taxa_multa),
             vals = {
                 "nuCPFCNPJ": int(emitente_cnpj_raiz),
                 "filialCPFCNPJ": int(emitente_cnpj_filial),
@@ -214,10 +218,8 @@ class PaymentOrderLine(models.Model):
                 "cdEspecieTitulo": 2,
                 "cindcdAceitSacdo": "2",
                 "percentualJuros": str(taxa_mora),
-                "vlJuros": "%.02f" % valor_juros,
                 "qtdeDiasJuros": 1,
-                "percentualMulta": str(taxa_multa),
-                "vlMulta": "%.02f" % valor_multa,
+                "percentualMulta": "%.02f" % valor_multa,
                 "qtdeDiasMulta": 1,
                 "percentualDesconto1": 0,
                 "vlDesconto1": "0",
@@ -250,7 +252,7 @@ class PaymentOrderLine(models.Model):
                     {"mensagem": instrucao}
                 ]
             }
-            print(vals)
+            #print(vals)
 
             cert_path, key_path, token, id_bradesco, secret = self.buscar_token(diario)
             cert = base64.b64decode(diario.l10n_br_bradesco_cert)
@@ -275,7 +277,7 @@ class PaymentOrderLine(models.Model):
                 url_connect = self.url_sandbox
                 vals = self._vals_homologacao_bradesco()
             response = requests.post(url_connect, json=vals, headers=headers, cert=cert)
-            print(response.text)
+            #print(response.text)
             nosso_numero = ''
             if response.status_code == 200:
                 json_p = response.json()

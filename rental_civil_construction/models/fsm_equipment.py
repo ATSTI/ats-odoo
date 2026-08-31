@@ -137,7 +137,9 @@ class FSMEquipment(models.Model):
         for record in self:
             if record.date_rental_start and record.date_rental_end:
                 if record.date_rental_start > record.date_rental_end:
-                    raise UserError('A data de início da locação deve ser anterior à data de término.')          
+                    raise UserError('A data de início da locação deve ser anterior à data de término.')
+                else:
+                    record._check_number_equipment()
 
 
     @api.constrains('product_id', 'number_equipment')
@@ -147,7 +149,7 @@ class FSMEquipment(models.Model):
                 continue
 
             excluded_stages = self.env['fsm.stage'].search([
-                ('name', 'in', ['Trocas', 'Concluido', 'Cancelado'])
+                ('name', 'in', ['À Faturar', 'Concluido', 'Cancelado'])
             ]).ids
 
             exists = self.search([
@@ -164,22 +166,63 @@ class FSMEquipment(models.Model):
             else:
                 self._onchange_display_name()
 
-    @api.onchange('product_id','number_equipment')
+    @api.onchange('product_id', 'number_equipment')
     def _onchange_display_name(self):
-        for record in self:
-            if record.product_id and record.number_equipment:
-                record.display_name_custom = f"{record.product_id.name} - {record.number_equipment}" 
+        # 1. Atualização do display_name_custom
+        if self.product_id and self.number_equipment:
+            self.display_name_custom = f"{self.product_id.name} - {self.number_equipment}"
+
+        # 2. Histórico nas notas
+        if self._origin.number_equipment != self.number_equipment:
+            dt_start = self.date_rental_start.strftime('%d/%m/%Y') if self.date_rental_start else ''
+            dt_end = self.date_rental_end.strftime('%d/%m/%Y') if self.date_rental_end else ''
+            product_name = self.product_id.name or ''
+
+            # Estilos CSS Inline reutilizáveis
+            table_style = "width: 100%; border-collapse: collapse; margin-top: 8px; margin-bottom: 8px; font-family: sans-serif; font-size: 13px;"
+            th_style = "border: 1px solid #d1d5db; background-color: #f3f4f6; color: #374151; padding: 8px 12px; text-align: left; font-weight: 600;"
+            td_style = "border: 1px solid #d1d5db; padding: 8px 12px; color: #4b5563;"
+
+            if not self.notes:
+                header = (
+                    f'<table style="{table_style}">'
+                    '<thead>'
+                    '<tr>'
+                    f'<th style="{th_style}">Produto</th>'
+                    f'<th style="{th_style}">Número do Equipamento</th>'
+                    f'<th style="{th_style}">Data de Início</th>'
+                    f'<th style="{th_style}">Data de Término</th>'
+                    '</tr>'
+                    '</thead>'
+                    '<tbody>'
+                )
+                base_notes = header
+            else:
+                base_notes = self.notes.replace("</tbody></table>", "").replace("</table>", "")
+
+            row = (
+                '<tr>'
+                f'<td style="{td_style}">{product_name}</td>'
+                f'<td style="{td_style}">{self.number_equipment or ""}</td>'
+                f'<td style="{td_style}">{dt_start}</td>'
+                f'<td style="{td_style}">{dt_end}</td>'
+                '</tr>'
+            )
+
+            self.notes = f"{base_notes}{row}</tbody></table>"
 
     def copy(self, default=None):
         default = dict(default or {})
         default.update({
             "name": "",
             "number_equipment": False,
+            "notes": False,
         })
         return super().copy(default)
 
     @api.model
     def create(self, vals):
+        # Em Desuso
         if vals.get('parent_id'):
             parent = self.browse(vals['parent_id'])
 
@@ -213,10 +256,53 @@ class FSMEquipment(models.Model):
             limit=1,
         )
 
+    def _extract_items_from_html(self):
+        self.ensure_one()
+        if not self.notes:
+            return []
+
+        # 1. Isolamos o conteúdo da tag <tbody>
+        if '<tbody>' in self.notes and '</tbody>' in self.notes:
+            tbody_content = self.notes.split('<tbody>')[1].split('</tbody>')[0]
+        else:
+            tbody_content = self.notes
+
+        # 2. Separamos por linhas <tr>
+        tr_blocks = tbody_content.split('<tr>')
+        items = []
+
+        for tr in tr_blocks:
+            if '</tr>' not in tr:
+                continue
+            
+            row_html = tr.split('</tr>')[0]
+            
+            # Extraímos o texto entre as tags <td>...</td>
+            td_blocks = row_html.split('<td')
+            cols = []
+            for td in td_blocks:
+                if '</td>' in td:
+                    # Remove o fechamento e limpa estilos/propriedades da tag
+                    if not td.split('>')[-1]:
+                        val = td.split('>')[--1]
+                    val = val.split('</td')[0].strip()
+                    cols.append(val)
+
+            # Estrutura esperada da tabela: [Produto, Num Equipamento, Data Inicio, Data Termino]
+            if len(cols) >= 4:
+                items.append({
+                    'product_name': cols[0],
+                    'number_equipment': cols[1],
+                    'date_start': cols[2],
+                    'date_end': cols[3],
+                })
+
+        return items
 
     def _prepare_invoice_lines(self, move_type):
+        self.ensure_one()
         accounts = self.product_id.product_tmpl_id.get_product_accounts()
-
+        
         account = (
             accounts["income"]
             if move_type == "out_invoice"
@@ -229,31 +315,28 @@ class FSMEquipment(models.Model):
         )
 
         invoice_line = []
-        #CRIANDO LINHA DE FATURA PARA O EQUIPAMENTO PRINCIPAL
-        invoice_line.append(
-            (0, 0, {
+
+        # 1. Extrai todos os itens gravados na tabela HTML
+        html_items = self._extract_items_from_html()
+
+        # 2. Itera sobre cada linha da tabela HTML para montar a fatura
+        for item in html_items:
+            dt_start = item['date_start']
+            dt_end = item['date_end']
+            num_eq = f" ({item['number_equipment']})" if item['number_equipment'] else ""
+
+            # Descrição formatada da linha
+            description = f"{dt_start} - {dt_end}{num_eq}" if (dt_start or dt_end) else item['product_name']
+
+            invoice_line.append((0, 0, {
                 "product_id": self.product_id.id,
                 "quantity": 1,
-                "name": f"{self.date_rental_start} - {self.date_rental_end} ({self.number_equipment or ''})",
+                "name": description,
                 "price_unit": price_unit,
                 "account_id": account.id,
                 "fsm_equipment_ids": [(4, self.id)],
-                "location_id": self.location_id.id,
-            })
-        )
-
-        for child in self.child_ids:
-            invoice_line.append(
-                (0, 0, {
-                    "product_id": child.product_id.id,
-                    "quantity": 1,
-                    "name": f"{child.date_rental_start} - {child.date_rental_end} ({child.number_equipment or ''})",
-                    "price_unit": price_unit,
-                    "account_id": account.id,
-                    "fsm_equipment_ids": [(4, child.id)],
-                    "location_id": child.location_id.id,
-                })
-            )
+                "location_id": self.location_id.id if self.location_id else False,
+            }))
 
         return invoice_line
 
@@ -320,6 +403,19 @@ class FSMEquipment(models.Model):
 
     def account_create_invoice(self):
         self.ensure_one()
+
+        # Se já existir uma fatura aberta para o mesmo local, juntar na mesma
+        exist_inv = self.env["account.move"].search([
+            ('partner_id', '=', self.partner_id.id),
+            ('move_type', '=', "out_invoice"),
+        ])
+        for inv in exist_inv:
+            if any(line.location_id == self.location_id for line in inv.invoice_line_ids):
+                inv.write({
+                    'invoice_line_ids': self._prepare_invoice_lines("out_invoice"),
+                })
+                return inv
+            
         invoice = self.env["account.move"].create(
             self.account_prepare_invoice()
         )

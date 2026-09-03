@@ -527,7 +527,7 @@ class PosSession(models.Model):
                 # nao encontrou um pos_config para este usuario
                 continue
             session = self.env['pos.session'].search([
-                ('name', 'like', caixa),
+                ('name', '=like', '%' + caixa),
                 ('config_id', '=', ses_config.id),
             ])
             if not session:

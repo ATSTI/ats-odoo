@@ -149,7 +149,7 @@ class FSMEquipment(models.Model):
                 continue
 
             excluded_stages = self.env['fsm.stage'].search([
-                ('name', 'in', ['À Faturar', 'Concluido', 'Cancelado'])
+                ('name', 'in', ['À Faturar', 'Concluido', 'Cancelado', 'Trocas'])
             ]).ids
 
             exists = self.search([

@@ -283,6 +283,9 @@ class IntegracaoPdv(http.Controller):
         lista = []
         for partner_id in cli_ids:
             cliente = {}
+            if not partner_id.name:
+                print('clientes sem nome: %s' % (str(partner_id.id)))
+                continue
             nome = partner_id.name.strip()
             nome = nome.replace("'"," ")
             nome = unidecode(nome)

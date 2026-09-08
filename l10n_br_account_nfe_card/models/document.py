@@ -14,7 +14,7 @@ from odoo.addons.l10n_br_fiscal.constants.fiscal import (
 class FiscalDocumentCard(models.Model):
     _inherit = "l10n_br_fiscal.document"
 
-    def _export_fields(self, xsd_fields, class_obj, export_dict):
+    def _export_fields(self, xsd_fields, class_obj, export_dict, field_name=None):
         if class_obj._name == "nfe.40.pag":
             for crd in self.move_ids.card_ids:
                 if self.nfe40_detPag.nfe40_tPag in ['03', '04', '17']:
@@ -30,7 +30,7 @@ class FiscalDocumentCard(models.Model):
                 else:
                     continue
 
-        return super()._export_fields(xsd_fields, class_obj, export_dict)
+        return super()._export_fields(xsd_fields, class_obj, export_dict, field_name)
 
     # sobrescrevi o original pq alguns emitem como 01, e se mudar para outro tipo depois da erro no detPag
     def _need_compute_nfe_tags(self):

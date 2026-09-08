@@ -7,7 +7,7 @@ from erpbrasil.base.misc import punctuation_rm
 class FiscalDocumentAgro(models.Model):
     _inherit = "l10n_br_fiscal.document"
 
-    def _export_fields(self, xsd_fields, class_obj, export_dict):
+    def _export_fields(self, xsd_fields, class_obj, export_dict, field_name=None):
         if "nfe40_agropecuario" in class_obj._fields:
             if self.move_ids.nfe40_tpGuia:
                 agropecuario = self.env['nfe.40.agropecuario'].create({})
@@ -30,4 +30,4 @@ class FiscalDocumentAgro(models.Model):
                     defensivo.append(rec)
                 self.nfe40_agropecuario.nfe40_defensivo = defensivo
 
-        return super()._export_fields(xsd_fields, class_obj, export_dict)
+        return super()._export_fields(xsd_fields, class_obj, export_dict, field_name)

@@ -6,7 +6,7 @@ from odoo import models
 class FiscalDocumentTransp(models.Model):
     _inherit = "l10n_br_fiscal.document"
 
-    def _export_fields(self, xsd_fields, class_obj, export_dict):
+    def _export_fields(self, xsd_fields, class_obj, export_dict, field_name=None):
         if class_obj._name == "nfe.40.transp":
             for tr in self.move_ids.trans_ids:
                 vals_vol = {
@@ -34,4 +34,4 @@ class FiscalDocumentTransp(models.Model):
                 if not obj_vol:
                     self.env["nfe.40.vol"].create(vals_vol)
                     
-        return super()._export_fields(xsd_fields, class_obj, export_dict)
+        return super()._export_fields(xsd_fields, class_obj, export_dict, field_name)

@@ -10,7 +10,7 @@
         </t>
     </template>
 
-    <report id="chair_control.chair_view"
+    <record id="chair_control.chair_view"
         name="chair_control.chair_template"
         file="chair_control.chair_template"
         model="chair.control"

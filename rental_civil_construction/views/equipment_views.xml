@@ -78,6 +78,11 @@
             <xpath expr="//notebook" position="replace">
                 <notebook>
                     <page string="Locações">
+                        <group>
+                            <group>
+                                <field name="child_count" readonly="1" string="Total de locações"/>
+                            </group>
+                        </group>
                         <field name="notes" nolabel="1" widget="html" readonly="1" force_save="1"/>
                     </page>
                     <!-- <page string="Localização">

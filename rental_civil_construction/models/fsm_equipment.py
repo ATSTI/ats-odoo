@@ -56,6 +56,12 @@ class FSMEquipment(models.Model):
         copy=False,
     )
 
+    child_count = fields.Integer(
+        compute="_compute_count_child",
+        readonly=True,
+        copy=False,
+    )
+
     bill_invoice = fields.Boolean(string="Bill Invoice", default=False)
     customer_invoice = fields.Boolean(string="Customer Invoice", default=False)
 
@@ -74,6 +80,11 @@ class FSMEquipment(models.Model):
 
             fsm.invoice_ids = invoices
             fsm.invoice_count = len(invoices)
+
+    @api.depends("child_ids")
+    def _compute_count_child(self):
+        for fsm in self:
+            fsm.child_count = len(fsm.child_ids)
 
     def action_view_invoices(self):
         self.ensure_one()

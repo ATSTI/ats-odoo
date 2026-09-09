@@ -187,7 +187,7 @@ class PaymentOrderLine(models.Model):
             valor_multa = 0
             if diario.l10n_br_valor_multa:
                 taxa_multa = int(diario.l10n_br_valor_multa)
-                valor_multa = self.amount_total * (taxa_multa/100)
+                valor_multa = moveline.l10n_br_order_line_id.amount_total * (taxa_multa/100)
                 #valor_multa = 0
             partner_id = moveline.partner_id.commercial_partner_id
             cliente = unidecode(partner_id.legal_name or partner_id.name)
@@ -199,7 +199,7 @@ class PaymentOrderLine(models.Model):
             bank = diario.bank_account_id
             nu_negociacao = bank.bra_number + '0000000' + bank.acc_number.zfill(7)
             tipo_cpfcnpj = 2 if moveline.move_id.partner_id.is_company else 1
-            cnpj_cpf = int(re.sub('[^0-9]', '', moveline.move_id.partner_id.cnpj_cpf or ''))
+            cnpj_cpf = int(re.sub('[^a-zA-Z0-9]', '', moveline.move_id.partner_id.cnpj_cpf or ''))
 
             #    "vlJuros": "%.02f" % valor_juros,
             #    "vlMulta": "%.02f" % valor_multa,
@@ -252,8 +252,9 @@ class PaymentOrderLine(models.Model):
                     {"mensagem": instrucao}
                 ]
             }
-            #print(vals)
-
+            print(vals)
+            return True
+        
             cert_path, key_path, token, id_bradesco, secret = self.buscar_token(diario)
             cert = base64.b64decode(diario.l10n_br_bradesco_cert)
             key = base64.b64decode(diario.l10n_br_bradesco_key)
@@ -367,6 +368,7 @@ class PaymentOrderLine(models.Model):
             raise UserError(_('Modo de pagamento não é boleto!'))
         if gerado:
             raise UserError(_('Boleto ja emitido!'))
+        import pudb;pu.db
         for line in move_lines:
             if line.nosso_numero:
                 continue

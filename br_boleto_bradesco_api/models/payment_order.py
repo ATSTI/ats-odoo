@@ -364,12 +364,16 @@ class PaymentOrderLine(models.Model):
                 not_boleto = True
             if item.boleto_emitido:
                 gerado = True
+            else:
+                gerado = False
         if not not_boleto:
             raise UserError(_('Modo de pagamento não é boleto!'))
         if gerado:
             raise UserError(_('Boleto ja emitido!'))
         for line in move_lines:
             if line.nosso_numero:
+                continue
+            if line.boleto_emitido:
                 continue
             if line.payment_mode_id.boleto:
                 order_line = self.generate_payment_order_line(line)

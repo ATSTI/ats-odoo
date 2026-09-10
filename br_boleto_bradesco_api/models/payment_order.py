@@ -92,7 +92,6 @@ class PaymentOrderLine(models.Model):
 
             agora = datetime.now()
             tempo_token = diario.write_date
-            # import pudb;pu.db
             if (agora - tempo_token).total_seconds() > 3500:
                 cert = (cert_path, key_path)
                 headers = {
@@ -173,7 +172,6 @@ class PaymentOrderLine(models.Model):
         return payload
 
     def send_information_to_banco_bradesco(self, moveline):
-        # import pudb;pu.db
         if moveline:
             diario = moveline.payment_mode_id.journal_id
             instrucao = diario.l10n_br_boleto_instrucoes or ''
@@ -200,6 +198,9 @@ class PaymentOrderLine(models.Model):
             nu_negociacao = bank.bra_number + '0000000' + bank.acc_number.zfill(7)
             tipo_cpfcnpj = 2 if moveline.move_id.partner_id.is_company else 1
             cnpj_cpf = int(re.sub('[^a-zA-Z0-9]', '', moveline.move_id.partner_id.cnpj_cpf or ''))
+            logradouro = re.sub(r"[^a-zA-Z0-9\sÀ-ÿ]", "", self.remover_acentos(moveline.move_id.partner_id.street))
+            bairro = re.sub(r"[^a-zA-Z0-9\sÀ-ÿ]", "", self.remover_acentos(moveline.move_id.partner_id.district))
+            numero = re.sub(r"[^a-zA-Z0-9\sÀ-ÿ]", "", self.remover_acentos(moveline.move_id.partner_id.number))
 
             #    "vlJuros": "%.02f" % valor_juros,
             #    "vlMulta": "%.02f" % valor_multa,
@@ -225,11 +226,11 @@ class PaymentOrderLine(models.Model):
                 "vlDesconto1": "0",
                 "dataLimiteDesconto1": "",
                 "nomePagador": cliente,
-                "logradouroPagador": self.remover_acentos(moveline.move_id.partner_id.street),
-                "nuLogradouroPagador": moveline.move_id.partner_id.number,
+                "logradouroPagador": logradouro,
+                "nuLogradouroPagador": numero,
                 "cepPagador": moveline.move_id.partner_id.zip[:5],
                 "complementoCepPagador": moveline.move_id.partner_id.zip[6:9],
-                "bairroPagador": self.remover_acentos(moveline.move_id.partner_id.district),
+                "bairroPagador": bairro,
                 "municipioPagador": self.remover_acentos(moveline.move_id.partner_id.city_id.name),
                 "ufPagador": moveline.move_id.partner_id.state_id.code,
                 "cdIndCpfcnpjPagador": tipo_cpfcnpj,
@@ -252,9 +253,8 @@ class PaymentOrderLine(models.Model):
                     {"mensagem": instrucao}
                 ]
             }
-            print(vals)
-            return True
-        
+            #print(vals)
+
             cert_path, key_path, token, id_bradesco, secret = self.buscar_token(diario)
             cert = base64.b64decode(diario.l10n_br_bradesco_cert)
             key = base64.b64decode(diario.l10n_br_bradesco_key)
@@ -368,7 +368,6 @@ class PaymentOrderLine(models.Model):
             raise UserError(_('Modo de pagamento não é boleto!'))
         if gerado:
             raise UserError(_('Boleto ja emitido!'))
-        import pudb;pu.db
         for line in move_lines:
             if line.nosso_numero:
                 continue

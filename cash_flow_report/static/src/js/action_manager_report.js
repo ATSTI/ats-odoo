@@ -1,5 +1,4 @@
-odoo.define("account_financial_report.ReportActionManager", function (require) {
-    "use strict";
+odoo.define("cash_flow_report.ReportActionManager", function (require) {
 
     const ActionManager = require("web.ActionManager");
     require("web.ReportActionManager");

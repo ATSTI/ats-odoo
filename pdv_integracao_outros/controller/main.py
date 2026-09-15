@@ -991,4 +991,70 @@ class IntegracaoPdv(http.Controller):
                 pick.button_validate()
             return 'Sucesso'
 
+    @http.route('/clientesvalidar', type='json', auth="user", csrf=False)
+    def website_clientesvalidar(self, **kwargs):
+        """
+        Retorna TODOS os clientes (ativos e inativos) com os campos
+        necessarios para validacao no PDV:
+            codcliente  = res.partner.id
+            nomecliente = name (unidecode)
+            cnpj        = cnpj_cpf (so digitos)
+            active      = True/False
+        """
+        parceiros = http.request.env['res.partner'].sudo().with_context(
+            active_test=False
+        ).search([('customer_rank', '>', 0)])
 
+        lista = []
+        for p in parceiros:
+            nome = (p.name or "").strip().replace("'", " ")
+            nome = unidecode(nome)
+
+            cnpj = ""
+            if p.cnpj_cpf:
+                cnpj = re.sub('[^0-9]', '', p.cnpj_cpf)
+
+            lista.append({
+                'codcliente': p.id,
+                'nomecliente': nome,
+                'cnpj': cnpj,
+                'active': bool(p.active),
+            })
+        return json.dumps(lista)
+
+    @http.route('/produtosvalidar', type='json', auth="user", csrf=False)
+    def website_produtosvalidar(self, **kwargs):
+        """
+        Retorna TODOS os produtos (ativos e inativos) com os campos
+        necessarios para validacao no PDV:
+            codproduto  = product.product.id
+            produto     = name (unidecode)
+            codpro      = default_code (ou id)
+            cod_barra   = barcode
+            active      = True/False
+        """
+        produtos = http.request.env['product.product'].sudo().with_context(
+            active_test=False
+        ).search([('sale_ok', '=', True)])
+
+        lista = []
+        for prd in produtos:
+            nome = (prd.name or "").strip().replace("'", " ")
+            nome = unidecode(nome)
+
+            codpro = prd.default_code.strip() if prd.default_code else str(prd.id)
+            codpro = codpro[:15]
+
+            codbarra = ''
+            if prd.barcode and len(prd.barcode) < 14:
+                codbarra = prd.barcode.strip()
+
+            lista.append({
+                'codproduto': prd.id,
+                'produto': nome,
+                'codpro': codpro,
+                'cod_barra': codbarra,
+                'active': bool(prd.active),
+                'valor_prazo': prd.lst_price,
+            })
+        return json.dumps(lista)

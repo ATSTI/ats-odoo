@@ -1,5 +1,4 @@
-odoo.define("account_financial_report.report", function (require) {
-    "use strict";
+odoo.define("cash_flow_report.report", function (require) { "use strict";
 
     require("web.dom_ready");
     const utils = require("report.utils");

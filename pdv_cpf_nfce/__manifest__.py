@@ -34,9 +34,6 @@
     "data": [
         "views/assets.xml",           
     ],
-   'qweb': [
-        'static/src/xml/OrderReceipt.xml',
-    ],
     "installable": True,
     "application": False,
     "auto_install": False

@@ -1,0 +1,29 @@
+<odoo>
+<record id="paperformat_cupom_multa_juros" model="report.paperformat">
+    <field name="name">Cupom 80mm - Multa e Juros</field>
+    <field name="default" eval="True"/>
+        <field name="format">custom</field>
+        <field name="page_height">200</field>
+        <field name="page_width">70</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">2</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">0</field>
+        <field name="margin_right">2</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">50</field>
+        <field name="dpi">130</field>
+</record>
+
+    <record id="action_report_multa_juros_cupom" model="ir.actions.report">
+        <field name="name">Recibo Multa e Juros (Cupom)</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">report_multajuros.report_multa_juros</field>
+        <field name="report_file">report_multajuros.report_multa_juros</field>
+        <field name="paperformat_id" ref="paperformat_cupom_multa_juros"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Recibo_Multa_Juros_-_%s' % (object.name)</field>
+    </record>
+</odoo>

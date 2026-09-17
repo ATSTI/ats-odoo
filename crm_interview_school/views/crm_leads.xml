@@ -1,0 +1,87 @@
+<odoo>
+    <data>
+   
+        <record id="view_crm_lead_form_interview" model="ir.ui.view">
+            <field name="name">crm.lead.view.form.interview</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+            <field name="arch" type="xml">
+                <!-- Substitui o título principal (nome do lead) pelos dados do aluno -->
+                <xpath expr="//div[@class='oe_title']" position="replace">
+                    <div class="oe_title">
+                        <span class="o_form_label">Nome do aluno:</span>
+                        <h1><field name="student_name" placeholder="Nome do aluno..."/></h1>
+                        
+                        <group>
+                            <field name="tag_ids" 
+                                string="Série/Nível"
+                                placeholder="Ex: 9º Ano, Ensino Médio..." 
+                                widget="many2many_tags"/>
+                            <field name="school_period" widget="radio" options="{'horizontal': true}"/>
+                            <field name="current_school" placeholder="Atual escola..."/>
+                        </group>
+                    </div>
+                </xpath>
+
+                <!-- Ajusta os grupos de informações de contato para Pais, Telefone e Indicação -->
+                <xpath expr="//sheet/group" position="replace">
+                    <group>
+                        <group string="Filiação e Contato">
+                            <field name="father_name" string="Nome do pai"/>
+                            <field name="mother_name" string="Nome da mãe"/>
+                            <field name="phone" widget="phone" string="Telefone"/>
+                            <field name="source_indication" string="Indicação"/>
+                        </group>
+                        <group string="Comercial / Proposta">
+                            <field name="expected_revenue" widget="monetary" string="Valor da mensalidade"/>
+                            <field name="tuition_installments" string="Parcelado em (vezes) - Mensalidade"/>
+                            <field name="material_cost" widget="monetary" string="Valor do material didático"/>
+                            <field name="material_installments" string="Parcelado em (vezes) - Material"/>
+                            <field name="discount_acquired" string="Desconto adquirido"/>
+                            <field name="discount_validity_date" string="Desconto válido até o dia"/>
+                        </group>
+                    </group>
+                    
+                    <!-- Aviso de desconto confidencial -->
+                    <!-- <div class="alert alert-warning text-center fw-bold" role="alert">
+                        DESCONTO CONFIDENCIAL, A SUA DIVULGAÇÃO À TERCEIROS IMPLICA NA PERDA DO DESCONTO
+                    </div> -->
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_crm_quick_create_opportunity_form_inherit_interview" model="ir.ui.view">
+            <field name="name">crm.lead.quick.create.form.inherit.interview</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.quick_create_opportunity_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_id']" position="replace">
+                    <field name="student_name" placeholder="Nome do aluno..."/>
+                    <field name="tag_ids" 
+                                string="Série/Nível"
+                                placeholder="Ex: 9º Ano, Ensino Médio..." 
+                                widget="many2many_tags"/>
+                    <field name="school_period" widget="radio" options="{'horizontal': true}"/>
+                    <field name="current_school" placeholder="Escola atual..."/>
+                    <field name="mother_name" placeholder="Nome da mãe..."/>
+                </xpath>
+
+                <xpath expr="//field[@name='name']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='expected_revenue']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='priority']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='recurring_revenue']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='recurring_plan']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

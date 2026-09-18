@@ -3,63 +3,147 @@
         <t t-foreach="docs" t-as="o">
             <t t-set="dados" t-value="multa_data[o.id]"/>
             <main>
-            <div class="page" style="font-family: 'Courier New', monospace; font-size: 10px; width: 72mm; margin: 0 auto;">
+                <div class="page"
+                     style="font-family: 'Courier New', monospace; font-size: 11px; width: 90mm; margin: 0 auto;">
 
-                <div style="text-align:center;">
-                    <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)"
-                         style="max-width:60mm; max-height:20mm;"/>
-                    <h4 style="margin:2px 0;"><span t-field="o.company_id.name"/></h4>
-                    <div t-if="o.company_id.partner_id.vat">CNPJ: <span t-field="o.company_id.partner_id.vat"/></div>
-                    <div t-field="o.company_id.partner_id.street"/>
-                    <div>
-                        <span t-field="o.company_id.partner_id.city"/>/<span t-field="o.company_id.partner_id.state_id.code"/>
+                    <div style="text-align:center;">
+                        <img t-if="o.company_id.logo"
+                             t-att-src="image_data_uri(o.company_id.logo)"
+                             style="max-width:70mm; max-height:25mm;"/>
+
+                        <h4 style="margin:3px 0; font-size:14px;">
+                            <span t-field="o.company_id.name"/>
+                        </h4>
+
+                        <div t-if="o.company_id.partner_id.vat">
+                            CNPJ: <span t-field="o.company_id.partner_id.vat"/>
+                        </div>
+
+                        <div t-field="o.company_id.partner_id.street"/>
+
+                        <div>
+                            <span t-field="o.company_id.partner_id.city"/>
+                            /
+                            <span t-field="o.company_id.partner_id.state_id.code"/>
+                        </div>
                     </div>
-                </div>
 
-                <div style="border-top:1px dashed #000; margin:4px 0;"/>
-                <div style="text-align:center; font-weight:bold;">RECIBO DE MULTA E JUROS</div>
-                <div style="border-top:1px dashed #000; margin:4px 0;"/>
+                    <div style="border-top:1px dashed #000; margin:6px 0;"/>
 
-                <div>Cliente: <span t-field="o.partner_id.name"/></div>
-                <div t-if="o.partner_id.vat">CPF/CNPJ: <span t-field="o.partner_id.vat"/></div>
-                <div>Fatura: <span t-field="o.name"/></div>
-                <div>Emissão: <span t-field="o.invoice_date"/></div>
-                <div>Vencimento: <span t-esc="dados['vencimento']"/></div>
+                    <div style="text-align:center; font-weight:bold; font-size:13px;">
+                        RECIBO DE MULTA E JUROS
+                    </div>
 
-                <div style="border-top:1px dashed #000; margin:4px 0;"/>
-                <div style="font-weight:bold;">ITENS</div>
-                <t t-foreach="o.invoice_line_ids.filtered(lambda l: not l.display_type)" t-as="linha">
+                    <div style="border-top:1px dashed #000; margin:6px 0;"/>
+
                     <div>
-                        <span t-field="linha.product_id.name"/><br/>
-                        <t t-esc="'%.2f' % linha.quantity"/> x
-                        <span t-field="linha.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
-                        <span style="float:right;" t-field="linha.price_subtotal"
+                        Cliente:
+                        <span t-field="o.partner_id.name"/>
+                    </div>
+
+                    <div t-if="o.partner_id.vat">
+                        CPF/CNPJ:
+                        <span t-field="o.partner_id.vat"/>
+                    </div>
+
+                    <div>
+                        Fatura:
+                        <span t-field="o.name"/>
+                    </div>
+
+                    <div>
+                        Emissão:
+                        <span t-field="o.invoice_date"/>
+                    </div>
+
+                    <div>
+                        Vencimento:
+                        <span t-esc="dados['vencimento']"/>
+                    </div>
+
+                    <div style="border-top:1px dashed #000; margin:6px 0;"/>
+
+                    <div style="font-weight:bold;">
+                        ITENS
+                    </div>
+
+                    <t t-foreach="o.invoice_line_ids.filtered(lambda l: not l.display_type)"
+                       t-as="linha">
+
+                        <div style="margin:3px 0;">
+                            <span t-field="linha.product_id.name"/>
+                            <br/>
+
+                            <t t-esc="'%.2f' % linha.quantity"/>
+                            x
+
+                            <span t-field="linha.price_unit"
+                                  t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+
+                            <span style="float:right;"
+                                  t-field="linha.price_subtotal"
+                                  t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                        </div>
+
+                    </t>
+
+                    <div style="border-top:1px dashed #000; margin:6px 0;"/>
+
+                    <div>
+                        Subtotal fatura:
+                        <span style="float:right;"
+                              t-field="o.amount_total"
                               t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
                     </div>
-                </t>
 
-                <div style="border-top:1px dashed #000; margin:4px 0;"/>
-                <div>Subtotal fatura:
-                    <span style="float:right;" t-field="o.amount_total"
-                          t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                    <div style="border-top:1px dashed #000; margin:6px 0;"/>
+
+                    <div style="font-weight:bold;">
+                        MULTA E JUROS POR ATRASO
+                    </div>
+
+                    <div>
+                        Dias em atraso:
+                        <span style="float:right;"
+                              t-esc="dados['dias_atraso']"/>
+                    </div>
+
+                    <div>
+                        Meses em atraso:
+                        <span style="float:right;"
+                              t-esc="dados['meses_atraso']"/>
+                    </div>
+
+                    <div>
+                        Multa (10%):
+                        <span style="float:right;"
+                              t-esc="'%.2f' % dados['valor_multa']"/>
+                    </div>
+
+                    <div>
+                        Juros (1% a.m.):
+                        <span style="float:right;"
+                              t-esc="'%.2f' % dados['valor_juros']"/>
+                    </div>
+
+                    <div style="border-top:1px dashed #000; margin:6px 0;"/>
+
+                    <div style="font-weight:bold; font-size:14px;">
+                        TOTAL:
+                        <span style="float:right;"
+                              t-esc="'%.2f' % dados['valor_total_final']"/>
+                    </div>
+
+                    <div style="border-top:1px dashed #000; margin:10px 0;"/>
+
+                    <div style="text-align:center; font-size:10px;">
+                        Impresso em
+                        <span t-esc="dados['hoje']"/>
+                    </div>
+
                 </div>
-
-                <div style="border-top:1px dashed #000; margin:4px 0;"/>
-                <div style="font-weight:bold;">MULTA E JUROS POR ATRASO</div>
-                <div>Dias em atraso: <span style="float:right;" t-esc="dados['dias_atraso']"/></div>
-                <div>Meses em atraso: <span style="float:right;" t-esc="dados['meses_atraso']"/></div>
-                <div>Multa (10%): <span style="float:right;" t-esc="'%.2f' % dados['valor_multa']"/></div>
-                <div>Juros (1% a.m.): <span style="float:right;" t-esc="'%.2f' % dados['valor_juros']"/></div>
-
-                <div style="border-top:1px dashed #000; margin:4px 0;"/>
-                <div style="font-weight:bold; font-size:12px;">
-                    TOTAL: <span style="float:right;" t-esc="'%.2f' % dados['valor_total_final']"/>
-                </div>
-
-                <div style="border-top:1px dashed #000; margin:8px 0;"/>
-                <div style="text-align:center; font-size:9px;">Impresso em <span t-esc="dados['hoje']"/></div>
-            </div>
             </main>
         </t>
     </template>
 </odoo>
+

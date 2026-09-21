@@ -52,12 +52,28 @@ class IntegracaoPdv(http.Controller):
         list_cnpj = list(lista_cnpj)
         # criar lista do financeiro
         lista_financeiro = set()
+        canal = http.request.env['discuss.channel'].search([('name', '=', 'geral')], limit=1)
         for lista in list_cnpj:
             print (f" ---- fazendo  {cnpj} -----------")
             cnpj = lista
             cli_ids = cliente.sudo().search([('vat', '=', cnpj),])
+            if not cli_ids:
+                msg = f"Cliente não localizado, CNPJ: {cnpj}"
+                canal.message_post(
+                    body=(msg),
+                    message_type='comment',
+                    subtype_xmlid='mail.mt_comment',
+                )
             # se cliente tem financeiro, cobranca e dele
             if cli_ids.financeiro:
+                if len(cli_ids.financeiro) > 1:
+                    msg = f"Erro pra inserir CNPJ: {cnpj}, encontrado 2 {cli_ids.financeiro}"
+                    canal.message_post(
+                        body=(msg),
+                        message_type='comment',
+                        subtype_xmlid='mail.mt_comment',
+                    )
+                    continue
                 lista_financeiro.add(cli_ids.financeiro.id)
             else:
                 for emp in lista_notas:
@@ -91,7 +107,15 @@ class IntegracaoPdv(http.Controller):
                     'client_order_ref': mes_ano,
                     'user_id': usuario,
                 }
-                order_id = order.create(vals)
+                try:
+                    order_id = order.create(vals)
+                except:
+                    msg = f"Erro pra gravar a venda: {vals}"
+                    canal.message_post(
+                        body=(msg),
+                        message_type='comment',
+                        subtype_xmlid='mail.mt_comment',
+                    )
                 # cnpj = '%s.%s.%s/%s-%s' %(cnpj[:2],cnpj[2:5],cnpj[5:8],cnpj[8:12],cnpj[12:14])
                 #emitente = f"{cnpj} - {lista['nome']}"
             if order_id:

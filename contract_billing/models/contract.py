@@ -195,7 +195,10 @@ class ContractContract(models.Model):
         if not contracts_to_invoice:
             raise ValidationError(_("O contrato deve estar ativo e não cancelado para gerar faturas."))
         invoices_values = contracts_to_invoice._prepare_recurring_invoices_values(date_ref)
-        ref = invoices_values[0].get('ref')
+        try:
+            ref = invoices_values[0].get('ref')
+        except:
+            return False
         mv = self.env["account.move"]
         # evitando duplicidade da fatura
         ctr = mv.search([('ref','=',ref), ('partner_id','=',contracts_to_invoice.partner_id.id)])

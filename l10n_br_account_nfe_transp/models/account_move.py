@@ -28,12 +28,14 @@ class AccountMove(models.Model):
     @api.onchange('partner_shipping_id')
     def partner_shipping_id_onchange(self):
         if self.partner_shipping_id and self.partner_id:
-            vals_prt = {
-                'company_type': self.partner_id.company_type,
-                'legal_name': self.partner_id.name,
-                'vat': self.partner_id.vat,
-            }
-            self.partner_shipping_id.write(vals_prt)
+                vals_prt = {
+                    'company_type': self.partner_id.company_type,
+                    # CORREÇÃO: Copia a Razão Social REAL, e se não tiver, usa o name como último fallback
+                    'legal_name': self.partner_id.legal_name or self.partner_id.name,
+                    'vat': self.partner_id.vat,
+                }
+                self.partner_shipping_id.write(vals_prt)
+
 
 class TranspFrete(models.Model):
     _name = "transp.frete"

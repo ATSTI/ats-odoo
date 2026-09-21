@@ -407,6 +407,7 @@ class PosSession(models.Model):
             num_arq += 1           
             # buscar pedido ja existe
             pick = self.env['stock.picking']
+            product = self.env['product.product']
             picking = pick.search([('name', '=', nome_arq)])
 
             if picking:
@@ -420,7 +421,7 @@ class PosSession(models.Model):
             #             ('origin', 'like', nome_busca)
             #         ]) 
             item = []
-            vals = {}            
+            vals = {}
             for lines in p['move_lines']:
                 line = lines[2]
                 vals['origin'] = str(p['origin'])
@@ -438,9 +439,14 @@ class PosSession(models.Model):
                         vals['note'] = p['motivo'] 
                         prd['location_id'] = tipo.default_location_src_id.id
                         prd['location_dest_id'] = tipo.default_location_dest_id.id
-                prod = self.search([('default_code', '=', line['product_code'])])
+                prod = product.search([('default_code', '=', line['product_code'])])
                 if not prod:
-                    prod = self.search([('name', 'ilike', line['name'])], limit=1)
+                    prod = product.search([('id', '=', line['product_code'])])
+                if not prod:
+                    prod = product.search([('name', 'ilike', line['name'])], limit=1)
+                if not prod:
+                    print(f"############# - Produto nao encontrado : {line['product_code']}")
+                    continue
                 prd['product_id'] =  prod.id
                 prd['product_uom_qty'] = line['qty_done'] 
                 prd['product_uom'] = prod.uom_id.id
@@ -454,6 +460,7 @@ class PosSession(models.Model):
                 pick.action_confirm()
                 pick.action_assign()            
                 pick.button_validate()
+                os.remove(path_file + '/' + i)
 
     def insere_sangria(self):
         arquivos = sorted(fnmatch.filter(os.listdir(path_file), "san_*.json"))
@@ -469,11 +476,13 @@ class PosSession(models.Model):
             sg_obj = self.env['account.bank.statement.line']
         
             # vejo os diarios usados no PDV do Caixa aberto       
-            session = self.env['pos.session'].sudo().search([('name', 'ilike', caixa)])
+            session = self.env['pos.session'].sudo().search([('name', '=like', '%' + caixa)])
             if not session:
+                os.remove(path_file + '/' + i)
                 continue
 
             if session.state not in ('opened'):
+                os.remove(path_file + '/' + i)
                 continue
 
             motivo = lt['motivo']

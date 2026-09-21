@@ -56,9 +56,9 @@
             <xpath expr="//group[@id='main-right']" position="after">
                 <group string="Informações de Locação">
                     <field name="product_id"/>
-                    <field name="number_equipment" style="background-color: #d2d2ff"/>
                     <field name="date_rental_start"/>
                     <field name="date_rental_end"/>
+                    <field name="number_equipment" style="background-color: #d2d2ff"/>
                 </group>
             </xpath>
             <xpath expr="//group[@id='main-right']" position="replace">
@@ -77,10 +77,15 @@
             </xpath>
             <xpath expr="//notebook" position="replace">
                 <notebook>
-                    <page string="Notes">
-                        <field name="notes" nolabel="1" />
+                    <page string="Locações">
+                        <group>
+                            <group>
+                                <field name="child_count" readonly="1" string="Total de locações"/>
+                            </group>
+                        </group>
+                        <field name="notes" nolabel="1" widget="html" readonly="1" force_save="1"/>
                     </page>
-                    <page string="Location">
+                    <!-- <page string="Localização">
                         <group>
                             <group>
                                 <field name="territory_id" />
@@ -90,7 +95,7 @@
                             </group>
                         </group>
                     </page>
-                    <page string="Trocas" groups="fieldservice.group_fsm_manager">
+                    <page string="Locações" groups="fieldservice.group_fsm_manager">
                         <field name="child_ids">
                             <tree editable="bottom">
                                 <field name="product_id"/>
@@ -99,7 +104,7 @@
                                 <field name="date_rental_end"/>
                             </tree>
                         </field>
-                    </page>
+                    </page> -->
                 </notebook>
             </xpath>
         </field>
@@ -141,6 +146,9 @@
                                         <strong class="o_kanban_record_title">
                                             <field name="display_name_custom"/>
                                         </strong>
+                                    </div>
+                                    <div>
+                                        <field name="partner_id"/>
                                     </div>
                                     <div class="o_row">
                                         <field name="date_rental_start"/>

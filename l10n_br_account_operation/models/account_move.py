@@ -12,4 +12,8 @@ class AccountMove(models.Model):
         if self.fiscal_operation_id:
             for line in self.invoice_line_ids:
                 line.fiscal_operation_id = self.fiscal_operation_id.id
+                # corrige o parceiro da linha fiscal, caso seja diferente do parceiro da fatura
+                # isso gera problema se ele for outro uf nao carrega o cfop correto
+                if line.fiscal_document_line_id.partner_id != self.partner_id:
+                    line.fiscal_document_line_id.partner_id = self.partner_id
                 line._compute_all_tax()

@@ -35,7 +35,7 @@ class AccountPaymentRegister(models.TransientModel):
             if ja_importou:
                 #print(cod_forma +caixa + 'X')
                 continue
-            for cx in ses.statement_ids:
+            for cx in ses:
                 if cx.journal_id.id == journal_id.id:
                     stt = cx
                     jrn = cx.journal_id

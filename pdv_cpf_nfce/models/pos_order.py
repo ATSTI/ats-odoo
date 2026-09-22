@@ -16,5 +16,6 @@ class PosOrder(models.Model):
                 )
                 self.partner_id.nfe40_CPF = ""
                 self.partner_id.nfe40_CNPJ = ""
+                self.partner_id.vat = ""
 
         return super()._setup_anonymous_consumer()

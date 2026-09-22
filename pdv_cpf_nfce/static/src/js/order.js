@@ -76,14 +76,41 @@ odoo.define('pdv_cpf_nfce.pos_extra_note_button', function(require) {
         return dv2 === parseInt(cnpj[13]);
     }
 
+    // Zera extra_note/cnpj_cpf num pedido, sempre que houver dúvida sobre a origem dele.
+    function resetDadosFiscais(order, motivo) {
+        if (!order) {
+            return;
+        }
+        if (order.extra_note || order.cnpj_cpf) {
+            console.warn(
+                '[pdv_cpf_nfce] Resetando CPF/CNPJ herdado indevidamente. ' +
+                'uid=' + order.uid + ' motivo=' + motivo +
+                ' valor_anterior=' + order.cnpj_cpf
+            );
+        }
+        order.extra_note = '';
+        order.cnpj_cpf = '';
+    }
 
     const _super_initialize = Order.prototype.initialize;
     Order.prototype.initialize = function(attributes, options) {
         _super_initialize.apply(this, arguments);
 
-        this.extra_note = this.extra_note || '';
-        this.cnpj_cpf = this.cnpj_cpf || '';
+        this.extra_note = '';
+        this.cnpj_cpf = '';
     };
+
+    // Blindagem: se o core do POS tiver um clone() de Order (usado em backorder,
+    // troco/gorjeta, split de conta etc.), garante que o clone NUNCA herde o CPF
+    // do pedido original.
+    if (typeof Order.prototype.clone === 'function') {
+        const _super_clone = Order.prototype.clone;
+        Order.prototype.clone = function() {
+            const cloned = _super_clone.apply(this, arguments);
+            resetDadosFiscais(cloned, 'clone()');
+            return cloned;
+        };
+    }
 
     Order.prototype.set_extra_note = function(note) {
         this.extra_note = note ? String(note) : '';
@@ -110,6 +137,18 @@ odoo.define('pdv_cpf_nfce.pos_extra_note_button', function(require) {
         const json = _super_export_json.apply(this, arguments);
         json.extra_note = this.extra_note || '';
         json.cnpj_cpf = this.cnpj_cpf || '';
+
+        // Diagnóstico: toda vez que um CPF/CNPJ for de fato exportado pro backend,
+        // fica registrado no console com o uid do pedido. Se aparecer um uid que
+        // você sabe que não teve "Dados adicionais" preenchido, é a pista de onde
+        // o valor veio (clone, restauração de rascunho, etc.).
+        if (json.cnpj_cpf) {
+            console.log(
+                '[pdv_cpf_nfce] Exportando pedido uid=' + this.uid +
+                ' com cnpj_cpf=' + json.cnpj_cpf
+            );
+        }
+
         return json;
     };
 
@@ -118,6 +157,13 @@ odoo.define('pdv_cpf_nfce.pos_extra_note_button', function(require) {
         _super_init_json.apply(this, arguments);
         this.extra_note = json.extra_note || '';
         this.cnpj_cpf = json.cnpj_cpf || '';
+
+        if (this.cnpj_cpf) {
+            console.log(
+                '[pdv_cpf_nfce] Restaurando pedido uid=' + this.uid +
+                ' com cnpj_cpf=' + this.cnpj_cpf + ' via init_from_JSON (rascunho salvo)'
+            );
+        }
     };
 
     const _super_export_print = Order.prototype.export_for_printing;
@@ -194,4 +240,3 @@ odoo.define('pdv_cpf_nfce.pos_extra_note_button', function(require) {
         PosPaymentScreenExtra
     );
 });
-

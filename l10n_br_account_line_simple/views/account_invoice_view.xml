@@ -4,20 +4,75 @@
     <record id="invoice_simple_line_form" model="ir.ui.view">
         <field name="name">l10n_br_account.invoice.simple_line.form</field>
         <field name="model">account.move</field>
-        <field name="inherit_id" ref="l10n_br_account.invoice_form" />
+        <field name="inherit_id" ref="account.view_move_form" />
         <field name="priority">999</field>
         <field name="arch" type="xml">
-            <field name="fiscal_price" position="replace">
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/group/field[@name='fiscal_operation_id']" position="replace" />
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/group/field[@name='fiscal_operation_line_id']" position="replace" />
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/group/field[@name='cfop_id']" position="replace" />
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/group/field[@name='ncm_id']" position="replace" />
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/group/field[@name='fiscal_genre_id']" position="replace" />
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/group/field[@name='nbm_id']" position="replace" />
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/group/field[@name='cest_id']" position="replace" />
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/group/field[@name='city_taxation_code_id']" position="replace" />
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/group/field[@name='service_type_id']" position="replace" />
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/group/field[@name='cnae_id']" position="replace" />
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/group/field[@name='nbs_id']" position="replace" />
+
+            <!-- Campos não relacionados ao L10n -->
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/group/field[@name='analytic_tag_ids']" position="replace" />
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/group/field[@name='national_taxation_code_id']" position="replace" />
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/group/field[@name='operation_indicator_id']" position="replace" />
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/group/field[@name='account_id']" position="replace" />
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/group/field[@name='analytic_account_id']" position="replace" />
+
+            <xpath expr="//field[@name='fiscal_price']" position="replace">
                 <field name="fiscal_price" invisible="1"/>
-            </field>
-            <field name="discount_value" position="replace">
+            </xpath>
+            <xpath expr="//field[@name='discount_value']" position="replace">
                 <field name="discount_value" invisible="1"/>
-            </field>
-            <field name="fiscal_quantity" position="replace" />
-            <field name="uot_id" position="replace" />
+            </xpath>
+            <xpath expr="//field[@name='fiscal_quantity']" position="replace" />
+            <xpath expr="//field[@name='uot_id']" position="replace" />
             <label for="fiscal_quantity" position="replace">
                 <notebook colspan="4">
                     <page string="Geral">
+                        <group style="width: 100%">
+                            <label for="fiscal_operation_id" string="Operação" />
+                            <div>
+                                <field name="fiscal_operation_id" />
+                            </div>
+                            <label for="fiscal_operation_line_id" string="Linha da Operação" />
+                            <div>
+                                <field name="fiscal_operation_line_id" />
+                            </div>
+                            <label for="cfop_id" string="CFOP" />
+                            <div>
+                                <field name="cfop_id" />
+                            </div>
+                            <label for="ncm_id" string="NCM" />
+                            <div>
+                                <field name="ncm_id" />
+                            </div>
+                            <label for="icms_cst_id" string="CST" />
+                            <div>
+                                <field name="tax_framework" invisible="1"/>
+                                <field name="icms_tax_id" invisible="1"/>
+                                <field name="icms_cst_id" 
+                                    force_save="1"
+                                    attrs="{'readonly': [('icms_tax_id', '!=', False)]}"
+                                    options="{'no_create': True, 'no_create_edit': True}"
+                                />
+                            </div>
+                            <label for="cbenef_id" string="Benefício Fiscal" />
+                            <div>
+                                <field name="cbenef_id" />
+                            </div>
+                            <label for="tax_classification_id" string="Classificação Tributária" />
+                            <div>
+                                <field name="tax_classification_id" />
+                            </div>
+                        </group>
                     </page>
                     <page string="Inf Fiscal">
                         <group>
@@ -48,23 +103,48 @@
                                 <div>
                                     <field name="discount_value"/>
                                 </div>
+
+                                <label for="fiscal_genre_id" string="Gênero Fiscal do Produto" />
+                                <div>
+                                    <field name="fiscal_genre_id" />
+                                </div>
+                                <label for="nbm_id" string="NBM" />
+                                <div>
+                                    <field name="nbm_id" />
+                                </div>
+                                <label for="cest_id" string="CEST" />
+                                <div>
+                                    <field name="cest_id" />
+                                </div>
+                                <label for="city_taxation_code_id" string="Código de Tributação" />
+                                <div>
+                                    <field name="city_taxation_code_id" />
+                                </div>
+                                <label for="service_type_id" string="Tipo de Serviço" />
+                                <div>
+                                    <field name="service_type_id" />
+                                </div>
+                                <label for="cnae_id" string="CNAE" />
+                                <div>
+                                    <field name="cnae_id" />
+                                </div>
+                                <label for="nbs_id" string="NBS" />
+                                <div>
+                                    <field name="nbs_id" />
+                                </div>
                             </group>
                         </group>
                     </page>
                 </notebook>
             </label>
-            <!-- NAO CONSEGUI COLOCAR ESTES CAMPOS DENTRO DA PAGINA, ELES NÂO SUMIAM
-            <field name="fiscal_operation_line_id" position="replace" />
-            <field name="fiscal_operation_line_id" position="replace" />
-            <field name="cfop_id" position="replace" />
-            <field name="ncm_id" position="replace" />
-            <field name="fiscal_genre_id" position="replace" />
-            <field name="nbm_id" position="replace" />
-            <field name="cest_id" position="replace" />
-            <field name="city_taxation_code_id" position="replace" />
-            <field name="service_type_id" position="replace" />
-            <field name="cnae_id" position="replace" />
-            <field name="nbs_id" position="replace" /> -->
+
+            <xpath expr="//field[@name='invoice_line_ids']/form/sheet/notebook/page[@name='others']" position="inside" >
+                <group string="Contas" colspan="4">
+                    <field name="account_id" />
+                    <field name="analytic_account_id" />
+                </group>
+            </xpath>
+
         </field>
     </record>
 

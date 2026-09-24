@@ -1,84 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-   
+        <!-- Formulário principal do Lead -->
         <record id="view_crm_lead_form_interview" model="ir.ui.view">
             <field name="name">crm.lead.view.form.interview</field>
             <field name="model">crm.lead</field>
             <field name="inherit_id" ref="crm.crm_lead_view_form"/>
             <field name="arch" type="xml">
-                <!-- Substitui o título principal (nome do lead) pelos dados do aluno -->
-                <xpath expr="//div[@class='oe_title']" position="replace">
+                <!-- Título principal -->
+                <xpath expr="//div[contains(@class, 'oe_title')]" position="replace">
                     <div class="oe_title">
-                        <span class="o_form_label">Nome do aluno:</span>
-                        <h1><field name="student_name" placeholder="Nome do aluno..."/></h1>
-                        
-                        <group>
-                            <field name="tag_ids" 
-                                string="Série/Nível"
-                                placeholder="Ex: 9º Ano, Ensino Médio..." 
-                                widget="many2many_tags"/>
-                            <field name="school_period" widget="radio" options="{'horizontal': true}"/>
-                            <field name="current_school" placeholder="Atual escola..."/>
-                        </group>
+                        <span class="o_form_label">
+                            Nome do responsável:
+                        </span>
+                        <h1>
+                            <field name="resp_name"
+                                   placeholder="Nome do responsável..."/>
+                        </h1>
                     </div>
                 </xpath>
 
-                <!-- Ajusta os grupos de informações de contato para Pais, Telefone e Indicação -->
+                <!-- Informações do responsável -->
                 <xpath expr="//sheet/group" position="replace">
-                    <group>
-                        <group string="Filiação e Contato">
-                            <field name="father_name" string="Nome do pai"/>
-                            <field name="mother_name" string="Nome da mãe"/>
-                            <field name="phone" widget="phone" string="Telefone"/>
-                            <field name="source_indication" string="Indicação"/>
+                    <group col="1">
+                        <!-- Informações gerais -->
+                        <group colspan="4">
+                            <field name="tag_ids"
+                                string="Série/Nível"
+                                placeholder="Ex: 9º Ano, Ensino Médio..."
+                                widget="many2many_tags"/>
+                            <field name="source_indication"
+                                string="Indicação"/>
                         </group>
-                        <group string="Comercial / Proposta">
-                            <field name="expected_revenue" widget="monetary" string="Valor da mensalidade"/>
-                            <field name="tuition_installments" string="Parcelado em (vezes) - Mensalidade"/>
-                            <field name="material_cost" widget="monetary" string="Valor do material didático"/>
-                            <field name="material_installments" string="Parcelado em (vezes) - Material"/>
-                            <field name="discount_acquired" string="Desconto adquirido"/>
-                            <field name="discount_validity_date" string="Desconto válido até o dia"/>
+                        <!-- Responsável Pedagógico -->
+                        <group string="Responsável Pedagógico">
+                            <label for="resp_ped_name" string="Nome e Grau de Parentesco"/> 
+                            <div class="o_row"> 
+                                <field name="resp_ped_name" placeholder="Nome do responsável pedagógico..."/> 
+                                <field name="grau_parentesco_ped" placeholder="Grau de parentesco..."/> 
+                            </div>
+                            <field name="phone_ped"
+                                widget="phone"
+                                string="Telefone"/>
+                            <field name="email_ped"
+                                widget="email"
+                                string="E-mail"/>
+                        </group>
+                        <!-- Responsável Financeiro -->
+                        <group string="Responsável Financeiro">
+                            <label for="resp_finan_name" string="Nome e Grau de Parentesco"/> 
+                            <div class="o_row"> 
+                                <field name="resp_finan_name"
+                                    placeholder="Nome do responsável financeiro..."
+                                    style="width: 70%;"/>
+                                <field name="grau_parentesco_finan"
+                                    placeholder="Grau de parentesco..."
+                                    style="width: 30%;"/>
+                            </div>
+                            <field name="phone_finan"
+                                widget="phone"
+                                string="Telefone"/>
+                            <field name="email_finan"
+                                widget="email"
+                                string="E-mail"/>
                         </group>
                     </group>
-                    
-                    <!-- Aviso de desconto confidencial -->
-                    <!-- <div class="alert alert-warning text-center fw-bold" role="alert">
-                        DESCONTO CONFIDENCIAL, A SUA DIVULGAÇÃO À TERCEIROS IMPLICA NA PERDA DO DESCONTO
-                    </div> -->
+                </xpath>
+
+                <!-- Filhos / Ingressantes -->
+                <xpath expr="//sheet/notebook/page[@name='internal_notes']" position="before">
+                    <page string="Ingressantes">
+                        <field name="child_ids">
+                            <list editable="bottom">
+                                <field name="child_name"
+                                        string="Nome do Filho"/>
+                                <!-- <field name="child_age"
+                                        string="Idade"/> -->
+                                <field name="tag_ids"
+                                        string="Série/Nível"
+                                        widget="many2many_tags"/>
+                                <field name="school_period"
+                                        string="Período"
+                                        options="{'horizontal': true}"/>
+                                <field name="current_school"
+                                        string="Escola Atual"/>
+                                <field name="tuition_cost" widget="monetary" 
+                                        string="Mensalidade"/>
+                                <field name="tuition_installments"
+                                        string="Parcelas Mensalidade"/>
+                                <field name="material_cost"
+                                        string="Material"/>
+                                <field name="material_installments"
+                                        string="Parcelas Material"/>
+                                <field name="discount_acquired"
+                                        string="Desconto"/>
+                                <field name="discount_validity_date"
+                                        string="Validade Desc"/>
+                            </list>
+                            <form>
+                                <sheet>
+                                    <group>
+                                        <group string="Aluno">
+                                            <field name="child_name"
+                                                    string="Nome do Filho"/>
+                                            <field name="tag_ids"
+                                                    string="Série/Nível"
+                                                    widget="many2many_tags"/>
+                                            <field name="school_period"
+                                                    string="Período Escolar"
+                                                    widget="radio"
+                                                    options="{'horizontal': true}"/>
+                                            <field name="current_school"
+                                                    string="Escola Atual"/>
+                                        </group>
+                                        <group string="Comercial">
+                                            <field name="tuition_cost" widget="monetary" 
+                                                string="Valor da mensalidade"/>
+                                            <field name="tuition_installments"
+                                                    string="Parcelas da Mensalidade"/>
+                                            <field name="material_cost"
+                                                    string="Valor do Material"/>
+                                            <field name="material_installments"
+                                                    string="Parcelas do Material"/>
+                                            <field name="discount_acquired"
+                                                    string="Desconto"/>
+                                            <field name="discount_validity_date"
+                                                    string="Validade Desc"/>
+                                        </group>
+                                    </group>
+                                </sheet>
+                            </form>
+                        </field>
+                    </page>
                 </xpath>
             </field>
         </record>
 
-        <record id="view_crm_quick_create_opportunity_form_inherit_interview" model="ir.ui.view">
-            <field name="name">crm.lead.quick.create.form.inherit.interview</field>
+        <!-- Criação rápida de oportunidade -->
+        <record id="view_crm_quick_create_opportunity_form_inherit_interview"
+                model="ir.ui.view">
+            <field name="name">
+                crm.lead.quick.create.form.inherit.interview
+            </field>
             <field name="model">crm.lead</field>
-            <field name="inherit_id" ref="crm.quick_create_opportunity_form"/>
+            <field name="inherit_id"
+                   ref="crm.quick_create_opportunity_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='partner_id']" position="replace">
-                    <field name="student_name" placeholder="Nome do aluno..."/>
-                    <field name="tag_ids" 
-                                string="Série/Nível"
-                                placeholder="Ex: 9º Ano, Ensino Médio..." 
-                                widget="many2many_tags"/>
-                    <field name="school_period" widget="radio" options="{'horizontal': true}"/>
-                    <field name="current_school" placeholder="Escola atual..."/>
-                    <field name="mother_name" placeholder="Nome da mãe..."/>
+                <!-- Responsável -->
+                <xpath expr="//field[@name='partner_id']"
+                       position="replace">
+                    <field name="resp_name"
+                           placeholder="Nome do responsável..."/>
+                    <field name="resp_ped_name"
+                           placeholder="Responsável pedagógico..."/>
+                    <field name="resp_finan_name"
+                           placeholder="Responsável financeiro..."/>
+                    <field name="phone"
+                           widget="phone"
+                           placeholder="Telefone..."/>
+                    <field name="source_indication"
+                           placeholder="Indicação..."/>
                 </xpath>
 
-                <xpath expr="//field[@name='name']" position="attributes">
+                <!-- Campos internos do CRM -->
+                <xpath expr="//field[@name='name']"
+                       position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
-                <xpath expr="//field[@name='expected_revenue']" position="attributes">
+                <xpath expr="//field[@name='expected_revenue']"
+                       position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
-                <xpath expr="//field[@name='priority']" position="attributes">
+                <xpath expr="//field[@name='priority']"
+                       position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
-                <xpath expr="//field[@name='recurring_revenue']" position="attributes">
+                <xpath expr="//field[@name='recurring_revenue']"
+                       position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
-                <xpath expr="//field[@name='recurring_plan']" position="attributes">
+                <xpath expr="//field[@name='recurring_plan']"
+                       position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
             </field>

@@ -22,7 +22,7 @@ quem visitou, ano, antiga escola, período pretendido...
         'crm',
     ],
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'views/crm_leads.xml',
     ],
     'installable': True,

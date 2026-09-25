@@ -149,50 +149,46 @@ class FSMOrder(models.Model):
             return res
 
     def account_prepare_invoice(self):
-        # custom
         if not self.customer_id:
             raise ValidationError(_("Customer empty"))
+
         invoice_exists = self.env['account.move'].search([
             ("partner_id", "=", self.customer_id.id),
             ("move_type", "=", "out_invoice"),
             ("state", "=", "draft"),
         ])
         if len(invoice_exists) > 1:
-            raise UserError("Mais de uma Fatura Aberta Foi Encontrada para este Parceiro")
+            raise UserError(_("Mais de uma Fatura Aberta Foi Encontrada para este Parceiro"))
+
         if self.bill_to == "contact":
-            partner = self.customer_id.id,
+            partner_id = self.customer_id.id
             price_list = self.customer_id.property_product_pricelist
             fpos = self.customer_id.property_account_position_id
         else:
-            partner = self.location_id.customer_id.id,
-            price_list = self.location_id.customer_id.property_product_pricelist
-            fpos = self.location_id.customer_id.property_account_position_id
+            partner_id = self.location_id.customer_id.id if self.location_id.customer_id else self.customer_id.id
+            price_list = self.location_id.customer_id.property_product_pricelist if self.location_id.customer_id else self.customer_id.property_product_pricelist
+            fpos = self.location_id.customer_id.property_account_position_id if self.location_id.customer_id else self.customer_id.property_account_position_id
+
         if not invoice_exists:
-            jrnl = self.env["account.journal"].search(
-                [
-                    ("company_id", "=", self.env.company.id),
-                    ("type", "=", "sale"),
-                    ("active", "=", True),
-                ],
-                limit=1,
-            )  #TODO checar aq depois a questao de duplicar o KANBAN, pois aquilo é o diário
+            jrnl = self.env["account.journal"].search([
+                ("company_id", "=", self.env.company.id),
+                ("type", "=", "sale"),
+                ("active", "=", True),
+            ], limit=1)
             
             invoice_vals = {
-                "partner_id": partner,
+                "partner_id": partner_id,
                 "journal_id": jrnl.id or False,
                 "fiscal_position_id": fpos.id or False,
                 "move_type": "out_invoice",
                 "fsm_order_ids": [(4, self.id)],
                 "company_id": self.env.company.id,
                 "team_id": False,
-                "fiscal_operation_id": self.company_id.sale_fiscal_operation_id.id,
-                "document_type_id": self.company_id.document_type_id.id,
+                "fiscal_operation_id": self.company_id.sale_fiscal_operation_id.id if self.company_id.sale_fiscal_operation_id else False,
+                "document_type_id": self.company_id.document_type_id.id if self.company_id.document_type_id else False,
             }
             if self.operating_unit_id:
-                fiscal_vals = {
-                    "operating_unit_id": self.operating_unit_id.id,
-                }
-                invoice_vals.update(fiscal_vals)
+                invoice_vals["operating_unit_id"] = self.operating_unit_id.id
         else:
             invoice_vals = {
                 "partner_id": self.customer_id.id,
@@ -200,6 +196,7 @@ class FSMOrder(models.Model):
                 "fsm_order_ids": [(4, self.id)],
                 "existing_invoice": invoice_exists.id,
             }
+
         invoice_line_vals = []
         for line in self.employee_timesheet_ids:
             price = price_list.get_product_price(
@@ -212,45 +209,38 @@ class FSMOrder(models.Model):
             template = line.product_id.product_tmpl_id
             accounts = template.get_product_accounts()
             account = accounts["income"]
-            taxes = template.taxes_id
-            tax_ids = fpos.map_tax(taxes)
-            #import pudb;pu.db
+
             fiscal_operation_line_id = False
-            if self.company_id.sale_fiscal_operation_id:                
+            if self.company_id.sale_fiscal_operation_id:
                 fiscal_operation_line_id = self.company_id.sale_fiscal_operation_id.line_definition(
                     company=self.company_id,
                     partner=self.customer_id,
                     product=line.product_id,
                 )
-            invoice_line_vals.append(
-                (
-                    0,
-                    0,
-                    {
-                        "date_line": self.scheduled_date_start,
-                        "product_id": line.product_id.id,
-                        "product_uom_id": line.product_id.uom_id.id,
-                        "analytic_account_id": line.account_id.id,
-                        "quantity": line.unit_amount,
-                        "fiscal_quantity": line.unit_amount,
-                        "name": line.name,
-                        "price_unit": price,
-                        "account_id": account.id,
-                        "fsm_order_ids": [(4, self.id)],
-                        "fiscal_operation_id": self.company_id.sale_fiscal_operation_id.id,
-                        "fiscal_operation_line_id": fiscal_operation_line_id.id if fiscal_operation_line_id else False,
-                        "ncm_id": line.product_id.ncm_id.id if line.product_id.ncm_id else False,
-                        "nbs_id": line.product_id.nbs_id.id if line.product_id.nbs_id else False,
-                        "service_type_id": line.product_id.service_type_id.id if line.product_id.service_type_id else False,
-                        "tax_icms_or_issqn": "issqn" if line.product_id.service_type_id else "icms"
-                        },
-                )
-            )
-        invoice_vals.update({"invoice_line_ids": invoice_line_vals})
+
+            invoice_line_vals.append((0, 0, {
+                "date_line": self.scheduled_date_start,
+                "product_id": line.product_id.id,
+                "product_uom_id": line.product_id.uom_id.id,
+                "analytic_account_id": line.account_id.id if line.account_id else False,
+                "quantity": line.unit_amount,
+                "fiscal_quantity": line.unit_amount,
+                "name": line.name,
+                "price_unit": price,
+                "account_id": account.id,
+                "fsm_order_ids": [(4, self.id)],
+                "fiscal_operation_id": self.company_id.sale_fiscal_operation_id.id if self.company_id.sale_fiscal_operation_id else False,
+                "fiscal_operation_line_id": fiscal_operation_line_id.id if fiscal_operation_line_id else False,
+                "ncm_id": line.product_id.ncm_id.id if line.product_id.ncm_id else False,
+                "nbs_id": line.product_id.nbs_id.id if line.product_id.nbs_id else False,
+                "service_type_id": line.product_id.service_type_id.id if line.product_id.service_type_id else False,
+                "tax_icms_or_issqn": "issqn" if line.product_id.service_type_id else "icms",
+            }))
+
+        invoice_vals["invoice_line_ids"] = invoice_line_vals
         return invoice_vals
 
     def account_create_invoice(self):
-        import pudb;pu.db
         invoice_vals = self.account_prepare_invoice()
         if invoice_vals.get("existing_invoice"):
             invoice = self.env["account.move"].browse(invoice_vals["existing_invoice"])
@@ -258,96 +248,33 @@ class FSMOrder(models.Model):
                 "invoice_line_ids": invoice_vals.get("invoice_line_ids", [])
             })
         else:
-            invoice = self.env["account.move"].sudo().create(invoice_vals)        
-        # import pudb;pu.db
-        invoice._compute_amount()
-        if invoice.move_type == "out_invoice":
-            import pudb;pu.db
+            invoice = self.env["account.move"].sudo().create(invoice_vals)
+
+        # 1. Atualiza impostos e regras fiscais nas linhas
         for line in invoice.invoice_line_ids:
-            line.update({'fiscal_operation_id': invoice.fiscal_operation_id})
+            line._onchange_product_id()
             line._onchange_product_id_fiscal()
-            # line._get_price_total_and_subtotal_model(
-            #     line.price_unit, line.quantity, line.discount, invoice.currency_id, line.product_id, invoice.partner_id, line.tax_ids, invoice.move_type
-            # )
 
-
-        # invoice._compute_amount()
+        # 2. Converte os impostos fiscais para tax_ids
         for line in invoice.invoice_line_ids:
-            #line._onchange_fiscal_operation_id()
-            #line._onchange_fiscal_operation_line_id()
-            #line._onchange_mark_recompute_taxes()
-            # line._update_fiscal_tax_ids(line._get_all_tax_id_fields())
-            import pudb;pu.db
-            # line.write({
-            #     'fiscal_tax_ids': [(5, 0, 0)] 
-            # })
-            if not line.fiscal_tax_ids:
-                taxes = line._get_all_tax_id_fields()
-                for t in taxes:
-                    print(f"Tax: {t.name}, Domain: {t.tax_domain}, Id: {t.id}")
-                user_type = "sale"
-                taxes_ids = line.fiscal_tax_ids.account_taxes(
-                    user_type=user_type, fiscal_operation=invoice.fiscal_operation_id
+            if hasattr(line, '_onchange_fiscal_tax_ids'):
+                line._onchange_fiscal_tax_ids()
+            elif line.fiscal_tax_ids:
+                taxes = line.fiscal_tax_ids.account_taxes(
+                    user_type="sale",
+                    fiscal_operation=invoice.fiscal_operation_id
                 )
-                for t in taxes_ids:
-                    print(f"Tax: {t.name}, Domain: {t.tax_domain}, Id: {t.id}")
-                # Criamos uma lista para acumular os comandos e fazer um único write (melhor performance)
-                comandos_tax = []
-                
-                # 2. Varre apenas os impostos válidos para a empresa atual
-                for t in taxes:
-                    nome_imposto = t.name.lower()
-                    if ('issqn' in nome_imposto or 'inss' in nome_imposto) and line.product_id.service_type_id:
-                        comandos_tax.append((4, t.id, 0))
-                        
-                # 3. Aplica todos os impostos encontrados de uma só vez
-                if comandos_tax:
-                    line.write({
-                        'fiscal_tax_ids': comandos_tax
-                    })
+                if taxes:
+                    line.tax_ids = [(6, 0, taxes.ids)]
 
-                # taxes_groups = line.fiscal_tax_ids.mapped("tax_domain")
-                # fiscal_taxes = line.fiscal_tax_ids.filtered(
-                    # lambda ft, taxes_groups=taxes_groups: ft.tax_domain not in taxes_groups
-                # )              
-                # for t in taxes:
-                #     if 'issqn' in t.name.lower() and line.product_id.service_type_id:
-                #         line.write({
-                #             'tax_ids': [(4, t.id, 0)]
-                #         })
-                #     if 'inss' in t.name.lower() and line.product_id.service_type_id:
-                #         line.write({
-                #             'tax_ids': [(4, t.id, 0)]
-                #         })
-            #     # line.tax_ids = [(6, 0, line.fiscal_operation_line_id.tax_ids.ids)]
-            #     import pudb;pu.db
-            # line._onchange_fiscal_tax_ids()
-            # line._onchange_price_subtotal()
-        # import pudb;pu.db    
+        # 3. Força a re-geração das linhas dinamicas e o rebalanceamento dos débitos/créditos
+        invoice.with_context(check_move_validity=False)._recompute_dynamic_lines(recompute_all_taxes=True)
         
-        # invoice._recompute_dynamic_lines(recompute_all_taxes=True)
-        # invoice._recompute_payment_terms_lines()            
+        # 4. Atualiza os totais e reequilibra a linha de Contas a Receber
+        invoice._compute_amount()
+        if hasattr(invoice, '_onchange_tc_amount'):
+            invoice._onchange_tc_amount()
 
-        # import pudb;pu.db
-        # for line in invoice.invoice_line_ids:
-        #     # line._onchange_product_id_fiscal()
-        #     # line._onchange_fiscal_operation_id()
-        #     # line._onchange_price_subtotal()
-        #     line._get_fields_onchange_balance_model(
-        #         quantity=line.quantity,
-        #         discount=line.discount,
-        #         amount_currency=line.amount_currency,
-        #         move_type=line.move_id.move_type,
-        #         currency=line.move_id.currency_id,
-        #         taxes=line.tax_ids,
-        #         price_subtotal=line.price_subtotal,
-        #         force_computation=True,
-        #     )
-
-        # invoice._recompute_dynamic_lines(recompute_all_taxes=True)
-        # invoice._recompute_payment_terms_lines()
-
-        # invoice.payment_reference = invoice.payment_reference + self.name
         self.account_stage = "invoiced"
         return invoice
 

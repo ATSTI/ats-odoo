@@ -1,0 +1,8 @@
+<odoo>
+    <template id="assets_backend" inherit_id="point_of_sale.assets">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/pdv_barcode_search/static/src/js/products_widget_barcode.js"></script>
+            <!-- <script type="text/javascript" src="/pdv_cpf_nfce/static/src/js/pos_custom_button.js"></script> -->
+        </xpath>
+    </template>
+</odoo>

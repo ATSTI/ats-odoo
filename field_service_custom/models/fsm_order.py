@@ -272,8 +272,6 @@ class FSMOrder(models.Model):
         
         # 4. Atualiza os totais e reequilibra a linha de Contas a Receber
         invoice._compute_amount()
-        if hasattr(invoice, '_onchange_tc_amount'):
-            invoice._onchange_tc_amount()
 
         self.account_stage = "invoiced"
         return invoice

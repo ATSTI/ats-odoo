@@ -92,6 +92,7 @@ class FSMOrder(models.Model):
         )
         fpos = self.person_id.partner_id.property_account_position_id
         invoice_line_vals = []
+
         for cost in self.contractor_cost_ids:
             template = cost.product_id.product_tmpl_id
             accounts = template.get_product_accounts()
@@ -106,6 +107,7 @@ class FSMOrder(models.Model):
                         "date_line": self.scheduled_date_start,
                         "analytic_account_id": self.location_id.analytic_account_id.id,
                         "product_id": cost.product_id.id,
+                        "product_uom_id": cost.product_id.uom_id.id,
                         "quantity": cost.quantity,
                         "name": cost.product_id.display_name,
                         "price_unit": cost.price_unit,
@@ -128,8 +130,6 @@ class FSMOrder(models.Model):
         if self.operating_unit_id:
             fiscal_vals = {
                 "operating_unit_id": self.operating_unit_id.id,
-                "document_type_id": 40, # 01 Nota Fiscal
-                "fiscal_operation_id": self.company_id.sale_fiscal_operation_id.id,
             }
             vals.update(fiscal_vals)
         return vals
@@ -151,48 +151,44 @@ class FSMOrder(models.Model):
     def account_prepare_invoice(self):
         if not self.customer_id:
             raise ValidationError(_("Customer empty"))
-        
+
         invoice_exists = self.env['account.move'].search([
             ("partner_id", "=", self.customer_id.id),
             ("move_type", "=", "out_invoice"),
             ("state", "=", "draft"),
         ])
         if len(invoice_exists) > 1:
-            raise UserError("Mais de uma Fatura Aberta Foi Encontrada para este Parceiro")
+            raise UserError(_("Mais de uma Fatura Aberta Foi Encontrada para este Parceiro"))
+
         if self.bill_to == "contact":
-            partner = self.customer_id.id,
+            partner_id = self.customer_id.id
             price_list = self.customer_id.property_product_pricelist
             fpos = self.customer_id.property_account_position_id
         else:
-            partner = self.location_id.customer_id.id,
-            price_list = self.location_id.customer_id.property_product_pricelist
-            fpos = self.location_id.customer_id.property_account_position_id
+            partner_id = self.location_id.customer_id.id if self.location_id.customer_id else self.customer_id.id
+            price_list = self.location_id.customer_id.property_product_pricelist if self.location_id.customer_id else self.customer_id.property_product_pricelist
+            fpos = self.location_id.customer_id.property_account_position_id if self.location_id.customer_id else self.customer_id.property_account_position_id
+
         if not invoice_exists:
-            jrnl = self.env["account.journal"].search(
-                [
-                    ("company_id", "=", self.env.company.id),
-                    ("type", "=", "sale"),
-                    ("active", "=", True),
-                ],
-                limit=1,
-            )  #TODO checar aq depois a questao de duplicar o KANBAN, pois aquilo é o diário
+            jrnl = self.env["account.journal"].search([
+                ("company_id", "=", self.env.company.id),
+                ("type", "=", "sale"),
+                ("active", "=", True),
+            ], limit=1)
             
             invoice_vals = {
-                "partner_id": partner,
-                "move_type": "out_invoice",
+                "partner_id": partner_id,
                 "journal_id": jrnl.id or False,
                 "fiscal_position_id": fpos.id or False,
+                "move_type": "out_invoice",
                 "fsm_order_ids": [(4, self.id)],
                 "company_id": self.env.company.id,
                 "team_id": False,
+                "fiscal_operation_id": self.company_id.sale_fiscal_operation_id.id if self.company_id.sale_fiscal_operation_id else False,
+                "document_type_id": self.company_id.document_type_id.id if self.company_id.document_type_id else False,
             }
             if self.operating_unit_id:
-                fiscal_vals = {
-                    "operating_unit_id": self.operating_unit_id.id,
-                    "document_type_id": 40, # 01 Nota Fiscal
-                    "fiscal_operation_id": self.company_id.sale_fiscal_operation_id.id,
-                }
-                invoice_vals.update(fiscal_vals)
+                invoice_vals["operating_unit_id"] = self.operating_unit_id.id
         else:
             invoice_vals = {
                 "partner_id": self.customer_id.id,
@@ -200,6 +196,7 @@ class FSMOrder(models.Model):
                 "fsm_order_ids": [(4, self.id)],
                 "existing_invoice": invoice_exists.id,
             }
+
         invoice_line_vals = []
         for line in self.employee_timesheet_ids:
             price = price_list.get_product_price(
@@ -212,26 +209,35 @@ class FSMOrder(models.Model):
             template = line.product_id.product_tmpl_id
             accounts = template.get_product_accounts()
             account = accounts["income"]
-            taxes = template.taxes_id
-            tax_ids = fpos.map_tax(taxes)
-            invoice_line_vals.append(
-                (
-                    0,
-                    0,
-                    {
-                        "date_line": self.scheduled_date_start,
-                        "product_id": line.product_id.id,
-                        "analytic_account_id": line.account_id.id,
-                        "quantity": line.unit_amount,
-                        "name": line.name,
-                        "price_unit": price,
-                        "account_id": account.id,
-                        "fsm_order_ids": [(4, self.id)],
-                        "tax_ids": [(6, 0, tax_ids.ids)],
-                    },
+
+            fiscal_operation_line_id = False
+            if self.company_id.sale_fiscal_operation_id:
+                fiscal_operation_line_id = self.company_id.sale_fiscal_operation_id.line_definition(
+                    company=self.company_id,
+                    partner=self.customer_id,
+                    product=line.product_id,
                 )
-            )
-        invoice_vals.update({"invoice_line_ids": invoice_line_vals})
+
+            invoice_line_vals.append((0, 0, {
+                "date_line": self.scheduled_date_start,
+                "product_id": line.product_id.id,
+                "product_uom_id": line.product_id.uom_id.id,
+                "analytic_account_id": line.account_id.id if line.account_id else False,
+                "quantity": line.unit_amount,
+                "fiscal_quantity": line.unit_amount,
+                "name": line.name,
+                "price_unit": price,
+                "account_id": account.id,
+                "fsm_order_ids": [(4, self.id)],
+                "fiscal_operation_id": self.company_id.sale_fiscal_operation_id.id if self.company_id.sale_fiscal_operation_id else False,
+                "fiscal_operation_line_id": fiscal_operation_line_id.id if fiscal_operation_line_id else False,
+                "ncm_id": line.product_id.ncm_id.id if line.product_id.ncm_id else False,
+                "nbs_id": line.product_id.nbs_id.id if line.product_id.nbs_id else False,
+                "service_type_id": line.product_id.service_type_id.id if line.product_id.service_type_id else False,
+                "tax_icms_or_issqn": "issqn" if line.product_id.service_type_id else "icms",
+            }))
+
+        invoice_vals["invoice_line_ids"] = invoice_line_vals
         return invoice_vals
 
     def account_create_invoice(self):
@@ -244,7 +250,29 @@ class FSMOrder(models.Model):
         else:
             invoice = self.env["account.move"].sudo().create(invoice_vals)
 
-        invoice.payment_reference = invoice.payment_reference + self.name
+        # 1. Atualiza impostos e regras fiscais nas linhas
+        for line in invoice.invoice_line_ids:
+            line._onchange_product_id()
+            line._onchange_product_id_fiscal()
+
+        # 2. Converte os impostos fiscais para tax_ids
+        for line in invoice.invoice_line_ids:
+            if hasattr(line, '_onchange_fiscal_tax_ids'):
+                line._onchange_fiscal_tax_ids()
+            elif line.fiscal_tax_ids:
+                taxes = line.fiscal_tax_ids.account_taxes(
+                    user_type="sale",
+                    fiscal_operation=invoice.fiscal_operation_id
+                )
+                if taxes:
+                    line.tax_ids = [(6, 0, taxes.ids)]
+
+        # 3. Força a re-geração das linhas dinamicas e o rebalanceamento dos débitos/créditos
+        invoice.with_context(check_move_validity=False)._recompute_dynamic_lines(recompute_all_taxes=True)
+        
+        # 4. Atualiza os totais e reequilibra a linha de Contas a Receber
+        invoice._compute_amount()
+
         self.account_stage = "invoiced"
         return invoice
 

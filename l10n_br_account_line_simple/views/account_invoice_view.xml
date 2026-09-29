@@ -64,9 +64,9 @@
                                     options="{'no_create': True, 'no_create_edit': True}"
                                 />
                             </div>
-                            <label for="cbenef_id" string="Benefício Fiscal" />
+                            <label for="icms_tax_benefit_id" string="Benefício Fiscal" />
                             <div>
-                                <field name="cbenef_id" />
+                                <field name="icms_tax_benefit_id" />
                             </div>
                             <label for="tax_classification_id" string="Classificação Tributária" />
                             <div>

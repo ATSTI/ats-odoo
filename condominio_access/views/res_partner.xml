@@ -44,7 +44,7 @@
                             <field name="lote"/>
                             <field name="numero"/>
                             <field name="moradores"/>
-                            <field name="tipo"/>
+                            <field name="CEP"/>
                             <field name="image_1920"/>
 
                             <templates>
@@ -80,7 +80,7 @@
 
                                             <div>
                                                 <span class="badge bg-primary">
-                                                    <field name="tipo"/>
+                                                    <field name="CEP"/>
                                                 </span>
                                             </div>
                                         </div>
@@ -103,7 +103,7 @@
                             <field name="lote"/>
                             <field name="numero"/>
                             <field name="moradores"/>
-                            <field name="tipo"/>
+                            <field name="CEP"/>
                             <field name="image_1920"/>
 
                             <templates>
@@ -139,7 +139,7 @@
 
                                             <div>
                                                 <span class="badge bg-primary">
-                                                    <field name="tipo"/>
+                                                    <field name="CEP"/>
                                                 </span>
                                             </div>
                                         </div>

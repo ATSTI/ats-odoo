@@ -9,7 +9,7 @@
                 <field name="lote"/>
                 <field name="numero"/>
                 <field name="moradores"/>
-                <field name="tipo"/>
+                <field name="CEP"/>
                 <field name="image_1920"/>
                 <field name="active"/>
                 <field name="leitura_agua_ids" invisible="1"/>
@@ -108,7 +108,8 @@
                         </group>
 
                         <group string="Detalhes">
-                            <field name="tipo"/>
+                            <field name="CEP"/>
+                            <field name="tipo" invisible ='1'/>
                             <field name="moradores" readonly="1"/>
                             <field name="active"/>
                         </group>
@@ -250,6 +251,7 @@
             <field name="name"/>
             <field name="lote"/>
             <field name="rua"/>
+            <field name="CEP"/>
             <field name="tipo"/>
             <field name="inquilino_id"/>
             <field name="proprietario_id"/>
@@ -314,9 +316,9 @@
                         name="group_by_rua"
                         context="{'group_by': 'rua'}"/>
 
-                <filter string="Tipo"
-                        name="group_by_tipo"
-                        context="{'group_by': 'tipo'}"/>
+                <filter string="CEP"
+                        name="group_by_cep"
+                        context="{'group_by': 'CEP'}"/>
 
                 <filter string="Inquilino"
                         name="group_by_tenant"
@@ -350,6 +352,7 @@
                    decoration-primary="tipo == 'casa'"
                    decoration-info="tipo == 'apartamento'"/>
 
+            <field name="CEP"/>
             <field name="moradores" sum="Total de Moradores"/>
 
             <field name="inquilino_id"

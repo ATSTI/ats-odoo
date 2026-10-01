@@ -32,6 +32,7 @@
     'depends': ['account'],
     'data': [
         'report/report_action.xml',
+        'views/account_move.xml',
         'report/report_multa_juros_cupom.xml',
     ],
     'installable': True,

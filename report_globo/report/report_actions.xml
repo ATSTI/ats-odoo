@@ -1,11 +1,21 @@
 <odoo>
-<record id="action_report_pedido_venda_global" model="ir.actions.report">
+    <record id="action_report_pedido_venda_inv_global" model="ir.actions.report">
         <field name="name">Pedido de Venda - Global</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-pdf</field>
+        <field name="report_name">report_globo.report_pedido_venda_inv_global_template</field>
+        <field name="report_file">report_globo.report_pedido_venda_inv_global_template</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+    <record id="action_report_pedido_venda_global" model="ir.actions.report">
+        <field name="name">Pedido de Venda - Global</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
         <field name="report_name">report_globo.report_pedido_venda_global_template</field>
         <field name="report_file">report_globo.report_pedido_venda_global_template</field>
-        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
         <field name="binding_type">report</field>
         <field name="paperformat_id" ref="base.paperformat_euro"/>
     </record>

@@ -13,7 +13,7 @@ class AccountPaymentOrder(models.Model):
             if line.partner_id.desconto_boleto_inter:
                 # vencimento = line.ml_maturity_date.strftime("%Y-%m-%d")
                 desconto = {
-                    "taxa": line.partner_id.desconto_boleto_inter / 100,
+                    "taxa": line.partner_id.desconto_boleto_inter,
                     "codigo": "PERCENTUALDATAINFORMADA",
                     "quantidadeDias": 0,
                 }

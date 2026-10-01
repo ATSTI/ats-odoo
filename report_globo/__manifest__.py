@@ -28,7 +28,7 @@
     'description': """ Relatório para Globo verduras, desenvolvido para atender as necessidades específicas da empresa, proporcionando uma visualização clara e organizada dos dados financeiros. Este módulo inclui um layout personalizado que destaca as informações mais relevantes para a gestão financeira da empresa, facilitando a análise e tomada de decisões estratégicas. O relatório é projetado para ser fácil de usar e interpretar, garantindo que os usuários possam acessar rapidamente as informações necessárias para monitorar o desempenho financeiro da empresa.
     """,
     'author': 'ATS Soluções',
-    'depends': ['account'],
+    'depends': ['account', 'sale'],
     'data': [
         'report/report_actions.xml',
         'report/report_pedido_venda_global_template.xml',

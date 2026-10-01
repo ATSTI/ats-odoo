@@ -4,6 +4,7 @@
 import logging
 from datetime import datetime, timedelta
 import phonenumbers
+import re
 
 from odoo import _, models, fields
 from odoo.exceptions import UserError
@@ -124,18 +125,39 @@ class AccountPaymentOrder(models.Model):
             )            
             data = self._generate_bank_inter_boleto_data(move_line=move_line)
             for item in data:
-                # print(item._emissao_data())
                 resposta = api.boleto_inclui(item._emissao_data())
-                if resposta.get("erro"):
-                    erro = self.generate_error_message(resposta)
-                    raise UserError(f"{erro}")
-                # print(resposta)
+                
+                # 1. Localiza a linha de pagamento correspondente
                 payment_line_id = self.payment_line_ids.filtered(
                     lambda line: line.document_number == item._identifier
                 )
+
+                # 2. Tratamento de Erro
+                if resposta.get("erro"):
+                    title = resposta.get("title", "")
+                    detail = resposta.get("detail", "") or "" # Garante que seja string mesmo se vier None
+                    
+                    # Valida se o título é a requisição inválida e se o detalhe contém o código
+                    if title == "Requisição inválida" and "código de solicitação: " in detail:
+                        # Procura o padrão exato de um UUID (8-4-4-4-12 caracteres hexadecimais)
+                        padrao = r"[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"                       
+                        busca = re.search(padrao, detail, re.IGNORECASE)
+                        
+                        resultado = busca.group(0) if busca else None
+                        if resultado and payment_line_id:
+                            payment_line_id.digitable_line = resultado
+                            payment_line_id.move_line_id.codigo_solicitacao = resultado
+                            continue  # Avança para o próximo boleto no loop 'for'
+                            
+                    # Se for qualquer outro erro ou não encontrar o código, dispara a exceção
+                    erro = self.generate_error_message(resposta)
+                    raise UserError(f"{erro}")
+
+                # 3. Fluxo de Sucesso
                 if payment_line_id:
-                    payment_line_id.digitable_line = resposta["codigoSolicitacao"]
-                    payment_line_id.move_line_id.codigo_solicitacao = resposta["codigoSolicitacao"]
+                    codigo_sucesso = resposta.get("codigoSolicitacao")
+                    payment_line_id.digitable_line = codigo_sucesso
+                    payment_line_id.move_line_id.codigo_solicitacao = codigo_sucesso
         return False, False
 
     def _gererate_bank_inter_api(self, move_line=None):

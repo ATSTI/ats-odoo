@@ -7,6 +7,11 @@
             <xpath expr="//page[@id='invoice_tab']//field[@name='narration']" position="after">
                 <field name="evento"/>
             </xpath>
+
+            <!-- Correção aqui: adicionado o <group> para forçar a quebra de linha correta -->
+            <xpath expr="//field[@name='invoice_date']" position="after">
+                    <field name="data_limite"/>
+            </xpath>
         </field>
     </record>
 </odoo>

@@ -7,21 +7,13 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='date_order']" position="attributes">
             </xpath>
-            <field name="commitment_date" position="replace" />
-            <field name="date_order" position="replace">
-                <field name="date_order" attrs="{'invisible': [('state', 'in', ['draft', 'sent'])]}" nolabel="1"/>
-            </field>
-            <field name="date_order" position="after">
-                <field name="commitment_date" />
-                <field name="date_sale" />
-            </field>
         </field>
     </record>
 
-    <record id="date_sale_order_tree" model="ir.ui.view">
+    <record id="date_sale_quotation_tree" model="ir.ui.view">
         <field name="name">date.order.form</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_tree" />
+        <field name="inherit_id" ref="sale.view_quotation_tree" />
         <field name="priority">99</field>
         <field name="arch" type="xml">
             <field name="create_date" position="replace">

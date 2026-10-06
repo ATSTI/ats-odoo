@@ -82,6 +82,8 @@ class CondoResidence(models.Model):
         ('apartamento', 'Apartamento')
     ], string="Tipo")
 
+    CEP = fields.Char(string="CEP")
+
     active = fields.Boolean(string="Ativo", default=True)
 
     image_1920 = fields.Image("Imagem")

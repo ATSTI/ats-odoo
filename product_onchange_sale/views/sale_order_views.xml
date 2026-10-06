@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_atualizar_fatura" model="ir.ui.view">
+        <field name="name">sale.order.form.atualizar.fatura</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_atualizar_fatura"
+                        type="object"
+                        string="Atualizar Fatura"
+                        class="btn-secondary"
+                        attrs="{'invisible': [('invoice_count', '=', 0)]}"
+                        confirm="A fatura será voltada para rascunho, atualizada com as linhas do pedido e confirmada novamente. Continuar?"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

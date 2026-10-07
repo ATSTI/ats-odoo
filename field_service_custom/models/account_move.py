@@ -143,6 +143,20 @@ class AccountMove(models.Model):
                 ]
             })
 
+    def write(self, vals):
+        for line_field in ['invoice_line_ids', 'line_ids']:
+            if line_field in vals:
+                for command in vals[line_field]:
+                    # Comando 1 é Atualização: [1, line_id, {values}]
+                    if command[0] == 1 and 'date_line' in command[2]:
+                        line_id = command[1]
+                        new_date = command[2]['date_line']
+                        self.env.cr.execute(
+                            "UPDATE account_move_line SET date_line = %s WHERE id = %s",
+                            (new_date, line_id)
+                        )
+        return super().write(vals)
+
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 

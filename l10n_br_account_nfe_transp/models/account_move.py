@@ -25,15 +25,37 @@ class AccountMove(models.Model):
         if self.nfe40_transporta and self.carrier_id:
             self.carrier_id.partner_id = self.nfe40_transporta
 
+    @api.depends('partner_id')
+    def _compute_partner_shipping_id(self):
+        super(AccountMove, self)._compute_partner_shipping_id()
+        for move in self:
+            if (
+                move.partner_id and
+                move.partner_id == move.partner_shipping_id
+            ):
+                for contact in move.partner_id.child_ids:
+                    if contact.type == "delivery":
+                        move.partner_shipping_id = contact.id
+
     @api.onchange('partner_shipping_id')
     def partner_shipping_id_onchange(self):
-        if self.partner_shipping_id and self.partner_id:
-                vals_prt = {
-                    'company_type': self.partner_id.company_type,
-                    # CORREÇÃO: Copia a Razão Social REAL, e se não tiver, usa o name como último fallback
-                    'legal_name': self.partner_id.legal_name or self.partner_id.name,
-                    'vat': self.partner_id.vat,
-                }
+        if (
+            self.partner_shipping_id and
+            self.partner_id and
+            self.partner_shipping_id != self.partner_id
+            ):
+                vals_prt = {}
+                if not self.partner_shipping_id.company_type:
+                    vals_prt['company_type'] = self.partner_id.company_type
+                if not self.partner_shipping_id.legal_name:
+                    vals_prt['legal_name'] = self.partner_id.legal_name or self.partner_id.name
+                if not self.partner_shipping_id.vat:
+                    vals_prt['vat'] = self.partner_id.vat
+                if not self.partner_shipping_id.l10n_br_ie_code:
+                    vals_prt['l10n_br_ie_code'] = self.partner_id.l10n_br_ie_code
+                if not self.partner_shipping_id.name:
+                    vals_prt['name'] = self.partner_id.name
+
                 self.partner_shipping_id.write(vals_prt)
 
 

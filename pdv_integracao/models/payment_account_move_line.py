@@ -52,11 +52,14 @@ class AccountPaymentRegister(models.TransientModel):
             baixar_tudo = 'reconcile'
 
         payment_type = 'inbound'# if move_line_id.debit else 'outbound'
+
+        if payment_type == 'inbound':
+            method = journal_id.filtered('inbound_payment_method_line_ids')
+
         payment_methods = \
-            payment_type == 'inbound' and \
-            journal_id.inbound_payment_method_ids or \
-            journal_id.outbound_payment_method_ids
-        payment_method_id = payment_methods and payment_methods[0] or False
+            payment_type == 'inbound' and method
+        #payment_method_id = payment_methods and payment_methods[0] or False
+        payment_method_id = journal_id.inbound_payment_method_line_ids[0].payment_method_id
         conta_juros = ''
         juros_desc = ''
         if juros:

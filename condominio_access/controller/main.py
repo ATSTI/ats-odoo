@@ -69,7 +69,7 @@ class AccessLogs(http.Controller):
 
             last_records[key] = timestamp
 
-            date = datetime.fromtimestamp(timestamp)
+            date = datetime.fromtimestamp(timestamp) - timedelta(hours=1)
             inicio = date - timedelta(seconds=25)
             fim = date + timedelta(seconds=25)
 

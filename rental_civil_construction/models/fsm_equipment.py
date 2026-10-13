@@ -84,7 +84,7 @@ class FSMEquipment(models.Model):
     @api.depends("child_ids")
     def _compute_count_child(self):
         for fsm in self:
-            fsm.child_count = len(fsm.child_ids)
+            fsm.child_count = len(fsm.child_ids) + 1
 
     def action_view_invoices(self):
         self.ensure_one()

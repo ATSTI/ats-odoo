@@ -1,6 +1,10 @@
+import logging
+
 from odoo import _, models
 from odoo.exceptions import UserError
 from odoo.tools import float_compare
+
+_logger = logging.getLogger(__name__)
 
 
 class SaleOrder(models.Model):
@@ -24,7 +28,6 @@ class SaleOrder(models.Model):
 
         invoice = invoices
 
-        # Mapa: linha do pedido -> linha da fatura
         inv_by_sol = {}
         for inv_line in invoice.invoice_line_ids:
             for sol in inv_line.sale_line_ids:
@@ -32,48 +35,45 @@ class SaleOrder(models.Model):
 
         commands = []
         kept_ids = set()
+        so_sequencia = True  # vira False se algo além da ordem mudar
 
         for sol in self.order_line:
             vals = self._get_valores_linha_fatura(sol)
             inv_line = inv_by_sol.get(sol.id)
 
-            if inv_line:
-                kept_ids.add(inv_line.id)
+            if not inv_line:
+                commands.append((0, 0, vals))
+                so_sequencia = False
+                continue
 
-                # Se a linha estiver igual, mantém.
-                if self._linha_fatura_confere(inv_line, vals):
-                    if inv_line.sequence != vals['sequence']:
-                        commands.append((1, inv_line.id, {
-                            'sequence': vals['sequence'],
-                        }))
-                    continue
+            kept_ids.add(inv_line.id)
+            diff = self._diferencas_linha_fatura(inv_line, vals)
 
-                # Se somente a quantidade mudou, atualiza a linha existente.
-                if self._linha_fatura_difere_apenas_quantidade(inv_line, vals):
-                    commands.append((1, inv_line.id, {
-                        'quantity': vals['quantity'],
-                        'sequence': vals['sequence'],
-                    }))
-                    continue
+            # import pudb; pudb.set_trace()
 
-                commands.append((2, inv_line.id))
-
-            commands.append((0, 0, vals))
+            if diff:
+                commands.append((1, inv_line.id, diff))
+                if set(diff) != {'sequence'}:
+                    so_sequencia = False
 
         for inv_line in invoice.invoice_line_ids:
             if inv_line.id not in kept_ids:
                 commands.append((2, inv_line.id))
+                so_sequencia = False
+
+        _logger.info("ATUALIZAR_FATURA %s | commands=%s", invoice.name, commands)
 
         if not commands:
             return self._notificacao_fatura(
-                _("Fatura já está igual ao pedido."),
+                _("[v2] Fatura já está igual ao pedido."),
                 'info',
             )
 
-        if not any(c[0] in (0, 2) for c in commands):
+        # Mudou só a ordem das linhas: grava direto, sem voltar para rascunho.
+        if so_sequencia:
             invoice.write({'invoice_line_ids': commands})
             return self._notificacao_fatura(
-                _("Ordem das linhas da fatura atualizada."),
+                _("[v2] Ordem das linhas da fatura atualizada."),
                 'success',
             )
 
@@ -88,7 +88,7 @@ class SaleOrder(models.Model):
             invoice.action_post()
 
         return self._notificacao_fatura(
-            _("Fatura %s atualizada com sucesso.") % (invoice.name or ''),
+            _("[v2] Fatura %s atualizada com sucesso.") % (invoice.name or ''),
             'success',
         )
 
@@ -99,94 +99,53 @@ class SaleOrder(models.Model):
             vals['quantity'] = sol.product_uom_qty
         return vals
 
-    def _linha_fatura_confere(self, inv_line, vals):
-        dp = self.env['decimal.precision']
-        prec_price = dp.precision_get('Product Price')
-        prec_disc = dp.precision_get('Discount')
-        prec_qty = dp.precision_get('Product Unit of Measure')
+    def _diferencas_linha_fatura(self, inv_line, vals):
+            dp = self.env['decimal.precision']
+            prec_price = dp.precision_get('Product Price')
+            prec_disc = dp.precision_get('Discount')
+            prec_qty = dp.precision_get('Product Unit of Measure')
 
-        if (inv_line.display_type or False) != (vals.get('display_type') or False):
-            return False
-        if (inv_line.name or '') != (vals.get('name') or ''):
-            return False
+            diff = {}
 
-        if vals.get('display_type'):
-            return True
+            if inv_line.sequence != vals.get('sequence', inv_line.sequence):
+                diff['sequence'] = vals['sequence']
 
-        if inv_line.product_id.id != (vals.get('product_id') or False):
-            return False
-        if inv_line.product_uom_id.id != (vals.get('product_uom_id') or False):
-            return False
-        if float_compare(inv_line.quantity, vals.get('quantity', 0.0),
-                         precision_digits=prec_qty):
-            return False
-        if float_compare(inv_line.price_unit, vals.get('price_unit', 0.0),
-                         precision_digits=prec_price):
-            return False
-        if float_compare(inv_line.discount, vals.get('discount', 0.0),
-                         precision_digits=prec_disc):
-            return False
+            if (inv_line.name or '') != (vals.get('name') or ''):
+                diff['name'] = vals.get('name') or ''
 
-        tax_ids = set()
-        for cmd in vals.get('tax_ids') or []:
-            if cmd[0] == 6:
-                tax_ids = set(cmd[2])
-        if set(inv_line.tax_ids.ids) != tax_ids:
-            return False
+            # ATENÇÃO: linha de produto vem com display_type='product' no Odoo 16.
+            if vals.get('display_type') in ('line_section', 'line_note'):
+                return diff
 
-        if (inv_line.analytic_distribution or {}) != (vals.get('analytic_distribution') or {}):
-            return False
+            if inv_line.product_id.id != (vals.get('product_id') or False):
+                diff['product_id'] = vals.get('product_id') or False
 
-        return True
+            if inv_line.product_uom_id.id != (vals.get('product_uom_id') or False):
+                diff['product_uom_id'] = vals.get('product_uom_id') or False
 
-    def _linha_fatura_difere_apenas_quantidade(self, inv_line, vals):
-        """Verifica se somente a quantidade mudou na linha da fatura."""
+            if float_compare(inv_line.quantity, vals.get('quantity', 0.0),
+                            precision_digits=prec_qty):
+                diff['quantity'] = vals.get('quantity', 0.0)
 
-        dp = self.env['decimal.precision']
-        prec_qty = dp.precision_get('Product Unit of Measure')
+            if float_compare(inv_line.price_unit, vals.get('price_unit', 0.0),
+                            precision_digits=prec_price):
+                diff['price_unit'] = vals.get('price_unit', 0.0)
 
-        if (inv_line.display_type or False) != (vals.get('display_type') or False):
-            return False
+            if float_compare(inv_line.discount, vals.get('discount', 0.0),
+                            precision_digits=prec_disc):
+                diff['discount'] = vals.get('discount', 0.0)
 
-        if (inv_line.name or '') != (vals.get('name') or ''):
-            return False
+            tax_ids = set()
+            for cmd in vals.get('tax_ids') or []:
+                if cmd[0] == 6:
+                    tax_ids = set(cmd[2])
+            if set(inv_line.tax_ids.ids) != tax_ids:
+                diff['tax_ids'] = [(6, 0, list(tax_ids))]
 
-        if vals.get('display_type'):
-            return False
+            if (inv_line.analytic_distribution or {}) != (vals.get('analytic_distribution') or {}):
+                diff['analytic_distribution'] = vals.get('analytic_distribution') or {}
 
-        if inv_line.product_id.id != (vals.get('product_id') or False):
-            return False
-
-        if inv_line.product_uom_id.id != (vals.get('product_uom_id') or False):
-            return False
-
-        if not float_compare(
-            inv_line.quantity,
-            vals.get('quantity', 0.0),
-            precision_digits=prec_qty,
-        ):
-            return False
-
-        if inv_line.price_unit != vals.get('price_unit', 0.0):
-            return False
-
-        if inv_line.discount != vals.get('discount', 0.0):
-            return False
-
-        tax_ids = set()
-        for cmd in vals.get('tax_ids') or []:
-            if cmd[0] == 6:
-                tax_ids = set(cmd[2])
-
-        if set(inv_line.tax_ids.ids) != tax_ids:
-            return False
-
-        if (inv_line.analytic_distribution or {}) != (
-            vals.get('analytic_distribution') or {}
-        ):
-            return False
-
-        return True
+            return diff
 
     def _notificacao_fatura(self, mensagem, tipo):
         return {

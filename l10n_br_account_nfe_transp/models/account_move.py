@@ -51,6 +51,7 @@ class AccountMove(models.Model):
                     vals_prt['legal_name'] = self.partner_id.legal_name or self.partner_id.name
                 if not self.partner_shipping_id.vat:
                     vals_prt['vat'] = self.partner_id.vat
+                    vals_prt['company_type'] = self.partner_id.company_type
                 if not self.partner_shipping_id.l10n_br_ie_code:
                     vals_prt['l10n_br_ie_code'] = self.partner_id.l10n_br_ie_code
                 if not self.partner_shipping_id.name:

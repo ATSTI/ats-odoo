@@ -279,7 +279,11 @@ class IntegracaoPdv(http.Controller):
         hj = hj - timedelta(days=10)
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
         cliente = http.request.env['res.partner']
-        cli_ids = cliente.sudo().search([('write_date', '>=', hj)])
+        # cli_ids = cliente.sudo().search([('write_date', '>=', hj)])
+        cli_ids = cliente.sudo().search([
+            ('write_date', '>=', hj),
+            '|', ('active', '=', True), ('active', '=', False),
+        ])
         lista = []
         for partner_id in cli_ids:
             cliente = {}
@@ -298,7 +302,7 @@ class IntegracaoPdv(http.Controller):
             #if partner_id.curso:
             #    cliente['regiao'] = partner_id.curso
             cliente['codusuario'] = 1
-            cliente['status'] = 1
+            cliente['status'] = 1 if partner_id.active else 0
             cliente['cnpj'] = ''
             if partner_id.cnpj_cpf:
                 cliente['cnpj'] = partner_id.cnpj_cpf

@@ -84,8 +84,8 @@ class SaleOrder(models.Model):
 
         invoice.write({'invoice_line_ids': commands})
 
-        if estava_postada:
-            invoice.action_post()
+        # if estava_postada:
+        #     invoice.action_post()
 
         return self._notificacao_fatura(
             _("[v2] Fatura %s atualizada com sucesso.") % (invoice.name or ''),
@@ -113,7 +113,6 @@ class SaleOrder(models.Model):
             if (inv_line.name or '') != (vals.get('name') or ''):
                 diff['name'] = vals.get('name') or ''
 
-            # ATENÇÃO: linha de produto vem com display_type='product' no Odoo 16.
             if vals.get('display_type') in ('line_section', 'line_note'):
                 return diff
 

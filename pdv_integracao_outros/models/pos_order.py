@@ -392,6 +392,49 @@ class PosSession(models.Model):
             # recalcula totais server-side (Odoo 16 nao tem compute em amount_*)
             self._recalcula_totais(ped_id)
 
+            # ---- AJUSTE: total do pedido = valor pago ----
+            # O script externo fecha o total pago; o Odoo recalcula pelas linhas
+            # e pode dar diferenca (desconto de forma de pagamento, arredondamento).
+            # Absorvemos a diferenca como desconto na ultima linha para que
+            # amount_total == amount_paid e action_pos_order_paid() funcione.
+            total_linhas = round(ped_id.amount_total, 2)
+            total_pago = round(sum(p.amount for p in ped_id.payment_ids), 2)
+            diff = round(total_linhas - total_pago, 2)
+
+            if abs(diff) >= 0.01 and ped_id.lines:
+                ultima = ped_id.lines[-1]
+                base = ultima.price_unit * ultima.qty
+                if base > 0:
+                    novo_desc = ultima.discount + (diff / base * 100.0)
+                    novo_desc = max(0.0, min(100.0, novo_desc))
+                    ultima.write({'discount': novo_desc})
+                else:
+                    pag = ped_id.payment_ids[:1]
+                    if pag:
+                        pag.write({'amount': round(pag.amount - diff, 2)})
+
+                self._recalcula_totais(ped_id)
+
+                _logger.info(
+                    "AJUSTE TOTAL pedido %s: total_linhas=%s pago=%s diff=%s "
+                    "-> total=%s pago=%s",
+                    ped_id.name, total_linhas, total_pago, diff,
+                    ped_id.amount_total, ped_id.amount_paid,
+                )
+
+            # residual de centavo: joga no primeiro pagamento
+            diff_res = round(ped_id.amount_total - ped_id.amount_paid, 2)
+            if abs(diff_res) >= 0.01:
+                pag = ped_id.payment_ids[:1]
+                if pag:
+                    pag.write({'amount': round(pag.amount + diff_res, 2)})
+                    self._recalcula_totais(ped_id)
+                _logger.warning(
+                    "AJUSTE RESIDUAL pedido %s: diff=%s total=%s pago=%s",
+                    ped_id.name, diff_res,
+                    ped_id.amount_total, ped_id.amount_paid,
+                )
+
             # conferencia
             total_odoo = round(ped_id.amount_total, 2)
             pago_odoo = round(ped_id.amount_paid, 2)

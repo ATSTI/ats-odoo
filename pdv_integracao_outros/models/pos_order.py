@@ -196,12 +196,24 @@ class PosSession(models.Model):
                 for items in list(sesd):
                     tfile.write('%s,' % items)
 
+    def _recalcula_totais(self, ped_id):
+        """Replica _onchange_amount_all para uso server-side."""
+        PosOrder = self.env['pos.order']
+        currency = ped_id.pricelist_id.currency_id
+        ped_id.amount_paid = sum(p.amount for p in ped_id.payment_ids)
+        ped_id.amount_return = sum(
+            p.amount < 0 and p.amount or 0 for p in ped_id.payment_ids)
+        ped_id.amount_tax = currency.round(
+            sum(PosOrder._amount_line_tax(line, ped_id.fiscal_position_id)
+                for line in ped_id.lines))
+        amount_untaxed = currency.round(
+            sum(line.price_subtotal for line in ped_id.lines))
+        ped_id.amount_total = ped_id.amount_tax + amount_untaxed
+
     def insere_pedido_integracao(self):
-        """ lê arquivos json recebido dos pedidos
-        verifica se o pedido ja foi incluido
-        gera um arquivo com todos os pedidos da sessao
-        pra ser enviado para o pdv evitando o envio dos 
-        arquivos que ja estao neste retorno"""
+        """Le arquivos json de pedidos e cria os pos.order.
+        O desconto vem do script externo JA em percentual (0-100) e com
+        a ultima linha fechando o total — o Odoo NAO deve recalcular."""
         path_file = self._path_file()
         path_file_return = self._path_file_return()
         arquivos = sorted(fnmatch.filter(os.listdir(path_file), "ped_*.json"))
@@ -214,29 +226,26 @@ class PosSession(models.Model):
                 continue
             num_arq += 1
 
-            f = open(path_file + '/' + i, mode="r")
-            ped = json.load(f)
+            with open(path_file + '/' + i, encoding='utf-8') as f:
+                ped = json.load(f)
+
             user = ped['user_id']
-            # chaplin so usa um usuario e no pedido vem todos
             ses_config = self.get_pos_config(user)
             if not ses_config:
-                # nao encontrou um pos_config para este usuario
                 continue
-            user_id = self.env['res.users'].search([('id', '=', user)])            
 
-            # buscar pedido ja existente deste pos_config
+            user_id = self.env['res.users'].search([('id', '=', user)])
+
             pos = self.env['pos.order']
             pedido = pos.search([
                 ('name', '=', nome_arq),
                 ('session_id.config_id', '=', ses_config.id),
             ])
             if not pedido:
-                # chaplin compativel odoo velho
                 pedido = pos.search([
                     ('pos_reference', '=', nome_arq),
                     ('session_id.config_id', '=', ses_config.id),
                 ])
-
             if pedido:
                 ses = pedido.session_id
                 os.remove(path_file + '/' + i)
@@ -254,161 +263,203 @@ class PosSession(models.Model):
                 continue
 
             _logger.info(f"Inserido PEDIDO : {nome_arq}")
-            vals = {}
-            vals['name'] = ped['name']
-            vals['session_id'] = ses.id
-            # vals['date_order'] = datetime.strftime(ped['date_order'],'%Y-%m-%d %H:%M:%S')
-            vals['date_order'] = ped['date_order'][:19]
+
+            # -------- cliente --------
             cli_n = ped['nomecliente']
-            #if vals['name'] == '23-351':
-            if ped['nomecliente'] == 'Cliente do Sistema':
+            if cli_n == 'Cliente do Sistema':
                 cli_n = 'Consumidor'
             prt = prt_obj.search([('name', '=', cli_n)], limit=1)
             if not prt:
                 prt = prt_obj.search([('name', 'ilike', cli_n)], limit=1)
             if not prt:
                 prt = prt_obj.search([('id', '=', ped['partner_id'])])
-            if prt:
-                vals['partner_id'] = prt.id
-            else:
-                #print(f"############# - Cliente nao encontrado : {ped['nomecliente']}")
+            if not prt:
                 continue
 
+            # -------- header do pedido (SEM amount_*) --------
+            vals = {
+                'name': ped['name'],
+                'session_id': ses.id,
+                'date_order': ped['date_order'][:19],
+                'partner_id': prt.id,
+                'pos_reference': ped['pos_reference'],
+                'company_id': ses.company_id.id,
+                'pricelist_id': 1,
+                # NOT NULL sem compute imediato no create: precisam ir com valor.
+                # O _compute_amount_all sobrescreve quando as lines forem criadas.
+                'amount_tax': 0.0,
+                'amount_total': 0.0,
+                'amount_paid': 0.0,
+                'amount_return': 0.0,                
+            }
             if user_id:
                 vals['user_id'] = user_id.id
             else:
                 vals['note'] = f"USER: {ped['user_id']}"
                 vals['user_id'] = ses.user_id.id
-            
-            vals['pos_reference'] = ped['pos_reference']
-            vals['amount_tax'] = ped['amount_return']
-            vals['amount_total'] = ped['amount_return']
-            vals['amount_return'] = ped['amount_return']
 
-            # Tem troca
-            troca = 0.0
-            for line_ids in ped['lines']:
-                line = line_ids[2]
-                if 'Troca' in line['name']:
-                    troca += line['price_unit'] * line['qty']
+            ped_id = pos.create(vals)
 
-            t_paid = 0.0
-            for pg_ids in ped['statement_ids']:
-                pg = pg_ids[2]
-                t_paid += pg['amount']
-            dif_pag = ped['amount_return'] - t_paid + troca
-
-            desconto = 0.0
-            if dif_pag > 0.009:
-                desconto = round(dif_pag / ped['amount_return'] * 100, 2)
-                if desconto < 0.01:
-                    desconto = 0.0
-
-            vals['amount_paid'] = t_paid
-            vals['company_id'] = ses.company_id.id
-            vals['pricelist_id'] = 1
-            try:
-                #print(f"arquivo : {i}")
-                ped_id = pos.create(vals)
-            except Error as e:
-                ses.message_post(
-                    body=_(
-                        "ERRO para inserir pedido %s, Erro %s"
-                    ) % (ped['name'], e.pgerror)
-                )               
+            # -------- linhas --------
+            # O script externo ja manda 'discount' em percentual e com a
+            # ultima linha fechando a conta. NAO recalcular.
             list_adi = []
-            
-            linhas = len(ped['lines'])
-            desc_soma = dif_pag
-            # print('Inicio : %s' %str(desc_soma))
+            troca_total = 0.0
             for line_ids in ped['lines']:
-                linhas -= 1
                 line = line_ids[2]
-                #if len(prod):
-                #    print (f"ITEM : {line.product_id.default_code}")
                 codpro = line['product_id']
-                discount = line['discount']
+
                 if isinstance(codpro, int):
                     prd = prod_obj.sudo().search([('id', '=', codpro)], limit=1)
                 else:
                     prd = prod_obj.sudo().search([('default_code', '=', codpro)], limit=1)
-                if prd.default_code != line['codpro']:
-                    prd = prod_obj.sudo().search([('default_code', '=', line['codpro'])], limit=1)
-                descricao  = line['name']
+                if prd and prd.default_code != line.get('codpro'):
+                    prd = prod_obj.sudo().search(
+                        [('default_code', '=', line['codpro'])], limit=1)
+
+                descricao = line['name']
+                if not prd and 'Troca' in descricao:
+                    prd = prod_obj.search([('default_code', '=', 'troca')])
                 if not prd:
-                    if 'Troca' in descricao:
-                        prd = prod_obj.search([('default_code', '=', 'troca')])
-                if not prd:
-                    prd = prod_obj.sudo().search([('name', 'ilike', line['name'])], limit=1)
+                    prd = prod_obj.sudo().search(
+                        [('name', 'ilike', line['name'])], limit=1)
                     if len(str(line['product_id'])) < 10 and not prd:
                         prd = prod_obj.search([('id', '=', line['product_id'])])
                     if not prd:
                         prd = prod_obj.search([('default_code', '=', '321')])
                         descricao = f"{descricao} - PRODUTO NAO LOCALIZADO"
-                sub_total = line['price_unit'] * line['qty']
-                if linhas == 0:
-                    desconto = 0.0
-                    if sub_total:
-                        desconto =  (desc_soma / sub_total) * 100
-                else:
-                    desc_soma -= sub_total * (desconto/100)
-                sub_total = sub_total - (sub_total * (desconto/100))
-                vals_item = {
-                    "name": descricao, 
-                    "product_id": prd.id, 
-                    "full_product_name" :line['name'],
-                    "qty": line['qty'],
-                    "price_unit": line['price_unit'],
-                    "discount": discount + desconto,
-                    "price_subtotal": sub_total,
-                    "price_subtotal_incl": sub_total,
 
-                }    
+                if 'Troca' in descricao:
+                    troca_total += line['price_unit'] * line['qty']
+
+                # percentual EXATO vindo do script externo (0-100)
+                perc = float(line.get('discount') or 0.0)
+                if perc < 0:
+                    perc = 0.0
+                elif perc > 100:
+                    perc = 100.0
+
+                # Calcular primeiro o preço unitário com desconto
+                price = line['price_unit'] * (1 - (perc or 0.0) / 100.0)
+                subtotal = price * line['qty']
+
+                vals_item = {
+                    'name': descricao,
+                    'product_id': prd.id,
+                    'full_product_name': line['name'],
+                    'qty': line['qty'],
+                    'price_unit': line['price_unit'],
+                    'discount': perc,
+                    # Deve ser fornecido, caso contrário viola a restrição NOT NULL
+                    'price_subtotal': subtotal,
+                    'price_subtotal_incl': subtotal,
+                }
+
+
                 list_adi.append(vals_item)
                 ped_id.write({'lines': [(0, 0, vals_item)]})
-            if troca or dif_pag:
-                tot = ped_id.amount_total + troca - dif_pag
-                ped_id.write({
-                    'amount_tax': tot,
-                    'amount_total': tot,
-                    'amount_return': tot,
-                })
-            #  aqui aba pagamento 
+
+            # -------- pagamentos --------
             metodo_pag = ''
             falha_pag = True
             for pag_ids in ped['statement_ids']:
                 pag = pag_ids[2]
-                if pag['journal'] in ('R-', 'S-','U-'):
+                if pag['journal'] in ('R-', 'S-', 'U-'):
                     continue
                 jrn = self.env['account.journal'].search([
-                        ('name', 'like', pag['journal']),
-                        ('company_id','=', ses.company_id.id)
-                    ])
+                    ('name', 'like', pag['journal']),
+                    ('company_id', '=', ses.company_id.id),
+                ])
                 if not jrn:
-                    ses.message_post(
-                        body=_(
-                            "ERRO DIARIO NAO ENCONTRADO: %s - %s"
-                        ) % (ped['name'], pag['journal'])
-                    )
+                    ses.message_post(body=_(
+                        "ERRO DIARIO NAO ENCONTRADO: %s - %s"
+                    ) % (ped['name'], pag['journal']))
                     falha_pag = False
-                    continue 
+                    continue
                 metodo_pag = self.env['pos.payment.method'].search([
                     ('name', 'ilike', jrn.name[:2]),
-                    ('company_id','=', ses.company_id.id)
+                    ('company_id', '=', ses.company_id.id),
                 ])
-                # print('Total PAGO: %s' %(str(pag['amount'])))
                 vals_pag = {
-                    "name": pag['name'],                
-                    "amount": pag['amount'],                     
-                    "payment_method_id": metodo_pag.id,
-                    "payment_date": pag['date'][:10],
-                    "session_id": ses.id,
+                    'name': pag['name'],
+                    'amount': pag['amount'],
+                    'payment_method_id': metodo_pag.id,
+                    'payment_date': pag['date'][:10],
+                    'session_id': ses.id,
                 }
                 ped_id.write({'payment_ids': [(0, 0, vals_pag)]})
+
+            # recalcula totais server-side (Odoo 16 nao tem compute em amount_*)
+            self._recalcula_totais(ped_id)
+
+            # ---- AJUSTE: total do pedido = valor pago ----
+            # O script externo fecha o total pago; o Odoo recalcula pelas linhas
+            # e pode dar diferenca (desconto de forma de pagamento, arredondamento).
+            # Absorvemos a diferenca como desconto na ultima linha para que
+            # amount_total == amount_paid e action_pos_order_paid() funcione.
+            total_linhas = round(ped_id.amount_total, 2)
+            total_pago = round(sum(p.amount for p in ped_id.payment_ids), 2)
+            diff = round(total_linhas - total_pago, 2)
+
+            if abs(diff) >= 0.01 and ped_id.lines:
+                ultima = ped_id.lines[-1]
+                base = ultima.price_unit * ultima.qty
+                if base > 0:
+                    novo_desc = ultima.discount + (diff / base * 100.0)
+                    novo_desc = max(0.0, min(100.0, novo_desc))
+                    ultima.write({'discount': novo_desc})
+                else:
+                    pag = ped_id.payment_ids[:1]
+                    if pag:
+                        pag.write({'amount': round(pag.amount - diff, 2)})
+
+                self._recalcula_totais(ped_id)
+
+                _logger.info(
+                    "AJUSTE TOTAL pedido %s: total_linhas=%s pago=%s diff=%s "
+                    "-> total=%s pago=%s",
+                    ped_id.name, total_linhas, total_pago, diff,
+                    ped_id.amount_total, ped_id.amount_paid,
+                )
+
+            # residual de centavo: joga no primeiro pagamento
+            diff_res = round(ped_id.amount_total - ped_id.amount_paid, 2)
+            if abs(diff_res) >= 0.01:
+                pag = ped_id.payment_ids[:1]
+                if pag:
+                    pag.write({'amount': round(pag.amount + diff_res, 2)})
+                    self._recalcula_totais(ped_id)
+                _logger.warning(
+                    "AJUSTE RESIDUAL pedido %s: diff=%s total=%s pago=%s",
+                    ped_id.name, diff_res,
+                    ped_id.amount_total, ped_id.amount_paid,
+                )
+
+            # conferencia
+            total_odoo = round(ped_id.amount_total, 2)
+            pago_odoo = round(ped_id.amount_paid, 2)
+            alvo = round(float(ped.get('amount_return') or 0.0), 2)
+
+            if abs(total_odoo - alvo) > 0.01:
+                _logger.warning(
+                    "DIVERGENCIA pedido %s: Odoo total=%s alvo=%s "
+                    "(bruto=%s desc_itens=%s desc_forma=%s "
+                    "| lines=%s amount_paid=%s)",
+                    ped['name'], total_odoo, alvo,
+                    ped.get('_bruto_total'),
+                    ped.get('_desc_itens_total'),
+                    ped.get('_desc_forma_total'),
+                    [(l.name[:20], l.price_unit, l.qty, l.discount,
+                      l.price_subtotal) for l in ped_id.lines],
+                    pago_odoo,
+                )
+
+            # fecha o pedido
             if metodo_pag and metodo_pag.name[:2] != '4-' and falha_pag:
-                if jrn and jrn.type in ('cash','bank'):
+                if jrn and jrn.type in ('cash', 'bank'):
                     ped_id.action_pos_order_paid()
-            # se a prazo criando a Fatura
+
+            # a prazo -> cria fatura
             if metodo_pag and metodo_pag.name[:2] == '4-':
                 ped_id.write({'to_invoice': True})
                 move_vals = ped_id._prepare_invoice_vals()
@@ -416,24 +467,26 @@ class PosSession(models.Model):
                 new_move = ped_id._create_invoice(move_vals)
                 ped_id.write({'account_move': new_move.id, 'state': 'invoiced'})
                 new_move.sudo().with_company(ped_id.company_id)._post()
+
             ped_id._create_order_picking()
+
+        # -------- arquivo de retorno da sessao --------
         if ses:
-            # crio um arquivo com todos os pedidos desta sessao
             pedido_ses = self.env['pos.order'].search([
                 ('session_id', '=', ses.id),
                 ('config_id', '=', ses.config_id.id),
             ])
             pd = []
             for px in pedido_ses:
-                px_ids = {}
-                px_ids['tipo'] = 'pedido'
-                px_ids['caixa'] = px.session_id.id
-                px_ids['order_id'] = px.id
-                px_ids['codmovimento'] = px.name
-                px_ids['user_id'] = px.user_id.id
-                pd.append(px_ids)
+                pd.append({
+                    'tipo': 'pedido',
+                    'caixa': px.session_id.id,
+                    'order_id': px.id,
+                    'codmovimento': px.name,
+                    'user_id': px.user_id.id,
+                })
             with open(path_file_return, 'w') as tfile:
-                for items in list(pd):
+                for items in pd:
                     tfile.write('%s,' % items)
 
     def insere_devolucao_integracao(self):

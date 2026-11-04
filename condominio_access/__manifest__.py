@@ -8,7 +8,7 @@
     'category': 'Services',
     'author': 'ATS Soluções',
     'maintainer': 'Otávio Andretta <otavio12257@gmail.com>',
-    'depends': ['contacts', 'base','web_widget_image_webcam', 'helpdesk_mgmt'],
+    'depends': ['account', 'contacts', 'base', 'web_widget_image_webcam', 'helpdesk_mgmt'],
     'data': [
         'views/security.xml',
         'security/ir.model.access.csv',
@@ -22,6 +22,7 @@
         'views/wizard_water_report_view.xml',
         'views/condo_visitor_view.xml',
         'views/helpdesk_ticket_view.xml',
+        'views/account_move.xml',
         'views/wizard_cancelar_visita.xml',
     ],
     'installable': True,

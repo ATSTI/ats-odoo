@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='invoice_date_due']" position="attributes">
                 <attribute name="widget"/>
+                <attribute name="attrs"/>
             </xpath>
         </field>
     </record>

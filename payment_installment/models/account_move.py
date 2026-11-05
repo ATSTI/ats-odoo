@@ -49,12 +49,17 @@ class AccountMove(models.Model):
                 key=lambda line: line.date_maturity
             )
             
-            number = move.document_number if move.document_type_id else move.name
+            #number = move.document_number if move.document_type_id else move.name
+            if hasattr(move, "document_number") and hasattr(move, "document_type_id"):
+                number = move.document_number if move.document_type_id else move.name
+            else:
+                number = move.name
+
             for idx, line in enumerate(payment_term_lines_sorted, start=1):
                 if len(payment_term_lines_sorted) > 1:
                     line.with_context(skip_invoice_sync=True).write(
                         {
-                            "payment_term_number": f"{idx}-{len(payment_term_lines_sorted)}",
+                            # "payment_term_number": f"{idx}-{len(payment_term_lines_sorted)}",
                             "name": f"{number}/{str(idx).zfill(2)}-{len(payment_term_lines_sorted)}"
                         }
                     )
@@ -129,10 +134,11 @@ class AccountMove(models.Model):
     def action_calcula_parcela(self):
         prcs = []       
         prc = 0
+        freight = self.amount_freight_value if hasattr(self, "amount_freight_value") else 0.0
         if self.rateio_frete:
             total = self.amount_total
         else:
-            total = self.amount_total - self.amount_freight_value
+            total = self.amount_total - freight
         valor_prc = 0.0
         if self.vlr_prim_prc:
             total = self.currency_id.round(total - self.vlr_prim_prc)
@@ -161,7 +167,7 @@ class AccountMove(models.Model):
                 if total > 0.0 or total < 0.0:
                     valor_parc = self.currency_id.round(valor_parc + total)
             if not self.rateio_frete and prc == 0:
-                valor_parc = valor_parc + self.amount_freight_value
+                valor_parc = valor_parc + freight
             prcs.append((0, None, {
                 'currency_id': self.currency_id.id,
                 'data_vencimento': data_parc,

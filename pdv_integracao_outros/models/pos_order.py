@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
 
-from odoo import models, fields, api, tools, _
-from datetime import datetime, date, timedelta
+from odoo import models
+import time
+from datetime import datetime, date
 import logging
 import os
 import fnmatch
@@ -112,6 +113,16 @@ class PosSession(models.Model):
             Payment = self.env['account.payment']
             pay = Payment.create(vals)
             pay.post()
+
+    def _limpar_arquivo(self, caminho_arquivo):
+        # 2 dias em segundos
+        LIMITE = 2 * 24 * 60 * 60
+        agora = time.time()
+
+        if os.path.exists(caminho_arquivo):
+            idade = agora - os.path.getmtime(caminho_arquivo)
+            if idade > LIMITE:
+                os.remove(caminho_arquivo)
    
     def get_pos_config(self, user):
         ses_conf = self.env['pos.config']
@@ -163,7 +174,7 @@ class PosSession(models.Model):
                 with open(path_file_return, 'a+') as tfile:
                     for items in list(sesd):
                         tfile.write('%s,' % items)
-                os.remove(path_file + '/' + i)
+                self._limpar_arquivo(path_file + '/' + i)
                 continue
             vals = {}
             vals["start_at"] = arq["start_at"]

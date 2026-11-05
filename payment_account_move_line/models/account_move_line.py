@@ -13,9 +13,24 @@ class AccountMoveLine(models.Model):
     # )
 
     number_nfe = fields.Char(
-        related="move_id.document_number",
+        # related="move_id.document_number",
         string="Nota Fiscal",
+        compute="_compute_number_nfe",
+        store=True,  # opcional, se quiser armazenar no banco
     )
+
+    @api.depends("move_id", "move_id.name")
+    def _compute_number_nfe(self):
+        for rec in self:
+            move = rec.move_id
+            if not move:
+                rec.number_nfe = False
+                continue
+            # Verificar se o campo document_number existe
+            if hasattr(move, "document_number"):
+                rec.number_nfe = move.document_number or move.name
+            else:
+                rec.number_nfe = move.name
 
     def action_register_payment_move_line(self):
         ''' Open the account.payment.register wizard to pay the selected journal entries.

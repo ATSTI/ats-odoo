@@ -30,7 +30,7 @@ class IntegracaoPdv(http.Controller):
         data = json.loads(request.httprequest.data)
         # TODO testar aqui se e a empresa mesmo
         hj = datetime.now()
-        hj = hj - timedelta(days=3)
+        hj = hj - timedelta(days=45)
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
         audit = http.request.env['auditlog.log'].sudo().search([
             ('create_date', '>=', hj),
@@ -276,7 +276,7 @@ class IntegracaoPdv(http.Controller):
         data = json.loads(request.httprequest.data)
         # TODO testar aqui se e a empresa mesmo
         hj = datetime.now()
-        hj = hj - timedelta(days=10)
+        hj = hj - timedelta(days=45)
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
         cliente = http.request.env['res.partner']
         # cli_ids = cliente.sudo().search([('write_date', '>=', hj)])

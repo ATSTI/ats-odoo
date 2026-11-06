@@ -11,4 +11,15 @@
             </xpath>
         </field>
     </record>
+
+    <record id="view_account_invoice_filter_inherit_ref" model="ir.ui.view">
+        <field name="name">account.invoice.filter.inherit.ref</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="ref" string="Referência da conta"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>

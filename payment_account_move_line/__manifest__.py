@@ -23,8 +23,8 @@ Funcionalidades:
     'maintainer': 'Carlos R. Silveira, Mauricio-ATS, ATSTi',
     'website': 'https://github.com/ATSTI/ats-odoo',
     'depends': [
-        'l10n_br_account',
-        'l10n_br_account_due_list',
+        'account',
+        'account_due_list',
     ],
     'data': [
         'security/ir.model.access.csv',

@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
-from odoo import models, fields, api, tools, _
-from datetime import datetime, date, timedelta
+from odoo import models
+from datetime import datetime, time
 import logging
 import os
 import fnmatch
@@ -112,6 +112,16 @@ class PosSession(models.Model):
             Payment = self.env['account.payment']
             pay = Payment.create(vals)
             pay.post()
+
+    def _limpar_arquivo(self, caminho_arquivo):
+        # 2 dias em segundos
+        LIMITE = 2 * 24 * 60 * 60
+        agora = time.time()
+
+        if os.path.exists(caminho_arquivo):
+            idade = agora - os.path.getmtime(caminho_arquivo)
+            if idade > LIMITE:
+                os.remove(caminho_arquivo)
    
     def get_pos_config(self, user):
         ses_conf = self.env['pos.config']
@@ -131,67 +141,110 @@ class PosSession(models.Model):
         num_arq = 1
         user_adic = []
         ses = self.env['pos.session']
+
         for i in arquivos:
-            f = open(path_file + '/' + i, mode="r")
-            arq = json.load(f)            
+            with open(os.path.join(path_file, i), mode="r") as f:
+                arq = json.load(f)
+
             ses_config = self.get_pos_config(arq['user_id'])
             if not ses_config:
                 # nao encontrou um pos_config para este usuario
                 continue
+
             num_arq += 1
+
             # buscar pedido ja existe
             caixa = "-%s" % (arq['caixa'])
-            #session = ses.search([('config_id', '=', ses_config.id), ('state', 'in', ('opened','closing_control'))], order='id desc', limit=3)
-            #session = ses.search([('config_id', '=', ses_config.id), ('name', 'like', caixa)], order='id desc', limit=3)
-            session = ses.search([('config_id', '=', ses_config.id), ('name', '=like', '%'+caixa)], order='id desc', limit=3)
+            session = ses.search(
+                [('config_id', '=', ses_config.id), ('name', '=like', '%' + caixa)],
+                order='id desc', limit=3,
+            )
             state = arq["state"]
+
             if session:
                 sesd = []
                 for px in session:
-                    if px.state == "opened" and state == "closed":
-                        px.action_pos_session_closing_control()
-                    if px.state == "closing_control" and state == "closed":
-                        px._validate_session()
-                    else:    
-                        px_ids = {}
-                        px_ids['tipo'] = 'sessao'
-                        px_ids['user_id'] = px.user_id.id
-                        px_ids['name'] = px.name
-                        caixa = px.name[px.name.find('-')+1:]
-                        px_ids['caixa'] = caixa
+                    try:
+                        if state != "closed":
+                            # nada a fechar; apenas reporta a sessão encontrada
+                            pass
+                        elif px.state == "opened":
+                            # 1) muda para closing_control
+                            px.action_pos_session_closing_control()
+                            # 2) se ficou em closing_control, informa o "contado"
+                            #    como o saldo teórico (diferença = 0) e valida
+                            if px.state == "closing_control":
+                                if px.cash_journal_id:
+                                    px.post_closing_cash_details(px.cash_register_balance_end)
+                                result = px.action_pos_session_validate()
+                                if isinstance(result, dict) and result.get('res_model') == 'pos.close.session.wizard':
+                                    wizard = self.env['pos.close.session.wizard'].browse(result['res_id'])
+                                    wizard.action_force_close_session()
+                        elif px.state == "closing_control":
+                            # já estava em fechamento: só informa o contado e valida
+                            if px.cash_journal_id:
+                                px.post_closing_cash_details(px.cash_register_balance_end)
+                            result = px.action_pos_session_validate()
+                            if isinstance(result, dict) and result.get('res_model') == 'pos.close.session.wizard':
+                                wizard = self.env['pos.close.session.wizard'].browse(result['res_id'])
+                                wizard.action_force_close_session()
+                        else:
+                            # estado inesperado (ex: já 'closed'): só reporta
+                            pass
+
+                        # reporta a sessão processada (independente do estado final)
+                        px_ids = {
+                            'tipo': 'sessao',
+                            'user_id': px.user_id.id,
+                            'name': px.name,
+                            'caixa': px.name[px.name.find('-') + 1:],
+                        }
                         sesd.append(px_ids)
+
+                    except Exception as e:
+                        _logger.error("Falha ao fechar sessão %s: %s", px.name, e)
+                        # segue para a próxima sessão; não aborta o loop
+
                 with open(path_file_return, 'a+') as tfile:
                     for items in list(sesd):
                         tfile.write('%s,' % items)
-                os.remove(path_file + '/' + i)
+
+                self._limpar_arquivo(os.path.join(path_file, i))
                 continue
+
+            # ---- criação de sessão nova (fluxo original) ----
             vals = {}
             vals["start_at"] = arq["start_at"]
             usuario = self.env['res.users'].browse(arq["user_id"])
             vals["user_id"] = usuario.id
+
             if usuario.id in user_adic:
                 continue
             user_adic.append(usuario.id)
+
             session_open = ses.search([('user_id', '=', usuario.id), ('state', '=', 'opened')])
             if session_open:
                 continue
+
             ses_id = []
             vals['config_id'] = ses_config.id
             ses_id = ses.create(vals)
+
             if ses_id:
                 caixa = f"{ses_id.name}{caixa}"
                 ses_id.write({"name": caixa})
                 ses_id.set_cashbox_pos(0.0, '')
-  
+
             sesd = []
             for px in ses_id:
-                px_ids = {}
-                px_ids['tipo'] = 'sessao'
-                px_ids['user_id'] = px.user_id.id
-                px_ids['name'] = px.name
-                caixa = px.name[px.name.find('-')+1:]
-                px_ids['caixa'] = caixa
+                px_ids = {
+                    'tipo': 'sessao',
+                    'user_id': px.user_id.id,
+                    'name': px.name,
+                    'caixa': px.name[px.name.find('-') + 1:],
+                }
                 sesd.append(px_ids)
+
             with open(path_file_return, 'a+') as tfile:
                 for items in list(sesd):
                     tfile.write('%s,' % items)

@@ -14,6 +14,8 @@ class FiscalDocumentLineMixin(models.AbstractModel):
     @api.depends("product_id")
     def _compute_product_fiscal_fields(self):
         for line in self:
+            if not line.fiscal_operation_id:
+                continue
             super()._compute_product_fiscal_fields()
             if not line.product_id.icms_origin or not line.product_id.fiscal_type:
                 prd_id = "product.template,{}".format(line.product_id.product_tmpl_id.id)

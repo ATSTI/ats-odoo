@@ -48,6 +48,13 @@ class AccountMove(models.Model):
             payment_term_lines_sorted = payment_term_lines.sorted(
                 key=lambda line: line.date_maturity
             )
+            
+            #number = move.document_number if move.document_type_id else move.name
+            if hasattr(move, "document_number") and hasattr(move, "document_type_id"):
+                number = move.document_number if move.document_type_id else move.name
+            else:
+                number = move.name
+
             if hasattr(move, "document_number") and hasattr(move, "document_type_id"):
                 number = move.document_number if move.document_type_id else move.name
             else:

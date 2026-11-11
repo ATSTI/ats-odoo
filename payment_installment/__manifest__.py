@@ -18,9 +18,9 @@
     'website': 'https://github.com/ATSTI/ats-odoo',
     "depends": [
         "account_payment_mode",
-        "l10n_br_account",
-        "l10n_br_account_payment_order",
-        "l10n_br_account_due_list",
+        "account",
+        "account_payment_order",
+        "account_due_list",
     ],
     "data": [
         "security/ir.model.access.csv",

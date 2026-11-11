@@ -55,10 +55,6 @@ class AccountMove(models.Model):
             else:
                 number = move.name
 
-            if hasattr(move, "document_number") and hasattr(move, "document_type_id"):
-                number = move.document_number if move.document_type_id else move.name
-            else:
-                number = move.name
             # number = move.document_number if move.document_type_id else move.name
             for idx, line in enumerate(payment_term_lines_sorted, start=1):
                 if len(payment_term_lines_sorted) > 1:

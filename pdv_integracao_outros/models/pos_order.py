@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
 
 from odoo import models
-from datetime import datetime, time
+from datetime import datetime
+import time
 import logging
 import os
 import fnmatch

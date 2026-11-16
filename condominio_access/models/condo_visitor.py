@@ -30,9 +30,10 @@ class CondoVisitor(models.Model):
 
     morador_id = fields.Many2one(
     "res.partner",
-    string="Morador",
+    string="Morador / Proprietário",
     required=True,
-    domain="[('is_morador','=',True)]")
+    domain="['|', '|', ('is_morador', '=', True), ('proprietario_residence_ids', '!=', False), ('coproprietario_residence_ids', '!=', False)]"
+)
 
     nome_rua = fields.Char("Nome da rua", related="residence_id.rua", store=True)
 
@@ -222,10 +223,19 @@ class CondoVisitor(models.Model):
     @api.depends("morador_id")
     def _compute_residence_id(self):
         Residence = self.env["condo.residence"]
+
         for rec in self:
+            if not rec.morador_id:
+                rec.residence_id = False
+                continue
+
             residence = Residence.search([
-                ("partner_ids", "in", rec.morador_id.id)
+                "|", "|",
+                ("partner_ids", "in", rec.morador_id.id),
+                ("proprietario_id", "=", rec.morador_id.id),
+                ("coproprietario_id", "=", rec.morador_id.id),
             ], limit=1)
+
             rec.residence_id = residence
 
     @api.onchange('status')

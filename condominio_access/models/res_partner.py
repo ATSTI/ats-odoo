@@ -3,6 +3,19 @@ from odoo import models, fields, api, _
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
+    
+    proprietario_residence_ids = fields.One2many(
+        "condo.residence",
+        "proprietario_id",
+        string="Residências como Proprietário"
+    )
+
+    coproprietario_residence_ids = fields.One2many(
+        "condo.residence",
+        "coproprietario_id",
+        string="Residências como Co-Proprietário"
+    )
+
     residence_id = fields.Many2one(
         'condo.residence', string='Residência'
     )

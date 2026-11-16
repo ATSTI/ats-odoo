@@ -1,0 +1,34 @@
+<odoo>
+    <template id="report_saleorder_document_company_left"
+              inherit_id="sale.report_saleorder_document"
+              name="Add Company Info Left Side">
+
+        <xpath expr="//t[@t-set='address']" position="before">
+
+            <div class="row mb-4" style="margin-top:0; padding-top:0;">
+                <div class="col-6">
+                    <t t-if="doc.company_id.logo">
+                        <img t-attf-src="data:image/png;base64,#{doc.company_id.logo}"
+                             style="max-width:160px; max-height:80px;"/>
+                    </t>
+
+                    <h3 t-esc="doc.company_id.name"/>
+                    <div>
+                        <span t-field="doc.company_id.partner_id"
+                              t-options="{'widget':'contact','fields':['address','phone','email'], 'no_marker': True}"/>
+                    </div>
+                    <t t-if="doc.company_id.cnpj_cpf">
+                        <div>
+                            <strong>CNPJ/CPF:</strong>
+                            <span t-esc="doc.company_id.cnpj_cpf"/>
+                        </div>
+                    </t>
+
+                </div>
+                <div class="col-6"></div>
+            </div>
+
+        </xpath>
+
+    </template>
+</odoo>

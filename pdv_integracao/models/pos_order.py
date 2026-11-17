@@ -314,10 +314,13 @@ class PosSession(models.Model):
                 #if len(prod):
                 #    print (f"ITEM : {line.product_id.default_code}")
                 codpro = line['product_id']
+                prd = False
                 if isinstance(codpro, int):
                     prd = prod_obj.search([('id', '=', codpro)], limit=1)
-                else:
+                if not prd:
+                    codpro = line['codpro']
                     prd = prod_obj.search([('default_code', '=', str(codpro))], limit=1)
+               
                 descricao  = line['name']
                 if not prd:
                     if 'Troca' in descricao:

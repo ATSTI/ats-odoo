@@ -188,7 +188,10 @@ class IntegracaoPdv(http.Controller):
         hj = hj - timedelta(days=10)
         hj = datetime.strftime(hj,'%Y-%m-%d %H:%M:%S')
         cliente = http.request.env['res.partner']
-        cli_ids = cliente.sudo().search([('write_date', '>=', hj)])
+        cli_ids = cliente.sudo().search([
+            ('write_date', '>=', hj),
+            '|', ('active', '=', True), ('active', '=', False),
+        ])
         lista = []
         for partner_id in cli_ids:
             cliente = {}
@@ -204,7 +207,7 @@ class IntegracaoPdv(http.Controller):
             if partner_id.curso:
                 cliente['regiao'] = partner_id.curso
             cliente['codusuario'] = 1
-            cliente['status'] = 1
+            cliente['status'] = 1 if partner_id.active else 0
             cliente['cnpj'] = ''
             if partner_id.cnpj_cpf:
                 cliente['cnpj'] = partner_id.cnpj_cpf
@@ -225,16 +228,18 @@ class IntegracaoPdv(http.Controller):
     def website_contasconsulta(self, **kwargs):
         user_id = http.request.env['res.users'].browse([request.uid])
         data = request.jsonrequest
-        cod_cliente = data['cod_cliente']
-        caixa = data['caixa']
-        aml_id = data['aml_id']
-        cod_forma = data['cod_forma']   
-        if ',' in data['valor_pago']:     
-            valor_pago = data['valor_pago'].replace(',','.')
-            juro = data['juro'].replace(',','.')
+        params = data.get('params', data) 
+        cod_cliente = params.get('cod_cliente')
+        caixa = params.get('caixa')
+        aml_id = params.get('aml_id')
+        cod_forma = params.get('cod_forma')   
+        
+        if ',' in str(params.get('valor_pago', '0')):     
+            valor_pago = params['valor_pago'].replace(',','.')
+            juro = params['juro'].replace(',','.')
         else:
-            valor_pago = data['valor_pago']
-            juro = data['juro']
+            valor_pago = str(params.get('valor_pago', '0'))
+            juro = str(params.get('juro', '0'))
         # TODO testar aqui se e a empresa mesmo
         #diarios_usados = http.request.env["ir.config_parameter"].sudo().get_param("pos.diario_contas")
         #diarios_usados = json.loads(diarios_usados)
@@ -350,7 +355,10 @@ class IntegracaoPdv(http.Controller):
         # receber todas as sangrias e reforco do caixa
         # verificar no odoo se existe       
         data = request.jsonrequest
-        lista_pdv = json.loads(data['todos'])
+        # Correção aqui também
+        params = data.get('params', data)
+        lista_pdv = json.loads(params['todos'])        
+        # lista_pdv = json.loads(data['todos'])
         caixa = lista_pdv[0]['caixa']
         sg_obj = http.request.env['account.bank.statement.line']
         

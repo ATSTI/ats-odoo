@@ -81,7 +81,7 @@ class IntegracaoPdv(http.Controller):
             for lista in lista_cnpj:
                 cnpj = lista['cnpj']
                 # cnpj = '%s.%s.%s/%s-%s' %(cnpj[:2],cnpj[2:5],cnpj[5:8],cnpj[8:12],cnpj[12:14])
-                emitente = f"{cnpj} - {lista['nome']}"
+                emitente = '%s - %s' %(cnpj, lista['nome'])
                 # verificar se cnpj ja inserido na linha
                 order_line = []
                 nao_incluido = True

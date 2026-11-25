@@ -26,7 +26,7 @@ class PosSession(models.Model):
                     self.name, amount_to_balance, account.display_name,
                 )
                 result = self.action_pos_session_closing_control(
-                    balancing_account=account.id,
+                    balancing_account=account,
                     amount_to_balance=amount_to_balance,
                 )
                 self.message_post(body=_(

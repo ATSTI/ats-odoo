@@ -1,0 +1,36 @@
+.o_lista_agrupada th[data-name="tuition_cost"],
+.o_lista_agrupada th[data-name="tuition_cost_with_discount"],
+.o_lista_agrupada th[data-name="tuition_installments"] {
+    background-color: #dbeafe !important;
+    border-bottom: 2px solid #3b82f6 !important;
+}
+
+.o_lista_agrupada td[name="tuition_cost"],
+.o_lista_agrupada td[name="tuition_cost_with_discount"],
+.o_lista_agrupada td[name="tuition_installments"] {
+    background-color: #eff6ff !important;
+}
+
+.o_lista_agrupada th[data-name="material_cost"],
+.o_lista_agrupada th[data-name="material_cost_with_discount"],
+.o_lista_agrupada th[data-name="material_installments"] {
+    background-color: #dcfce7 !important;
+    border-bottom: 2px solid #22c55e !important;
+}
+
+.o_lista_agrupada td[name="material_cost"],
+.o_lista_agrupada td[name="material_cost_with_discount"],
+.o_lista_agrupada td[name="material_installments"] {
+    background-color: #f0fdf4 !important;
+}
+
+.o_lista_agrupada th[data-name="tax_registration"],
+.o_lista_agrupada th[data-name="excempt_up_to"] {
+    background-color: #fef3c7 !important;
+    border-bottom: 2px solid #f59e0b !important;
+}
+
+.o_lista_agrupada td[name="tax_registration"],
+.o_lista_agrupada td[name="excempt_up_to"] {
+    background-color: #fffbeb !important;
+}

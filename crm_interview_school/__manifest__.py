@@ -25,6 +25,12 @@ quem visitou, ano, antiga escola, período pretendido...
         'security/ir.model.access.csv',
         'views/crm_leads.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'crm_interview_school/static/src/js/crm_kanban_form_redirect.js',
+            'crm_interview_school/static/src/scss/lista_agrupada.scss',
+        ],
+    },
     'installable': True,
     'application': False,
 }

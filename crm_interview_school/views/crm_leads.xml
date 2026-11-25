@@ -8,7 +8,7 @@
             <field name="inherit_id" ref="crm.crm_lead_view_form"/>
             <field name="arch" type="xml">
                 <!-- Título principal -->
-                <xpath expr="//div[contains(@class, 'oe_title')]" position="replace">
+                <xpath expr="//div[hasclass('oe_title')]" position="replace">
                     <div class="oe_title">
                         <span class="o_form_label">
                             Nome do responsável:
@@ -31,6 +31,11 @@
                                 widget="many2many_tags"/>
                             <field name="source_indication"
                                 string="Indicação"/>
+                            <field name="mobile"
+                                widget="phone"
+                                string="Telefone"/>
+                            <field name="city" 
+                                string="Cidade"/>
                         </group>
                         <!-- Responsável Pedagógico -->
                         <group string="Responsável Pedagógico">
@@ -71,31 +76,25 @@
                 <xpath expr="//sheet/notebook/page[@name='internal_notes']" position="before">
                     <page string="Ingressantes">
                         <field name="child_ids">
-                            <list editable="bottom">
-                                <field name="child_name"
-                                        string="Nome do Filho"/>
-                                <!-- <field name="child_age"
-                                        string="Idade"/> -->
-                                <field name="tag_ids"
-                                        string="Série/Nível"
-                                        widget="many2many_tags"/>
-                                <field name="school_period"
-                                        string="Período"
-                                        options="{'horizontal': true}"/>
-                                <field name="current_school"
-                                        string="Escola Atual"/>
-                                <field name="tuition_cost" widget="monetary" 
-                                        string="Mensalidade"/>
-                                <field name="tuition_installments"
-                                        string="Parcelas Mensalidade"/>
-                                <field name="material_cost"
-                                        string="Material"/>
-                                <field name="material_installments"
-                                        string="Parcelas Material"/>
-                                <field name="discount_acquired"
-                                        string="Desconto"/>
-                                <field name="discount_validity_date"
-                                        string="Validade Desc"/>
+                            <list editable="bottom" class="o_lista_agrupada">
+                                <field name="child_name" string="Nome do Filho"/>
+                                <field name="tag_ids" string="Série" widget="many2many_tags"/>
+                                <field name="school_period" string="Período" options="{'horizontal': true}"/>
+                                <field name="current_school" string="Escola Atual"/>
+
+                                <!-- Grupo Mensalidade -->
+                                <field name="tuition_cost" widget="monetary" string="Mensalidade"/>
+                                <field name="tuition_cost_with_discount" widget="monetary" string="Com Desconto" />
+                                <field name="tuition_installments" string="Parcelas"/>
+
+                                <!-- Grupo Material -->
+                                <field name="material_cost" widget="monetary" string="Material" />
+                                <field name="material_cost_with_discount" widget="monetary" string="Com Desconto" />
+                                <field name="material_installments" string="Parcelas"/>
+
+                                <!-- Grupo Taxa -->
+                                <field name="tax_registration" widget="monetary" string="Matrícula" />
+                                <field name="excempt_up_to" string="Isento Até" />
                             </list>
                             <form>
                                 <sheet>
@@ -115,17 +114,21 @@
                                         </group>
                                         <group string="Comercial">
                                             <field name="tuition_cost" widget="monetary" 
-                                                string="Valor da mensalidade"/>
+                                                    string="Mensalidade"/>
+                                            <field name="tuition_cost_with_discount" widget="monetary" 
+                                                    string="Mensalidade com Desconto"/>
                                             <field name="tuition_installments"
-                                                    string="Parcelas da Mensalidade"/>
+                                                    string="Parcelas Mensalidade"/>
                                             <field name="material_cost"
-                                                    string="Valor do Material"/>
+                                                    string="Material"/>
+                                            <field name="material_cost_with_discount"
+                                                    string="Material com Desconto"/>
                                             <field name="material_installments"
-                                                    string="Parcelas do Material"/>
-                                            <field name="discount_acquired"
-                                                    string="Desconto"/>
-                                            <field name="discount_validity_date"
-                                                    string="Validade Desc"/>
+                                                    string="Parcelas Material"/>
+                                            <field name="tax_registration"
+                                                    string="Taxa da Matrícula"/>
+                                            <field name="excempt_up_to"
+                                                    string="Isento Até"/>
                                         </group>
                                     </group>
                                 </sheet>
@@ -182,6 +185,18 @@
                 <xpath expr="//field[@name='recurring_plan']"
                        position="attributes">
                     <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="crm_case_kanban_view_leads_inherit" model="ir.ui.view">
+            <field name="name">crm.lead.kanban.inherit</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
+            <field name="arch" type="xml">
+                <xpath expr="//kanban" position="attributes">
+                    <attribute name="on_create"/>
+                    <attribute name="quick_create_view"/>
                 </xpath>
             </field>
         </record>

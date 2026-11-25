@@ -1,36 +1,81 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+    <record id="paperformat_etiqueta_transporte" model="report.paperformat">
+        <field name="name">Etiqueta Transporte</field>
+        <field name="format">custom</field>
+        <field name="page_height">89</field>
+        <field name="page_width">36</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">0.1</field>
+        <field name="margin_bottom">0.1</field>
+        <field name="margin_left">1</field>
+        <field name="margin_right">1</field>
+        <field name="header_line" eval="True"/>
+        <field name="header_spacing">1</field>
+        <field name="dpi">90</field>
+    </record>
+
     <template id="view_res_invoice_label">
         <t t-call="web.basic_layout">
             <t t-foreach="docs.with_context(show_address=True)" t-as="this">
-                <div t-attf-style="height: {{this.company_id.invoice_labels_height}}mm;
-                    width: {{this.company_id.invoice_labels_width}}mm;
-                    padding: {{this.company_id.invoice_labels_padding}}mm;
-                    margin-top: {{this.company_id.invoice_labels_margin_top}}mm;
-                    margin-bottom: {{this.company_id.invoice_labels_margin_bottom}}mm;
-                    margin-left: {{this.company_id.invoice_labels_margin_left}}mm;
-                    margin-right: {{this.company_id.invoice_labels_margin_right}}mm;
-                    display: inline-block;
-                    overflow: hidden;
-                    float:left;
-                    page-break-inside: avoid;">
-                    <h4 style="font-weight: bold;"  t-field="this.company_id.name" />
-                    <h4 style="font-weight: bold;" t-field="this.company_id.partner_id.cnpj_cpf" />
-                    <span style="font-weight: bold;" >EMPRESA: <h4 style="font-weight: bold;"  t-field="this.partner_id.name" /></span>
-                    <span style="font-weight: bold;" >ENDEREÇO: </span><span t-field="this.partner_id.street" />, <span t-field="this.partner_id.number" /><span t-field="this.partner_id.street2" /><br />
-                    <span style="font-weight: bold;" >BAIRRO: </span><span t-field="this.partner_id.district" /><br />
-                    <span style="font-weight: bold;" >CIDADE: </span><span t-field="this.partner_id.city_id.name"/><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]]> <span style="font-weight: bold;" >UF:</span> <span t-field="this.partner_id.state_id.code"/><br />
-                    <span style="font-weight: bold;" >TRANSPORTADORA: </span><span t-field="this.shipping_supplier_id.name"/><br />
-                    <span style="font-weight: bold;" >NOTA FISCAL: </span><span t-field="this.nfe_number_static" /><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]]><span style="font-weight: bold;" >VOLUME: </span><span t-field="this.number_of_packages"/><br />
+                <div t-attf-style="width: 87mm; height: 34.5mm; box-sizing: border-box; padding: 1mm 1.5mm; overflow: hidden; page-break-inside: avoid; page-break-after: #{'auto' if this_last else 'always'}; font-family: Arial, Helvetica, sans-serif; font-size: 10px; line-height: 15px;">
+
+                    <div style="text-align: center; font-weight: bold; font-size: 11px; line-height: 15px;">
+                        <span t-field="this.company_id.name"/>
+                    </div>
+                    <div style="text-align: center; font-weight: bold; font-size: 11px; line-height: 15px;">
+                        <span t-field="this.company_id.partner_id.cnpj_cpf"/>
+                    </div>
+
+                    <div style="white-space: nowrap;">
+                        <strong>DESTINATÁRIO: </strong>
+                        <span t-field="this.partner_id.name"/>
+                    </div>
+
+                    <div style="white-space: nowrap;">
+                        <strong>ENDEREÇO: </strong>
+                        <span t-field="this.partner_id.street"/>, <span t-field="this.partner_id.number"/> <span t-field="this.partner_id.street2"/>
+                    </div>
+
+                    <div style="white-space: nowrap;">
+                        <strong>BAIRRO: </strong>
+                        <span t-field="this.partner_id.district"/>
+                    </div>
+
+                    <div style="white-space: nowrap;">
+                        <strong>MUNICÍPIO: </strong>
+                        <span t-field="this.partner_id.city_id.name"/>
+                        <strong style="margin-left: 6mm;">UF: </strong>
+                        <span t-field="this.partner_id.state_id.code"/>
+                    </div>
+
+                    <div style="white-space: nowrap;">
+                        <strong>TRANSPORTADORA: </strong>
+                        <span t-field="this.shipping_supplier_id.name"/>
+                    </div>
+
+                    <div style="white-space: nowrap;">
+                        <strong>NOTA FISCAL: </strong>
+                        <span t-field="this.nfe_number_static"/>
+                        <strong style="margin-left: 6mm;">VOLUMES: </strong>
+                        <span t-field="this.number_of_packages"/>
+                    </div>
+
                 </div>
             </t>
         </t>
     </template>
-    <report id="report_res_invoice_label"
-        string="Etiqueta Transporte"
-        model="account.invoice"
-        name="invoice_label.view_res_invoice_label"
-        report_type="qweb-pdf"
-        paperformat="base.paperformat_euro"
-    />
+
+    <record id="report_res_invoice_label" model="ir.actions.report">
+        <field name="name">Etiqueta Transporte</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">invoice_label.view_res_invoice_label</field>
+        <field name="report_file">invoice_label.view_res_invoice_label</field>
+        <field name="paperformat_id" ref="paperformat_etiqueta_transporte"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record>
+
 </odoo>

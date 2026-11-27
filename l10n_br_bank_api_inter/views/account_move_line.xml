@@ -11,7 +11,7 @@
             ref="l10n_br_account_payment_order.cnab_view_move_line_form_inherit"
         />
         <field name="arch" type="xml">
-            <field name="payment_method_code" position="after">
+            <xpath expr="//header" position="inside">
                 <button
                     name="print_pdf_boleto"
                     type="object"
@@ -36,7 +36,7 @@
                     string="Refazer Boleto"
                     class="btn btn-info"
                 />                
-            </field>
+            </xpath>
 
             <field name="partner_bank_id" position="after">
                 <field name="bank_inter_state" string="State" />
